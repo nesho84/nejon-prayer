@@ -1,10 +1,21 @@
-import { Picker } from "@react-native-picker/picker"; // install separately
+import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, Platform, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { loadSettings, saveSettings } from "../utils/storage";
+
+// Set the notifications handler globally
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Start() {
   const router = useRouter();
@@ -14,6 +25,7 @@ export default function Start() {
   const [coords, setCoords] = useState(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
+  // Check if settings exist on first load
   useEffect(() => {
     (async () => {
       const saved = await loadSettings();
@@ -25,27 +37,52 @@ export default function Start() {
     })();
   }, []);
 
+  // Request location permission
   async function requestLocation() {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Location required", "You can skip, but prayer times will not be location-based.");
+    setLoading(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Location required",
+          "You can skip, but prayer times will not be location-based."
+        );
+        setStep(3);
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      setCoords(loc.coords);
       setStep(3);
-      return;
+    } catch (err) {
+      console.error("Location error:", err);
+      Alert.alert("Error", "Failed to get location.");
+    } finally {
+      setLoading(false);
     }
-    const loc = await Location.getCurrentPositionAsync({});
-    setCoords(loc.coords);
-    setStep(3);
   }
 
+  // Request notification permission
   async function requestNotifications() {
-    const { status } = await Notifications.requestPermissionsAsync();
-    const granted = status === "granted";
-    setNotificationsEnabled(granted);
-    finishOnboarding(granted);
+    setLoading(true);
+    try {
+      const { status } = await Notifications.requestPermissionsAsync();
+      const granted = status === "granted";
+      setNotificationsEnabled(granted);
+
+      // Pass coords directly to finishOnboarding
+      await finishOnboarding(granted, coords);
+    } catch (err) {
+      console.error("Notification error:", err);
+      Alert.alert("Error", "Failed to request notifications.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function finishOnboarding(notifications) {
-    const prefs = { language, coords, notifications };
+  // Save settings and redirect to home
+  async function finishOnboarding(notifications, userCoords) {
+    const prefs = { language, coords: userCoords, notifications };
     await saveSettings(prefs);
     router.replace("/home");
   }
@@ -59,38 +96,54 @@ export default function Start() {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
-      {step === 1 && (
-        <>
-          <Text style={{ fontSize: 20, marginBottom: 12 }}>Select Language</Text>
-          {Platform.OS === "android" ? (
-            <Picker selectedValue={language} onValueChange={setLanguage} style={{ width: 200, color: "#000" }}>
-              <Picker.Item label="English" value="en" />
-              <Picker.Item label="Arabic" value="ar" />
-              <Picker.Item label="Turkish" value="tr" />
-              <Picker.Item label="Shqip" value="sq" />
-            </Picker>
-          ) : (
-            <Button title={`Language: ${language}`} onPress={() => Alert.alert("iOS", "Implement picker for iOS")} />
-          )}
-          <Button title="Next" onPress={() => setStep(2)} />
-        </>
-      )}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
 
-      {step === 2 && (
-        <>
-          <Text style={{ fontSize: 20, marginBottom: 12 }}>Location Access</Text>
-          <Button title="Allow Location" onPress={requestLocation} />
-        </>
-      )}
+        {/* Step 1: Language */}
+        {step === 1 && (
+          <>
+            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Select Language</Text>
+            {Platform.OS === "android" ? (
+              <Picker
+                selectedValue={language}
+                onValueChange={setLanguage}
+                style={{ width: '100%', backgroundColor: '#ccc', color: '#000' }}
+              >
+                <Picker.Item label="English" value="en" />
+                <Picker.Item label="Arabic" value="ar" />
+                <Picker.Item label="Turkish" value="tr" />
+                <Picker.Item label="Shqip" value="sq" />
+              </Picker>
+            ) : (
+              <View style={{ width: '100%', marginVertical: 12 }}>
+                <Button title={`Language: ${language}`} onPress={() => Alert.alert("iOS", "Implement picker for iOS")} />
+              </View>
+            )}
+            <View style={{ width: '100%', marginVertical: 12 }}>
+              <Button title="Next" onPress={() => setStep(2)} />
+            </View>
+          </>
+        )}
 
-      {step === 3 && (
-        <>
-          <Text style={{ fontSize: 20, marginBottom: 12 }}>Notifications Access</Text>
-          <Button title="Allow Notifications" onPress={requestNotifications} />
-          <Button title="Skip" onPress={finishOnboarding} />
-        </>
-      )}
-    </View>
+        {/* Step 2: Location */}
+        {step === 2 && (
+          <>
+            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Location Access</Text>
+            <Button title="Allow Location" onPress={requestLocation} />
+          </>
+        )}
+
+        {/* Step 3: Notifications */}
+        {step === 3 && (
+          <>
+            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Notifications Access</Text>
+            <View style={{ marginBottom: 12 }}>
+              <Button title="Allow Notifications" onPress={requestNotifications} />
+            </View>
+            <Button title="Skip" color="red" onPress={() => finishOnboarding(false, coords)} />
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
