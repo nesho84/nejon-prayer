@@ -110,9 +110,8 @@ export default function Start() {
                 style={{ width: '100%', backgroundColor: '#ccc', color: '#000' }}
               >
                 <Picker.Item label="English" value="en" />
-                <Picker.Item label="Arabic" value="ar" />
-                <Picker.Item label="Turkish" value="tr" />
                 <Picker.Item label="Shqip" value="sq" />
+                <Picker.Item label="Deutsch" value="de" />
               </Picker>
             ) : (
               <View style={{ width: '100%', marginVertical: 12 }}>

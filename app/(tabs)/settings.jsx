@@ -1,14 +1,20 @@
+import { useLanguage } from "@/context/LanguageContext";
+import useTheme from "@/hooks/useTheme";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Button, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchPrayerTimes } from "../../utils/api";
 import { scheduleDailyPrayerNotifications } from "../../utils/notifications";
 import { loadSettings, saveSettings } from "../../utils/storage";
 
 export default function Settings() {
+    const { theme } = useTheme();
+    // LanguageContext
+    const { setContextLanguage, lang } = useLanguage();
+
     const [settings, setSettings] = useState({ language: "en", coords: null, notifications: false });
     const [address, setAddress] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -54,8 +60,10 @@ export default function Settings() {
         })();
     }, [settings.coords]);
 
+    // Save settings and re-schedule notifications if needed
     async function saveAndSchedule(newSettings) {
         setLoading(true);
+
         setSettings(newSettings);
         await saveSettings(newSettings);
 
@@ -75,29 +83,45 @@ export default function Settings() {
         setLoading(false);
     }
 
+    // Change language
     async function changeLanguage(value) {
-        const newSettings = { ...settings, language: value };
-        await saveAndSchedule(newSettings);
-    }
-
-    async function resetLocation() {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-
-        if (status !== "granted") {
-            Alert.alert("Location denied", "Prayer times will not be location-based.");
-            return;
+        setLoading(true);
+        try {
+            const newSettings = { ...settings, language: value };
+            setSettings(newSettings);
+            await saveSettings(newSettings);
+            // Update context
+            setContextLanguage(value);
+        } catch (error) {
+            console.error("Language change error:", err);
+            Alert.alert("Error", "Failed to language setting.");
+        } finally {
+            setLoading(false);
         }
-        const loc = await Location.getCurrentPositionAsync({});
-        const newSettings = { ...settings, coords: loc.coords };
-        await saveAndSchedule(newSettings);
-        setLoading(false);
     }
 
-    async function clearLocation() {
-        const newSettings = { ...settings, coords: null };
-        await saveAndSchedule(newSettings);
+    // Set or update location and Reschedule notifications
+    async function resetLocation() {
+        setLoading(true);
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+
+            if (status !== "granted") {
+                Alert.alert("Location denied", "Prayer times will not be location-based.");
+                return;
+            }
+            const loc = await Location.getCurrentPositionAsync({});
+            const newSettings = { ...settings, coords: loc.coords };
+            await saveAndSchedule(newSettings);
+        } catch (err) {
+            console.error("Location error:", err);
+            Alert.alert("Error", "Failed to get location.");
+        } finally {
+            setLoading(false);
+        }
     }
 
+    // Toggle notifications
     async function toggleNotifications(value) {
         setLoading(true);
         try {
@@ -123,54 +147,48 @@ export default function Settings() {
 
     if (loading) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
             <View style={{ flex: 1, padding: 16 }}>
-                <Text style={{ fontSize: 20, marginBottom: 12 }}>Language</Text>
-                <Picker
-                    selectedValue={settings.language}
-                    onValueChange={(value) => changeLanguage(value)}
-                    dropdownIconColor={'#000'}
-                    dropdownIconRippleColor={'#000'}
-                    style={{ width: '100%', backgroundColor: '#fff', color: '#000' }}
-                >
-                    <Picker.Item label="English" value="en" />
-                    <Picker.Item label="Arabic" value="ar" />
-                    <Picker.Item label="Turkish" value="tr" />
-                    <Picker.Item label="Shqip" value="sq" />
-                </Picker>
 
-                <View style={{ marginVertical: 12, backgroundColor: '#fff', padding: 8 }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12 }}>Location</Text>
+                <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
+                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang("labels.language")}</Text>
+                    <Picker
+                        selectedValue={settings.language}
+                        onValueChange={(value) => changeLanguage(value)}
+                        dropdownIconColor={theme.primaryText}
+                        dropdownIconRippleColor={theme.primaryText}
+                        style={{ width: '100%', backgroundColor: theme.background, color: theme.primaryText }}
+                    >
+                        <Picker.Item label="English" value="en" />
+                        <Picker.Item label="Shqip" value="sq" />
+                        <Picker.Item label="Deutsch" value="de" />
+                    </Picker>
+                </View>
+
+                <View style={{ borderRadius: 5, marginVertical: 12, padding: 8, backgroundColor: theme.card }}>
+                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang("labels.location")}</Text>
                     <Button
-                        title={settings.coords ? "Update Location" : "Set Location"}
+                        title={settings.coords ? lang("labels.locationButtonText1") : lang("labels.locationButtonText2")}
                         onPress={resetLocation}
                     />
 
                     {/* human-readable Address */}
                     {settings.coords && (
-                        <Text style={{ marginTop: 8, marginBottom: 16 }}>
-                            {address ? address : "Loading address..."}
+                        <Text style={{ marginVertical: 8, color: theme.primaryText }}>
+                            {address ? address : lang("labels.loading")}
                         </Text>
-                    )}
-
-                    {settings.coords && (
-                        <Button
-                            title="Clear Location"
-                            color="red"
-                            onPress={clearLocation}
-                        />
                     )}
                 </View>
 
-                <View style={{ flexDirection: "row", alignItems: "center", width: '100%', justifyContent: 'space-between', backgroundColor: '#fff', padding: 8 }}>
-                    <Text style={{ fontSize: 20, marginRight: 12 }}>Notifications</Text>
+                <View style={{ borderRadius: 5, flexDirection: "row", alignItems: "center", width: '100%', justifyContent: 'space-between', backgroundColor: theme.card, padding: 8 }}>
+                    <Text style={{ fontSize: 20, marginRight: 12, color: theme.primaryText }}>{lang("labels.notifications")}</Text>
                     <Switch
                         value={settings.notifications}
                         onValueChange={(value) => toggleNotifications(value)}
@@ -180,3 +198,7 @@ export default function Settings() {
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+
+});

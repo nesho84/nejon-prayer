@@ -1,12 +1,20 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useLanguage } from "@/context/LanguageContext";
+import useTheme from "@/hooks/useTheme";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function About() {
+    const { theme } = useTheme();
+    // LanguageContext
+    const { lang } = useLanguage();
+
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
             <View style={styles.inner}>
-                <Text style={styles.title}>About This App</Text>
-                <Text style={styles.desc}>This is a prayer times and Islamic events app.</Text>
+                <Image style={styles.logo} source={require("../../assets/images/icon.png")} />
+
+                <Text style={styles.title}>{lang("labels.aboutText1")}</Text>
+                <Text style={styles.desc}>{lang("labels.aboutText2")}</Text>
 
                 <Text style={styles.yearText}>
                     ©{(new Date()).getFullYear()} <Text style={styles.link}>nejon.net</Text>
@@ -29,19 +37,20 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     logo: {
-        marginBottom: 10,
+        marginBottom: 8,
         width: 150,
         height: 150,
     },
     title: {
-        paddingBottom: 10,
+        paddingBottom: 12,
         fontWeight: "bold",
         fontSize: 25,
         color: "#777",
     },
     desc: {
-        paddingBottom: 16,
+        paddingBottom: 26,
         fontSize: 16,
+        textAlign: "center",
         color: "#888",
     },
     yearText: {

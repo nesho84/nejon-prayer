@@ -1,17 +1,21 @@
+import { useLanguage } from "@/context/LanguageContext";
+import useTheme from "@/hooks/useTheme";
 import { scheduleDailyPrayerNotifications } from "@/utils/notifications";
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchPrayerTimes } from "../../utils/api";
-import { initLanguage, lang } from "../../utils/language";
 import { loadSettings } from "../../utils/storage";
 
 const PRAYER_ORDER = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 export default function Home() {
+    const { theme } = useTheme();
+    // LanguageContext
+    const { lang } = useLanguage();
     const isFocused = useIsFocused();
-    const [settings, setSettings] = useState(null);
+
     const [warning, setWarning] = useState(null);
     const [prayerTimes, setPrayerTimes] = useState(null);
     const [nextPrayer, setNextPrayer] = useState(null);
@@ -23,12 +27,8 @@ export default function Home() {
         let interval;
 
         (async () => {
-            // ensure translation uses saved language
-            await initLanguage();
-
             const saved = await loadSettings();
             if (!saved) return;
-            setSettings(saved);
 
             // fetch prayer times and schedule notifications (if coords exist)
             if (saved.coords) {
@@ -67,15 +67,14 @@ export default function Home() {
         (async () => {
             const saved = await loadSettings();
             if (!saved) return;
-            setSettings(saved);
 
             // set warning based on explicit boolean values
             if (!saved?.coords && !saved?.notifications) {
-                setWarning("Location and notifications are disabled. Prayer times are not location-based and no notifications will be sent.");
+                setWarning(lang("labels.warning1"));
             } else if (!saved?.coords) {
-                setWarning("Location is disabled. Prayer times are not location-based.");
+                setWarning(lang("labels.warning2"));
             } else if (!saved?.notifications) {
-                setWarning("Notifications are disabled. You won't receive prayer reminders.");
+                setWarning(lang("labels.warning3"));
             } else {
                 setWarning(null);
             }
@@ -140,7 +139,7 @@ export default function Home() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
             <View style={styles.inner}>
 
                 {/* Warnings box */}
@@ -151,11 +150,11 @@ export default function Home() {
                 )}
 
                 {/* Current date */}
-                <Text style={styles.date}>{new Date().toDateString()}</Text>
+                <Text style={{ ...styles.date, color: theme.primaryText }}>{new Date().toDateString()}</Text>
 
                 {/* Next prayer countdown */}
                 {nextPrayer && (
-                    <Text style={styles.countdown}>
+                    <Text style={{ ...styles.countdown, color: theme.secondaryText }}>
                         {countdown} » {nextPrayer ? lang(`prayers.${nextPrayer}`) : ""}
                     </Text>
                 )}
@@ -168,8 +167,8 @@ export default function Home() {
                         keyExtractor={([name]) => name}
                         renderItem={({ item: [name, time] }) => (
                             <View style={styles.row}>
-                                <Text style={styles.prayer}>{lang(`prayers.${name}`)}</Text>
-                                <Text style={styles.time}>{time}</Text>
+                                <Text style={{ ...styles.prayer, color: theme.primaryText }}>{lang(`prayers.${name}`)}</Text>
+                                <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
                             </View>
                         )}
                     />
@@ -185,7 +184,7 @@ export default function Home() {
                 </View> */}
 
             </View>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
@@ -200,7 +199,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     date: {
-        fontSize: 18,
+        fontSize: 20,
         color: "#000",
         marginTop: 100,
         marginBottom: 38,
@@ -208,7 +207,6 @@ const styles = StyleSheet.create({
     countdown: {
         fontSize: 26,
         fontWeight: "500",
-        color: "#4D3C3C",
         marginBottom: 30,
     },
     row: {
@@ -221,12 +219,10 @@ const styles = StyleSheet.create({
     },
     prayer: {
         fontSize: 18,
-        color: "#000",
     },
     time: {
         fontSize: 18,
-        fontWeight: "500",
-        color: "#000",
+        fontWeight: "700",
     },
     warningBox: {
         padding: 8,
