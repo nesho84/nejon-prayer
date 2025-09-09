@@ -7,16 +7,6 @@ import { ActivityIndicator, Alert, Button, Platform, Text, View } from "react-na
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadSettings, saveSettings } from "../utils/storage";
 
-// Set the notifications handler globally
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export default function Start() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);

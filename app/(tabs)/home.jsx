@@ -1,6 +1,6 @@
 import { useLanguage } from "@/context/LanguageContext";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTheme from "@/hooks/useTheme";
-import { scheduleDailyPrayerNotifications } from "@/utils/notifications";
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -8,13 +8,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchPrayerTimes } from "../../utils/api";
 import { loadSettings } from "../../utils/storage";
 
-const PRAYER_ORDER = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
 export default function Home() {
     const { theme } = useTheme();
     // LanguageContext
     const { lang } = useLanguage();
     const isFocused = useIsFocused();
+    const { scheduleDailyPrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
     const [warning, setWarning] = useState(null);
     const [prayerTimes, setPrayerTimes] = useState(null);
@@ -30,28 +29,24 @@ export default function Home() {
             const saved = await loadSettings();
             if (!saved) return;
 
-            // fetch prayer times and schedule notifications (if coords exist)
+            // Fetch prayer times and schedule notifications
             if (saved.coords) {
                 try {
                     const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
+                    if (!times) return;
 
-                    // Filter and keep only the prayers in the fixed order
-                    const filtered = {};
-                    PRAYER_ORDER.forEach((key) => {
-                        if (times[key]) filtered[key] = times[key];
-                    });
-                    setPrayerTimes(filtered);
+                    setPrayerTimes(times);
 
-                    // schedule notifications (util cancels old prayer notifs first)
+                    // schedule notifications if enabled
                     if (saved.notifications) {
-                        await scheduleDailyPrayerNotifications(filtered);
+                        await scheduleDailyPrayerNotifications(times);
                     }
 
                     // Set the first update immediately
-                    updateNextPrayer(filtered);
+                    updateNextPrayer(times);
 
                     // Then start interval
-                    interval = setInterval(() => updateNextPrayer(filtered), 1000);
+                    interval = setInterval(() => updateNextPrayer(times), 1000);
                 } catch (error) {
                     console.error("Failed fetching prayer times:", err);
                 }
@@ -115,9 +110,9 @@ export default function Home() {
             }
 
             if (upcoming) {
-                setNextPrayer(upcoming.name);         // update text only when prayer changes
-                setNextPrayerTime(upcoming.time);     // update state
-                upcomingTime = upcoming.time;         // use for countdown immediately
+                setNextPrayer(upcoming.name);
+                setNextPrayerTime(upcoming.time);
+                upcomingTime = upcoming.time;
             } else {
                 setNextPrayer(null);
                 setNextPrayerTime(null);
@@ -125,7 +120,6 @@ export default function Home() {
             }
         }
 
-        // Update countdown using local variable, not state
         if (upcomingTime) {
             const diff = upcomingTime - now;
             const hours = Math.floor(diff / 3600000);
@@ -133,7 +127,6 @@ export default function Home() {
             const seconds = Math.floor((diff % 60000) / 1000);
             setCountdown(`${hours}h ${minutes}m ${seconds}s`);
         } else {
-            // setCountdown("");
             setCountdown("No more prayers today");
         }
     }
@@ -176,7 +169,7 @@ export default function Home() {
                     <Text>{lang("labels.loading")}</Text>
                 )}
 
-                {/* <Button title="Log Scheduled Notifications" onPress={listScheduledNotifications} /> */}
+                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
                 {/* <View style={{ padding: 20, marginTop: 20, backgroundColor: "#fdecea", borderWidth: 1, borderColor: "#f5c2c7", borderRadius: 4 }}>
                     <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 12 }}>Testing Notifications</Text>

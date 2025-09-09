@@ -1,4 +1,5 @@
 import { useLanguage } from "@/context/LanguageContext";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTheme from "@/hooks/useTheme";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
@@ -7,13 +8,13 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchPrayerTimes } from "../../utils/api";
-import { scheduleDailyPrayerNotifications } from "../../utils/notifications";
 import { loadSettings, saveSettings } from "../../utils/storage";
 
 export default function Settings() {
     const { theme } = useTheme();
     // LanguageContext
     const { setContextLanguage, lang } = useLanguage();
+    const { scheduleDailyPrayerNotifications } = usePrayerNotifications();
 
     const [settings, setSettings] = useState({ language: "en", coords: null, notifications: false });
     const [address, setAddress] = useState(null);
@@ -48,7 +49,6 @@ export default function Settings() {
                         loc.name,         // e.g., building / house number
                         loc.postalCode,   // postal code
                         loc.city,         // city
-                        // loc.region,       // state/region
                         loc.country       // country
                     ].filter(Boolean).join(", ");
                     setAddress(fullAddress);
@@ -199,6 +199,4 @@ export default function Settings() {
     );
 }
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
