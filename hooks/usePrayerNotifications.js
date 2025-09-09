@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { Alert, Linking, Platform } from "react-native";
@@ -7,20 +8,23 @@ Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowBanner: true,
         shouldShowList: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
     }),
 });
 
 export default function usePrayerNotifications() {
+    // LanguageContext
+    const { lang } = useLanguage();
+
     // Request notification permissions
     const requestPermission = async () => {
         try {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert(
-                    "Notification Permission",
-                    "You have denied notification permission. Please enable it in your device settings to receive prayer notifications.",
+                    lang("labels.notifications"),
+                    lang("labels.warning3"),
                     [
                         {
                             text: "OK",
@@ -61,9 +65,8 @@ export default function usePrayerNotifications() {
                 }
             }
 
-            const now = new Date();
-
             // Already filtered & ordered in api.js
+            const now = new Date();
             for (const [name, timeString] of Object.entries(times)) {
                 const [hourStr, minuteStr] = timeString.split(":");
                 const hour = parseInt(hourStr, 10);
@@ -77,8 +80,8 @@ export default function usePrayerNotifications() {
 
                 await Notifications.scheduleNotificationAsync({
                     content: {
-                        title: `Prayer time: ${name}`,
-                        body: `${name} is at ${timeString}`,
+                        title: `${lang("labels.alertTitle")} ${name} ${timeString}`,
+                        body: `${lang("labels.alertBody")}`,
                         data: { type: "prayer", prayer: name },
                         sound: true,
                         android: { channelId: "default" },
@@ -114,17 +117,12 @@ export default function usePrayerNotifications() {
     // Debug utility: send a test notification in 5 seconds
     const sendTestNotification = async () => {
         try {
-            if (Platform.OS === "android") {
-                await Notifications.setNotificationChannelAsync("default", {
-                    name: "default",
-                    importance: Notifications.AndroidImportance.MAX,
-                });
-            }
+            await setNotificationChannel();
 
             await Notifications.scheduleNotificationAsync({
                 content: {
-                    title: "Test Prayer Notification",
-                    body: "This is a test notification. Everything works!",
+                    title: `(Test) ${lang("labels.alertTitle")} Fajr 5:32`,
+                    body: `${lang("labels.alertBody")}`,
                     sound: true,
                     android: { channelId: "default" },
                     data: { type: "test" },

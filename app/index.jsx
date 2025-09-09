@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -9,6 +10,9 @@ import { loadSettings, saveSettings } from "../utils/storage";
 
 export default function Start() {
   const router = useRouter();
+  // LanguageContext
+  const { setContextLanguage, lang } = useLanguage();
+
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
   const [language, setLanguage] = useState("en");
@@ -26,6 +30,21 @@ export default function Start() {
       }
     })();
   }, []);
+
+  // Change language
+  async function changeLanguage(value) {
+    setLoading(true);
+    try {
+      setLanguage(value);
+      // Update context
+      setContextLanguage(value);
+    } catch (error) {
+      console.error("Language change error:", err);
+      Alert.alert("Error", "Failed to language setting.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   // Request location permission
   async function requestLocation() {
@@ -92,12 +111,12 @@ export default function Start() {
         {/* Step 1: Language */}
         {step === 1 && (
           <>
-            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Select Language</Text>
+            <Text style={{ color: "#a78d8dff", fontSize: 20, marginBottom: 12 }}>Select Language</Text>
             {Platform.OS === "android" ? (
               <Picker
                 selectedValue={language}
-                onValueChange={setLanguage}
-                style={{ width: '100%', backgroundColor: '#ccc', color: '#000' }}
+                onValueChange={(value) => changeLanguage(value)}
+                style={{ width: '100%', backgroundColor: '#cccccc', color: '#000' }}
               >
                 <Picker.Item label="English" value="en" />
                 <Picker.Item label="Shqip" value="sq" />
@@ -117,7 +136,7 @@ export default function Start() {
         {/* Step 2: Location */}
         {step === 2 && (
           <>
-            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Location Access</Text>
+            <Text style={{ color: "#a78d8dff", fontSize: 20, marginBottom: 12 }}>Location Access</Text>
             <Button title="Allow Location" onPress={requestLocation} />
           </>
         )}
@@ -125,7 +144,7 @@ export default function Start() {
         {/* Step 3: Notifications */}
         {step === 3 && (
           <>
-            <Text style={{ color: "#f0f0f0", fontSize: 20, marginBottom: 12 }}>Notifications Access</Text>
+            <Text style={{ color: "#a78d8dff", fontSize: 20, marginBottom: 12 }}>Notifications Access</Text>
             <View style={{ marginBottom: 12 }}>
               <Button title="Allow Notifications" onPress={requestNotifications} />
             </View>

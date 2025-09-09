@@ -45,11 +45,11 @@ export default function Settings() {
                 if (loc) {
                     // Build a full readable address
                     const fullAddress = [
-                        loc.street,       // street name
-                        loc.name,         // e.g., building / house number
-                        loc.postalCode,   // postal code
-                        loc.city,         // city
-                        loc.country       // country
+                        loc.street,
+                        loc.name,
+                        loc.postalCode,
+                        loc.city,
+                        loc.country
                     ].filter(Boolean).join(", ");
                     setAddress(fullAddress);
                 }

@@ -2,17 +2,19 @@ import { useLanguage } from "@/context/LanguageContext";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTheme from "@/hooks/useTheme";
 import { useIsFocused } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchPrayerTimes } from "../../utils/api";
 import { loadSettings } from "../../utils/storage";
+
 
 export default function Home() {
     const { theme } = useTheme();
     // LanguageContext
     const { lang } = useLanguage();
     const isFocused = useIsFocused();
+    const intervalRef = useRef(null);
     const { scheduleDailyPrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
     const [warning, setWarning] = useState(null);
@@ -20,44 +22,49 @@ export default function Home() {
     const [nextPrayer, setNextPrayer] = useState(null);
     const [nextPrayerTime, setNextPrayerTime] = useState(null);
     const [countdown, setCountdown] = useState("");
+    const [fetchError, setFetchError] = useState(false);
 
     // On mount: load settings, fetch prayer times, schedule notifications, start interval to update next prayer
     useEffect(() => {
-        let interval;
+        // fetch once immediately
+        loadPrayerTimes();
 
-        (async () => {
-            const saved = await loadSettings();
-            if (!saved) return;
+        const interval = setInterval(() => {
+            if (intervalRef.current) updateNextPrayer(intervalRef.current);
+        }, 1000);
 
-            // Fetch prayer times and schedule notifications
-            if (saved.coords) {
-                try {
-                    const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
-                    if (!times) return;
-
-                    setPrayerTimes(times);
-
-                    // schedule notifications if enabled
-                    if (saved.notifications) {
-                        await scheduleDailyPrayerNotifications(times);
-                    }
-
-                    // Set the first update immediately
-                    updateNextPrayer(times);
-
-                    // Then start interval
-                    interval = setInterval(() => updateNextPrayer(times), 1000);
-                } catch (error) {
-                    console.error("Failed fetching prayer times:", err);
-                }
-            }
-        })();
-
-        // cleanup on unmount
         return () => clearInterval(interval);
     }, []);
 
-    // On focus: reload settings to update warnings
+    // Load prayer times
+    const loadPrayerTimes = async () => {
+        setFetchError(false);
+
+        const saved = await loadSettings();
+        if (!saved || !saved.coords) return;
+
+        try {
+            const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
+            if (!times) {
+                console.log("Failed to fetch prayer times or no data returned");
+
+                setFetchError(true);
+                return;
+            }
+
+            setPrayerTimes(times);
+            intervalRef.current = times;
+
+            if (saved.notifications) await scheduleDailyPrayerNotifications(times);
+
+            updateNextPrayer(times);
+        } catch (err) {
+            console.error("Failed fetching prayer times:", err);
+            setFetchError(true);
+        }
+    };
+
+    // On Screen focus: reload settings to update warnings
     useEffect(() => {
         (async () => {
             const saved = await loadSettings();
@@ -108,7 +115,6 @@ export default function Home() {
                     upcoming = { name: "Fajr", time: tomorrowFajr };
                 }
             }
-
             if (upcoming) {
                 setNextPrayer(upcoming.name);
                 setNextPrayerTime(upcoming.time);
@@ -119,7 +125,6 @@ export default function Home() {
                 upcomingTime = null;
             }
         }
-
         if (upcomingTime) {
             const diff = upcomingTime - now;
             const hours = Math.floor(diff / 3600000);
@@ -153,28 +158,36 @@ export default function Home() {
                 )}
 
                 {/* Prayer times list */}
-                {prayerTimes ? (
+                {fetchError ? (
+                    <View style={{ marginTop: 20, alignItems: "center" }}>
+                        <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: "center", marginBottom: 16 }}>
+                            {lang("labels.noPrayerTimes")}
+                        </Text>
+                        <Button title={lang("labels.retryFetch")} onPress={loadPrayerTimes} />
+                    </View>
+                ) : prayerTimes ? (
                     <FlatList
                         contentContainerStyle={{ padding: 20 }}
                         data={Object.entries(prayerTimes)}
                         keyExtractor={([name]) => name}
                         renderItem={({ item: [name, time] }) => (
                             <View style={styles.row}>
-                                <Text style={{ ...styles.prayer, color: theme.primaryText }}>{lang(`prayers.${name}`)}</Text>
+                                <Text style={{ ...styles.prayer, color: theme.primaryText }}>
+                                    {lang(`prayers.${name}`)}
+                                </Text>
                                 <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
                             </View>
                         )}
                     />
                 ) : (
-                    <Text>{lang("labels.loading")}</Text>
+                    <Text style={{ color: theme.primaryText, fontSize: 16, marginTop: 20 }}>
+                        {lang("labels.loading")}
+                    </Text>
                 )}
 
                 {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
-                {/* <View style={{ padding: 20, marginTop: 20, backgroundColor: "#fdecea", borderWidth: 1, borderColor: "#f5c2c7", borderRadius: 4 }}>
-                    <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 12 }}>Testing Notifications</Text>
-                    <Button title="Send Test Notification" onPress={sendTestNotification} />
-                </View> */}
+                <Button title="Send Test Notification" onPress={sendTestNotification} />
 
             </View>
         </SafeAreaView >
