@@ -187,7 +187,7 @@ export default function Home() {
 
                 {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
-                <Button title="Send Test Notification" onPress={sendTestNotification} />
+                {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
 
             </View>
         </SafeAreaView >

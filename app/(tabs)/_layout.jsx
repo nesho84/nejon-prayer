@@ -18,7 +18,9 @@ export default function TabLayout() {
                     tabBarInactiveTintColor: theme.secondaryText,
                     tabBarStyle: {
                         backgroundColor: theme.tabs,
-                        borderTopColor: theme.border,
+                        // borderTopColor: theme.border,
+                        // borderTopWidth: 0,
+                        bottom: "0.6%",
                     },
                 }}
             >
