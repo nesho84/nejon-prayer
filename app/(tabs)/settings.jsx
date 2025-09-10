@@ -15,7 +15,7 @@ export default function Settings() {
     const { theme, currentTheme, setContextTheme } = useTheme();
     // LanguageContext
     const { lang, currentLang, setContextLanguage } = useLanguage();
-    const { scheduleDailyPrayerNotifications } = usePrayerNotifications();
+    const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     const [loading, setLoading] = useState(true);
     const [settings, setSettings] = useState({ language: "en", coords: null, notifications: false });
@@ -63,7 +63,7 @@ export default function Settings() {
     }, [settings.coords]);
 
     // Save settings and re-schedule notifications
-    async function saveAndSchedule(newSettings) {
+    async function updateAndSchedule(newSettings) {
         setLoading(true);
         try {
             setSettings(newSettings);
@@ -72,31 +72,10 @@ export default function Settings() {
             // If notifications and location enabled, re-schedule notifications
             if (newSettings.notifications && newSettings.coords) {
                 const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
-                if (!times) {
-                    console.log("Failed to fetch prayer times or no data returned");
-                    return;
-                }
-                await scheduleDailyPrayerNotifications(times);
+                if (times) await schedulePrayerNotifications(times, lang);
             }
         } catch (error) {
             console.error("❌ Failed to save and schedule prayer notifications", err);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Change language
-    async function changeLanguage(value) {
-        setLoading(true);
-        try {
-            const newSettings = { ...settings, language: value };
-            setSettings(newSettings);
-            await saveSettings(newSettings);
-            // Update context
-            setContextLanguage(value);
-        } catch (error) {
-            console.error("Language change error:", err);
-            Alert.alert("Error", "Failed to update language setting.");
         } finally {
             setLoading(false);
         }
@@ -119,19 +98,42 @@ export default function Settings() {
         }
     }
 
+    // Change language
+    async function changeLanguage(value) {
+        setLoading(true);
+        try {
+            // Update context
+            setContextLanguage(value);
+
+            const newSettings = { ...settings, language: value };
+            // Update settings and reschedule notifications if enabled
+            await updateAndSchedule(newSettings);
+        } catch (error) {
+            console.error("Language change error:", err);
+            Alert.alert("Error", "Failed to update language setting.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
     // Set or update location and Reschedule notifications
     async function resetLocation() {
         setLoading(true);
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
-
             if (status !== "granted") {
                 Alert.alert("Location denied", "Prayer times will not be location-based.");
                 return;
             }
-            const loc = await Location.getCurrentPositionAsync({});
+
+            // Get current position with high accuracy
+            const loc = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Highest,
+            });
+
             const newSettings = { ...settings, coords: loc.coords };
-            await saveAndSchedule(newSettings);
+            // Update settings and reschedule notifications if enabled
+            await updateAndSchedule(newSettings);
         } catch (err) {
             console.error("Location error:", err);
             Alert.alert("Error", "Failed to get location.");
@@ -144,18 +146,43 @@ export default function Settings() {
     async function toggleNotifications(value) {
         setLoading(true);
         try {
+            let finalValue = value;
+
             if (value) {
-                // User wants to enable notifications → check/request permission
-                const { status } = await Notifications.requestPermissionsAsync();
+                // 1️⃣ Check current status
+                const { status } = await Notifications.getPermissionsAsync();
+
                 if (status !== "granted") {
-                    Alert.alert("Notifications denied", "You won't receive prayer reminders.");
-                    value = false; // force disable in settings
+                    // 2️⃣ Request permission (shows modal only first time)
+                    const { status: newStatus } = await Notifications.requestPermissionsAsync();
+                    if (newStatus !== "granted") {
+                        // 3️⃣ Denied → open system settings
+                        Alert.alert(
+                            "Notifications Disabled",
+                            "To receive prayer reminders, please enable notifications in system settings.",
+                            [
+                                { text: "Cancel", style: "cancel" },
+                                { text: "Open Settings", onPress: () => Linking.openSettings() },
+                            ]
+                        );
+                        finalValue = false; // force disable
+                    }
                 }
+                // 4️⃣ If granted and location available, schedule notifications
+                if (finalValue && settings.coords) {
+                    const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
+                    if (times) await schedulePrayerNotifications(times, lang);
+                }
+            } else {
+                // User turned off notifications → cancel all scheduled prayer notifications
+                await cancelPrayerNotifications();
             }
-            // Save the actual state (granted or false)
-            const newSettings = { ...settings, notifications: value };
+
+            // 5️⃣ Save settings
+            const newSettings = { ...settings, notifications: finalValue };
             await saveSettings(newSettings);
             setSettings(newSettings);
+
         } catch (err) {
             console.error("Notification toggle error:", err);
             Alert.alert("Error", "Failed to update notifications setting.");

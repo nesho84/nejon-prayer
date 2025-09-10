@@ -16,7 +16,7 @@ export default function Home() {
     const { lang } = useLanguage();
     const isFocused = useIsFocused();
     const intervalRef = useRef(null);
-    const { scheduleDailyPrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
+    const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
     const [warning, setWarning] = useState(null);
     const [prayerTimes, setPrayerTimes] = useState(null);
@@ -42,20 +42,14 @@ export default function Home() {
         setFetchError(false);
 
         const saved = await loadSettings();
-        if (!saved || !saved.coords) return;
+        if (!saved) return;
 
         try {
             const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
-            if (!times) {
-                console.log("Failed to fetch prayer times or no data returned");
-                setFetchError(true);
-                return;
-            }
+            if (times) await schedulePrayerNotifications(times, lang);
 
             setPrayerTimes(times);
             intervalRef.current = times;
-
-            if (saved.notifications) await scheduleDailyPrayerNotifications(times);
 
             updateNextPrayer(times);
         } catch (err) {
@@ -187,7 +181,7 @@ export default function Home() {
 
                 {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
-                {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
+                {/* <Button title="Send Test Notification" onPress={() => sendTestNotification(lang)} /> */}
 
             </View>
         </SafeAreaView >

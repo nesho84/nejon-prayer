@@ -1,4 +1,3 @@
-import { useLanguage } from "@/context/LanguageContext";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { Alert, Linking, Platform } from "react-native";
@@ -14,9 +13,6 @@ Notifications.setNotificationHandler({
 });
 
 export default function usePrayerNotifications() {
-    // LanguageContext
-    const { lang } = useLanguage();
-
     // Request notification permissions
     const requestPermission = async () => {
         try {
@@ -52,22 +48,18 @@ export default function usePrayerNotifications() {
     };
 
     // Schedule today's Prayer notifications
-    const scheduleDailyPrayerNotifications = async (times) => {
+    const schedulePrayerNotifications = async (times, lang) => {
         try {
             await requestPermission();
+
+            // Clear existing prayer notifications first
+            await cancelPrayerNotifications();
+
             await setNotificationChannel();
 
-            // Cancel existing prayer notifications
-            const all = await Notifications.getAllScheduledNotificationsAsync();
-            for (const item of all) {
-                if (item.content?.data?.type === "prayer") {
-                    await Notifications.cancelScheduledNotificationAsync(item.identifier);
-                }
-            }
-
+            // Schedule notifications for each prayer time
             const now = new Date();
             const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
             for (const name of PRAYER_ORDER) {
                 const timeString = times[name]; // e.g. "05:32"
                 if (!timeString) continue;
@@ -84,7 +76,7 @@ export default function usePrayerNotifications() {
 
                 await Notifications.scheduleNotificationAsync({
                     content: {
-                        title: `${lang("labels.alertTitle")} ${name} ${timeString}`,
+                        title: `${lang("labels.alertTitle")} ${lang(`prayers.${name}`)} ${timeString}`,
                         body: `${lang("labels.alertBody")}`,
                         data: { type: "prayer", prayer: name },
                         sound: true,
@@ -98,7 +90,22 @@ export default function usePrayerNotifications() {
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications", err);
         }
+    }
 
+    // Cancel existing prayer notifications
+    const cancelPrayerNotifications = async () => {
+        try {
+            const all = await Notifications.getAllScheduledNotificationsAsync();
+            for (const item of all) {
+                if (item.content?.data?.type === "prayer") {
+                    await Notifications.cancelScheduledNotificationAsync(item.identifier);
+                }
+            }
+
+            console.log("✅ All existing prayer notifications cancelled");
+        } catch (err) {
+            console.error("❌ Failed to cancel prayer notifications", err);
+        }
     }
 
     // Debug utility: list/log all scheduled notifications
@@ -119,7 +126,7 @@ export default function usePrayerNotifications() {
     }
 
     // Debug utility: send a test notification in 5 seconds
-    const sendTestNotification = async () => {
+    const sendTestNotification = async (lang) => {
         try {
             await setNotificationChannel();
 
@@ -161,7 +168,8 @@ export default function usePrayerNotifications() {
     }, []);
 
     return {
-        scheduleDailyPrayerNotifications,
+        schedulePrayerNotifications,
+        cancelPrayerNotifications,
         sendTestNotification,
         logScheduledNotifications,
     };

@@ -15,7 +15,7 @@ export function LanguageProvider({ children }) {
                 setCurrentLang(saved.language);
             }
         })();
-    }, []);
+    }, [currentLang]);
 
     const setContextLanguage = async (value) => {
         // just update context, screens handle saving in storage

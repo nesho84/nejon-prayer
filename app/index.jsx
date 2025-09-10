@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Appearance, Button, Platform, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Button, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Start() {
@@ -34,12 +34,12 @@ export default function Start() {
   async function changeLanguage(value) {
     setLoading(true);
     try {
-      setLanguage(value);
       // Update context
       setContextLanguage(value);
+      setLanguage(value);
     } catch (error) {
       console.error("Language change error:", err);
-      Alert.alert("Error", "Failed to language setting.");
+      Alert.alert("Error", "Failed to save language setting.");
     } finally {
       setLoading(false);
     }
@@ -59,12 +59,16 @@ export default function Start() {
         return;
       }
 
-      const loc = await Location.getCurrentPositionAsync({});
+      // Get current position with high accuracy
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+      });
+
       setCoords(loc.coords);
       setStep(3);
     } catch (err) {
       console.error("Location error:", err);
-      Alert.alert("Error", "Failed to get location.");
+      Alert.alert("Error", "Failed to get location. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -81,16 +85,16 @@ export default function Start() {
       await finishOnboarding(notificationsStatus);
     } catch (err) {
       console.error("Notification error:", err);
-      Alert.alert("Error", "Failed to request notifications.");
+      Alert.alert("Error", "Failed to request notifications. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Save settings and redirect to home
+  // (Finish) Save settings and redirect to home
   async function finishOnboarding(notificationsStatus) {
     const prefs = {
-      theme: Appearance.getColorScheme() || "light",
+      theme: "system",
       language,
       coords,
       notifications: notificationsStatus,
@@ -103,6 +107,7 @@ export default function Start() {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 12 }}>Please Wait</Text>
       </View>
     );
   }
