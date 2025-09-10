@@ -1,9 +1,10 @@
 import { useLanguage } from "@/context/LanguageContext";
-import useTheme from "@/hooks/useTheme";
+import { useTheme } from "@/context/ThemeContext";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function About() {
+    // ThemeContext
     const { theme } = useTheme();
     // LanguageContext
     const { lang } = useLanguage();

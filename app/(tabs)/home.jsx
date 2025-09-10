@@ -1,8 +1,8 @@
 import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 import { fetchPrayerTimes } from "@/hooks/api";
 import { loadSettings } from "@/hooks/storage";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import useTheme from "@/hooks/useTheme";
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, View } from "react-native";
@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function Home() {
+    // ThemeContext
     const { theme } = useTheme();
     // LanguageContext
     const { lang } = useLanguage();
@@ -27,7 +28,7 @@ export default function Home() {
     // On mount: load settings, fetch prayer times, schedule notifications, start interval to update next prayer
     useEffect(() => {
         // fetch once immediately
-        loadPrayerTimes();
+        loadPrayerTimesAndSchedule();
 
         const interval = setInterval(() => {
             if (intervalRef.current) updateNextPrayer(intervalRef.current);
@@ -37,7 +38,7 @@ export default function Home() {
     }, []);
 
     // Load prayer times
-    const loadPrayerTimes = async () => {
+    const loadPrayerTimesAndSchedule = async () => {
         setFetchError(false);
 
         const saved = await loadSettings();
@@ -47,7 +48,6 @@ export default function Home() {
             const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
             if (!times) {
                 console.log("Failed to fetch prayer times or no data returned");
-
                 setFetchError(true);
                 return;
             }
@@ -163,7 +163,7 @@ export default function Home() {
                         <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: "center", marginBottom: 16 }}>
                             {lang("labels.noPrayerTimes")}
                         </Text>
-                        <Button title={lang("labels.retryFetch")} onPress={loadPrayerTimes} />
+                        <Button title={lang("labels.retryFetch")} onPress={loadPrayerTimesAndSchedule} />
                     </View>
                 ) : prayerTimes ? (
                     <FlatList

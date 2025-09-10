@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, Platform, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Appearance, Button, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Start() {
@@ -17,7 +17,6 @@ export default function Start() {
   const [step, setStep] = useState(1);
   const [language, setLanguage] = useState("en");
   const [coords, setCoords] = useState(null);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   // Check if settings exist on first load
   useEffect(() => {
@@ -31,7 +30,7 @@ export default function Start() {
     })();
   }, []);
 
-  // Change language
+  // (Step 1) Change language
   async function changeLanguage(value) {
     setLoading(true);
     try {
@@ -46,7 +45,7 @@ export default function Start() {
     }
   }
 
-  // Request location permission
+  // (Step 2) Request location permission
   async function requestLocation() {
     setLoading(true);
     try {
@@ -71,16 +70,15 @@ export default function Start() {
     }
   }
 
-  // Request notification permission
+  // (Step 3) Request notification permission
   async function requestNotifications() {
     setLoading(true);
     try {
       const { status } = await Notifications.requestPermissionsAsync();
-      const granted = status === "granted";
-      setNotificationsEnabled(granted);
+      const notificationsStatus = status === "granted";;
 
-      // Pass coords directly to finishOnboarding
-      await finishOnboarding(granted, coords);
+      // Finish Onboarding (last step)
+      await finishOnboarding(notificationsStatus);
     } catch (err) {
       console.error("Notification error:", err);
       Alert.alert("Error", "Failed to request notifications.");
@@ -90,8 +88,13 @@ export default function Start() {
   }
 
   // Save settings and redirect to home
-  async function finishOnboarding(notifications, userCoords) {
-    const prefs = { language, coords: userCoords, notifications };
+  async function finishOnboarding(notificationsStatus) {
+    const prefs = {
+      theme: Appearance.getColorScheme() || "light",
+      language,
+      coords,
+      notifications: notificationsStatus,
+    };
     await saveSettings(prefs);
     router.replace("/home");
   }
@@ -116,6 +119,8 @@ export default function Start() {
               <Picker
                 selectedValue={language}
                 onValueChange={(value) => changeLanguage(value)}
+                dropdownIconColor={'#000'}
+                dropdownIconRippleColor={'#000'}
                 style={{ width: '100%', backgroundColor: '#cccccc', color: '#000' }}
               >
                 <Picker.Item label="English" value="en" />

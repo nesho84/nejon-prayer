@@ -1,10 +1,11 @@
 import { useLanguage } from "@/context/LanguageContext";
-import useTheme from "@/hooks/useTheme";
+import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 export default function TabLayout() {
+    // ThemeContext
     const { theme } = useTheme();
     // LanguageContext
     const { lang } = useLanguage();
