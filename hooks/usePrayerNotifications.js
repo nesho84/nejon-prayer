@@ -14,7 +14,7 @@ Notifications.setNotificationHandler({
 
 export default function usePrayerNotifications() {
     // Request notification permissions
-    const requestPermission = async () => {
+    const requestPermission = async (lang) => {
         try {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status !== "granted") {
@@ -50,7 +50,7 @@ export default function usePrayerNotifications() {
     // Schedule today's Prayer notifications
     const schedulePrayerNotifications = async (times, lang) => {
         try {
-            await requestPermission();
+            await requestPermission(lang);
 
             // Clear existing prayer notifications first
             await cancelPrayerNotifications();
