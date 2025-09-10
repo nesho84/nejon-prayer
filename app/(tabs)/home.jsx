@@ -1,12 +1,12 @@
 import { useLanguage } from "@/context/LanguageContext";
+import { fetchPrayerTimes } from "@/hooks/api";
+import { loadSettings } from "@/hooks/storage";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTheme from "@/hooks/useTheme";
 import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchPrayerTimes } from "../../utils/api";
-import { loadSettings } from "../../utils/storage";
 
 
 export default function Home() {

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loadSettings } from "../utils/storage";
+import { loadSettings } from "../hooks/storage";
 
 const translations = {
     en: {
@@ -61,7 +61,7 @@ const translations = {
             warning2: "Lokacioni është i çaktivizuar. Kohët e lutjeve nuk bazohen në lokacion.",
             warning3: "Njoftimet janë të çaktivizuara. Nuk do të merrni kujtesa për kohët e lutjeve.",
             aboutText1: "Rreth Këtij Aplikacioni",
-            aboutText2: "Kjo aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t'ju kujtuar kohët e lutjeve.",
+            aboutText2: "Ky aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t'ju kujtuar kohët e lutjeve.",
         },
     },
     de: {

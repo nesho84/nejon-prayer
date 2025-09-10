@@ -65,9 +65,13 @@ export default function usePrayerNotifications() {
                 }
             }
 
-            // Already filtered & ordered in api.js
             const now = new Date();
-            for (const [name, timeString] of Object.entries(times)) {
+            const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+            for (const name of PRAYER_ORDER) {
+                const timeString = times[name]; // e.g. "05:32"
+                if (!timeString) continue;
+
                 const [hourStr, minuteStr] = timeString.split(":");
                 const hour = parseInt(hourStr, 10);
                 const minute = parseInt(minuteStr, 10);

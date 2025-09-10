@@ -1,4 +1,6 @@
 import { useLanguage } from "@/context/LanguageContext";
+import { fetchPrayerTimes } from "@/hooks/api";
+import { loadSettings, saveSettings } from "@/hooks/storage";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTheme from "@/hooks/useTheme";
 import { Picker } from "@react-native-picker/picker";
@@ -7,8 +9,6 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchPrayerTimes } from "../../utils/api";
-import { loadSettings, saveSettings } from "../../utils/storage";
 
 export default function Settings() {
     const { theme } = useTheme();

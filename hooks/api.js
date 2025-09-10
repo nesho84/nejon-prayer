@@ -1,4 +1,4 @@
-const PRAYER_ORDER = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 export async function fetchPrayerTimes(lat, lon) {
     // return null;
@@ -6,8 +6,7 @@ export async function fetchPrayerTimes(lat, lon) {
         const method = 2; // ISNA
         const now = new Date();
 
-        const url = `https://api.aladhan.com/v1/timings/
-        ${Math.floor(now.getTime() / 1000)}?latitude=${lat}&longitude=${lon}&method=${method}`;
+        const url = `https://api.aladhan.com/v1/timings/${Math.floor(now.getTime() / 1000)}?latitude=${lat}&longitude=${lon}&method=${method}`;
 
         const resp = await fetch(url);
         const data = await resp.json();
@@ -15,7 +14,7 @@ export async function fetchPrayerTimes(lat, lon) {
 
         // Filter & order once here
         const filtered = {};
-        PRAYER_ORDER.forEach((key) => {
+        PRAYER_ORDER_FULL.forEach((key) => {
             if (allTimes[key]) {
                 filtered[key] = allTimes[key];
             }
