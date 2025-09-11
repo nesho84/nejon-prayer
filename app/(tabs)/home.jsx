@@ -46,7 +46,7 @@ export default function Home() {
 
         try {
             const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
-            if (times) await schedulePrayerNotifications(times, lang);
+            if (times) await schedulePrayerNotifications(times);
 
             setPrayerTimes(times);
             intervalRef.current = times;
@@ -181,7 +181,7 @@ export default function Home() {
 
                 {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
-                {/* <Button title="Send Test Notification" onPress={() => sendTestNotification(lang)} /> */}
+                {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
 
             </View>
         </SafeAreaView >

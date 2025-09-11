@@ -72,7 +72,7 @@ export default function Settings() {
             // If notifications and location enabled, re-schedule notifications
             if (newSettings.notifications && newSettings.coords) {
                 const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
-                if (times) await schedulePrayerNotifications(times, lang);
+                if (times) await schedulePrayerNotifications(times);
             }
         } catch (error) {
             console.error("❌ Failed to save and schedule prayer notifications", err);
@@ -171,7 +171,7 @@ export default function Settings() {
                 // 4️⃣ If granted and location available, schedule notifications
                 if (finalValue && settings.coords) {
                     const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
-                    if (times) await schedulePrayerNotifications(times, lang);
+                    if (times) await schedulePrayerNotifications(times);
                 }
             } else {
                 // User turned off notifications → cancel all scheduled prayer notifications
