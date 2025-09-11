@@ -6,8 +6,8 @@ import { StatusBar } from "expo-status-bar";
 export default function RootLayout() {
   return (
     <>
-      <LanguageProvider>
-        <ThemeProvider>
+      <ThemeProvider>
+        <LanguageProvider>
           <Stack
             screenOptions={{
               headerShown: false,
@@ -16,8 +16,8 @@ export default function RootLayout() {
             }}
           />
           <StatusBar style="auto" />
-        </ThemeProvider>
-      </LanguageProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </>
   );
 }

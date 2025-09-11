@@ -26,21 +26,21 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="home"
                     options={{
-                        title: lang("labels.home"),
+                        title: lang.tr("labels.home"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
                     name="settings"
                     options={{
-                        title: lang("labels.settings"),
+                        title: lang.tr("labels.settings"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
                     name="about"
                     options={{
-                        title: lang("labels.about"),
+                        title: lang.tr("labels.about"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
                     }}
                 />

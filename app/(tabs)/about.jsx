@@ -14,8 +14,8 @@ export default function About() {
             <View style={styles.inner}>
                 <Image style={styles.logo} source={require("../../assets/images/icon.png")} />
 
-                <Text style={styles.title}>{lang("labels.aboutText1")}</Text>
-                <Text style={styles.desc}>{lang("labels.aboutText2")}</Text>
+                <Text style={styles.title}>{lang.tr("labels.aboutText1")}</Text>
+                <Text style={styles.desc}>{lang.tr("labels.aboutText2")}</Text>
 
                 <Text style={styles.yearText}>
                     ©{(new Date()).getFullYear()} <Text style={styles.link}>nejon.net</Text>

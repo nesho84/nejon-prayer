@@ -13,7 +13,7 @@ export default function Home() {
     // ThemeContext
     const { theme } = useTheme();
     // LanguageContext
-    const { lang } = useLanguage();
+    const { lang, currentLang } = useLanguage();
     const isFocused = useIsFocused();
     const intervalRef = useRef(null);
     const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
@@ -25,9 +25,9 @@ export default function Home() {
     const [countdown, setCountdown] = useState("");
     const [fetchError, setFetchError] = useState(false);
 
-    // On mount: load settings, fetch prayer times, schedule notifications, start interval to update next prayer
+    // On mount: load settings, fetch prayer times, schedule notifications, update next prayer
     useEffect(() => {
-        // fetch once immediately
+        // Fetch once immediately
         loadPrayerTimesAndSchedule();
 
         const interval = setInterval(() => {
@@ -46,6 +46,9 @@ export default function Home() {
 
         try {
             const times = await fetchPrayerTimes(saved.coords.latitude, saved.coords.longitude);
+            // // Just for debug logging (@TODO: LanguageContext issue)
+            // console.log("\n\n---------------------------------------------------------------------------------");
+            // console.log("🟠 Current language in home.jsx just before scheduling notifications is:", currentLang);
             if (times) await schedulePrayerNotifications(times);
 
             setPrayerTimes(times);
@@ -66,11 +69,11 @@ export default function Home() {
 
             // set warning based on explicit boolean values
             if (!saved?.coords && !saved?.notifications) {
-                setWarning(lang("labels.warning1"));
+                setWarning(lang.tr("labels.warning1"));
             } else if (!saved?.coords) {
-                setWarning(lang("labels.warning2"));
+                setWarning(lang.tr("labels.warning2"));
             } else if (!saved?.notifications) {
-                setWarning(lang("labels.warning3"));
+                setWarning(lang.tr("labels.warning3"));
             } else {
                 setWarning(null);
             }
@@ -147,7 +150,7 @@ export default function Home() {
                 {/* Next prayer countdown */}
                 {nextPrayer && (
                     <Text style={{ ...styles.countdown, color: theme.secondaryText }}>
-                        {countdown} » {nextPrayer ? lang(`prayers.${nextPrayer}`) : ""}
+                        {countdown} » {nextPrayer ? lang.tr(`prayers.${nextPrayer}`) : ""}
                     </Text>
                 )}
 
@@ -155,9 +158,9 @@ export default function Home() {
                 {fetchError ? (
                     <View style={{ marginTop: 20, alignItems: "center" }}>
                         <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: "center", marginBottom: 16 }}>
-                            {lang("labels.noPrayerTimes")}
+                            {lang.tr("labels.noPrayerTimes")}
                         </Text>
-                        <Button title={lang("labels.retryFetch")} onPress={loadPrayerTimesAndSchedule} />
+                        <Button title={lang.tr("labels.retryFetch")} onPress={loadPrayerTimesAndSchedule} />
                     </View>
                 ) : prayerTimes ? (
                     <FlatList
@@ -167,7 +170,7 @@ export default function Home() {
                         renderItem={({ item: [name, time] }) => (
                             <View style={styles.row}>
                                 <Text style={{ ...styles.prayer, color: theme.primaryText }}>
-                                    {lang(`prayers.${name}`)}
+                                    {lang.tr(`prayers.${name}`)}
                                 </Text>
                                 <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
                             </View>
@@ -175,7 +178,7 @@ export default function Home() {
                     />
                 ) : (
                     <Text style={{ color: theme.primaryText, fontSize: 16, marginTop: 20 }}>
-                        {lang("labels.loading")}
+                        {lang.tr("labels.loading")}
                     </Text>
                 )}
 

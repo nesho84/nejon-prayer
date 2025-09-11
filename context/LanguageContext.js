@@ -9,26 +9,36 @@ export function LanguageProvider({ children }) {
 
     // Load saved settings
     useEffect(() => {
-        (async () => {
-            const saved = await loadSettings();
-            if (saved?.language) {
-                setCurrentLang(saved.language);
-            }
-        })();
-    }, [currentLang]);
+        let mounted = true;
+        if (mounted) {
+            (async () => {
+                const saved = await loadSettings();
+                if (saved?.language) {
+                    setCurrentLang(saved.language);
+                }
+            })();
+        }
+        return () => mounted = false;
+    }, []);
 
+    // Update language
     const setContextLanguage = async (value) => {
         // just update context, screens handle saving in storage
         setCurrentLang(value);
     };
 
-    const lang = (path) => {
-        const keys = path.split(".");
-        let result = translations[currentLang];
-        for (const key of keys) {
-            result = result?.[key];
-        }
-        return result ?? path;
+    // Full lang object
+    const lang = {
+        current: currentLang,
+        translations,
+        tr: (path) => {
+            const keys = path.split(".");
+            let result = translations[currentLang];
+            for (const key of keys) {
+                result = result?.[key];
+            }
+            return result ?? path;
+        },
     };
 
     return (

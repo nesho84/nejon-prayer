@@ -205,7 +205,7 @@ export default function Settings() {
 
                 {/* Theme */}
                 <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang("labels.theme")}</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.theme")}</Text>
                     <Picker
                         selectedValue={settings.theme || currentTheme}
                         onValueChange={(value) => changeTheme(value)}
@@ -221,7 +221,7 @@ export default function Settings() {
 
                 {/* Language */}
                 <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang("labels.language")}</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.language")}</Text>
                     <Picker
                         selectedValue={settings.language || currentLang}
                         onValueChange={(value) => changeLanguage(value)}
@@ -237,23 +237,23 @@ export default function Settings() {
 
                 {/* Location */}
                 <View style={{ borderRadius: 5, marginVertical: 12, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang("labels.location")}</Text>
+                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.location")}</Text>
                     <Button
-                        title={settings.coords ? lang("labels.locationButtonText1") : lang("labels.locationButtonText2")}
+                        title={settings.coords ? lang.tr("labels.locationButtonText1") : lang.tr("labels.locationButtonText2")}
                         onPress={resetLocation}
                     />
 
                     {/* human-readable Address */}
                     {settings.coords && (
                         <Text style={{ marginVertical: 8, color: theme.primaryText }}>
-                            {address ? address : lang("labels.loading")}
+                            {address ? address : lang.tr("labels.loading")}
                         </Text>
                     )}
                 </View>
 
                 {/* Notifications */}
                 <View style={{ borderRadius: 5, flexDirection: "row", alignItems: "center", width: '100%', justifyContent: 'space-between', backgroundColor: theme.card, padding: 8 }}>
-                    <Text style={{ fontSize: 20, marginRight: 12, color: theme.primaryText }}>{lang("labels.notifications")}</Text>
+                    <Text style={{ fontSize: 20, marginRight: 12, color: theme.primaryText }}>{lang.tr("labels.notifications")}</Text>
                     <Switch
                         value={settings.notifications}
                         onValueChange={(value) => toggleNotifications(value)}
