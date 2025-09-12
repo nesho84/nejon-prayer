@@ -15,9 +15,9 @@ export default function RootLayout() {
               animation: "fade",
             }}
           />
-          <StatusBar style="auto" />
         </LanguageProvider>
       </ThemeProvider>
+      <StatusBar style="auto" />
     </>
   );
 }

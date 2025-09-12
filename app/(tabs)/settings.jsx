@@ -195,6 +195,7 @@ export default function Settings() {
         return (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
                 <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 12 }}>Please Wait</Text>
             </View>
         );
     }

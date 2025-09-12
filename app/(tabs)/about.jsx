@@ -12,7 +12,7 @@ export default function About() {
     return (
         <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
             <View style={styles.inner}>
-                <Image style={styles.logo} source={require("../../assets/images/icon.png")} />
+                <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 
                 <Text style={styles.title}>{lang.tr("labels.aboutText1")}</Text>
                 <Text style={styles.desc}>{lang.tr("labels.aboutText2")}</Text>
