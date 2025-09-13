@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 export default function Home() {
     // ThemeContext
     const { theme } = useTheme();
@@ -182,7 +181,7 @@ export default function Home() {
                     </Text>
                 )}
 
-                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
+                <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} />
 
                 {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
 

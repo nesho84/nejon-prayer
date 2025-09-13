@@ -42,7 +42,7 @@ export function ThemeProvider({ children }) {
         };
     }, [currentTheme]);
 
-    const setContextTheme = async (value) => {
+    const changeTheme = async (value) => {
         // just update context, screens handle saving in storage
         setCurrentTheme(value);
     };
@@ -50,7 +50,7 @@ export function ThemeProvider({ children }) {
     const theme = activeTheme === "dark" ? darkTheme : lightTheme;
 
     return (
-        <ThemeContext.Provider value={{ theme, currentTheme, activeTheme, setContextTheme }}>
+        <ThemeContext.Provider value={{ theme, currentTheme, activeTheme, changeTheme }}>
             {children}
         </ThemeContext.Provider>
     );

@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Start() {
   const router = useRouter();
   // LanguageContext
-  const { setContextLanguage, lang } = useLanguage();
+  const { changeLanguage, lang } = useLanguage();
 
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
@@ -30,13 +30,13 @@ export default function Start() {
     })();
   }, []);
 
-  // (Step 1) Change language
-  async function changeLanguage(value) {
+  // (Step 1) Handle language
+  async function handleLanguage(value) {
     setLoading(true);
     try {
-      // Update context
-      setContextLanguage(value);
       setLanguage(value);
+      // Update LanguageContext
+      changeLanguage(value);
     } catch (error) {
       console.error("Language change error:", err);
       Alert.alert("Error", "Failed to save language setting.");
@@ -93,13 +93,13 @@ export default function Start() {
 
   // (Finish) Save settings and redirect to home
   async function finishOnboarding(notificationsStatus) {
-    const prefs = {
+    const settings = {
       theme: "system",
-      language,
       coords,
       notifications: notificationsStatus,
     };
-    await saveSettings(prefs);
+    // Save in AsyncStorage
+    await saveSettings(settings);
     router.replace("/home");
   }
 
@@ -123,7 +123,7 @@ export default function Start() {
             {Platform.OS === "android" ? (
               <Picker
                 selectedValue={language}
-                onValueChange={(value) => changeLanguage(value)}
+                onValueChange={(value) => handleLanguage(value)}
                 dropdownIconColor={'#000'}
                 dropdownIconRippleColor={'#000'}
                 style={{ width: '100%', backgroundColor: '#cccccc', color: '#000' }}

@@ -5,6 +5,7 @@ const STORAGE_KEY = "@app_settings_v1";
 export async function saveSettings(settings) {
     const toStore = {
         ...settings,
+        theme: settings.them || null,
         notifications: !!settings.notifications,
         coords: settings.coords || null,
     };

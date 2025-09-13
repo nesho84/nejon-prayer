@@ -6,10 +6,11 @@ import { Alert, Linking, Platform } from "react-native";
 // Set notification handler to show notifications when app is in foreground
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
-        shouldShowBanner: true,
-        shouldShowList: true,
         shouldPlaySound: true,
         shouldSetBadge: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldShowAlert: true,
     }),
 });
 
@@ -59,7 +60,7 @@ export default function usePrayerNotifications() {
                     await Notifications.cancelScheduledNotificationAsync(item.identifier);
                 }
             }
-            console.log("🟧 All existing prayer notifications cancelled");
+            // console.log("🟧 All existing prayer notifications cancelled");
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }
@@ -102,7 +103,7 @@ export default function usePrayerNotifications() {
                 });
             }
 
-            console.log("✅ Prayer notifications scheduled for today with lang:", currentLang);
+            console.log(`✅ Prayer notifications scheduled for today with langauge [ ${currentLang} ]`);
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications", err);
         }

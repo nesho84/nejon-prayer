@@ -5,19 +5,17 @@ import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
   return (
-    <>
-      <ThemeProvider>
-        <LanguageProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: "transparent" },
-              animation: "fade",
-            }}
-          />
-        </LanguageProvider>
-      </ThemeProvider>
-      <StatusBar style="auto" />
-    </>
+    <ThemeProvider>
+      <LanguageProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: "transparent" },
+            animation: "fade",
+          }}
+        />
+        <StatusBar style="auto" />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

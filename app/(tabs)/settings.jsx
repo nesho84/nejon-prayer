@@ -12,30 +12,43 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Settings() {
     // ThemeContext
-    const { theme, currentTheme, setContextTheme } = useTheme();
+    const { theme, currentTheme, changeTheme } = useTheme();
     // LanguageContext
-    const { lang, currentLang, setContextLanguage } = useLanguage();
+    const { lang, currentLang, changeLanguage } = useLanguage();
     const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     const [loading, setLoading] = useState(true);
-    const [settings, setSettings] = useState({ language: "en", coords: null, notifications: false });
+    const [settings, setSettings] = useState({});
     const [address, setAddress] = useState(null);
+    const [selectedLanguage, setSelectedLanguage] = useState(lang.current);
 
     useEffect(() => {
         (async () => {
             const saved = await loadSettings();
             if (saved) setSettings(saved);
-
             setLoading(false);
         })();
     }, []);
+
+    useEffect(() => {
+        if (settings.notifications && settings.coords) {
+            (async () => {
+                try {
+                    const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
+                    if (times) await schedulePrayerNotifications(times);
+                    console.log("🔔 Notifications schedule after Language change → to:", currentLang);
+                } catch (err) {
+                    console.error("❌ Failed to scheduled notifications after language change", err);
+                }
+            })();
+        }
+    }, [currentLang]);
 
     useEffect(() => {
         if (!settings.coords) {
             setAddress(null);
             return;
         }
-
         // Reverse geocode to get human-readable address
         (async () => {
             try {
@@ -62,60 +75,6 @@ export default function Settings() {
         })();
     }, [settings.coords]);
 
-    // Save settings and re-schedule notifications
-    async function updateAndSchedule(newSettings) {
-        setLoading(true);
-        try {
-            setSettings(newSettings);
-            await saveSettings(newSettings);
-
-            // If notifications and location enabled, re-schedule notifications
-            if (newSettings.notifications && newSettings.coords) {
-                const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
-                if (times) await schedulePrayerNotifications(times);
-            }
-        } catch (error) {
-            console.error("❌ Failed to save and schedule prayer notifications", err);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Change theme
-    async function changeTheme(value) {
-        setLoading(true);
-        try {
-            const newSettings = { ...settings, theme: value };
-            setSettings(newSettings);
-            await saveSettings(newSettings);
-            // Update context
-            setContextTheme(value);
-        } catch (err) {
-            console.error("Theme change error:", err);
-            Alert.alert("Error", "Failed to update theme setting.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Change language
-    async function changeLanguage(value) {
-        setLoading(true);
-        try {
-            // Update context
-            setContextLanguage(value);
-
-            const newSettings = { ...settings, language: value };
-            // Update settings and reschedule notifications if enabled
-            await updateAndSchedule(newSettings);
-        } catch (error) {
-            console.error("Language change error:", err);
-            Alert.alert("Error", "Failed to update language setting.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
     // Set or update location and Reschedule notifications
     async function resetLocation() {
         setLoading(true);
@@ -131,12 +90,53 @@ export default function Settings() {
                 accuracy: Location.Accuracy.Highest,
             });
 
+            // Save settings
             const newSettings = { ...settings, coords: loc.coords };
-            // Update settings and reschedule notifications if enabled
-            await updateAndSchedule(newSettings);
+            await saveSettings(newSettings);
+            setSettings(newSettings);
+
+            // If notifications and location enabled, re-schedule notifications
+            if (newSettings.notifications && newSettings.coords) {
+                const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
+                if (times) await schedulePrayerNotifications(times);
+                console.log("🔔 Notifications scheduled after Location reset");
+            }
         } catch (err) {
             console.error("Location error:", err);
             Alert.alert("Error", "Failed to get location.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // New: Change language
+    async function handleLanguage(value) {
+        setLoading(true);
+        try {
+            setSelectedLanguage(value);
+            // Update LanguageContext
+            changeLanguage(value);
+        } catch (error) {
+            console.error("Language change error:", error);
+            Alert.alert("Error", "Failed to update language setting.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // Change theme
+    async function handleTheme(value) {
+        setLoading(true);
+        try {
+            // Update context
+            changeTheme(value);
+
+            const newSettings = { ...settings, theme: value };
+            setSettings(newSettings);
+            await saveSettings(newSettings);
+        } catch (err) {
+            console.error("Theme change error:", err);
+            Alert.alert("Error", "Failed to update theme setting.");
         } finally {
             setLoading(false);
         }
@@ -172,17 +172,18 @@ export default function Settings() {
                 if (finalValue && settings.coords) {
                     const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
                     if (times) await schedulePrayerNotifications(times);
+                    console.log("🔔 Notifications schedule after Notifications enabled");
                 }
             } else {
                 // User turned off notifications → cancel all scheduled prayer notifications
                 await cancelPrayerNotifications();
+                console.log("🟧 All existing prayer notifications cancelled");
             }
 
             // 5️⃣ Save settings
             const newSettings = { ...settings, notifications: finalValue };
             await saveSettings(newSettings);
             setSettings(newSettings);
-
         } catch (err) {
             console.error("Notification toggle error:", err);
             Alert.alert("Error", "Failed to update notifications setting.");
@@ -209,7 +210,7 @@ export default function Settings() {
                     <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.theme")}</Text>
                     <Picker
                         selectedValue={settings.theme || currentTheme}
-                        onValueChange={(value) => changeTheme(value)}
+                        onValueChange={(value) => handleTheme(value)}
                         dropdownIconColor={theme.primaryText}
                         dropdownIconRippleColor={theme.primaryText}
                         style={{ width: '100%', backgroundColor: theme.background, color: theme.primaryText }}
@@ -224,8 +225,8 @@ export default function Settings() {
                 <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
                     <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.language")}</Text>
                     <Picker
-                        selectedValue={settings.language || currentLang}
-                        onValueChange={(value) => changeLanguage(value)}
+                        selectedValue={selectedLanguage || currentLang}
+                        onValueChange={(value) => handleLanguage(value)}
                         dropdownIconColor={theme.primaryText}
                         dropdownIconRippleColor={theme.primaryText}
                         style={{ width: '100%', backgroundColor: theme.background, color: theme.primaryText }}

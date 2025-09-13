@@ -1,5 +1,5 @@
 import { translations } from "@/constants/translations";
-import { loadSettings } from "@/hooks/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const LanguageContext = createContext();
@@ -7,30 +7,49 @@ const LanguageContext = createContext();
 export function LanguageProvider({ children }) {
     const [currentLang, setCurrentLang] = useState("en");
 
-    // Load saved settings
+    let languageKey = "@Language_Key";
+
     useEffect(() => {
         let mounted = true;
         if (mounted) {
-            (async () => {
-                const saved = await loadSettings();
-                if (saved?.language) {
-                    setCurrentLang(saved.language);
-                }
-            })();
+            loadLanguage();
         }
         return () => mounted = false;
-    }, []);
+    }, [currentLang]);
 
-    // Update language
-    const setContextLanguage = async (value) => {
-        // just update context, screens handle saving in storage
-        setCurrentLang(value);
+    // Change language
+    const changeLanguage = (language) => {
+        setCurrentLang(language);
+        saveInStorage(language);
+    };
+
+    // Read from AsyncStorage
+    const loadLanguage = async () => {
+        try {
+            let storageLanguage = await AsyncStorage.getItem(languageKey);
+            if (storageLanguage !== null) {
+                setCurrentLang(JSON.parse(storageLanguage));
+            } else {
+                saveInStorage(currentLang);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    // Save in AsyncStorage
+    const saveInStorage = async (newLanguage) => {
+        try {
+            await AsyncStorage.setItem(languageKey, JSON.stringify(newLanguage));
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     // Full lang object
     const lang = {
-        current: currentLang,
         translations,
+        current: currentLang,
         tr: (path) => {
             const keys = path.split(".");
             let result = translations[currentLang];
@@ -42,7 +61,7 @@ export function LanguageProvider({ children }) {
     };
 
     return (
-        <LanguageContext.Provider value={{ lang, currentLang, setContextLanguage }}>
+        <LanguageContext.Provider value={{ lang, currentLang, changeLanguage, loadLanguage }}>
             {children}
         </LanguageContext.Provider>
     );
