@@ -2,14 +2,14 @@
   "expo": {
     "name": "nejon-prayer",
     "slug": "nejon-prayer",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "buildNumber": "8",
+      "buildNumber": "9",
       "supportsTablet": true,
       "icon": {
         "dark": "./assets/icons/ios-dark.png",
@@ -18,7 +18,7 @@
       }
     },
     "android": {
-      "versionCode": 8,
+      "versionCode": 9,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "monochromeImage": "./assets/icons/adaptive-icon.png",
