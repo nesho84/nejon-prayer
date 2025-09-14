@@ -59,7 +59,7 @@ export default function usePrayerNotifications() {
                     await Notifications.cancelScheduledNotificationAsync(item.identifier);
                 }
             }
-            // console.log("🟧 All existing prayer notifications cancelled");
+            console.log("🟧 All existing prayer notifications cancelled");
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }

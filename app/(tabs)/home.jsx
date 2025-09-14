@@ -14,6 +14,7 @@ export default function Home() {
     // LanguageContext
     const { lang, currentLang } = useLanguage();
 
+    // Notifications hook
     const {
         schedulePrayerNotifications,
         sendTestNotification,
@@ -35,7 +36,7 @@ export default function Home() {
         })();
     }, []);
 
-    // Hook for prayer times + next prayer countdown
+    // Prayer times hook for prayer times + next prayer countdown
     const {
         loadPrayerTimes,
         prayerTimes,
@@ -46,12 +47,12 @@ export default function Home() {
         timesError
     } = usePrayerService(coords?.latitude, coords?.longitude);
 
-    // Schedule notifications when prayer times or language change
+    // Schedule notifications when prayer times are ready
     useEffect(() => {
         if (prayerTimes) {
             schedulePrayerNotifications(prayerTimes);
         }
-    }, [prayerTimes, currentLang]);
+    }, [prayerTimes]);
 
     // Update warnings when screen is focused
     useEffect(() => {

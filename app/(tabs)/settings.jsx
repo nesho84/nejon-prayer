@@ -1,8 +1,8 @@
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
-import { fetchPrayerTimes } from "@/hooks/api";
 import { loadSettings, saveSettings } from "@/hooks/storage";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import usePrayerService from "@/hooks/usePrayerService";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -30,20 +30,18 @@ export default function Settings() {
         })();
     }, []);
 
+    // Prayer times hook for prayer times
+    const { prayerTimes } = usePrayerService(settings.coords?.latitude, settings.coords?.longitude);
+
     // Important: handleLanguage updates the LanguageContext asynchronously.
     // Because of React timing, this effect ensures notifications are scheduled
     // only after the context language has actually changed, so they always use the latest translated text.
     useEffect(() => {
         if (settings.notifications && settings.coords) {
-            (async () => {
-                try {
-                    const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
-                    if (times) await schedulePrayerNotifications(times);
-                    console.log("🔔 Notifications schedule after Language change → to:", currentLang);
-                } catch (err) {
-                    console.error("❌ Failed to scheduled notifications after language change", err);
-                }
-            })();
+            if (prayerTimes) {
+                schedulePrayerNotifications(prayerTimes);
+                console.log("🔔 Notifications schedule after Language change → to:", currentLang);
+            }
         }
     }, [currentLang]);
 
@@ -111,9 +109,10 @@ export default function Settings() {
 
             // Reschedule notifications if enabled
             if (newSettings.notifications && newSettings.coords) {
-                const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
-                if (times) await schedulePrayerNotifications(times);
-                console.log("🔔 Notifications scheduled after Location reset");
+                if (prayerTimes) {
+                    schedulePrayerNotifications(prayerTimes);
+                    console.log("🔔 Notifications scheduled after Location reset");
+                }
             }
         } catch (err) {
             console.error("Location error:", err);
