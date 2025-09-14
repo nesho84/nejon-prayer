@@ -30,6 +30,9 @@ export default function Settings() {
         })();
     }, []);
 
+    // Important: handleLanguage updates the LanguageContext asynchronously.
+    // Because of React timing, this effect ensures notifications are scheduled
+    // only after the context language has actually changed, so they always use the latest translated text.
     useEffect(() => {
         if (settings.notifications && settings.coords) {
             (async () => {
@@ -75,7 +78,7 @@ export default function Settings() {
         })();
     }, [settings.coords]);
 
-    // Set or update location and Reschedule notifications
+    // Set or update location and reschedule notifications
     async function resetLocation() {
         setLoading(true);
         try {
@@ -85,17 +88,28 @@ export default function Settings() {
                 return;
             }
 
-            // Get current position with high accuracy
+            // Try high accuracy first, fallback to balanced
             const loc = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.Highest,
-            });
+                timeout: 5000,
+            }).catch(() =>
+                Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
+                    timeout: 10000,
+                })
+            );
+
+            if (!loc?.coords) {
+                Alert.alert("Error", "Failed to get location. Please try again.");
+                return;
+            }
 
             // Save settings
             const newSettings = { ...settings, coords: loc.coords };
             await saveSettings(newSettings);
             setSettings(newSettings);
 
-            // If notifications and location enabled, re-schedule notifications
+            // Reschedule notifications if enabled
             if (newSettings.notifications && newSettings.coords) {
                 const times = await fetchPrayerTimes(newSettings.coords.latitude, newSettings.coords.longitude);
                 if (times) await schedulePrayerNotifications(times);

@@ -43,7 +43,7 @@ export default function usePrayerNotifications() {
         if (Platform.OS === "android") {
             await Notifications.setNotificationChannelAsync("default", {
                 name: "default",
-                importance: Notifications.AndroidImportance.MAX,
+                importance: Notifications.AndroidImportance.HIGH,
                 vibrationPattern: [0, 250, 250, 250],
                 lightColor: "#ffffff",
             });
@@ -69,42 +69,77 @@ export default function usePrayerNotifications() {
     const schedulePrayerNotifications = async (times) => {
         try {
             await requestPermission();
-            // Clear existing prayer notifications first
             await cancelPrayerNotifications();
             await setNotificationChannel();
 
-            // Schedule notifications for each prayer time
             const now = new Date();
             const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
             for (const name of PRAYER_ORDER) {
-                const timeString = times[name]; // e.g. "05:32"
-                if (!timeString) continue;
+                const timeStringRaw = times[name];
+                if (!timeStringRaw) {
+                    console.log(`⚠️ No time for ${name}`);
+                    continue;
+                }
 
-                const [hourStr, minuteStr] = timeString.split(":");
-                const hour = parseInt(hourStr, 10);
-                const minute = parseInt(minuteStr, 10);
+                // Normalize: trim + replace NBSP
+                const timeString = String(timeStringRaw).replace(/\u00A0/g, " ").trim();
+                // Parse "HH:mm" strictly
+                const m = timeString.match(/^(\d{1,2}):(\d{2})$/);
+                if (!m) {
+                    console.warn(`⚠️ Invalid time format for ${name}:`, timeStringRaw);
+                    continue;
+                }
 
+                const hour = Number(m[1]);
+                const minute = Number(m[2]);
                 const fireDate = new Date();
                 fireDate.setHours(hour, minute, 0, 0);
 
-                // Don’t schedule past prayers
-                if (fireDate <= now) continue;
+                // If time already passed today → schedule tomorrow
+                if (fireDate <= now) {
+                    fireDate.setDate(fireDate.getDate() + 1);
+                }
+
+                console.log(`⏰ Scheduling ${name} at ${fireDate.toString()} (from "${timeString}")`);
 
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: `${lang.tr(`prayers.${name}`)} ${timeString}`,
-                        body: `${lang.tr("labels.alertBody")}`,
-                        data: { type: "prayer", prayer: name },
+                        body: lang.tr("labels.alertBody"),
                         sound: true,
                         android: { channelId: "default" },
+                        data: { type: "prayer", prayer: name },
                     },
-                    trigger: { type: "date", date: fireDate }, // no repeats → only today
+                    trigger: { type: "date", date: fireDate },
                 });
             }
 
-            console.log(`✅ Prayer notifications scheduled for today with langauge [ ${currentLang} ]`);
+            console.log(`✅ Prayer notifications scheduled with language [ ${currentLang} ]`);
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications", err);
+        }
+    };
+
+    // Debug utility: send a test notification in 5 seconds
+    const sendTestNotification = async () => {
+        try {
+            await requestPermission();
+            await setNotificationChannel();
+
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: `(Test) Fajr 5:32`,
+                    body: `${lang.tr("labels.alertBody")}`,
+                    sound: true,
+                    android: { channelId: "default" },
+                    data: { type: "test" },
+                },
+                trigger: { type: "date", date: new Date(Date.now() + 5000) }, // 5 seconds
+            });
+        } catch (err) {
+            Alert.alert("Error", "Failed to send test notification");
+            console.error(err);
         }
     }
 
@@ -125,27 +160,6 @@ export default function usePrayerNotifications() {
         return mapped;
     }
 
-    // Debug utility: send a test notification in 5 seconds
-    const sendTestNotification = async () => {
-        try {
-            await setNotificationChannel();
-
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: `(Test) Fajr 5:32`,
-                    body: `${lang.tr("labels.alertBody")}`,
-                    sound: true,
-                    android: { channelId: "default" },
-                    data: { type: "test" },
-                },
-                trigger: { type: "date", date: new Date(Date.now() + 5000) }, // 5 seconds
-            });
-        } catch (err) {
-            Alert.alert("Error", "Failed to send test notification");
-            console.error(err);
-        }
-    }
-
     // Set up listeners for received notifications & responses
     useEffect(() => {
         // app open in Foreground
@@ -154,10 +168,12 @@ export default function usePrayerNotifications() {
             // console.log('Received notification:', notification);
             // await Notifications.setBadgeCountAsync(1);
         });
+
         // app closed in backgrdound
         const responseReceivedListener = Notifications.addNotificationResponseReceivedListener(async (response) => {
             // const prayer = notification.request.content.data.prayer;
             // console.log('User responded to received notification:', response);
+            // const badgeCount = await Notifications.getBadgeCountAsync();
         });
 
         return () => {

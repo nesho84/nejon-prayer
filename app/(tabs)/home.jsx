@@ -56,9 +56,11 @@ export default function Home() {
     // Update warnings when screen is focused
     useEffect(() => {
         (async () => {
+            // re-read storage on screen focus
             const saved = await loadSettings();
-            if (!saved) return;
+            setCoords(saved?.coords ?? null);
 
+            // update warnings immediately
             if (!saved?.coords && !saved?.notifications) {
                 setWarning(lang.tr("labels.warning1"));
             } else if (!saved?.coords) {
@@ -121,8 +123,8 @@ export default function Home() {
                 )}
 
                 {/* Just for Testing... */}
-                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
                 {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
+                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
             </View>
         </SafeAreaView >

@@ -30,7 +30,7 @@ export default function Start() {
     })();
   }, []);
 
-  // (Step 1) Handle language
+  // 1️⃣ (Step 1) Handle language
   async function handleLanguage(value) {
     setLoading(true);
     try {
@@ -45,7 +45,7 @@ export default function Start() {
     }
   }
 
-  // (Step 2) Request location permission
+  // 2️⃣ (Step 2) Request location permission
   async function requestLocation() {
     setLoading(true);
     try {
@@ -59,27 +59,38 @@ export default function Start() {
         return;
       }
 
-      // Get current position with high accuracy
-      const loc = await Location.getCurrentPositionAsync({
+      // Try high accuracy first, fallback to balanced
+      let loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
-      });
+        timeout: 5000,
+      }).catch(() =>
+        Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+          timeout: 10000,
+        })
+      );
+
+      if (!loc?.coords) {
+        Alert.alert("Error", "Failed to get location. Please try again.");
+        return;
+      }
 
       setCoords(loc.coords);
       setStep(3);
     } catch (err) {
-      console.error("Location error:", err);
+      console.error("❌ Location error:", err);
       Alert.alert("Error", "Failed to get location. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  // (Step 3) Request notification permission
+  // 3️⃣ (Step 3) Request notification permission
   async function requestNotifications() {
     setLoading(true);
     try {
       const { status } = await Notifications.requestPermissionsAsync();
-      const notificationsStatus = status === "granted";;
+      const notificationsStatus = status === "granted";
 
       // Finish Onboarding (last step)
       await finishOnboarding(notificationsStatus);
@@ -91,7 +102,7 @@ export default function Start() {
     }
   }
 
-  // (Finish) Save settings and redirect to home
+  // 🏁 (Finish) Save settings and redirect to home
   async function finishOnboarding(notificationsStatus) {
     const settings = {
       theme: "system",

@@ -8,51 +8,49 @@ export default function usePrayerService(lat, lon) {
     const [nextPrayerTime, setNextPrayerNameTime] = useState(null); // not used ??
     const [prayerCountdown, setPrayerCountdown] = useState("No more prayers today");
 
-    // ---- Helpers ----
+    // fetchPrayerTimes
     const fetchPrayerTimes = async (lat, lon) => {
-        // // TEMP: simulate error for testing retry button
-        // if (!lat || !lon || Math.random() < 1) { // always fail
-        //     throw new Error("Simulated fetch error");
-        // }
+        try {
+            const now = new Date();
+            const timestamp = Math.floor(now.getTime() / 1000);
+            const url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lon}&method=2`;
 
-        const now = new Date();
-        const timestamp = Math.floor(now.getTime() / 1000);
-        const url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lon}&method=2`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const allTimes = data.data.timings;
 
-        const resp = await fetch(url);
-        const data = await resp.json();
-        const allTimes = data.data.timings;
+            // Parse Fajr -> Date
+            const [fajrH, fajrM] = allTimes["Fajr"].split(":").map(Number);
+            const fajrDate = new Date();
+            fajrDate.setHours(fajrH, fajrM, 0, 0);
 
-        // Parse Fajr
-        let [fajrH, fajrM] = allTimes["Fajr"].split(":").map(Number);
-        const fajrDate = new Date();
-        fajrDate.setHours(fajrH, fajrM);
+            // Imsak = Fajr - 20 minutes
+            const imsakDate = new Date(fajrDate.getTime() - 20 * 60000);
 
-        // Imsak = Fajr - 20 min
-        const imsakDate = new Date(fajrDate);
-        imsakDate.setMinutes(fajrDate.getMinutes() - 20);
+            // Ensure spacing rule (Imsak vs Fajr)
+            if ((fajrDate - imsakDate) / 60000 < 25) {
+                fajrDate.setMinutes(imsakDate.getMinutes() + 5);
+            }
 
-        // Ensure Fajr is at least 25 min after Imsak
-        const diffMinutes = (fajrDate - imsakDate) / 60000;
-        if (diffMinutes < 25) {
-            fajrDate.setMinutes(imsakDate.getMinutes() + 5);
+            //  format Date -> "HH:mm" (always 24h, no AM/PM)
+            const correctedFajr = `${String(fajrDate.getHours()).padStart(2, "0")}:${String(fajrDate.getMinutes()).padStart(2, "0")}`;
+            const correctedImsak = `${String(imsakDate.getHours()).padStart(2, "0")}:${String(imsakDate.getMinutes()).padStart(2, "0")}`;
+
+            // Return final object
+            const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+            const filtered = {};
+            PRAYER_ORDER_FULL.forEach((key) => {
+                if (key === "Fajr") filtered[key] = correctedFajr;
+                else if (key === "Imsak") filtered[key] = correctedImsak;
+                else if (allTimes[key]) filtered[key] = allTimes[key]; // API is already "HH:mm"
+            });
+
+            return filtered; // e.g. { Fajr: "05:46", Dhuhr: "12:50", ... }
+        } catch (err) {
+            console.error("Prayer times fetch error:", err);
+            return null;
         }
-
-        const correctedFajr = `${fajrDate.getHours().toString().padStart(2, "0")}:${fajrDate.getMinutes().toString().padStart(2, "0")}`;
-        const correctedImsak = `${imsakDate.getHours().toString().padStart(2, "0")}:${imsakDate.getMinutes().toString().padStart(2, "0")}`;
-
-        // Define prayer order
-        const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-        // Build final filtered object
-        const filtered = {};
-        PRAYER_ORDER_FULL.forEach((key) => {
-            if (key === "Fajr") filtered[key] = correctedFajr;
-            else if (key === "Imsak") filtered[key] = correctedImsak;
-            else if (allTimes[key]) filtered[key] = allTimes[key];
-        });
-
-        return filtered;
-    };
+    }
 
     const loadPrayerTimes = async () => {
         setLoading(true);
