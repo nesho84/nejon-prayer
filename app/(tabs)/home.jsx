@@ -18,13 +18,7 @@ export default function HomeScreen() {
     const { settings, settingsLoading, settingsError } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
-
-    // Notifications hook
-    const {
-        schedulePrayerNotifications,
-        sendTestNotification,
-        logScheduledNotifications
-    } = usePrayerNotifications();
+    const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
     const isFocused = useIsFocused();
     const [warning, setWarning] = useState(null);
@@ -36,14 +30,14 @@ export default function HomeScreen() {
     // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
-    // // --------------------------------------------------
-    // // Schedule notifications when prayer times are ready
-    // // --------------------------------------------------
-    // useEffect(() => {
-    //     if (prayersTimes) {
-    //         schedulePrayerNotifications(prayersTimes);
-    //     }
-    // }, [prayersTimes]);
+    // --------------------------------------------------
+    // Schedule notifications when prayer times are ready
+    // --------------------------------------------------
+    useEffect(() => {
+        if (hasPrayersTimes && settings?.notifications) {
+            schedulePrayerNotifications(prayersTimes);
+        }
+    }, [hasPrayersTimes, settings?.notifications]);
 
     // --------------------------------------------------
     // Update warnings when screen is focused
@@ -61,19 +55,50 @@ export default function HomeScreen() {
         }
     }, [isFocused]);
 
-    // Reverse geocode to get human - readable address
+    // -------------------------------------------------------
+    // Format location and timezone when location is available
+    // --------------------------------------------------------
     useEffect(() => {
+        if (!settings?.location || settingsLoading) {
+            return;
+        }
+
         (async () => {
-            // Full human-readable string
-            if (!hasPrayersTimes) {
-                const formatedAddress = await formatLocation(settings.location);
-                setFullAddress(formatedAddress);
+            try {
+                // Full human-readable string
+                if (!hasPrayersTimes) {
+                    const formatedAddress = await formatLocation(settings.location);
+                    if (formatedAddress) {
+                        setFullAddress(formatedAddress);
+                    }
+                }
+                // User formatted timezone
+                const formatedTimezone = await formatTimezone(settings.location);
+                if (formatedTimezone) {
+                    setTimezone(formatedTimezone);
+                }
+            } catch (error) {
+                console.warn("Location formatting error:", error);
+                // Set fallback for timezone so UI doesn't break
+                setTimezone({
+                    title: new Date().toDateString(),
+                    subTitle: "",
+                    date: ""
+                });
             }
-            // User formated timezone
-            const formatedTimezone = await formatTimezone(settings.location);
-            setTimezone(formatedTimezone);
         })();
-    }, [settings.location]);
+    }, [settings?.location, settingsLoading, hasPrayersTimes]);
+
+    // --------------------------------------------------
+    // Handle refresh with better error handling
+    // --------------------------------------------------
+    const handleRefresh = async () => {
+        try {
+            await refetchPrayersTimes();
+        } catch (error) {
+            console.warn("Refresh failed:", error);
+        }
+    };
 
     // Loading state
     if (isLoading) {
@@ -94,7 +119,7 @@ export default function HomeScreen() {
                     {tr("labels.noPrayersTimes")}
                     {settingsError || prayersError}
                 </Text>
-                <TouchableOpacity style={styles.retryButton} onPress={refetchPrayersTimes}>
+                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
                     <Text style={styles.retryButtonText}>Retry</Text>
                 </TouchableOpacity>
             </View>
@@ -120,13 +145,14 @@ export default function HomeScreen() {
             <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
                 <Text style={styles.messageText}>No prayer times available for</Text>
                 <Text style={styles.subText}>{fullAddress || 'your location'}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={refetchPrayersTimes}>
+                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
                     <Text style={styles.retryButtonText}>Refresh</Text>
                 </TouchableOpacity>
             </View>
         );
     }
 
+    // Main content
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={styles.innerContainer}>
@@ -141,13 +167,13 @@ export default function HomeScreen() {
                 {/* Current Timezone/Date */}
                 <View style={styles.timeZone}>
                     <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>
-                        {timeZone.title || new Date().toDateString()}
+                        {timeZone?.title || new Date().toDateString()}
                     </Text>
-                    <Text style={[styles.timeZoneSubTitle, { color: theme.primaryText }]}>
-                        {timeZone.subTitle || ""}
+                    <Text style={[styles.timeZoneSubTitle, { color: theme.secondaryText }]}>
+                        {timeZone?.subTitle || ""}
                     </Text>
-                    <Text style={[styles.timeZoneDate, { color: theme.primaryText }]}>
-                        {timeZone.date || ""}
+                    <Text style={[styles.timeZoneDate, { color: theme.secondaryText }]}>
+                        {timeZone?.date || ""}
                     </Text>
                 </View>
 
@@ -171,13 +197,21 @@ export default function HomeScreen() {
                         </View>
                     )}
                     refreshControl={
-                        <RefreshControl refreshing={prayersLoading} onRefresh={refetchPrayersTimes} />
+                        <RefreshControl refreshing={prayersLoading} onRefresh={handleRefresh} />
                     }
                     contentContainerStyle={{ padding: 20 }}
                     // Safety props for FlatList
                     removeClippedSubviews={false}
                     initialNumToRender={10}
                     maxToRenderPerBatch={10}
+                    // Handle empty data gracefully
+                    ListEmptyComponent={
+                        <View style={styles.emptyContainer}>
+                            <Text style={[styles.emptyText, { color: theme.secondaryText }]}>
+                                {tr("labels.noPrayerData") || "No prayer data available"}
+                            </Text>
+                        </View>
+                    }
                 />
 
                 {/* Just for Testing... */}
@@ -209,34 +243,37 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginTop: 60,
-        marginBottom: 60,
+        marginBottom: 30,
     },
     timeZoneTitle: {
         fontSize: 23,
         marginBottom: 6,
     },
     timeZoneSubTitle: {
+        fontSize: 15,
         fontWeight: "300",
         color: '#666',
         marginBottom: 5,
     },
     timeZoneDate: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: "500",
         color: '#666',
     },
     countdown: {
         fontSize: 26,
         fontWeight: "500",
-        marginBottom: 30,
+        marginTop: 30,
+        marginBottom: 45,
     },
     listContainer: {
+        backgroundColor: "red",
         flexDirection: "row",
         justifyContent: "space-between",
-        width: "100%",
-        paddingVertical: 10,
         borderBottomWidth: 0.5,
         borderBottomColor: "#333",
+        width: "100%",
+        paddingVertical: 10,
     },
     prayerName: {
         fontSize: 18,

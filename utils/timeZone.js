@@ -3,6 +3,12 @@ import * as Location from "expo-location";
 // Reverse-geocodes given coordinates into a human-readable timezone.
 export async function formatTimezone(location) {
     try {
+        // ✅ Add safety check at the beginning
+        if (!location?.latitude || !location?.longitude) {
+            console.warn("formatTimezone: Invalid location provided", location);
+            return null;
+        }
+
         // Reverse geocode → get human-readable address
         const [place] = await Location.reverseGeocodeAsync({
             latitude: location.latitude,
@@ -34,7 +40,6 @@ export async function formatTimezone(location) {
             minute: "2-digit",
         }).format(now);
 
-        // return `${fullTimeZoneName}\nTime zone in ${area || city}, ${country} (${tzOffset})\n${formattedTime}`;
         return {
             title: fullTimeZoneName,
             subTitle: `Time zone in ${area || city}, ${country} (${tzOffset})`,
@@ -49,7 +54,9 @@ export async function formatTimezone(location) {
 // Reverse-geocodes given coordinates into a human-readable Address.
 export async function formatLocation(location) {
     try {
+        // ✅ This check was already there - good!
         if (!location?.latitude || !location?.longitude) {
+            console.warn("formatLocation: Invalid location provided", location);
             return null;
         }
 

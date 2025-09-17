@@ -1,6 +1,6 @@
 import useTranslation from "@/hooks/useTranslation";
 import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Alert, Linking, Platform } from "react-native";
 
 // Set notification handler to show notifications when app is in foreground
@@ -15,38 +15,41 @@ Notifications.setNotificationHandler({
 
 export default function usePrayerNotifications() {
     const { tr, currentLang } = useTranslation();
+    const isInitialized = useRef(false);
+    const lastScheduledTimes = useRef(null);
 
-    // Request notification permission
-    const requestPermission = async () => {
+    // Initialize permissions and channel once
+    const initialize = async () => {
+        if (isInitialized.current) return true;
+
         try {
+            // Request permission
             const { status } = await Notifications.requestPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert(
                     tr("labels.notifications"),
                     tr("labels.warning3"),
-                    [
-                        {
-                            text: "OK",
-                            onPress: async () => Linking.openSettings(),
-                        },
-                    ],
+                    [{ text: "OK", onPress: () => Linking.openSettings() }],
                     { cancelable: false }
                 );
+                return false;
             }
-        } catch (err) {
-            console.error("Error requesting notification permission:", err);
-        }
-    };
 
-    // Android notification channel
-    const setNotificationChannel = async () => {
-        if (Platform.OS === "android") {
-            await Notifications.setNotificationChannelAsync("default", {
-                name: "default",
-                importance: Notifications.AndroidImportance.HIGH,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: "#ffffff",
-            });
+            // Set Android channel
+            if (Platform.OS === "android") {
+                await Notifications.setNotificationChannelAsync("default", {
+                    name: "default",
+                    importance: Notifications.AndroidImportance.HIGH,
+                    vibrationPattern: [0, 250, 250, 250],
+                    lightColor: "#ffffff",
+                });
+            }
+
+            isInitialized.current = true;
+            return true;
+        } catch (err) {
+            console.error("❌ Notification initialization failed:", err);
+            return false;
         }
     };
 
@@ -63,17 +66,33 @@ export default function usePrayerNotifications() {
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }
-    }
+    };
 
     // Schedule today's Prayer notifications
     const schedulePrayerNotifications = async (times) => {
+        // Prevent duplicate scheduling
+        const timesKey = JSON.stringify(times);
+        if (lastScheduledTimes.current === timesKey) {
+            console.log("⚠️ Same prayer times already scheduled, skipping");
+            return;
+        }
+
         try {
-            await requestPermission();
+            console.log("🔔 Starting notification scheduling...");
+
+            // Initialize if needed
+            const initialized = await initialize();
+            if (!initialized) {
+                console.log("❌ Notification initialization failed");
+                return;
+            }
+
+            // Cancel existing notifications
             await cancelPrayerNotifications();
-            await setNotificationChannel();
 
             const now = new Date();
             const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+            let scheduledCount = 0;
 
             for (const name of PRAYER_ORDER) {
                 const timeStringRaw = times[name];
@@ -101,8 +120,6 @@ export default function usePrayerNotifications() {
                     fireDate.setDate(fireDate.getDate() + 1);
                 }
 
-                console.log(`⏰ Scheduling ${name} at ${fireDate.toString()} (from "${timeString}")`);
-
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: `${tr(`prayers.${name}`)} ${timeString}`,
@@ -113,20 +130,27 @@ export default function usePrayerNotifications() {
                     },
                     trigger: { type: "date", date: fireDate },
                 });
+
+                scheduledCount++;
+
+                // Only for Debugging: Format date as DD/MM/YYYY, HH:mm:ss
+                const formattedDate = fireDate.toLocaleDateString('en-GB') + ', ' +
+                    fireDate.toLocaleTimeString('en-GB', { hour12: false });
+                console.log(`⏰ Scheduled ${name} at ${formattedDate}`);
             }
 
-            console.log(`✅ Prayer notifications scheduled with language [ ${currentLang} ]`);
+            lastScheduledTimes.current = timesKey;
+            console.log(`✅ ${scheduledCount} prayer notifications scheduled with language "${currentLang}"`);
+
         } catch (err) {
-            console.error("❌ Failed to schedule prayer notifications", err);
+            console.error("❌ Failed to schedule prayer notifications:", err);
         }
     };
 
-    // Debug utility: send a test notification in 5 seconds
+    // Debug utility: send a test notification
     const sendTestNotification = async () => {
         try {
-            await requestPermission();
-            await setNotificationChannel();
-
+            await initialize();
             await Notifications.scheduleNotificationAsync({
                 content: {
                     title: `(Test) Fajr 5:32`,
@@ -135,49 +159,48 @@ export default function usePrayerNotifications() {
                     android: { channelId: "default" },
                     data: { type: "test" },
                 },
-                trigger: { type: "date", date: new Date(Date.now() + 5000) }, // 5 seconds
+                trigger: { type: "date", date: new Date(Date.now() + 5000) }, // 5 sec.
             });
+            console.log("📱 Test notification scheduled");
         } catch (err) {
             Alert.alert("Error", "Failed to send test notification");
             console.error(err);
         }
-    }
+    };
 
     // Debug utility: list/log all scheduled notifications
     const logScheduledNotifications = async () => {
         const all = await Notifications.getAllScheduledNotificationsAsync();
-
-        // Map to avoid using deprecated dataString
         const mapped = all.map(n => ({
             id: n.identifier,
             title: n.content.title,
             body: n.content.body,
-            data: n.content.data, // use this
+            data: n.content.data,
             trigger: n.trigger
         }));
-
         console.log("📌 Scheduled notifications:", JSON.stringify(mapped, null, 2));
         return mapped;
-    }
+    };
 
     // Set up listeners for received notifications & responses
     useEffect(() => {
-        // app open in Foreground
+        // App open in Foreground
         const receivedListener = Notifications.addNotificationReceivedListener(async (notification) => {
+            // Handle foreground notifications
             // const prayer = notification.request.content.data.prayer;
             // console.log('Received notification:', notification);
             // await Notifications.setBadgeCountAsync(1);
         });
 
-        // app closed in backgrdound
+        // App closed in backgrdound
         const responseReceivedListener = Notifications.addNotificationResponseReceivedListener(async (response) => {
+            // Handle user interaction with notification
             // const prayer = notification.request.content.data.prayer;
             // console.log('User responded to received notification:', response);
             // const badgeCount = await Notifications.getBadgeCountAsync();
         });
 
         return () => {
-            // Cleanup listeners when unmounting
             receivedListener.remove();
             responseReceivedListener.remove();
         };
