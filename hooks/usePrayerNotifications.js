@@ -1,4 +1,4 @@
-import { useLanguage } from "@/context/LanguageContext";
+import useTranslation from "@/hooks/useTranslation";
 import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { Alert, Linking, Platform } from "react-native";
@@ -14,7 +14,7 @@ Notifications.setNotificationHandler({
 });
 
 export default function usePrayerNotifications() {
-    const { lang, currentLang } = useLanguage();
+    const { tr, currentLang } = useTranslation();
 
     // Request notification permission
     const requestPermission = async () => {
@@ -22,8 +22,8 @@ export default function usePrayerNotifications() {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert(
-                    lang.tr("labels.notifications"),
-                    lang.tr("labels.warning3"),
+                    tr("labels.notifications"),
+                    tr("labels.warning3"),
                     [
                         {
                             text: "OK",
@@ -105,8 +105,8 @@ export default function usePrayerNotifications() {
 
                 await Notifications.scheduleNotificationAsync({
                     content: {
-                        title: `${lang.tr(`prayers.${name}`)} ${timeString}`,
-                        body: lang.tr("labels.alertBody"),
+                        title: `${tr(`prayers.${name}`)} ${timeString}`,
+                        body: tr("labels.alertBody"),
                         sound: true,
                         android: { channelId: "default" },
                         data: { type: "prayer", prayer: name },
@@ -130,7 +130,7 @@ export default function usePrayerNotifications() {
             await Notifications.scheduleNotificationAsync({
                 content: {
                     title: `(Test) Fajr 5:32`,
-                    body: `${lang.tr("labels.alertBody")}`,
+                    body: `${tr("labels.alertBody")}`,
                     sound: true,
                     android: { channelId: "default" },
                     data: { type: "test" },

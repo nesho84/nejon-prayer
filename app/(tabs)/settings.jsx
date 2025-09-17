@@ -1,8 +1,7 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import { loadSettings, saveSettings } from "@/hooks/storage";
+import { usePrayersContext } from "@/contexts/PrayersContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import usePrayerService from "@/hooks/usePrayerService";
+import { reverseGeocode } from "@/utils/timeZone";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -10,11 +9,11 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Button, StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Settings() {
-    // ThemeContext
-    const { theme, currentTheme, changeTheme } = useTheme();
-    // LanguageContext
-    const { lang, currentLang, changeLanguage } = useLanguage();
+export default function SettingsScreen() {
+    const { theme, currentTheme, changeTheme } = useThemeContext();
+    const { prayerTimes, prayersLoading } = usePrayersContext();
+
+    // Notifications hook
     const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     const [loading, setLoading] = useState(true);
@@ -30,9 +29,6 @@ export default function Settings() {
         })();
     }, []);
 
-    // Prayer times hook for prayer times
-    const { prayerTimes } = usePrayerService(settings.coords?.latitude, settings.coords?.longitude);
-
     // Important: handleLanguage updates the LanguageContext asynchronously.
     // Because of React timing, this effect ensures notifications are scheduled
     // only after the context language has actually changed, so they always use the latest translated text.
@@ -45,36 +41,13 @@ export default function Settings() {
         }
     }, [currentLang]);
 
+    // Reverse geocode to get human-readable address
     useEffect(() => {
-        if (!settings.coords) {
-            setAddress(null);
-            return;
-        }
-        // Reverse geocode to get human-readable address
         (async () => {
-            try {
-                const [loc] = await Location.reverseGeocodeAsync({
-                    latitude: settings.coords.latitude,
-                    longitude: settings.coords.longitude,
-                });
-
-                if (loc) {
-                    // Build a full readable address
-                    const fullAddress = [
-                        loc.street,
-                        loc.name,
-                        loc.postalCode,
-                        loc.city,
-                        loc.country
-                    ].filter(Boolean).join(", ");
-                    setAddress(fullAddress);
-                }
-            } catch (err) {
-                console.error("Reverse geocoding error:", err);
-                setAddress(null);
-            }
+            const fullAddress = await reverseGeocode(settings.location);
+            setAddress(fullAddress);
         })();
-    }, [settings.coords]);
+    }, [settings.location]);
 
     // Set or update location and reschedule notifications
     async function resetLocation() {

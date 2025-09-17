@@ -1,18 +1,23 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import { loadSettings } from "@/hooks/storage";
+import LoadingScreen from "@/components/LoadingScreen";
+import { usePrayersContext } from '@/contexts/PrayersContext';
+import { useSettingsContext } from '@/contexts/SettingsContext';
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useNextPrayer from "@/hooks/useNextPrayer";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import usePrayerService from "@/hooks/usePrayerService";
+import useTranslation from "@/hooks/useTranslation";
+import { formatTimezone, reverseGeocode } from "@/utils/timeZone";
 import { useIsFocused } from "@react-navigation/native";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Home() {
-    // ThemeContext
-    const { theme } = useTheme();
-    // LanguageContext
-    const { lang, currentLang } = useLanguage();
+export default function HomeScreen() {
+    const { theme } = useThemeContext();
+    const { tr } = useTranslation();
+    const { settings, settingsLoading, settingsError } = useSettingsContext();
+    const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
+    const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
 
     // Notifications hook
     const {
@@ -22,57 +27,98 @@ export default function Home() {
     } = usePrayerNotifications();
 
     const isFocused = useIsFocused();
-
     const [warning, setWarning] = useState(null);
-    const [coords, setCoords] = useState(null);
+    const [address, setAddress] = useState(null);
 
-    // Load coords once from saved settings
-    useEffect(() => {
-        (async () => {
-            const saved = await loadSettings();
-            if (saved?.coords) {
-                setCoords(saved.coords);
-            }
-        })();
-    }, []);
+    // Show loading if either context is loading
+    const isLoading = settingsLoading || prayersLoading;
+    // Show error if either context has an error
+    const hasError = settingsError || prayersError;
 
-    // Prayer times hook for prayer times + next prayer countdown
-    const {
-        loadPrayerTimes,
-        prayerTimes,
-        nextPrayerName,
-        nextPrayerTime,
-        prayerCountdown,
-        loading,
-        timesError
-    } = usePrayerService(coords?.latitude, coords?.longitude);
-
+    // --------------------------------------------------
     // Schedule notifications when prayer times are ready
-    useEffect(() => {
-        if (prayerTimes) {
-            schedulePrayerNotifications(prayerTimes);
-        }
-    }, [prayerTimes]);
+    // --------------------------------------------------
+    // useEffect(() => {
+    //     if (prayersTimes) {
+    //         schedulePrayerNotifications(prayersTimes);
+    //     }
+    // }, [prayersTimes]);
 
+    // --------------------------------------------------
     // Update warnings when screen is focused
+    // --------------------------------------------------
+    useEffect(() => {
+        // update warnings
+        if (!settings?.location && !settings?.notifications) {
+            setWarning(tr("labels.warning1"));
+        } else if (!settings?.location) {
+            setWarning(tr("labels.warning2"));
+        } else if (!settings?.notifications) {
+            setWarning(tr("labels.warning3"));
+        } else {
+            setWarning(null);
+        }
+    }, [isFocused]);
+
+    // Reverse geocode to get human-readable address
     useEffect(() => {
         (async () => {
-            // re-read storage on screen focus
-            const saved = await loadSettings();
-            setCoords(saved?.coords ?? null);
-
-            // update warnings immediately
-            if (!saved?.coords && !saved?.notifications) {
-                setWarning(lang.tr("labels.warning1"));
-            } else if (!saved?.coords) {
-                setWarning(lang.tr("labels.warning2"));
-            } else if (!saved?.notifications) {
-                setWarning(lang.tr("labels.warning3"));
-            } else {
-                setWarning(null);
-            }
+            const fullAddress = await reverseGeocode(settings.location);
+            setAddress(fullAddress);
         })();
-    }, [isFocused]);
+    }, [settings.location]);
+
+    // Loading state
+    if (isLoading) {
+        // return <LoadingScreen message={tr("labels.loading")} />
+        return (
+            <LoadingScreen
+                message={settingsLoading ? 'Loading settings...' : 'Loading prayer times...'}
+                styling={{ backgroundColor: theme.background }}
+            />
+        );
+    }
+
+    // Error state
+    if (hasError) {
+        return (
+            <View style={{ ...styles.centerContainer, backgroundColor: theme.background }}>
+                <Text style={styles.errorText}>
+                    {tr("labels.noPrayersTimes")}
+                    {settingsError || prayersError}
+                </Text>
+                <TouchableOpacity style={styles.retryButton} onPress={refetchPrayersTimes}>
+                    <Text style={styles.retryButtonText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // No location set
+    if (!settings.location) {
+        return (
+            <View style={{ ...styles.centerContainer, backgroundColor: theme.background }}>
+                <Text style={styles.messageText}>Welcome to Nejon-Prayer!</Text>
+                <Text style={styles.subText}>Please set your location to view prayer times</Text>
+                <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/(tabs)/settings")}>
+                    <Text style={styles.settingsButtonText}>Go to Settings</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // No prayer times available
+    if (!hasPrayersTimes) {
+        return (
+            <View style={{ ...styles.centerContainer, backgroundColor: theme.background }}>
+                <Text style={styles.messageText}>No prayer times available for</Text>
+                <Text style={styles.subText}>{address || 'your location'}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={refetchPrayersTimes}>
+                    <Text style={styles.retryButtonText}>Refresh</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
@@ -86,42 +132,31 @@ export default function Home() {
                 )}
 
                 {/* Current date */}
-                <Text style={{ ...styles.date, color: theme.primaryText }}>{new Date().toDateString()}</Text>
+                <Text style={{ ...styles.date, color: theme.primaryText }}>
+                    {formatTimezone(settings.location)}
+                </Text>
 
                 {/* Next prayer countdown */}
                 {nextPrayerName && (
                     <Text style={{ ...styles.countdown, color: theme.secondaryText }}>
-                        {prayerCountdown} » {nextPrayerName ? lang.tr(`prayers.${nextPrayerName}`) : ""}
+                        {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
                     </Text>
                 )}
 
-                {loading ? (
-                    /* Loading text */
-                    <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 20 }}>{lang.tr("labels.loading")}</Text>
-                ) : timesError ? (
-                    /* Prayer times error and retry */
-                    <View style={{ marginTop: 20, alignItems: "center" }}>
-                        <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: "center", marginBottom: 16 }}>
-                            {lang.tr("labels.noPrayerTimes")}
-                        </Text>
-                        <Button title={lang.tr("labels.retryFetch")} onPress={loadPrayerTimes} />
-                    </View>
-                ) : (
-                    /* Prayer times list */
-                    <FlatList
-                        contentContainerStyle={{ padding: 20 }}
-                        data={Object.entries(prayerTimes)}
-                        keyExtractor={([name]) => name}
-                        renderItem={({ item: [name, time] }) => (
-                            <View style={styles.row}>
-                                <Text style={{ ...styles.prayer, color: theme.primaryText }}>
-                                    {lang.tr(`prayers.${name}`)}
-                                </Text>
-                                <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
-                            </View>
-                        )}
-                    />
-                )}
+                {/* Prayer times list  */}
+                <FlatList
+                    contentContainerStyle={{ padding: 20 }}
+                    data={Object.entries(prayersTimes)}
+                    keyExtractor={([name]) => name}
+                    renderItem={({ item: [name, time] }) => (
+                        <View style={styles.row}>
+                            <Text style={{ ...styles.prayer, color: theme.primaryText }}>
+                                {tr(`prayers.${name}`)}
+                            </Text>
+                            <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
+                        </View>
+                    )}
+                />
 
                 {/* Just for Testing... */}
                 {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
@@ -179,5 +214,83 @@ const styles = StyleSheet.create({
         color: "#856404",
         textAlign: "center",
         fontWeight: "500",
+    },
+
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    header: {
+        padding: 20,
+        backgroundColor: '#007AFF',
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    locationText: {
+        fontSize: 16,
+        color: 'white',
+        opacity: 0.8,
+        marginTop: 5,
+    },
+    listContainer: {
+        padding: 10,
+    },
+    prayerTime: {
+        fontSize: 16,
+        color: '#666',
+        fontWeight: '500',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#666',
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#FF3B30',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    messageText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    subText: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    retryButton: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    retryButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    settingsButton: {
+        backgroundColor: '#007AFF',
+        margin: 20,
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    settingsButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

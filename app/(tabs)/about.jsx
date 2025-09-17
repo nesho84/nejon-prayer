@@ -1,21 +1,19 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function About() {
-    // ThemeContext
-    const { theme } = useTheme();
-    // LanguageContext
-    const { lang } = useLanguage();
+export default function AboutScreen() {
+    const { theme } = useThemeContext();
+    const { tr } = useTranslation();
 
     return (
         <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
             <View style={styles.inner}>
                 <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 
-                <Text style={styles.title}>{lang.tr("labels.aboutText1")}</Text>
-                <Text style={styles.desc}>{lang.tr("labels.aboutText2")}</Text>
+                <Text style={styles.title}>{tr("labels.aboutText1")}</Text>
+                <Text style={styles.desc}>{tr("labels.aboutText2")}</Text>
 
                 <Text style={styles.yearText}>
                     ©{(new Date()).getFullYear()} <Text style={styles.link}>nejon.net</Text>
