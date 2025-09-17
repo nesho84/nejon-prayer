@@ -1,8 +1,9 @@
 import * as Location from "expo-location";
 
+// Reverse-geocodes given coordinates into a human-readable timezone.
 export async function formatTimezone(location) {
     try {
-        // 1. Reverse geocode → get human-readable address
+        // Reverse geocode → get human-readable address
         const [place] = await Location.reverseGeocodeAsync({
             latitude: location.latitude,
             longitude: location.longitude,
@@ -12,15 +13,15 @@ export async function formatTimezone(location) {
         const area = place?.district || place?.name || "";
         const country = place?.country || "";
 
-        // 2. Timezone lookup → with Intl.DateTimeFormat
+        // Timezone lookup → with Intl.DateTimeFormat
         const now = new Date();
-        const userLocale = "en-US"; // or detect from device
+        const userLocale = "en-DE"; // or detect from device
 
         const fullTimeZoneName = new Intl.DateTimeFormat(userLocale, {
             timeZoneName: "long",
         }).formatToParts(now).find((p) => p.type === "timeZoneName")?.value;
 
-        const tzOffset = new Intl.DateTimeFormat("en-US", {
+        const tzOffset = new Intl.DateTimeFormat("en-DE", {
             timeZoneName: "shortOffset",
         }).format(now).split(" ").pop();
 
@@ -33,20 +34,20 @@ export async function formatTimezone(location) {
             minute: "2-digit",
         }).format(now);
 
-        return `${fullTimeZoneName}\nTime zone in ${area || city}, ${country} (${tzOffset})\n${formattedTime}`;
+        // return `${fullTimeZoneName}\nTime zone in ${area || city}, ${country} (${tzOffset})\n${formattedTime}`;
+        return {
+            title: fullTimeZoneName,
+            subTitle: `Time zone in ${area || city}, ${country} (${tzOffset})`,
+            date: formattedTime,
+        }
     } catch (err) {
         console.error("❌ Location formatting error:", err);
-        return new Date().toDateString(); // fallback
+        return null;
     }
 }
 
-/**
- * Reverse-geocodes given coordinates into a human-readable string.
- *
- * @param {Object} location - { latitude, longitude }
- * @returns {Promise<string|null>} - Formatted address or null if failed
- */
-export async function reverseGeocode(location) {
+// Reverse-geocodes given coordinates into a human-readable Address.
+export async function formatLocation(location) {
     try {
         if (!location?.latitude || !location?.longitude) {
             return null;
@@ -70,7 +71,7 @@ export async function reverseGeocode(location) {
 
         return fullAddress;
     } catch (err) {
-        console.error("Reverse geocoding error:", err);
+        console.error("❌ Reverse geocoding error:", err);
         return null;
     }
 }

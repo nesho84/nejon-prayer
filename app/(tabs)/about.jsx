@@ -8,7 +8,7 @@ export default function AboutScreen() {
     const { tr } = useTranslation();
 
     return (
-        <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <View style={styles.inner}>
                 <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 

@@ -1,8 +1,8 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-export default function LoadingScreen({ message = "Loading...", styling = null }) {
+export default function LoadingScreen({ message = "Loading...", style }) {
     return (
-        <View style={{ ...styles.container, ...styling }}>
+        <View style={[styles.container, style]}>
             <ActivityIndicator size="large" color="#0000ff" />
             <Text style={styles.text}>
                 {message}

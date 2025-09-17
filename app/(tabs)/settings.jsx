@@ -1,7 +1,7 @@
 import { usePrayersContext } from "@/contexts/PrayersContext";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import { reverseGeocode } from "@/utils/timeZone";
+import { formatLocation } from "@/utils/timeZone";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -32,19 +32,19 @@ export default function SettingsScreen() {
     // Important: handleLanguage updates the LanguageContext asynchronously.
     // Because of React timing, this effect ensures notifications are scheduled
     // only after the context language has actually changed, so they always use the latest translated text.
-    useEffect(() => {
-        if (settings.notifications && settings.coords) {
-            if (prayerTimes) {
-                schedulePrayerNotifications(prayerTimes);
-                console.log("🔔 Notifications schedule after Language change → to:", currentLang);
-            }
-        }
-    }, [currentLang]);
+    // useEffect(() => {
+    //     if (settings.notifications && settings.coords) {
+    //         if (prayerTimes) {
+    //             schedulePrayerNotifications(prayerTimes);
+    //             console.log("🔔 Notifications schedule after Language change → to:", currentLang);
+    //         }
+    //     }
+    // }, [currentLang]);
 
     // Reverse geocode to get human-readable address
     useEffect(() => {
         (async () => {
-            const fullAddress = await reverseGeocode(settings.location);
+            const fullAddress = await formatLocation(settings.location);
             setAddress(fullAddress);
         })();
     }, [settings.location]);
