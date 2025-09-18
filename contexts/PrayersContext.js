@@ -1,5 +1,5 @@
-import { useSettingsContext } from "@/contexts/SettingsContext";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useSettingsContext } from "@/contexts/SettingsContext";
 
 export const PrayersContext = createContext();
 
@@ -22,7 +22,7 @@ export function PrayersProvider({ children }) {
         }
 
         // Don't refetch if location hasn't changed
-        if (location === lastFetchedLocation && prayerData.length > 0) {
+        if (location === lastFetchedLocation && prayersTimes.length > 0) {
             setPrayersLoading(false);
             return;
         }
@@ -71,7 +71,7 @@ export function PrayersProvider({ children }) {
                 throw new Error("Invalid API response format");
             }
         } catch (err) {
-            console.warn("Failed to fetch prayer data:", err);
+            console.warn("❌ Failed to fetch prayer data:", err);
             setPrayersError(err.message);
             setPrayersTimes([]);
         } finally {

@@ -1,16 +1,16 @@
-import LoadingScreen from "@/components/LoadingScreen";
-import { usePrayersContext } from '@/contexts/PrayersContext';
-import { useSettingsContext } from '@/contexts/SettingsContext';
-import { useThemeContext } from "@/contexts/ThemeContext";
-import useNextPrayer from "@/hooks/useNextPrayer";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import useTranslation from "@/hooks/useTranslation";
-import { formatLocation, formatTimezone } from "@/utils/timeZone";
-import { useIsFocused } from "@react-navigation/native";
-import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useSettingsContext } from '@/contexts/SettingsContext';
+import { usePrayersContext } from '@/contexts/PrayersContext';
+import useNextPrayer from "@/hooks/useNextPrayer";
+import useTranslation from "@/hooks/useTranslation";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import { formatLocation, formatTimezone } from "@/utils/timeZone";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -18,8 +18,10 @@ export default function HomeScreen() {
     const { settings, settingsLoading, settingsError } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
-    const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
+    // Hook automatically handles all scheduling - we just need debug functions
+    const { sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
+    // Local state
     const isFocused = useIsFocused();
     const [warning, setWarning] = useState(null);
     const [fullAddress, setFullAddress] = useState(null);
@@ -31,19 +33,10 @@ export default function HomeScreen() {
     const hasError = settingsError || prayersError;
 
     // --------------------------------------------------
-    // Schedule notifications when prayer times are ready
-    // --------------------------------------------------
-    useEffect(() => {
-        if (hasPrayersTimes && settings?.notifications) {
-            schedulePrayerNotifications(prayersTimes);
-        }
-    }, [hasPrayersTimes, settings?.notifications]);
-
-    // --------------------------------------------------
     // Update warnings when screen is focused
     // --------------------------------------------------
     useEffect(() => {
-        // update warnings
+        // Update warnings
         if (!settings?.location && !settings?.notifications) {
             setWarning(tr("labels.warning1"));
         } else if (!settings?.location) {
@@ -59,27 +52,18 @@ export default function HomeScreen() {
     // Format location and timezone when location is available
     // --------------------------------------------------------
     useEffect(() => {
-        if (!settings?.location || settingsLoading) {
-            return;
-        }
-
+        if (!settings?.location || settingsLoading) return;
         (async () => {
             try {
-                // Full human-readable string
                 if (!hasPrayersTimes) {
                     const formatedAddress = await formatLocation(settings.location);
-                    if (formatedAddress) {
-                        setFullAddress(formatedAddress);
-                    }
+                    if (formatedAddress) setFullAddress(formatedAddress);
                 }
-                // User formatted timezone
                 const formatedTimezone = await formatTimezone(settings.location);
-                if (formatedTimezone) {
-                    setTimezone(formatedTimezone);
-                }
+                if (formatedTimezone) setTimezone(formatedTimezone);
             } catch (error) {
                 console.warn("Location formatting error:", error);
-                // Set fallback for timezone so UI doesn't break
+                // Set fallback for timezone
                 setTimezone({
                     title: new Date().toDateString(),
                     subTitle: "",
@@ -102,7 +86,6 @@ export default function HomeScreen() {
 
     // Loading state
     if (isLoading) {
-        // return <LoadingScreen message={tr("labels.loading")} />
         return (
             <LoadingScreen
                 message={settingsLoading ? 'Loading settings...' : 'Loading prayer times...'}
@@ -117,7 +100,6 @@ export default function HomeScreen() {
             <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
                 <Text style={styles.errorText}>
                     {tr("labels.noPrayersTimes")}
-                    {settingsError || prayersError}
                 </Text>
                 <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
                     <Text style={styles.retryButtonText}>Retry</Text>
@@ -155,70 +137,68 @@ export default function HomeScreen() {
     // Main content
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-            <View style={styles.innerContainer}>
+            <ScrollView
+                style={styles.scrollContainer}
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={prayersLoading || settingsLoading}
+                        onRefresh={handleRefresh}
+                        tintColor={theme.accent}
+                        colors={[theme.accent]}
+                    />
+                }
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.innerContainer}>
 
-                {/* Warnings box */}
-                {warning && (
-                    <View style={styles.warningBox}>
-                        <Text style={styles.warningText}>{warning}</Text>
-                    </View>
-                )}
-
-                {/* Current Timezone/Date */}
-                <View style={styles.timeZone}>
-                    <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>
-                        {timeZone?.title || new Date().toDateString()}
-                    </Text>
-                    <Text style={[styles.timeZoneSubTitle, { color: theme.secondaryText }]}>
-                        {timeZone?.subTitle || ""}
-                    </Text>
-                    <Text style={[styles.timeZoneDate, { color: theme.secondaryText }]}>
-                        {timeZone?.date || ""}
-                    </Text>
-                </View>
-
-                {/* Next prayer countdown */}
-                {nextPrayerName && (
-                    <Text style={[styles.countdown, { color: theme.secondaryText }]}>
-                        {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
-                    </Text>
-                )}
-
-                {/* Prayer times list  */}
-                <FlatList
-                    data={Object.entries(prayersTimes)}
-                    keyExtractor={([name]) => name}
-                    renderItem={({ item: [name, time] }) => (
-                        <View style={styles.listContainer}>
-                            <Text style={[styles.prayerName, { color: theme.primaryText }]}>
-                                {tr(`prayers.${name}`)}
-                            </Text>
-                            <Text style={[styles.prayerTime, { color: theme.primaryText }]}>{time}</Text>
+                    {/* Warnings box */}
+                    {warning && (
+                        <View style={styles.warningBox}>
+                            <Text style={styles.warningText}>{warning}</Text>
                         </View>
                     )}
-                    refreshControl={
-                        <RefreshControl refreshing={prayersLoading} onRefresh={handleRefresh} />
-                    }
-                    contentContainerStyle={{ padding: 20 }}
-                    // Safety props for FlatList
-                    removeClippedSubviews={false}
-                    initialNumToRender={10}
-                    maxToRenderPerBatch={10}
-                    // Handle empty data gracefully
-                    ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Text style={[styles.emptyText, { color: theme.secondaryText }]}>
-                                {tr("labels.noPrayerData") || "No prayer data available"}
-                            </Text>
-                        </View>
-                    }
-                />
 
-                {/* Just for Testing... */}
-                {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
-                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
+                    {/* Current Timezone/Date */}
+                    <View style={styles.timeZone}>
+                        <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>
+                            {timeZone?.title || new Date().toDateString()}
+                        </Text>
+                        <Text style={[styles.timeZoneSubTitle, { color: theme.secondaryText }]}>
+                            {timeZone?.subTitle || ""}
+                        </Text>
+                        <Text style={[styles.timeZoneDate, { color: theme.secondaryText }]}>
+                            {timeZone?.date || ""}
+                        </Text>
+                    </View>
 
-            </View >
+                    {/* Next prayer countdown */}
+                    {nextPrayerName && (
+                        <Text style={[styles.countdown, { color: theme.secondaryText }]}>
+                            {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
+                        </Text>
+                    )}
+
+                    {/* Prayer times list - Using map instead of FlatList */}
+                    <View style={styles.prayersList}>
+                        {Object.entries(prayersTimes || {}).map(([name, time]) => (
+                            <View key={name} style={[styles.listContainer, { borderBottomColor: theme.border }]}>
+                                <Text style={[styles.prayerName, { color: theme.primaryText }]}>
+                                    {tr(`prayers.${name}`) || name}
+                                </Text>
+                                <Text style={[styles.prayerTime, { color: theme.primaryText }]}>
+                                    {time}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    {/* Just for Testing... */}
+                    {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
+                    {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
+
+                </View>
+            </ScrollView>
         </SafeAreaView >
     );
 }
@@ -227,11 +207,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    scrollContainer: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
     innerContainer: {
         flex: 1,
-        padding: 8,
+        paddingHorizontal: 20,
         alignItems: "center",
         justifyContent: "center",
+        minHeight: '100%',
     },
     centerContainer: {
         flex: 1,
@@ -242,18 +230,17 @@ const styles = StyleSheet.create({
     timeZone: {
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 60,
-        marginBottom: 30,
+        marginBottom: 45,
     },
     timeZoneTitle: {
         fontSize: 23,
-        marginBottom: 6,
+        marginBottom: 5,
     },
     timeZoneSubTitle: {
         fontSize: 15,
         fontWeight: "300",
         color: '#666',
-        marginBottom: 5,
+        marginBottom: 4,
     },
     timeZoneDate: {
         fontSize: 16,
@@ -261,13 +248,12 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     countdown: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: "500",
         marginTop: 30,
-        marginBottom: 45,
+        marginBottom: 55,
     },
     listContainer: {
-        backgroundColor: "red",
         flexDirection: "row",
         justifyContent: "space-between",
         borderBottomWidth: 0.5,
@@ -277,10 +263,11 @@ const styles = StyleSheet.create({
     },
     prayerName: {
         fontSize: 18,
+        fontWeight: "500",
     },
     prayerTime: {
         fontSize: 18,
-        fontWeight: "700",
+        fontWeight: "400",
     },
     warningBox: {
         padding: 8,
@@ -288,7 +275,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#f5c2c7",
         borderRadius: 4,
-        marginVertical: 6,
+        marginBottom: 30,
     },
     warningText: {
         color: "#856404",
@@ -327,7 +314,6 @@ const styles = StyleSheet.create({
     },
     settingsButton: {
         backgroundColor: '#007AFF',
-        margin: 20,
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',

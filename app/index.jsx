@@ -1,18 +1,18 @@
-import LoadingScreen from "@/components/LoadingScreen";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { Picker } from "@react-native-picker/picker";
-import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
-import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { Picker } from "@react-native-picker/picker";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();
   const { settingsLoading, settings, saveSettings } = useSettingsContext();
 
-  const [loading, setLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
     return <LoadingScreen message="Redirecting..." />;
   }
   // Show local loading
-  if (loading) {
+  if (localLoading) {
     return <LoadingScreen message="Please Wait..." />;
   }
 
@@ -47,7 +47,7 @@ export default function OnboardingScreen() {
   // 1️⃣ (Step 1) Handle language
   // ----------------------------
   async function handleLanguage() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
       // Update languageRef: updated in the dropdown-picker
       setStep(2);
@@ -55,7 +55,7 @@ export default function OnboardingScreen() {
       console.error("Language change error:", err);
       Alert.alert("Error", "Failed to save language setting.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
@@ -63,7 +63,7 @@ export default function OnboardingScreen() {
   // 2️⃣ (Step 2) Request location permission
   // ----------------------------------------
   async function requestLocation() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -96,7 +96,7 @@ export default function OnboardingScreen() {
       console.error("❌ Location access error:", err);
       Alert.alert("Error", "Failed to get location. Please try again.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
@@ -104,7 +104,7 @@ export default function OnboardingScreen() {
   // 3️⃣ (Step 3) Request notification permission
   // --------------------------------------------
   async function requestNotifications() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== "granted") {
@@ -124,7 +124,7 @@ export default function OnboardingScreen() {
       console.error("❌ Notification access error:", err);
       Alert.alert("Error", "Failed to request notifications. Please try again.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
@@ -132,7 +132,7 @@ export default function OnboardingScreen() {
   // 🏁 (Finish) Update SettingsContext and redirect to HomeScreen
   // --------------------------------------------------------------
   async function finishOnboarding() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
       // Update SettingsContext
       await saveSettings({
@@ -148,7 +148,7 @@ export default function OnboardingScreen() {
       console.error("❌ Onboarding error:", err);
       Alert.alert("Error", "Failed to finish onboarding. Please try again.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 

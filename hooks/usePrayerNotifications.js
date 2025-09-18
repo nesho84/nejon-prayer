@@ -1,7 +1,9 @@
-import useTranslation from "@/hooks/useTranslation";
-import * as Notifications from "expo-notifications";
 import { useEffect, useRef } from "react";
 import { Alert, Linking, Platform } from "react-native";
+import * as Notifications from "expo-notifications";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { usePrayersContext } from "@/contexts/PrayersContext";
+import useTranslation from "@/hooks/useTranslation";
 
 // Set notification handler to show notifications when app is in foreground
 Notifications.setNotificationHandler({
@@ -15,8 +17,11 @@ Notifications.setNotificationHandler({
 
 export default function usePrayerNotifications() {
     const { tr, currentLang } = useTranslation();
+    const { settings, settingsLoading } = useSettingsContext();
+    const { prayersTimes, prayersLoading, hasPrayersTimes } = usePrayersContext();
+
     const isInitialized = useRef(false);
-    const lastScheduledTimes = useRef(null);
+    const lastScheduledKey = useRef(null);
 
     // Initialize permissions and channel once
     const initialize = async () => {
@@ -62,21 +67,15 @@ export default function usePrayerNotifications() {
                     await Notifications.cancelScheduledNotificationAsync(item.identifier);
                 }
             }
-            console.log("🟧 All existing prayer notifications cancelled");
+            console.log("⚠️ All existing prayer notifications cancelled");
+            lastScheduledKey.current = null;
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }
     };
 
-    // Schedule today's Prayer notifications
+    // Schedule prayer notifications
     const schedulePrayerNotifications = async (times) => {
-        // Prevent duplicate scheduling
-        const timesKey = JSON.stringify(times);
-        if (lastScheduledTimes.current === timesKey) {
-            console.log("⚠️ Same prayer times already scheduled, skipping");
-            return;
-        }
-
         try {
             console.log("🔔 Starting notification scheduling...");
 
@@ -87,7 +86,7 @@ export default function usePrayerNotifications() {
                 return;
             }
 
-            // Cancel existing notifications
+            // Cancel existing notifications first
             await cancelPrayerNotifications();
 
             const now = new Date();
@@ -133,19 +132,119 @@ export default function usePrayerNotifications() {
 
                 scheduledCount++;
 
-                // Only for Debugging: Format date as DD/MM/YYYY, HH:mm:ss
+                // Debugg logging: Format date as DD/MM/YYYY, HH:mm:ss
                 const formattedDate = fireDate.toLocaleDateString('en-GB') + ', ' +
                     fireDate.toLocaleTimeString('en-GB', { hour12: false });
                 console.log(`⏰ Scheduled ${name} at ${formattedDate}`);
             }
 
-            lastScheduledTimes.current = timesKey;
             console.log(`✅ ${scheduledCount} prayer notifications scheduled with language "${currentLang}"`);
-
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications:", err);
         }
     };
+
+    // AUTOMATIC SCHEDULING EFFECT - The core reactive logic
+    useEffect(() => {
+        const handleNotificationScheduling = async () => {
+            // Don't do anything if contexts are still loading
+            if (settingsLoading || prayersLoading) {
+                return;
+            }
+            // Create a unique key that represents the current state
+            const currentKey = JSON.stringify({
+                notifications: settings?.notifications,
+                location: settings?.location,
+                language: currentLang,
+                prayerTimes: prayersTimes,
+            });
+            // Skip if nothing relevant has changed
+            if (lastScheduledKey.current === currentKey) {
+                return;
+            }
+            // If notifications are disabled, cancel all and exit
+            if (!settings?.notifications) {
+                await cancelPrayerNotifications();
+                lastScheduledKey.current = currentKey;
+                return;
+            }
+            // If notifications are enabled but we don't have prayer times, just update the key
+            if (!hasPrayersTimes) {
+                console.log("📵 Notifications enabled but no prayer times available yet");
+                lastScheduledKey.current = currentKey;
+                return;
+            }
+            // If notifications are enabled and we have prayer times, schedule them
+            if (settings.notifications && hasPrayersTimes) {
+                await schedulePrayerNotifications(prayersTimes);
+                lastScheduledKey.current = currentKey;
+            }
+        };
+        handleNotificationScheduling();
+    }, [
+        settings?.notifications,   // When notifications are toggled
+        settings?.location,        // When location changes
+        currentLang,               // When language changes
+        prayersTimes,              // When prayer times change
+        hasPrayersTimes,           // When prayer times become available
+        settingsLoading,           // When settings finish loading
+        prayersLoading,            // When prayers finish loading
+        tr                         // When translation function updates
+    ]);
+
+    // APP STARTUP/FOCUS EFFECT - Reschedule on app open/focus
+    useEffect(() => {
+        const handleAppStartup = async () => {
+            // Only run when all contexts are ready
+            if (settingsLoading || prayersLoading) {
+                return;
+            }
+            // Only reschedule if notifications are enabled and we have prayer times
+            if (!settings?.notifications || !hasPrayersTimes) {
+                return;
+            }
+
+            console.log("🚀 App startup - checking if notifications need rescheduling...");
+
+            try {
+                // Check if we have any scheduled prayer notifications
+                const allNotifications = await Notifications.getAllScheduledNotificationsAsync();
+                const prayerNotifications = allNotifications.filter(
+                    n => n.content?.data?.type === "prayer"
+                );
+                // If no prayer notifications exist, schedule them
+                if (prayerNotifications.length === 0) {
+                    console.log("📋 No prayer notifications found, scheduling...");
+                    await schedulePrayerNotifications(prayersTimes);
+                    return;
+                }
+                // Check if any scheduled notifications are in the past (old/stale)
+                const now = new Date();
+                const oldNotifications = prayerNotifications.filter(notification => {
+                    if (notification.trigger?.type === 'date') {
+                        const fireDate = new Date(notification.trigger.date);
+                        return fireDate < now;
+                    }
+                    return false;
+                });
+
+                // If we have stale notifications, reschedule everything
+                if (oldNotifications.length > 0) {
+                    console.log(`🕐 Found ${oldNotifications.length} stale notifications, rescheduling...`);
+                    await schedulePrayerNotifications(prayersTimes);
+                } else {
+                    console.log("✅ All prayer notifications are current");
+                }
+            } catch (error) {
+                console.error("❌ Error checking notification status:", error);
+            }
+        };
+
+        // Only run when contexts are ready (not loading)
+        if (!settingsLoading && !prayersLoading && settings?.notifications && hasPrayersTimes) {
+            handleAppStartup();
+        }
+    }, [settingsLoading, prayersLoading]); // Only trigger when loading states change
 
     // Debug utility: send a test notification
     const sendTestNotification = async () => {

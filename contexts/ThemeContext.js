@@ -1,7 +1,7 @@
-import { darkTheme, lightTheme } from "@/constants/themes";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Appearance } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { darkTheme, lightTheme } from "@/constants/themes";
 
 export const ThemeContext = createContext();
 
@@ -29,7 +29,7 @@ export function ThemeProvider({ children }) {
             setCurrentTheme(value);
             setAppTheme(resolveTheme(value));
         } catch (e) {
-            console.warn("Failed to load theme", e);
+            console.warn("❌ Failed to load theme", e);
             setAppTheme(lightTheme);
         } finally {
             setThemeLoading(false);
@@ -43,7 +43,7 @@ export function ThemeProvider({ children }) {
             setAppTheme(resolveTheme(value));
             await AsyncStorage.setItem(THEME_KEY, value);
         } catch (e) {
-            console.warn("Failed to save theme", e);
+            console.warn("❌ Failed to save theme", e);
         }
     };
 

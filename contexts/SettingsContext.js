@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const SettingsContext = createContext();
 
@@ -25,7 +25,7 @@ export function SettingsProvider({ children }) {
                 setSettings(parsedSettings);
             }
         } catch (e) {
-            console.warn("⚠️ Failed to load settings", e);
+            console.warn("❌ Failed to load settings", e);
             setSettingsError("Failed to load settings");
         } finally {
             setSettingsLoading(false);
@@ -39,8 +39,8 @@ export function SettingsProvider({ children }) {
             await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
             setSettings(updated);
         } catch (e) {
-            console.warn("Failed to save settings", e);
-            setSettingsError("Failed to save settings");
+            console.warn("❌ Failed to save settings", e);
+            setSettingsError("❌ Failed to save settings");
         }
     };
 

@@ -1,8 +1,8 @@
-import { useThemeContext } from "@/contexts/ThemeContext";
-import useTranslation from "@/hooks/useTranslation";
-import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
 
 export default function TabLayout() {
     const { theme } = useThemeContext();

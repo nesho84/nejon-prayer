@@ -1,61 +1,59 @@
-import { usePrayersContext } from "@/contexts/PrayersContext";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import { formatLocation } from "@/utils/timeZone";
-import { Picker } from "@react-native-picker/picker";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Button, Linking, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, StyleSheet, Switch, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Picker } from "@react-native-picker/picker";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { usePrayersContext } from "@/contexts/PrayersContext";
+import useTranslation from "@/hooks/useTranslation";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import { formatLocation } from "@/utils/timeZone";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function SettingsScreen() {
     const { theme, currentTheme, changeTheme } = useThemeContext();
-    const { prayerTimes, prayersLoading } = usePrayersContext();
+    const { tr, currentLang } = useTranslation();
+    const { settings, settingsLoading, settingsError, saveSettings } = useSettingsContext();
+    const { prayersTimes, prayersLoading, prayersError, hasPrayersTimes } = usePrayersContext();
+    // Hook automatically handles all scheduling - we just need debug functions
+    const { sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
-    // Notifications hook
-    const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
+    // Local state
+    const [localLoading, setLocalLoading] = useState(false);
+    const [fullAddress, setFullAddress] = useState(null);
+    const [selectedLanguage, setSelectedLanguage] = useState(currentLang);
 
-    const [loading, setLoading] = useState(true);
-    const [settings, setSettings] = useState({});
-    const [address, setAddress] = useState(null);
-    const [selectedLanguage, setSelectedLanguage] = useState(lang.current);
+    // Show loading if contexts are loading or local operations
+    const isLoading = settingsLoading || localLoading;
+    // Show error if either context has an error
+    const hasError = settingsError || prayersError;
 
+    // --------------------------------------------------
+    // Format address when location changes
+    // --------------------------------------------------
     useEffect(() => {
         (async () => {
-            const saved = await loadSettings();
-            if (saved) setSettings(saved);
-            setLoading(false);
+            if (!settings?.location || settingsLoading) return;
+            try {
+                const formattedAddress = await formatLocation(settings.location);
+                if (formattedAddress) setFullAddress(formattedAddress);
+            } catch (error) {
+                console.warn("Error formatting address:", error);
+            }
         })();
-    }, []);
+    }, [settings?.location, settingsLoading]);
 
-    // Important: handleLanguage updates the LanguageContext asynchronously.
-    // Because of React timing, this effect ensures notifications are scheduled
-    // only after the context language has actually changed, so they always use the latest translated text.
-    // useEffect(() => {
-    //     if (settings.notifications && settings.coords) {
-    //         if (prayerTimes) {
-    //             schedulePrayerNotifications(prayerTimes);
-    //             console.log("🔔 Notifications schedule after Language change → to:", currentLang);
-    //         }
-    //     }
-    // }, [currentLang]);
-
-    // Reverse geocode to get human-readable address
-    useEffect(() => {
-        (async () => {
-            const fullAddress = await formatLocation(settings.location);
-            setAddress(fullAddress);
-        })();
-    }, [settings.location]);
-
-    // Set or update location and reschedule notifications
-    async function resetLocation() {
-        setLoading(true);
+    // --------------------------------------------------
+    // Set or update location
+    // --------------------------------------------------
+    const resetLocation = async () => {
+        setLocalLoading(true);
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
-                Alert.alert("Location denied", "Prayer times will not be location-based.");
+                Alert.alert(tr("labels.locationDenied"), tr("labels.locationDeniedMessage"));
                 return;
             }
 
@@ -71,186 +69,312 @@ export default function SettingsScreen() {
             );
 
             if (!loc?.coords) {
-                Alert.alert("Error", "Failed to get location. Please try again.");
+                Alert.alert(tr("labels.error"), tr("labels.locationError"));
                 return;
             }
 
-            // Save settings
-            const newSettings = { ...settings, coords: loc.coords };
-            await saveSettings(newSettings);
-            setSettings(newSettings);
+            // Just save the location - hook will auto-handle notification rescheduling
+            await saveSettings({ location: loc.coords });
 
-            // Reschedule notifications if enabled
-            if (newSettings.notifications && newSettings.coords) {
-                if (prayerTimes) {
-                    schedulePrayerNotifications(prayerTimes);
-                    console.log("🔔 Notifications scheduled after Location reset");
-                }
-            }
+            console.log("✅ Location changed to:", loc.coords);
         } catch (err) {
             console.error("Location error:", err);
-            Alert.alert("Error", "Failed to get location.");
+            Alert.alert(tr("labels.error"), tr("labels.locationError"));
         } finally {
-            setLoading(false);
+            setLocalLoading(false);
         }
-    }
+    };
 
-    // New: Change language
-    async function handleLanguage(value) {
-        setLoading(true);
-        try {
-            setSelectedLanguage(value);
-            // Update LanguageContext
-            changeLanguage(value);
-        } catch (error) {
-            console.error("Language change error:", error);
-            Alert.alert("Error", "Failed to update language setting.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    // Change theme
-    async function handleTheme(value) {
-        setLoading(true);
-        try {
-            // Update context
-            changeTheme(value);
-
-            const newSettings = { ...settings, theme: value };
-            setSettings(newSettings);
-            await saveSettings(newSettings);
-        } catch (err) {
-            console.error("Theme change error:", err);
-            Alert.alert("Error", "Failed to update theme setting.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
+    // --------------------------------------------------
     // Toggle notifications
-    async function toggleNotifications(value) {
-        setLoading(true);
+    // --------------------------------------------------
+    const toggleNotifications = async (value) => {
+        setLocalLoading(true);
         try {
-            let finalValue = value;
-
             if (value) {
-                // 1️⃣ Check current status
+                // Check permission first
                 const { status } = await Notifications.getPermissionsAsync();
 
-                if (status !== "granted") {
-                    // 2️⃣ Request permission (shows modal only first time)
+                if (status !== 'granted') {
                     const { status: newStatus } = await Notifications.requestPermissionsAsync();
-                    if (newStatus !== "granted") {
-                        // 3️⃣ Denied → open system settings
+                    if (newStatus !== 'granted') {
+                        // Denied → open system settings
                         Alert.alert(
-                            "Notifications Disabled",
-                            "To receive prayer reminders, please enable notifications in system settings.",
+                            tr("labels.notificationsDisabled"),
+                            tr("labels.notificationsDisabledMessage"),
                             [
-                                { text: "Cancel", style: "cancel" },
-                                { text: "Open Settings", onPress: () => Linking.openSettings() },
+                                { text: tr("buttons.cancel"), style: "cancel" },
+                                { text: tr("buttons.openSettings"), onPress: Linking.openSettings },
                             ]
                         );
-                        finalValue = false; // force disable
+                        return;
                     }
                 }
-                // 4️⃣ If granted and location available, schedule notifications
-                if (finalValue && settings.coords) {
-                    const times = await fetchPrayerTimes(settings.coords.latitude, settings.coords.longitude);
-                    if (times) await schedulePrayerNotifications(times);
-                    console.log("🔔 Notifications schedule after Notifications enabled");
-                }
-            } else {
-                // User turned off notifications → cancel all scheduled prayer notifications
-                await cancelPrayerNotifications();
-                console.log("🟧 All existing prayer notifications cancelled");
             }
 
-            // 5️⃣ Save settings
-            const newSettings = { ...settings, notifications: finalValue };
-            await saveSettings(newSettings);
-            setSettings(newSettings);
+            // Just save the setting - hook automatically handles scheduling/cancelling!
+            await saveSettings({ notifications: value });
+
+            console.log("Notifications status changed to:", value);
         } catch (err) {
             console.error("Notification toggle error:", err);
-            Alert.alert("Error", "Failed to update notifications setting.");
+            Alert.alert(tr("labels.error"), tr("labels.notificationError"));
         } finally {
-            setLoading(false);
+            setLocalLoading(false);
         }
-    }
+    };
 
-    if (loading) {
+    // --------------------------------------------------
+    // Change language
+    // --------------------------------------------------
+    const handleLanguage = async (value) => {
+        setLocalLoading(true);
+        try {
+            setSelectedLanguage(value);
+
+            // Save language in settings - hook will auto-handle notification rescheduling
+            await saveSettings({ language: value });
+
+            console.log("✅ Language changed to:", value);
+        } catch (err) {
+            console.error("Language change error:", err);
+            Alert.alert(tr("labels.error"), tr("labels.languageError"));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // --------------------------------------------------
+    // Change theme
+    // --------------------------------------------------
+    const handleTheme = async (value) => {
+        setLocalLoading(true);
+        try {
+            // Update ThemeContext
+            await changeTheme(value);
+
+            console.log("✅ Theme changed to:", value);
+        } catch (err) {
+            console.error("Theme change error:", err);
+            Alert.alert(tr("labels.error"), tr("labels.themeError"));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // Loading State
+    if (isLoading) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
-                <ActivityIndicator size="large" color="#0000ff" />
-                <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 12 }}>Please Wait</Text>
-            </View>
+            <LoadingScreen
+                message={tr("labels.loadingSettings")}
+                style={{ backgroundColor: theme.background }}
+            />
         );
     }
 
+    // Error State
+    if (hasError) {
+        return (
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                <View style={styles.centerContainer}>
+                    <Text style={[styles.errorText, { color: theme.primaryText }]}>
+                        {tr("labels.settingsError")}
+                    </Text>
+                    <Text style={[styles.subText, { color: theme.secondaryText }]}>
+                        {settingsError || prayersError}
+                    </Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    // Main Content
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-            <View style={{ flex: 1, padding: 16 }}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+            <ScrollView
+                style={styles.scrollContainer}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.content}>
 
-                {/* Theme */}
-                <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.theme")}</Text>
-                    <Picker
-                        selectedValue={settings.theme || currentTheme}
-                        onValueChange={(value) => handleTheme(value)}
-                        dropdownIconColor={theme.primaryText}
-                        dropdownIconRippleColor={theme.primaryText}
-                        style={{ width: '100%', backgroundColor: theme.background, color: theme.primaryText }}
-                    >
-                        <Picker.Item label="Dark" value="dark" />
-                        <Picker.Item label="Light" value="light" />
-                        <Picker.Item label="System" value="system" />
-                    </Picker>
-                </View>
-
-                {/* Language */}
-                <View style={{ borderRadius: 5, marginTop: 16, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.language")}</Text>
-                    <Picker
-                        selectedValue={selectedLanguage || currentLang}
-                        onValueChange={(value) => handleLanguage(value)}
-                        dropdownIconColor={theme.primaryText}
-                        dropdownIconRippleColor={theme.primaryText}
-                        style={{ width: '100%', backgroundColor: theme.background, color: theme.primaryText }}
-                    >
-                        <Picker.Item label="English" value="en" />
-                        <Picker.Item label="Shqip" value="sq" />
-                        <Picker.Item label="Deutsch" value="de" />
-                    </Picker>
-                </View>
-
-                {/* Location */}
-                <View style={{ borderRadius: 5, marginVertical: 12, padding: 8, backgroundColor: theme.card }}>
-                    <Text style={{ fontSize: 20, marginBottom: 12, color: theme.primaryText }}>{lang.tr("labels.location")}</Text>
-                    <Button
-                        title={settings.coords ? lang.tr("labels.locationButtonText1") : lang.tr("labels.locationButtonText2")}
-                        onPress={resetLocation}
-                    />
-
-                    {/* human-readable Address */}
-                    {settings.coords && (
-                        <Text style={{ marginVertical: 8, color: theme.primaryText }}>
-                            {address ? address : lang.tr("labels.loading")}
+                    {/* Theme Setting */}
+                    <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                            {tr("labels.theme")}
                         </Text>
-                    )}
-                </View>
+                        <Picker
+                            selectedValue={settings.theme || currentTheme}
+                            onValueChange={handleTheme}
+                            dropdownIconColor={theme.primaryText}
+                            dropdownIconRippleColor={theme.primaryText}
+                            style={[styles.picker, { backgroundColor: theme.background, color: theme.primaryText }]}
+                            enabled={!localLoading}
+                        >
+                            <Picker.Item label="Dark" value="dark" />
+                            <Picker.Item label="Light" value="light" />
+                            <Picker.Item label="System" value="system" />
+                        </Picker>
+                    </View>
 
-                {/* Notifications */}
-                <View style={{ borderRadius: 5, flexDirection: "row", alignItems: "center", width: '100%', justifyContent: 'space-between', backgroundColor: theme.card, padding: 8 }}>
-                    <Text style={{ fontSize: 20, marginRight: 12, color: theme.primaryText }}>{lang.tr("labels.notifications")}</Text>
-                    <Switch
-                        value={settings.notifications}
-                        onValueChange={(value) => toggleNotifications(value)}
-                    />
-                </View>
+                    {/* Language Setting */}
+                    <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                            {tr("labels.language")}
+                        </Text>
+                        <Picker
+                            selectedValue={selectedLanguage}
+                            onValueChange={handleLanguage}
+                            dropdownIconColor={theme.primaryText}
+                            dropdownIconRippleColor={theme.primaryText}
+                            style={[styles.picker, { backgroundColor: theme.background, color: theme.primaryText }]}
+                            enabled={!localLoading}
+                        >
+                            <Picker.Item label="English" value="en" />
+                            <Picker.Item label="Shqip" value="sq" />
+                            <Picker.Item label="Deutsch" value="de" />
+                        </Picker>
+                    </View>
 
-            </View>
-        </SafeAreaView>
+                    {/* Location Setting */}
+                    <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                            {tr("labels.location")}
+                        </Text>
+                        <TouchableOpacity
+                            style={styles.resetLocationButton}
+                            onPress={resetLocation}
+                            disabled={localLoading}
+                        >
+                            <Text style={styles.resetLocationButtonText}>
+                                {settings.location
+                                    ? (tr("labels.locationButtonText1"))
+                                    : (tr("labels.locationButtonText2"))}
+                            </Text>
+                        </TouchableOpacity>
+                        {settings.location && (
+                            <Text style={[styles.addressText, { color: theme.secondaryText }]}>
+                                {fullAddress || (tr("labels.loading"))}
+                            </Text>
+                        )}
+                    </View>
+
+                    {/* Notifications Setting */}
+                    <View style={[styles.settingCard, styles.notificationCard, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText, paddingTop: 10 }]}>
+                            {tr("labels.notifications")}
+                        </Text>
+                        <Switch
+                            value={settings.notifications || false}
+                            onValueChange={toggleNotifications}
+                            disabled={localLoading}
+                            trackColor={{ false: theme.secondaryText, true: theme.accent }}
+                            thumbColor={settings.notifications ? theme.primary : theme.secondaryText}
+                        />
+                    </View>
+
+                    {/* Prayer Times Status */}
+                    <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                            {tr("labels.prayerTimesStatus")}
+                        </Text>
+                        <View style={styles.statusRow}>
+                            <Text style={[styles.statusText, { color: theme.secondaryText }]}>
+                                {hasPrayersTimes
+                                    ? (tr("labels.loaded"))
+                                    : (tr("labels.notLoaded"))
+                                }
+                            </Text>
+                            {prayersLoading && (
+                                <ActivityIndicator size="small" color={theme.accent} />
+                            )}
+                        </View>
+                    </View>
+
+                </View>
+            </ScrollView>
+        </SafeAreaView >
     );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    scrollContainer: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        padding: 16,
+    },
+    content: {
+        flex: 1,
+    },
+    settingCard: {
+        borderRadius: 12,
+        marginBottom: 16,
+        padding: 16,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    notificationCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    settingTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 12,
+    },
+    picker: {
+        width: '100%',
+        borderRadius: 8,
+    },
+    resetLocationButton: {
+        backgroundColor: '#007AFF',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    resetLocationButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    addressText: {
+        marginTop: 12,
+        fontSize: 14,
+        fontStyle: 'italic',
+        lineHeight: 20,
+    },
+    statusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    statusText: {
+        fontSize: 16,
+    },
+    errorText: {
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    subText: {
+        fontSize: 14,
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+});

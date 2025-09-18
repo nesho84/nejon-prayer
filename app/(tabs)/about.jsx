@@ -1,7 +1,7 @@
-import { useThemeContext } from "@/contexts/ThemeContext";
-import useTranslation from "@/hooks/useTranslation";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();

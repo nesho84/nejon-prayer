@@ -29,7 +29,29 @@ export const translations = {
             warning3: "Notifications are disabled. You will not receive prayer time reminders.",
             aboutText1: "About This App",
             aboutText2: "This app provides accurate prayer times based on your location. You can enable daily notifications to remind you of prayer times.",
+            // New translations for SettingsScreen
+            loadingSettings: "Loading settings...",
+            updatingSettings: "Updating settings...",
+            error: "Error",
+            locationDenied: "Location Access Denied",
+            locationDeniedMessage: "Prayer times will not be location-based without location access.",
+            locationError: "Failed to get location. Please try again.",
+            languageError: "Failed to update language setting.",
+            themeError: "Failed to update theme setting.",
+            notificationsDisabled: "Notifications Disabled",
+            notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
+            notificationError: "Failed to update notifications setting.",
+            settingsError: "Failed to load settings",
+            prayerTimesStatus: "Prayers Times Status",
+            loaded: "✅ Loaded",
+            notLoaded: "❌ Not Loaded",
+            loadingAddress: "Loading address...",
         },
+        buttons: {
+            cancel: "Cancel",
+            openSettings: "Open Settings",
+            retry: "Retry",
+        }
     },
     sq: {
         prayers: {
@@ -61,7 +83,29 @@ export const translations = {
             warning3: "Njoftimet janë të çaktivizuara. Nuk do të merrni kujtesa për kohët e lutjeve.",
             aboutText1: "Rreth Këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t'ju kujtuar kohët e lutjeve.",
+            // New Albanian translations
+            loadingSettings: "Duke ngarkuar cilësimet...",
+            updatingSettings: "Duke përditësuar cilësimet...",
+            error: "Gabim",
+            locationDenied: "Aksesi i Lokacionit u Refuzua",
+            locationDeniedMessage: "Kohët e lutjeve nuk do të bazohen në lokacion pa aksesin e lokacionit.",
+            locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
+            languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
+            themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
+            notificationsDisabled: "Njoftimet janë Çaktivizuar",
+            notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
+            notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
+            settingsError: "Dështoi në ngarkimin e cilësimeve",
+            prayerTimesStatus: "Gjendja e kohëve të lutjeve",
+            loaded: "✅ Ngarkuar",
+            notLoaded: "❌ Jo i Ngarkuar",
+            loadingAddress: "Duke ngarkuar adresën...",
         },
+        buttons: {
+            cancel: "Anulo",
+            openSettings: "Hap Cilësimet",
+            retry: "Riprovo",
+        }
     },
     de: {
         prayers: {
@@ -93,6 +137,28 @@ export const translations = {
             warning3: "Benachrichtigungen sind deaktiviert. Sie erhalten keine Erinnerungen an Gebetszeiten.",
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie können tägliche Benachrichtigungen aktivieren, um Sie an die Gebetszeiten zu erinnern.",
+            // New German translations
+            loadingSettings: "Einstellungen werden geladen...",
+            updatingSettings: "Einstellungen werden aktualisiert...",
+            error: "Fehler",
+            locationDenied: "Standortzugriff Verweigert",
+            locationDeniedMessage: "Gebetszeiten basieren nicht auf dem Standort ohne Standortzugriff.",
+            locationError: "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut.",
+            languageError: "Spracheinstellung konnte nicht aktualisiert werden.",
+            themeError: "Darstellungseinstellung konnte nicht aktualisiert werden.",
+            notificationsDisabled: "Benachrichtigungen Deaktiviert",
+            notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
+            notificationError: "Benachrichtigungseinstellung konnte nicht aktualisiert werden.",
+            settingsError: "Einstellungen konnten nicht geladen werden",
+            prayerTimesStatus: "Status der Gebetszeiten",
+            loaded: "✅ Geladen",
+            notLoaded: "❌ Nicht Geladen",
+            loadingAddress: "Adresse wird geladen...",
         },
+        buttons: {
+            cancel: "Abbrechen",
+            openSettings: "Einstellungen Öffnen",
+            retry: "Wiederholen",
+        }
     }
 };
