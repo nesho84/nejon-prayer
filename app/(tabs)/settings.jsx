@@ -18,12 +18,11 @@ export default function SettingsScreen() {
     const { settings, settingsLoading, settingsError, saveSettings } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, hasPrayersTimes } = usePrayersContext();
     // Hook automatically handles all scheduling - we just need debug functions
-    const { sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
+    const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
     const [fullAddress, setFullAddress] = useState(null);
-    const [selectedLanguage, setSelectedLanguage] = useState(currentLang);
 
     // Show loading if contexts are loading or local operations
     const isLoading = settingsLoading || localLoading;
@@ -44,6 +43,45 @@ export default function SettingsScreen() {
             }
         })();
     }, [settings?.location, settingsLoading]);
+
+    // --------------------------------------------------
+    // Change theme
+    // --------------------------------------------------
+    const handleTheme = async (value) => {
+        setLocalLoading(true);
+        try {
+            // Update ThemeContext
+            await changeTheme(value);
+            console.log("✅ Theme changed to:", value);
+        } catch (err) {
+            console.error("Theme change error:", err);
+            Alert.alert(tr("labels.error"), tr("labels.themeError"));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // --------------------------------------------------
+    // Change language
+    // --------------------------------------------------
+    const handleLanguage = async (value) => {
+        setLocalLoading(true);
+        try {
+            // Save settings
+            await saveSettings({ language: value });
+            console.log("🌐 Language changed to:", value);
+
+            // Reschedule notifications with new language
+            if (settings.notifications && hasPrayersTimes) {
+                await schedulePrayerNotifications(prayersTimes, value);
+            }
+        } catch (err) {
+            console.error("Language change error:", err);
+            Alert.alert(tr("labels.error"), tr("labels.languageError"));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
 
     // --------------------------------------------------
     // Set or update location
@@ -73,12 +111,16 @@ export default function SettingsScreen() {
                 return;
             }
 
-            // Just save the location - hook will auto-handle notification rescheduling
+            // Save settings
             await saveSettings({ location: loc.coords });
+            console.log("📍 Location changed to:", loc.coords);
 
-            console.log("✅ Location changed to:", loc.coords);
+            // Reschedule notifications with new prayer times
+            if (settings.notifications && hasPrayersTimes) {
+                await schedulePrayerNotifications(prayersTimes);
+            }
         } catch (err) {
-            console.error("Location error:", err);
+            console.error("Location access error:", err);
             Alert.alert(tr("labels.error"), tr("labels.locationError"));
         } finally {
             setLocalLoading(false);
@@ -112,51 +154,22 @@ export default function SettingsScreen() {
                 }
             }
 
-            // Just save the setting - hook automatically handles scheduling/cancelling!
+            //  If granted, schedule notifications
+            if (value) {
+                if (hasPrayersTimes) {
+                    await schedulePrayerNotifications(prayersTimes);
+                }
+            } else {
+                // User turned off notifications → cancel all scheduled notifications
+                await cancelPrayerNotifications();
+            }
+
+            // Save settings
             await saveSettings({ notifications: value });
-
-            console.log("Notifications status changed to:", value);
+            console.log("✅ Notifications status changed to:", value);
         } catch (err) {
-            console.error("Notification toggle error:", err);
+            console.error("Notifications toggle error:", err);
             Alert.alert(tr("labels.error"), tr("labels.notificationError"));
-        } finally {
-            setLocalLoading(false);
-        }
-    };
-
-    // --------------------------------------------------
-    // Change language
-    // --------------------------------------------------
-    const handleLanguage = async (value) => {
-        setLocalLoading(true);
-        try {
-            setSelectedLanguage(value);
-
-            // Save language in settings - hook will auto-handle notification rescheduling
-            await saveSettings({ language: value });
-
-            console.log("✅ Language changed to:", value);
-        } catch (err) {
-            console.error("Language change error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.languageError"));
-        } finally {
-            setLocalLoading(false);
-        }
-    };
-
-    // --------------------------------------------------
-    // Change theme
-    // --------------------------------------------------
-    const handleTheme = async (value) => {
-        setLocalLoading(true);
-        try {
-            // Update ThemeContext
-            await changeTheme(value);
-
-            console.log("✅ Theme changed to:", value);
-        } catch (err) {
-            console.error("Theme change error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.themeError"));
         } finally {
             setLocalLoading(false);
         }
@@ -223,7 +236,7 @@ export default function SettingsScreen() {
                             {tr("labels.language")}
                         </Text>
                         <Picker
-                            selectedValue={selectedLanguage}
+                            selectedValue={currentLang}
                             onValueChange={handleLanguage}
                             dropdownIconColor={theme.primaryText}
                             dropdownIconRippleColor={theme.primaryText}

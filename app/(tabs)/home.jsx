@@ -18,8 +18,7 @@ export default function HomeScreen() {
     const { settings, settingsLoading, settingsError } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
-    // Hook automatically handles all scheduling - we just need debug functions
-    const { sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
+    const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
 
     // Local state
     const isFocused = useIsFocused();
@@ -33,9 +32,23 @@ export default function HomeScreen() {
     const hasError = settingsError || prayersError;
 
     // --------------------------------------------------
+    // Schedule notifications when prayer times are ready
+    // --------------------------------------------------
+    useEffect(() => {
+        if (settings?.notifications && hasPrayersTimes) {
+            schedulePrayerNotifications(prayersTimes);
+        }
+    }, []);
+
+    // --------------------------------------------------
     // Update warnings when screen is focused
     // --------------------------------------------------
     useEffect(() => {
+        // Schedule notifications on focus
+        if (settings?.notifications && hasPrayersTimes) {
+            schedulePrayerNotifications(prayersTimes);
+        }
+
         // Update warnings
         if (!settings?.location && !settings?.notifications) {
             setWarning(tr("labels.warning1"));
