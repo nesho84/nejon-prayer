@@ -9,7 +9,7 @@ import { usePrayersContext } from '@/contexts/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import { formatLocation, formatTimezone } from "@/utils/timeZone";
+import { formatTimezone } from "@/utils/timeZone";
 import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
@@ -23,7 +23,6 @@ export default function HomeScreen() {
     // Local state
     const isFocused = useIsFocused();
     const [warning, setWarning] = useState(null);
-    const [fullAddress, setFullAddress] = useState(null);
     const [timeZone, setTimezone] = useState(null);
 
     // Show loading if either context is loading
@@ -38,39 +37,37 @@ export default function HomeScreen() {
         if (settings?.notifications && hasPrayersTimes) {
             schedulePrayerNotifications(prayersTimes);
         }
-    }, [isFocused, prayersTimes, settings?.notifications]);
+    }, [prayersTimes, settings?.notifications, isFocused]);
 
     // --------------------------------------------------
-    // Schedule notifications and update warnings when screen is focused
+    // Update warnings when screen is focused
     // --------------------------------------------------
     useEffect(() => {
         // Update warnings
-        if (!settings?.location && !settings?.notifications) {
-            setWarning(tr("labels.warning1"));
-        } else if (!settings?.location) {
-            setWarning(tr("labels.warning2"));
-        } else if (!settings?.notifications) {
-            setWarning(tr("labels.warning3"));
-        } else {
-            setWarning(null);
+        if (!isLoading) {
+            if (!settings?.location && !settings?.notifications) {
+                setWarning(tr("labels.warning1"));
+            } else if (!settings?.location) {
+                setWarning(tr("labels.warning2"));
+            } else if (!settings?.notifications) {
+                setWarning(tr("labels.warning3"));
+            } else {
+                setWarning(null);
+            }
         }
     }, [isFocused]);
 
     // -------------------------------------------------------
-    // Format location and timezone when location is available
+    // Format timezone when location is available
     // --------------------------------------------------------
     useEffect(() => {
         if (!settings?.location || settingsLoading) return;
         (async () => {
             try {
-                if (!hasPrayersTimes) {
-                    const formatedAddress = await formatLocation(settings.location);
-                    if (formatedAddress) setFullAddress(formatedAddress);
-                }
                 const formatedTimezone = await formatTimezone(settings.location);
                 if (formatedTimezone) setTimezone(formatedTimezone);
-            } catch (error) {
-                console.warn("Location formatting error:", error);
+            } catch (err) {
+                console.warn("Location formatting error:", err);
                 // Set fallback for timezone
                 setTimezone({
                     title: new Date().toDateString(),
@@ -82,13 +79,13 @@ export default function HomeScreen() {
     }, [settings?.location, settingsLoading, hasPrayersTimes]);
 
     // --------------------------------------------------
-    // Handle refresh with better error handling
+    // Handle prayers refresh
     // --------------------------------------------------
     const handleRefresh = async () => {
         try {
             await refetchPrayersTimes();
-        } catch (error) {
-            console.warn("Refresh failed:", error);
+        } catch (err) {
+            console.warn("Prayers refresh failed:", err);
         }
     };
 
@@ -96,7 +93,7 @@ export default function HomeScreen() {
     if (isLoading) {
         return (
             <LoadingScreen
-                message={settingsLoading ? 'Loading settings...' : 'Loading prayer times...'}
+                message={settingsLoading ? tr("labels.loadingSettings") : tr("labels.loadingPrayers")}
                 style={{ backgroundColor: theme.background }}
             />
         );
@@ -106,11 +103,9 @@ export default function HomeScreen() {
     if (hasError) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
-                <Text style={styles.errorText}>
-                    {tr("labels.noPrayersTimes")}
-                </Text>
+                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-                    <Text style={styles.retryButtonText}>Retry</Text>
+                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -120,10 +115,9 @@ export default function HomeScreen() {
     if (!settings.location) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
-                <Text style={styles.messageText}>Welcome to Nejon-Prayer!</Text>
-                <Text style={styles.subText}>Please set your location to view prayer times</Text>
+                <Text style={styles.subText}>{tr("labels.locationSet")}</Text>
                 <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/(tabs)/settings")}>
-                    <Text style={styles.settingsButtonText}>Go to Settings</Text>
+                    <Text style={styles.settingsButtonText}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -133,10 +127,9 @@ export default function HomeScreen() {
     if (!hasPrayersTimes) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
-                <Text style={styles.messageText}>No prayer times available for</Text>
-                <Text style={styles.subText}>{fullAddress || 'your location'}</Text>
+                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-                    <Text style={styles.retryButtonText}>Refresh</Text>
+                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -270,11 +263,11 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
     },
     prayerName: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: "500",
     },
     prayerTime: {
-        fontSize: 18,
+        fontSize: 19,
         fontWeight: "400",
     },
     warningBox: {
@@ -307,7 +300,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#666',
         textAlign: 'center',
-        marginBottom: 30,
+        marginBottom: 20,
     },
     retryButton: {
         backgroundColor: '#FF3B30',

@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Alert, Linking, Platform } from "react-native";
 import * as Notifications from "expo-notifications";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { usePrayersContext } from "@/contexts/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 
 // Set notification handler to show notifications when app is in foreground
@@ -41,7 +39,7 @@ export default function usePrayerNotifications() {
             if (Platform.OS === "android") {
                 await Notifications.setNotificationChannelAsync("default", {
                     name: "default",
-                    importance: Notifications.AndroidImportance.MAX,
+                    importance: Notifications.AndroidImportance.HIGH,
                     vibrationPattern: [0, 250, 250, 250],
                     lightColor: "#ffffff",
                 });

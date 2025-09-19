@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { Picker } from "@react-native-picker/picker";
+import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import { usePrayersContext } from "@/contexts/PrayersContext";
@@ -15,8 +16,8 @@ import LoadingScreen from "@/components/LoadingScreen";
 export default function SettingsScreen() {
     const { theme, currentTheme, changeTheme } = useThemeContext();
     const { tr, currentLang } = useTranslation();
-    const { settings, settingsLoading, settingsError, saveSettings } = useSettingsContext();
-    const { prayersTimes, prayersLoading, prayersError, hasPrayersTimes } = usePrayersContext();
+    const { settings, reloadSettings, settingsLoading, settingsError, saveSettings } = useSettingsContext();
+    const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
     const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     // Local state
@@ -25,8 +26,6 @@ export default function SettingsScreen() {
 
     // Show loading if contexts are loading or local operations
     const isLoading = settingsLoading || localLoading;
-    // Show error if either context has an error
-    const hasError = settingsError || prayersError;
 
     // --------------------------------------------------
     // Format address when location changes
@@ -37,8 +36,8 @@ export default function SettingsScreen() {
             try {
                 const formattedAddress = await formatLocation(settings.location);
                 if (formattedAddress) setFullAddress(formattedAddress);
-            } catch (error) {
-                console.warn("Error formatting address:", error);
+            } catch (err) {
+                console.warn("Error formatting address:", err);
             }
         })();
     }, [settings?.location, settingsLoading]);
@@ -153,19 +152,18 @@ export default function SettingsScreen() {
                 }
             }
 
+            // Save settings
+            await saveSettings({ notifications: value });
+            console.log("✅ Notifications status changed to:", value);
+
             //  If granted, schedule notifications
-            if (value) {
-                if (hasPrayersTimes) {
-                    await schedulePrayerNotifications(prayersTimes);
-                }
+            if (value && hasPrayersTimes) {
+                await schedulePrayerNotifications(prayersTimes);
             } else {
                 // User turned off notifications → cancel all scheduled notifications
                 await cancelPrayerNotifications();
             }
 
-            // Save settings
-            await saveSettings({ notifications: value });
-            console.log("✅ Notifications status changed to:", value);
         } catch (err) {
             console.error("Notifications toggle error:", err);
             Alert.alert(tr("labels.error"), tr("labels.notificationError"));
@@ -173,6 +171,28 @@ export default function SettingsScreen() {
             setLocalLoading(false);
         }
     };
+
+    // --------------------------------------------------
+    // Handle settings refresh
+    // --------------------------------------------------
+    const handleSettingsRefresh = async () => {
+        try {
+            await reloadSettings();
+        } catch (err) {
+            console.warn("Settings refresh failed:", err);
+        }
+    }
+
+    // --------------------------------------------------
+    // Handle prayers refresh
+    // --------------------------------------------------
+    const handlePrayersRefresh = async () => {
+        try {
+            await refetchPrayersTimes();
+        } catch (err) {
+            console.warn("Prayers refresh failed:", err);
+        }
+    }
 
     // Loading State
     if (isLoading) {
@@ -184,17 +204,15 @@ export default function SettingsScreen() {
         );
     }
 
-    // Error State
-    if (hasError) {
+    // Error State - settings
+    if (settingsError) {
         return (
             <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                 <View style={styles.centerContainer}>
-                    <Text style={[styles.errorText, { color: theme.primaryText }]}>
-                        {tr("labels.settingsError")}
-                    </Text>
-                    <Text style={[styles.subText, { color: theme.secondaryText }]}>
-                        {settingsError || prayersError}
-                    </Text>
+                    <Text style={styles.errorText}>{tr("labels.settingsError")}</Text>
+                    <TouchableOpacity style={styles.retryButton} onPress={handleSettingsRefresh}>
+                        <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
+                    </TouchableOpacity>
                 </View>
             </SafeAreaView>
         );
@@ -280,8 +298,8 @@ export default function SettingsScreen() {
                             value={settings.notifications || false}
                             onValueChange={toggleNotifications}
                             disabled={localLoading}
-                            trackColor={{ false: theme.secondaryText, true: theme.accent }}
-                            thumbColor={settings.notifications ? theme.primary : theme.secondaryText}
+                            trackColor={{ false: theme.border, true: theme.accent }}
+                            thumbColor={settings.notifications ? theme.primary : theme.placeholder}
                         />
                     </View>
 
@@ -292,14 +310,16 @@ export default function SettingsScreen() {
                         </Text>
                         <View style={styles.statusRow}>
                             <Text style={[styles.statusText, { color: theme.secondaryText }]}>
-                                {hasPrayersTimes
-                                    ? (tr("labels.loaded"))
-                                    : (tr("labels.notLoaded"))
-                                }
+                                {hasPrayersTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                             </Text>
+                            {/* Prayers loading... */}
                             {prayersLoading && (
                                 <ActivityIndicator size="small" color={theme.accent} />
                             )}
+                            {/* Reload prayers... */}
+                            {!prayersLoading &&
+                                <Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />
+                            }
                         </View>
                     </View>
 
@@ -329,6 +349,11 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
     },
+    settingTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 12,
+    },
     settingCard: {
         borderRadius: 12,
         marginBottom: 16,
@@ -339,15 +364,21 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 2,
     },
+    retryButton: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    retryButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
     notificationCard: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-    },
-    settingTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 12,
     },
     picker: {
         width: '100%',
@@ -379,10 +410,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     errorText: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 16,
+        color: '#FF3B30',
         textAlign: 'center',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     subText: {
         fontSize: 14,
