@@ -79,7 +79,7 @@ export default function usePrayerNotifications() {
         // Prevent duplicate scheduling
         const timesKey = JSON.stringify({ times, language: useLanguage });
         if (lastScheduledTimes.current === timesKey) {
-            console.log("⚠️ Same prayer times and language already scheduled, skipping");
+            console.log("⚠️  Notifications with the same prayer times and language already scheduled, skipping...");
             return;
         }
 

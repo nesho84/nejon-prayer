@@ -17,7 +17,6 @@ export default function SettingsScreen() {
     const { tr, currentLang } = useTranslation();
     const { settings, settingsLoading, settingsError, saveSettings } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, hasPrayersTimes } = usePrayersContext();
-    // Hook automatically handles all scheduling - we just need debug functions
     const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
 
     // Local state

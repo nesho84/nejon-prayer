@@ -38,17 +38,12 @@ export default function HomeScreen() {
         if (settings?.notifications && hasPrayersTimes) {
             schedulePrayerNotifications(prayersTimes);
         }
-    }, []);
+    }, [isFocused, prayersTimes, settings?.notifications]);
 
     // --------------------------------------------------
-    // Update warnings when screen is focused
+    // Schedule notifications and update warnings when screen is focused
     // --------------------------------------------------
     useEffect(() => {
-        // Schedule notifications on focus
-        if (settings?.notifications && hasPrayersTimes) {
-            schedulePrayerNotifications(prayersTimes);
-        }
-
         // Update warnings
         if (!settings?.location && !settings?.notifications) {
             setWarning(tr("labels.warning1"));
