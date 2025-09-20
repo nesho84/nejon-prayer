@@ -217,7 +217,6 @@ export default function usePrayerNotifications() {
                                     title: tr("actions.prayed") || "Prayed",
                                     pressAction: {
                                         id: 'mark-prayed',
-                                        // launchActivity: 'default' // Opens the app
                                     },
                                     icon: 'ic_check', // Optional: add check icon
                                 },
@@ -225,7 +224,6 @@ export default function usePrayerNotifications() {
                                     title: tr("actions.snooze") || "Remind Later",
                                     pressAction: {
                                         id: 'snooze-prayer',
-                                        // launchActivity: 'default' // Opens the app
                                     },
                                     icon: 'ic_access_time', // Optional: add time icon
                                 },
@@ -243,7 +241,7 @@ export default function usePrayerNotifications() {
                     {
                         type: TriggerType.TIMESTAMP,
                         timestamp: triggerTime.getTime(),
-                        alarmManager: { allowWhileIdle: true }, // When in low-power idle modes
+                        alarmManager: true, // When in low-power idle modes
                         repeatFrequency: RepeatFrequency.DAILY, // Repeat daily
                     }
                 );
@@ -322,7 +320,7 @@ export default function usePrayerNotifications() {
                 {
                     type: TriggerType.TIMESTAMP,
                     timestamp: timestamp,
-                    alarmManager: { allowWhileIdle: true },
+                    alarmManager: true,
                 }
             );
 
@@ -426,7 +424,7 @@ export default function usePrayerNotifications() {
                                     {
                                         type: TriggerType.TIMESTAMP,
                                         timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                                        alarmManager: { allowWhileIdle: true }, // When in low-power idle modes
+                                        alarmManager: true, // When in low-power idle modes
                                     }
                                 );
                                 console.log("🔔 Foreground: Prayer reminder scheduled for later...");

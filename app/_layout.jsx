@@ -1,9 +1,9 @@
+import { PrayersProvider } from "@/contexts/PrayersContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import notifee, { EventType, TriggerType } from '@notifee/react-native';
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import notifee, { EventType, TriggerType } from '@notifee/react-native';
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { SettingsProvider } from "@/contexts/SettingsContext";
-import { PrayersProvider } from "@/contexts/PrayersContext";
 
 // ------------------------------------------------------------
 // Notifee Notifications - Background event handler
@@ -39,7 +39,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
               {
                 type: TriggerType.TIMESTAMP,
                 timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                alarmManager: { allowWhileIdle: true }, // When in low-power idle modes
+                alarmManager: true, // When in low-power idle modes
               }
             );
             console.log("🔔 Background: Prayer reminder scheduled for later...");
