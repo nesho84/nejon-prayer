@@ -50,6 +50,10 @@ export const translations = {
             loadingAddress: "Loading address...",
             loaded: "✅ Loaded",
             notLoaded: "❌ Not Loaded",
+            alarmAccessTitle: "Alarms & Reminders",
+            alarmAccessBody: "To receive prayer notifications on time, please allow exact alarms in your system settings.",
+            batteryOptTitle: "Battery Optimization",
+            batteryOptBody: "To ensure prayers notifications work reliably, please disable battery optimization for this app.",
         },
         buttons: {
             cancel: "Cancel",
@@ -113,6 +117,10 @@ export const translations = {
             loadingAddress: "Duke ngarkuar adresën...",
             loaded: "✅ Ngarkuar",
             notLoaded: "❌ Jo i Ngarkuar",
+            alarmAccessTitle: "Alarme dhe Kujtesa",
+            alarmAccessBody: "Për të marrë njoftime lutjesh në kohë, ju lutemi lejoni 'alarme të sakta' në cilësimet e sistemit tuaj.",
+            batteryOptTitle: "Optimizimi i Baterisë",
+            batteryOptBody: "Për të siguruar që njoftimet e lutjeve të funksionojnë në mënyrë të besueshme, ju lutemi çaktivizoni optimizimin e baterisë për këtë aplikacion.",
         },
         buttons: {
             cancel: "Anulo",
@@ -176,6 +184,10 @@ export const translations = {
             loadingAddress: "Adresse wird geladen...",
             loaded: "✅ Geladen",
             notLoaded: "❌ Nicht Geladen",
+            alarmAccessTitle: "Alarme & Erinnerungen",
+            alarmAccessBody: "Për të marrë njoftime lutjesh në kohë, ju lutemi lejoni alarme të sakta në cilësimet e sistemit tuaj.",
+            batteryOptTitle: "Akkuoptimierung",
+            batteryOptBody: "Um Gebetsbenachrichtigungen pünktlich zu erhalten, aktivieren Sie bitte die Funktion 'Genaue Alarme' in Ihren Systemeinstellungen.",
         },
         buttons: {
             cancel: "Abbrechen",
