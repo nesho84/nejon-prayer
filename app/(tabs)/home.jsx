@@ -1,16 +1,16 @@
-import LoadingScreen from "@/components/LoadingScreen";
-import { usePrayersContext } from '@/contexts/PrayersContext';
-import { useSettingsContext } from '@/contexts/SettingsContext';
+import { useEffect, useState } from "react";
+import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useIsFocused } from "@react-navigation/native";
+import { router } from "expo-router";
 import { useThemeContext } from "@/contexts/ThemeContext";
+import { useSettingsContext } from '@/contexts/SettingsContext';
+import { usePrayersContext } from '@/contexts/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import usePrayerNotifications from "@/hooks/usePrayerNotifications";
 import useTranslation from "@/hooks/useTranslation";
 import { formatTimezone } from "@/utils/timeZone";
-import { useIsFocused } from "@react-navigation/native";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -21,8 +21,8 @@ export default function HomeScreen() {
     const {
         schedulePrayerNotifications,
         sendTestNotification,
-        sendNotifeeTestNotification,
-        logScheduledNotifications
+        getScheduledNotifications,
+        getNotificationStats
     } = usePrayerNotifications();
 
     // Local state
@@ -201,8 +201,8 @@ export default function HomeScreen() {
 
                     {/* Just for Testing... */}
                     {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
-                    <Button title="Send Notifee Test Notification" onPress={sendNotifeeTestNotification} />
-                    {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
+                    {/* <Button title="Log Scheduled Notifications" onPress={getScheduledNotifications} /> */}
+                    {/* <Button title="Notifications Stats" onPress={getNotificationStats} /> */}
 
                 </View>
             </ScrollView>

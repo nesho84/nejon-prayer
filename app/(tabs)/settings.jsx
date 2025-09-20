@@ -1,17 +1,17 @@
-import LoadingScreen from "@/components/LoadingScreen";
-import { usePrayersContext } from "@/contexts/PrayersContext";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import useTranslation from "@/hooks/useTranslation";
-import { formatLocation } from "@/utils/timeZone";
-import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
-import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Picker } from "@react-native-picker/picker";
+import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { usePrayersContext } from "@/contexts/PrayersContext";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import useTranslation from "@/hooks/useTranslation";
+import { Ionicons } from "@expo/vector-icons";
+import { formatLocation } from "@/utils/timeZone";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function SettingsScreen() {
     const { theme, currentTheme, changeTheme } = useThemeContext();

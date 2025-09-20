@@ -32,8 +32,8 @@ export default function usePrayerNotifications() {
                     tr("labels.notifications"),
                     tr("labels.warning3"),
                     [
-                        { text: "Cancel", style: "cancel" },
-                        { text: "Open Settings", onPress: () => Linking.openSettings() }
+                        { text: tr("buttons.cancel"), style: "cancel" },
+                        { text: tr("buttons.openSettings"), onPress: () => Linking.openSettings() }
                     ]
                 );
                 return false;
@@ -76,20 +76,19 @@ export default function usePrayerNotifications() {
             const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
 
             if (batteryOptimizationEnabled) {
-                // Alert.alert(
-                //     "Battery Optimization",
-                //     "To ensure prayer notifications work reliably, please disable battery optimization for this app.",
-                //     [
-                //         { text: "Later", style: "cancel" },
-                //         {
-                //             text: "Open Settings",
-                //             onPress: () => notifee.openBatteryOptimizationSettings()
-                //         }
-                //     ]
-                // );
+                Alert.alert(
+                    "Battery Optimization",
+                    "To ensure prayer notifications work reliably, please disable battery optimization for this app.",
+                    [
+                        { text: tr("buttons.later"), style: "cancel" },
+                        {
+                            text: tr("buttons.openSettings"),
+                            onPress: () => notifee.openBatteryOptimizationSettings()
+                        }
+                    ]
+                );
                 console.log("⚠️ Battery optimization is enabled - may affect notification reliability");
             }
-
             // Check power manager settings
             const powerManagerInfo = await notifee.getPowerManagerInfo();
             if (powerManagerInfo.activity) {
@@ -101,33 +100,6 @@ export default function usePrayerNotifications() {
     };
 
     // ------------------------------------------------------------
-    // Show battery optimization guidance to user
-    // ------------------------------------------------------------
-    const showBatteryOptimizationGuidance = async () => {
-        try {
-            const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
-
-            if (batteryOptimizationEnabled) {
-                Alert.alert(
-                    "Improve Prayer Notifications",
-                    "To ensure you never miss prayer notifications, please disable battery optimization for this app.",
-                    [
-                        { text: "Later", style: "cancel" },
-                        {
-                            text: "Open Settings",
-                            onPress: () => notifee.openBatteryOptimizationSettings()
-                        }
-                    ]
-                );
-            } else {
-                Alert.alert("Great!", "Battery optimization is already disabled for reliable notifications.");
-            }
-        } catch (err) {
-            Alert.alert("Settings", "Please check your device's battery optimization settings manually.");
-        }
-    };
-
-    // ------------------------------------------------------------
     // Enhanced prayer times change detection
     // ------------------------------------------------------------
     const checkPrayerTimesChanged = (newTimes, language = null) => {
@@ -135,11 +107,11 @@ export default function usePrayerNotifications() {
         const newTimesKey = JSON.stringify({ times: newTimes, language: useLanguage });
 
         if (lastScheduledTimes.current !== newTimesKey) {
-            console.log("📅 Prayer times changed - rescheduling needed");
+            console.log("📅 Prayer times changed - rescheduling needed...");
             return true;
         }
 
-        console.log("⏰ Prayer times unchanged - keeping existing schedule");
+        console.log("⏰ Prayer times unchanged - keeping existing schedule...");
         return false;
     };
 
@@ -245,7 +217,7 @@ export default function usePrayerNotifications() {
                                     title: tr("actions.prayed") || "Prayed",
                                     pressAction: {
                                         id: 'mark-prayed',
-                                        launchActivity: 'default'
+                                        // launchActivity: 'default' // Opens the app
                                     },
                                     icon: 'ic_check', // Optional: add check icon
                                 },
@@ -253,7 +225,7 @@ export default function usePrayerNotifications() {
                                     title: tr("actions.snooze") || "Remind Later",
                                     pressAction: {
                                         id: 'snooze-prayer',
-                                        launchActivity: 'default'
+                                        // launchActivity: 'default' // Opens the app
                                     },
                                     icon: 'ic_access_time', // Optional: add time icon
                                 },
@@ -271,7 +243,7 @@ export default function usePrayerNotifications() {
                     {
                         type: TriggerType.TIMESTAMP,
                         timestamp: triggerTime.getTime(),
-                        alarmManager: true, // Use AlarmManager for reliability
+                        alarmManager: { allowWhileIdle: true }, // When in low-power idle modes
                         repeatFrequency: RepeatFrequency.DAILY, // Repeat daily
                     }
                 );
@@ -313,31 +285,51 @@ export default function usePrayerNotifications() {
         try {
             await initialize();
 
-            await notifee.displayNotification({
-                title: `🕌 Test Prayer Notification`,
-                body: `${tr("labels.alertBody")} (Test)`,
-                data: { type: "test", timestamp: Date.now() },
-                android: {
-                    channelId: NOTIFICATION_CHANNEL_ID,
-                    importance: AndroidImportance.HIGH,
-                    smallIcon: 'ic_stat_prayer',
-                    largeIcon: require('../assets/images/alarm-clock.png'),
-                    color: '#4A90E2',
-                    actions: [
-                        {
-                            title: "Test Action",
-                            pressAction: { id: 'test-action' },
-                        },
-                    ],
-                    autoCancel: true,
-                },
-                ios: {
-                    sound: 'default',
-                }
-            });
+            const timestamp = Date.now() + (10 * 1000); // 10 sec.
 
-            console.log("📱 Test notification sent");
-            Alert.alert("Test Sent", "Test notification sent! Check your notification panel.");
+            await notifee.createTriggerNotification(
+                {
+                    id: 'simple-test',
+                    title: `${tr("prayers.Fajr") || "Fajr"} 05:30`,
+                    body: tr("labels.alertBody") || "It's prayer time",
+                    data: {
+                        type: "prayer",
+                        prayer: "Fajr",
+                        time: "05:30"
+                    },
+                    android: {
+                        channelId: NOTIFICATION_CHANNEL_ID,
+                        importance: AndroidImportance.HIGH,
+                        smallIcon: 'ic_stat_prayer',
+                        largeIcon: require('../assets/images/alarm-clock.png'),
+                        color: '#4A90E2',
+                        pressAction: {
+                            id: 'default',
+                            launchActivity: 'default', // Opens the app
+                        },
+                        actions: [
+                            {
+                                title: tr("actions.prayed") || "Prayed",
+                                pressAction: { id: 'mark-prayed' },
+                            },
+                            {
+                                title: tr("actions.remindLater") || "Remind Later",
+                                pressAction: { id: 'snooze-prayer' },
+                            },
+                        ],
+                    }
+                },
+                {
+                    type: TriggerType.TIMESTAMP,
+                    timestamp: timestamp,
+                    alarmManager: { allowWhileIdle: true },
+                }
+            );
+
+            // Convert timestamp to seconds
+            const remainingSeconds = Math.max(0, Math.floor((timestamp - Date.now()) / 1000) + 1);
+            console.log(`Test notification will appear in ${remainingSeconds} seconds`);
+            Alert.alert(`Test Scheduled`, `Test notification will appear in ${remainingSeconds} seconds. Try the action buttons!`);
         } catch (err) {
             Alert.alert("Error", `Failed to send test notification: ${err.message}`);
             console.error(err);
@@ -347,7 +339,7 @@ export default function usePrayerNotifications() {
     // ------------------------------------------------------------
     // Debug utility: list/log all scheduled notifications
     // ------------------------------------------------------------
-    const logScheduledNotifications = async () => {
+    const getScheduledNotifications = async () => {
         try {
             const notifications = await notifee.getTriggerNotifications();
 
@@ -380,14 +372,19 @@ export default function usePrayerNotifications() {
             const notifications = await notifee.getTriggerNotifications();
             const prayerNotifications = notifications.filter(n => n.notification.data?.type === "prayer");
 
-            return {
+            const data = {
                 total: prayerNotifications.length,
                 prayers: prayerNotifications.map(n => n.notification.data.prayer),
                 nextNotification: prayerNotifications.length > 0
-                    ? new Date(Math.min(...prayerNotifications.map(n => n.trigger.timestamp)))
+                    ? (new Date(Math.min(...prayerNotifications.map(n => n.trigger.timestamp)))).toLocaleString('en-US', { hour12: false })
                     : null,
-                lastScheduled: lastScheduledTimes.current ? new Date(JSON.parse(lastScheduledTimes.current).scheduledAt || Date.now()) : null,
+                lastScheduled: lastScheduledTimes.current
+                    ? (new Date(JSON.parse(lastScheduledTimes.current).scheduledAt || Date.now())).toLocaleString('en-US', { hour12: false })
+                    : null,
             };
+
+            console.log("📌 Notifications Stats:", JSON.stringify(data, null, 2));
+            return data;
         } catch (err) {
             console.error("Failed to get notification stats:", err);
             return { total: 0, prayers: [], nextNotification: null, lastScheduled: null };
@@ -398,37 +395,27 @@ export default function usePrayerNotifications() {
     // Foreground event listener
     // ------------------------------------------------------------
     useEffect(() => {
-        const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
+        return notifee.onForegroundEvent(async ({ type, detail }) => {
             const { notification, pressAction } = detail;
 
+            // console.log('🌙 Foreground notification event fired');
+
             switch (type) {
-                case EventType.DISMISSED:
-                    console.log('🔕 Notification dismissed');
-                    break;
-
-                case EventType.PRESS:
-                    console.log('👆 Notification pressed');
-                    break;
-
                 case EventType.ACTION_PRESS:
-                    console.log('⚡ Action pressed:', pressAction?.id);
-
                     switch (pressAction?.id) {
                         case 'mark-prayed':
-                            console.log(`✅ Marked ${notification?.data?.prayer} as prayed`);
+                            console.log(`✅ Foreground: Marked ${notification?.data?.prayer} as prayed`);
                             break;
-
                         case 'snooze-prayer':
-                            console.log(`⏰ Snoozed ${notification?.data?.prayer}`);
-
-                            // Schedule 10-minute reminder
+                            console.log(`⏰ Foreground: Snoozed ${notification?.data?.prayer}`);
+                            // Schedule ? minute reminder
                             try {
                                 await notifee.createTriggerNotification(
                                     {
-                                        id: `prayer-snooze-${notification?.data?.prayer?.toLowerCase()}`,
-                                        title: `🔔 Prayer Reminder: ${notification?.data?.prayer}`,
-                                        body: "You asked to be reminded about prayer time",
-                                        data: { type: "prayer-reminder", prayer: notification?.data?.prayer },
+                                        id: `prayer-snooze-${notification?.data?.prayer || 'unknown'}`,
+                                        title: tr("labels.prayerReminder") || "Prayer Reminder",
+                                        body: `${tr("labels.timeFor") || "Time for"} ${tr(`prayers.${notification?.data?.prayer}`) || notification?.data?.prayer || "prayer"}`,
+                                        data: { type: "prayer-reminder" },
                                         android: {
                                             channelId: NOTIFICATION_CHANNEL_ID,
                                             smallIcon: 'ic_stat_prayer',
@@ -439,24 +426,24 @@ export default function usePrayerNotifications() {
                                     {
                                         type: TriggerType.TIMESTAMP,
                                         timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                                        alarmManager: true,
+                                        alarmManager: { allowWhileIdle: true }, // When in low-power idle modes
                                     }
                                 );
-                                console.log("🔔 Prayer reminder scheduled for 10 minutes");
+                                console.log("🔔 Foreground: Prayer reminder scheduled for later...");
                             } catch (err) {
-                                console.error("Failed to schedule reminder:", err);
+                                console.error("Failed to schedule foreground reminder:", err);
                             }
                             break;
-
                         case 'test-action':
-                            console.log("🧪 Test action pressed");
+                            console.log("🧪 Foreground: Test action pressed");
                             break;
                     }
                     break;
+                case EventType.PRESS:
+                    console.log('👆 Background: Notification pressed - app will open');
+                    break;
             }
         });
-
-        return () => unsubscribe();
     }, []);
 
     return {
@@ -466,11 +453,10 @@ export default function usePrayerNotifications() {
 
         // Testing & debugging
         sendTestNotification,
-        logScheduledNotifications,
+        getScheduledNotifications,
         getNotificationStats,
 
         // Utility functions
-        showBatteryOptimizationGuidance,
         checkPrayerTimesChanged,
 
         // Status

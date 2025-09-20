@@ -1,12 +1,12 @@
-import LoadingScreen from "@/components/LoadingScreen";
-import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Button, Platform, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
-import { Alert, Button, Platform, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();

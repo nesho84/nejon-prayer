@@ -44,6 +44,8 @@ export const translations = {
             settingsError: "Failed to load settings.",
             loadingPrayers: "Loading prayers...",
             noPrayersTimes: "Prayer times could not be loaded. Please check your internet connection.",
+            prayerReminder: "Prayer Reminder",
+            timeFor: "Time for",
             prayerTimesStatus: "Prayers Times Status",
             loadingAddress: "Loading address...",
             loaded: "✅ Loaded",
@@ -51,12 +53,13 @@ export const translations = {
         },
         buttons: {
             cancel: "Cancel",
+            later: "Later",
             openSettings: "Open Settings",
             retry: "Retry",
         },
         actions: {
             prayed: "Prayed",
-            snooze: "Remind Later"
+            remindLater: "Remind Later"
         },
     },
     sq: {
@@ -104,6 +107,8 @@ export const translations = {
             settingsError: "Cilësimet nuk mund të ngarkohen.",
             loadingPrayers: "Duke ngarkuar lutjet...",
             noPrayersTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
+            prayerReminder: "Kujtesë lutjeje",
+            timeFor: "Koha për",
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
             loadingAddress: "Duke ngarkuar adresën...",
             loaded: "✅ Ngarkuar",
@@ -111,12 +116,13 @@ export const translations = {
         },
         buttons: {
             cancel: "Anulo",
+            later: "Më vonë",
             openSettings: "Hap Cilësimet",
             retry: "Riprovo",
         },
         actions: {
             prayed: "U luta",
-            snooze: "Më kujto më vonë"
+            remindLater: "Më kujto më vonë"
         },
     },
     de: {
@@ -164,6 +170,8 @@ export const translations = {
             settingsError: "Einstellungen konnten nicht geladen werden.",
             loadingPrayers: "Gebete werden geladen...",
             noPrayersTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
+            prayerReminder: "Gebetserinnerung",
+            timeFor: "Zeit für",
             prayerTimesStatus: "Status der Gebetszeiten",
             loadingAddress: "Adresse wird geladen...",
             loaded: "✅ Geladen",
@@ -171,12 +179,13 @@ export const translations = {
         },
         buttons: {
             cancel: "Abbrechen",
+            later: "Später",
             openSettings: "Einstellungen Öffnen",
             retry: "Wiederholen",
         },
         actions: {
             prayed: "Gebetet",
-            snooze: "Später erinnern"
+            remindLater: "Später erinnern"
         },
     }
 };
