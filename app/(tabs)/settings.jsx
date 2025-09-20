@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, Linking, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import LoadingScreen from "@/components/LoadingScreen";
+import { usePrayersContext } from "@/contexts/PrayersContext";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import useTranslation from "@/hooks/useTranslation";
+import { formatLocation } from "@/utils/timeZone";
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
-import { Picker } from "@react-native-picker/picker";
-import { Ionicons } from "@expo/vector-icons";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { usePrayersContext } from "@/contexts/PrayersContext";
-import useTranslation from "@/hooks/useTranslation";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import { formatLocation } from "@/utils/timeZone";
-import LoadingScreen from "@/components/LoadingScreen";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
     const { theme, currentTheme, changeTheme } = useThemeContext();
@@ -27,9 +27,9 @@ export default function SettingsScreen() {
     // Show loading if contexts are loading or local operations
     const isLoading = settingsLoading || localLoading;
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Format address when location changes
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     useEffect(() => {
         (async () => {
             if (!settings?.location || settingsLoading) return;
@@ -42,9 +42,9 @@ export default function SettingsScreen() {
         })();
     }, [settings?.location, settingsLoading]);
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Change theme
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const handleTheme = async (value) => {
         setLocalLoading(true);
         try {
@@ -59,9 +59,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Change language
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const handleLanguage = async (value) => {
         setLocalLoading(true);
         try {
@@ -81,9 +81,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Set or update location
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const resetLocation = async () => {
         setLocalLoading(true);
         try {
@@ -125,9 +125,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Toggle notifications
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const toggleNotifications = async (value) => {
         setLocalLoading(true);
         try {
@@ -172,9 +172,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Handle settings refresh
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const handleSettingsRefresh = async () => {
         try {
             await reloadSettings();
@@ -183,9 +183,9 @@ export default function SettingsScreen() {
         }
     }
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Handle prayers refresh
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const handlePrayersRefresh = async () => {
         try {
             await refetchPrayersTimes();

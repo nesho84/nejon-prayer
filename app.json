@@ -33,6 +33,7 @@
       "favicon": "./assets/icons/favicon.png"
     },
     "plugins": [
+      "./plugins/notifee-mod.js",
       "expo-router",
       [
         "expo-splash-screen",

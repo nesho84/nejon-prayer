@@ -1,12 +1,12 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { Picker } from "@react-native-picker/picker";
+import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { Picker } from "@react-native-picker/picker";
-import LoadingScreen from "@/components/LoadingScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -20,9 +20,9 @@ export default function OnboardingScreen() {
   const locationRef = useRef(null);
   const notificationsRef = useRef(false);
 
-  // ---------------------------------------------------
+  // -----------------------------------------------------------------
   // Onboarding check: Redirect once settings are loaded
-  // ---------------------------------------------------
+  // -----------------------------------------------------------------
   useEffect(() => {
     if (!settingsLoading && settings?.onboarding) {
       // Show HomeScreen (if already onboarded)
@@ -128,9 +128,9 @@ export default function OnboardingScreen() {
     }
   }
 
-  // --------------------------------------------------------------
+  // ----------------------------------------------------------------------------
   // 🏁 (Finish) Update SettingsContext and redirect to HomeScreen
-  // --------------------------------------------------------------
+  // ----------------------------------------------------------------------------
   async function finishOnboarding() {
     setLocalLoading(true);
     try {

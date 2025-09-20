@@ -53,7 +53,11 @@ export const translations = {
             cancel: "Cancel",
             openSettings: "Open Settings",
             retry: "Retry",
-        }
+        },
+        actions: {
+            prayed: "Prayed",
+            snooze: "Remind Later"
+        },
     },
     sq: {
         prayers: {
@@ -109,7 +113,11 @@ export const translations = {
             cancel: "Anulo",
             openSettings: "Hap Cilësimet",
             retry: "Riprovo",
-        }
+        },
+        actions: {
+            prayed: "U luta",
+            snooze: "Më kujto më vonë"
+        },
     },
     de: {
         prayers: {
@@ -165,6 +173,10 @@ export const translations = {
             cancel: "Abbrechen",
             openSettings: "Einstellungen Öffnen",
             retry: "Wiederholen",
-        }
+        },
+        actions: {
+            prayed: "Gebetet",
+            snooze: "Später erinnern"
+        },
     }
 };

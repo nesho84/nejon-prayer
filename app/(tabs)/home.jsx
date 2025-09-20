@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { useSettingsContext } from '@/contexts/SettingsContext';
-import { usePrayersContext } from '@/contexts/PrayersContext';
-import useNextPrayer from "@/hooks/useNextPrayer";
-import useTranslation from "@/hooks/useTranslation";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import { formatTimezone } from "@/utils/timeZone";
 import LoadingScreen from "@/components/LoadingScreen";
+import { usePrayersContext } from '@/contexts/PrayersContext';
+import { useSettingsContext } from '@/contexts/SettingsContext';
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useNextPrayer from "@/hooks/useNextPrayer";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import useTranslation from "@/hooks/useTranslation";
+import { formatTimezone } from "@/utils/timeZone";
+import { useIsFocused } from "@react-navigation/native";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -18,7 +18,12 @@ export default function HomeScreen() {
     const { settings, settingsLoading, settingsError } = useSettingsContext();
     const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
-    const { schedulePrayerNotifications, sendTestNotification, logScheduledNotifications } = usePrayerNotifications();
+    const {
+        schedulePrayerNotifications,
+        sendTestNotification,
+        sendNotifeeTestNotification,
+        logScheduledNotifications
+    } = usePrayerNotifications();
 
     // Local state
     const isFocused = useIsFocused();
@@ -30,18 +35,18 @@ export default function HomeScreen() {
     // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Schedule notifications when prayer times are ready
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     useEffect(() => {
         if (settings?.notifications && hasPrayersTimes) {
             schedulePrayerNotifications(prayersTimes);
         }
     }, [prayersTimes, settings?.notifications, isFocused]);
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Update warnings when screen is focused
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     useEffect(() => {
         // Update warnings
         if (!isLoading) {
@@ -57,9 +62,9 @@ export default function HomeScreen() {
         }
     }, [isFocused]);
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Format timezone when location is available
-    // --------------------------------------------------------
+    // ----------------------------------------------------------------------
     useEffect(() => {
         if (!settings?.location || settingsLoading) return;
         (async () => {
@@ -78,9 +83,9 @@ export default function HomeScreen() {
         })();
     }, [settings?.location, settingsLoading, hasPrayersTimes]);
 
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     // Handle prayers refresh
-    // --------------------------------------------------
+    // ----------------------------------------------------------------
     const handleRefresh = async () => {
         try {
             await refetchPrayersTimes();
@@ -196,6 +201,7 @@ export default function HomeScreen() {
 
                     {/* Just for Testing... */}
                     {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
+                    <Button title="Send Notifee Test Notification" onPress={sendNotifeeTestNotification} />
                     {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
 
                 </View>
