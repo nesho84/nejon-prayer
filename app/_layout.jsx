@@ -1,7 +1,7 @@
 import { PrayersProvider } from "@/contexts/PrayersContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import notifee, { EventType, TriggerType } from '@notifee/react-native';
+import notifee, { EventType, TriggerType, AndroidNotificationSetting } from '@notifee/react-native';
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
@@ -12,6 +12,10 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
   const { notification, pressAction } = detail;
 
   // console.log('🌙 Background notification event fired');
+
+  // Get Run Alarm & Reminders status
+  const settings = await notifee.getNotificationSettings();
+  const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
   switch (type) {
     case EventType.ACTION_PRESS:
@@ -39,7 +43,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
               {
                 type: TriggerType.TIMESTAMP,
                 timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                alarmManager: true, // When in low-power idle modes
+                alarmManager: hasAlarm,
               }
             );
             console.log("🔔 Background: Prayer reminder scheduled for later...");

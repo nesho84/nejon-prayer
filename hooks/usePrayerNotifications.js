@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Alert, Linking, Platform } from "react-native";
+import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 import notifee, {
     AndroidImportance,
     AndroidVisibility,
@@ -16,129 +17,96 @@ const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 export default function usePrayerNotifications() {
     const { tr, currentLang } = useTranslation();
-    const isInitialized = useRef(false);
     const lastScheduledTimes = useRef(null);
 
     // ------------------------------------------------------------
-    // Initialize Notifee permissions and channels
+    // Create notification channel (Android only)
     // ------------------------------------------------------------
-    const initialize = async () => {
-        if (isInitialized.current) return true;
+    const createNotificationChannel = async () => {
+        if (Platform.OS !== "android") return;
 
         try {
-            // Request permission with Notifee
-            const settings = await notifee.requestPermission();
-            if (settings.authorizationStatus < 1) { // Not authorized
-                Alert.alert(
-                    tr("labels.notifications"),
-                    tr("labels.warning3"),
-                    [
-                        { text: tr("buttons.cancel"), style: "cancel" },
-                        { text: tr("buttons.openSettings"), onPress: () => Linking.openSettings() }
-                    ]
-                );
-                return false;
-            }
-
-            // Create Android notification channel with enhanced settings
-            if (Platform.OS === "android") {
-                await notifee.createChannel({
-                    id: NOTIFICATION_CHANNEL_ID,
-                    name: 'Prayer Time Notifications',
-                    description: 'Notifications for daily prayer times',
-                    importance: AndroidImportance.HIGH,
-                    visibility: AndroidVisibility.PUBLIC,
-                    sound: 'default',
-                    vibration: true,
-                    vibrationPattern: [300, 500, 300, 500],
-                    lights: true,
-                    lightColor: '#4A90E2',
-                    badge: true,
-                    bypassDnd: true, // Bypass Do Not Disturb for prayer times
-                });
-            }
-
-            isInitialized.current = true;
-            return true;
+            await notifee.createChannel({
+                id: NOTIFICATION_CHANNEL_ID,
+                name: "Prayer Time Notifications",
+                description: "Notifications for daily prayer times",
+                importance: AndroidImportance.HIGH,
+                visibility: AndroidVisibility.PUBLIC,
+                sound: "default",
+                vibration: true,
+                vibrationPattern: [300, 500, 300, 500],
+                lights: true,
+                lightColor: "#4A90E2",
+                badge: true,
+                bypassDnd: true,
+            });
         } catch (err) {
-            console.error("❌ Notifee initialization failed:", err);
+            console.error("❌ Failed to create notification channel:", err);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Check basic notification permission
+    // ------------------------------------------------------------
+    const checkNotificationPermission = async () => {
+        try {
+            const settings = await notifee.requestPermission();
+            return settings.authorizationStatus >= 1;
+        } catch (err) {
+            console.error("❌ Error checking notification permission:", err);
             return false;
         }
     };
 
     // ------------------------------------------------------------
-    // Check if exact alarms are allowed
+    // Check if Alarm & Reminders are enabled
     // ------------------------------------------------------------
-    async function checkExactAlarmPermission() {
-        if (Platform.OS !== 'android') return;
+    const checkAlarmPermission = async () => {
+        if (Platform.OS !== "android") return false;
 
         try {
             const settings = await notifee.getNotificationSettings();
-            if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
-                Alert.alert(
-                    tr("labels.alarmAccessTitle"),
-                    tr("labels.alarmAccessBody"),
-                    [
-                        { text: tr("buttons.later"), style: 'cancel' },
-                        {
-                            text: tr("buttons.openSettings"),
-                            onPress: () => notifee.openAlarmPermissionSettings()
-                        }
-                    ]
-                );
-                console.log("⚠️ Alarm & Reminders permission is not enabled - may affect notification reliability");
-            }
+            return settings.android?.alarm === AndroidNotificationSetting.ENABLED;
         } catch (err) {
-            console.warn('Exact alarm check failed:', err);
+            console.warn('❌ Error checking Alarm & Reminders permission:', err);
         }
-    }
+    };
 
     // ------------------------------------------------------------
-    // Handle battery optimization for better reliability
+    // Check battery optimization
     // ------------------------------------------------------------
-    async function handleBatteryOptimization() {
-        if (Platform.OS !== 'android') return;
+    const checkBatteryOptimization = async () => {
+        if (Platform.OS !== "android") return true;
 
         try {
-            const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
-            if (batteryOptimizationEnabled) {
-                Alert.alert(
-                    tr("labels.batteryOptTitle"),
-                    tr("labels.batteryOptBody"),
-                    [
-                        { text: tr("buttons.later"), style: "cancel" },
-                        {
-                            text: tr("buttons.openSettings"),
-                            onPress: () => notifee.openBatteryOptimizationSettings()
-                        }
-                    ]
-                );
-                console.log("⚠️ Battery optimization is enabled - may affect notification reliability");
-            }
-
-            const powerManagerInfo = await notifee.getPowerManagerInfo();
-            if (powerManagerInfo.activity) {
-                console.log("⚠️ Power manager detected:", powerManagerInfo.manufacturer);
-            }
+            const isOptimized = await notifee.isBatteryOptimizationEnabled();
+            return !isOptimized; // Return true if optimization is disabled (good)
         } catch (err) {
-            console.warn("Battery optimization check failed:", err);
+            console.error("❌ Error checking battery optimization:", err);
+            return false;
         }
     }
 
     // ------------------------------------------------------------
-    // Enhanced prayer times change detection
+    // Cancel all existing prayer notifications
     // ------------------------------------------------------------
-    const checkPrayerTimesChanged = (newTimes, language = null) => {
-        const useLanguage = language || currentLang;
-        const newTimesKey = JSON.stringify({ times: newTimes, language: useLanguage });
+    const cancelPrayerNotifications = async () => {
+        try {
+            // Get all trigger notifications
+            const notifications = await notifee.getTriggerNotifications();
 
-        if (lastScheduledTimes.current !== newTimesKey) {
-            console.log("📅 Prayer times changed - rescheduling needed...");
-            return true;
+            // Cancel only prayer-related notifications
+            for (const notification of notifications) {
+                if (notification.notification.data?.type === "prayer") {
+                    await notifee.cancelNotification(notification.notification.id);
+                }
+            }
+
+            console.log("⚠️  All existing prayer notifications cancelled");
+            lastScheduledTimes.current = null;
+        } catch (err) {
+            console.error("❌ Failed to cancel prayer notifications", err);
         }
-
-        console.log("⏰ Prayer times unchanged - keeping existing schedule...");
-        return false;
     };
 
     // ------------------------------------------------------------
@@ -148,28 +116,60 @@ export default function usePrayerNotifications() {
         // Use passed language or current
         const useLanguage = language || currentLang;
 
-        // Prevent duplicate scheduling and only reschedule if times changed or forced
-        if (!force && !checkPrayerTimesChanged(times, useLanguage)) {
+        // Prevent duplicate scheduling - only reschedule if times changed or forced
+        const timesKey = JSON.stringify({ times, language: useLanguage });
+        if (!force && lastScheduledTimes.current === timesKey) {
+            console.log("Prayer times unchanged - keeping existing schedule");
             return;
         }
 
         try {
-            // Initialize if needed
-            const initialized = await initialize();
-            if (!initialized) {
-                console.log("❌ Notification initialization failed");
+            // Create Channel
+            await createNotificationChannel();
+
+            // Check basic notification permission
+            const hasNotifications = await checkNotificationPermission();
+            if (!hasNotifications) {
+                Alert.alert(
+                    tr("labels.notifications"),
+                    tr("labels.warning3"),
+                    [
+                        { text: tr("buttons.cancel"), style: "cancel" },
+                        { text: tr("buttons.openSettings"), onPress: () => Linking.openSettings() }
+                    ]
+                );
+                console.log("⚠️ Notifications permission is not enabled");
                 return;
             }
 
-            // Run Battery Management check
-            checkExactAlarmPermission();
+            // Check Alarm&Reminders permission
+            const hasAlarm = await checkAlarmPermission();
+            if (!hasAlarm) {
+                Alert.alert(
+                    tr("labels.alarmAccessTitle"),
+                    tr("labels.alarmAccessBody"),
+                    [
+                        { text: tr("buttons.later"), style: 'cancel' },
+                        { text: tr("buttons.openSettings"), onPress: () => notifee.openAlarmPermissionSettings() }
+                    ]
+                );
+                console.log("⚠️ Alarm & Reminders permission is not enabled - may affect notification reliability");
+            }
 
-            // Run Alarm & Reminders check
-            handleBatteryOptimization();
-            const settings = await notifee.getNotificationSettings();
-            const hasExactAlarmPermission = settings.android.alarm === AndroidNotificationSetting.ENABLED;
+            // Check Battery Optimization status
+            const hasBatteryOptimization = await checkBatteryOptimization();
+            if (!hasBatteryOptimization) {
+                Alert.alert(
+                    tr("labels.batteryOptTitle"),
+                    tr("labels.batteryOptBody"),
+                    [
+                        { text: tr("buttons.later"), style: "cancel" },
+                        { text: tr("buttons.openSettings"), onPress: () => notifee.openBatteryOptimizationSettings() }
+                    ]
+                );
+            }
 
-            // Cancel existing notifications first
+            // Cancel existing notifications
             await cancelPrayerNotifications();
 
             const now = new Date();
@@ -250,7 +250,7 @@ export default function usePrayerNotifications() {
                     {
                         type: TriggerType.TIMESTAMP,
                         timestamp: triggerTime.getTime(),
-                        alarmManager: hasExactAlarmPermission, // true if allowed, fallback false if denied
+                        alarmManager: hasAlarm, // true if allowed, fallback false if denied
                         repeatFrequency: RepeatFrequency.DAILY, // Repeat daily
                     }
                 );
@@ -260,7 +260,7 @@ export default function usePrayerNotifications() {
                 // Debugg logging: Format date as DD/MM/YYYY, HH:mm:ss
                 const formattedDate = triggerTime.toLocaleDateString('en-GB') + ', ' +
                     triggerTime.toLocaleTimeString('en-GB', { hour12: false });
-                console.log(`⏰ Scheduled ${name} at ${formattedDate} (alarmManager=${hasExactAlarmPermission})`);
+                console.log(`⏰ Scheduled ${name} at ${formattedDate} (alarmManager=${hasAlarm})`);
             }
 
             // Update the stored times key after successful scheduling
@@ -286,33 +286,14 @@ export default function usePrayerNotifications() {
     };
 
     // ------------------------------------------------------------
-    // Cancel all existing prayer notifications
-    // ------------------------------------------------------------
-    const cancelPrayerNotifications = async () => {
-        try {
-            // Get all trigger notifications
-            const notifications = await notifee.getTriggerNotifications();
-
-            // Cancel only prayer-related notifications
-            for (const notification of notifications) {
-                if (notification.notification.data?.type === "prayer") {
-                    await notifee.cancelNotification(notification.notification.id);
-                }
-            }
-
-            console.log("⚠️  All existing prayer notifications cancelled");
-            lastScheduledTimes.current = null;
-        } catch (err) {
-            console.error("❌ Failed to cancel prayer notifications", err);
-        }
-    };
-
-    // ------------------------------------------------------------
     // Debug utility: send a test notification
     // ------------------------------------------------------------
     const sendTestNotification = async () => {
         try {
             await initialize();
+
+            // Check Alarm&Reminders permission
+            const hasAlarm = await checkAlarmPermission();
 
             const timestamp = Date.now() + (10 * 1000); // 10 sec.
 
@@ -348,7 +329,7 @@ export default function usePrayerNotifications() {
                 {
                     type: TriggerType.TIMESTAMP,
                     timestamp: timestamp,
-                    alarmManager: true,
+                    alarmManager: hasAlarm,
                 }
             );
 
@@ -426,6 +407,9 @@ export default function usePrayerNotifications() {
 
             // console.log('🌙 Foreground notification event fired');
 
+            // Check Alarm&Reminders permission
+            const hasAlarm = await checkAlarmPermission();
+
             switch (type) {
                 case EventType.ACTION_PRESS:
                     switch (pressAction?.id) {
@@ -452,7 +436,7 @@ export default function usePrayerNotifications() {
                                     {
                                         type: TriggerType.TIMESTAMP,
                                         timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                                        alarmManager: true, // When in low-power idle modes
+                                        alarmManager: hasAlarm, // When in low-power idle modes
                                     }
                                 );
                                 console.log("🔔 Foreground: Prayer reminder scheduled for later...");
@@ -483,9 +467,8 @@ export default function usePrayerNotifications() {
         getNotificationStats,
 
         // Utility functions
-        checkPrayerTimesChanged,
-
-        // Status
-        isInitialized: isInitialized.current,
+        checkNotificationPermission,
+        checkAlarmPermission,
+        checkBatteryOptimization,
     };
 }
