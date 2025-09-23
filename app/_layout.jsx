@@ -1,19 +1,28 @@
-import { PrayersProvider } from "@/contexts/PrayersContext";
-import { SettingsProvider } from "@/contexts/SettingsContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import notifee, { EventType, TriggerType, AndroidNotificationSetting } from '@notifee/react-native';
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
+import { PrayersProvider } from "@/contexts/PrayersContext";
+import AppStatusBar from "@/components/AppStatusBar";
+import notifee, {
+  AndroidColor,
+  AndroidImportance,
+  AndroidNotificationSetting,
+  AndroidVisibility,
+  EventType,
+  TriggerType
+} from '@notifee/react-native';
 
 // ------------------------------------------------------------
-// Notifee Notifications - Background event handler
+// Background event handler - Notifee Notifications
 // ------------------------------------------------------------
 notifee.onBackgroundEvent(async ({ type, detail }) => {
+  // console.log('🌙 Background notification event fired');
   const { notification, pressAction } = detail;
 
-  // console.log('🌙 Background notification event fired');
+  // Ignore if no notification
+  if (!notification) return;
 
-  // Get Run Alarm & Reminders status
+  // Check Alarm & Reminders permission
   const settings = await notifee.getNotificationSettings();
   const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
@@ -25,8 +34,21 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
           break;
         case 'snooze-prayer':
           console.log(`⏰ Background: Snoozed ${notification?.data?.prayer}`);
-          // Schedule ? minute reminder
+
           try {
+            // Create reminder-specific channel
+            await notifee.createChannel({
+              id: 'prayer-reminders',
+              name: 'Prayer Reminders',
+              description: "Reminder for daily prayer times",
+              importance: AndroidImportance.HIGH,
+              visibility: AndroidVisibility.PUBLIC,
+              sound: 'default',
+              vibration: true,
+              bypassDnd: true,
+            });
+
+            // Schedule timestamp reminder
             await notifee.createTriggerNotification(
               {
                 id: `prayer-snooze-${notification?.data?.prayer || 'unknown'}`,
@@ -37,7 +59,8 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                   channelId: 'prayer-notifications',
                   smallIcon: 'ic_stat_prayer',
                   largeIcon: require('../assets/images/alarm-clock.png'),
-                  color: '#FF9500',
+                  color: AndroidColor.RED,
+                  pressAction: { id: 'default', launchActivity: 'default' },
                 }
               },
               {
@@ -50,9 +73,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
           } catch (err) {
             console.error("Failed to schedule background reminder:", err);
           }
-          break;
-        case 'test-action':
-          console.log("🧪 Background: Test action pressed");
           break;
       }
       break;
@@ -70,13 +90,14 @@ export default function RootLayout() {
           <Stack
             screenOptions={{
               headerShown: false,
-              contentStyle: {
-                backgroundColor: "transparent"
-              },
+              contentStyle: { backgroundColor: "transparent" },
               animation: "fade",
             }}
-          />
-          <StatusBar style="auto" />
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+          <AppStatusBar />
         </PrayersProvider>
       </SettingsProvider>
     </ThemeProvider>

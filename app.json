@@ -11,6 +11,7 @@
     "ios": {
       "buildNumber": "13",
       "supportsTablet": true,
+      "jsEngine": "jsc",
       "icon": {
         "dark": "./assets/icons/ios-dark.png",
         "light": "./assets/icons/ios-light.png",
@@ -47,20 +48,11 @@
             "backgroundColor": "#000000"
           }
         }
-      ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icons/notification-icon.png",
-          "color": "#ffffff",
-          "defaultChannel": "default",
-          "sounds": [],
-          "enableBackgroundRemoteNotifications": false
-        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "jsEngine": "hermes"
   }
 }

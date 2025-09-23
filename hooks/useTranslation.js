@@ -2,9 +2,9 @@ import { translations } from "@/constants/translations";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 
 export default function useTranslation() {
-    const { settings } = useSettingsContext();
+    const { appSettings } = useSettingsContext();
 
-    const currentLang = settings.language || "en";
+    const currentLang = appSettings.language || "en";
 
     const tr = (path) => {
         const keys = path.split(".");

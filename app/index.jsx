@@ -3,14 +3,15 @@ import { Alert, Button, Platform, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
 import { useSettingsContext } from "@/contexts/SettingsContext";
+import notifee, { AuthorizationStatus } from "@notifee/react-native";
+import { formatAddress, formatTimezone } from "@/utils/geoInfo";
 import LoadingScreen from "@/components/LoadingScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { settingsLoading, settings, saveSettings } = useSettingsContext();
+  const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
 
   const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -18,24 +19,26 @@ export default function OnboardingScreen() {
   // Refs for onboarding data
   const languageRef = useRef("en");
   const locationRef = useRef(null);
-  const notificationsRef = useRef(false);
+  const prayerTimesRef = useRef(null);
+  const fullAddressRef = useRef(null);
+  const timeZoneRef = useRef(null);
 
   // -----------------------------------------------------------------
   // Onboarding check: Redirect once settings are loaded
   // -----------------------------------------------------------------
   useEffect(() => {
-    if (!settingsLoading && settings?.onboarding) {
+    if (!settingsLoading && !localLoading && appSettings?.onboarding) {
       // Show HomeScreen (if already onboarded)
       router.replace("/(tabs)/home");
     }
-  }, [settingsLoading, settings?.onboarding]);
+  }, [settingsLoading, appSettings?.onboarding]);
 
   // If still loading settings
   if (settingsLoading) {
     return <LoadingScreen message="Loading settings..." />;
   }
   // Redirecting...
-  if (settings?.onboarding) {
+  if (appSettings?.onboarding) {
     return <LoadingScreen message="Redirecting..." />;
   }
   // Show local loading
@@ -89,8 +92,11 @@ export default function OnboardingScreen() {
         return;
       }
 
-      // Update Ref
+      // Update Refs
       locationRef.current = loc.coords;
+      fullAddressRef.current = await formatAddress(loc.coords);
+      timeZoneRef.current = await formatTimezone(loc.coords);
+
       setStep(3);
     } catch (err) {
       console.error("❌ Location access error:", err);
@@ -106,8 +112,8 @@ export default function OnboardingScreen() {
   async function requestNotifications() {
     setLocalLoading(true);
     try {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== "granted") {
+      const settings = await notifee.requestPermission();
+      if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
         Alert.alert(
           "Notifications needed",
           "You can skip for now, but you won’t receive prayer time reminders until you allow notifications. You can enable them later in Settings."
@@ -116,8 +122,6 @@ export default function OnboardingScreen() {
         return;
       }
 
-      // Update Ref
-      notificationsRef.current = true;
       // Finish Onboarding (final step)
       await finishOnboarding();
     } catch (err) {
@@ -135,11 +139,12 @@ export default function OnboardingScreen() {
     setLocalLoading(true);
     try {
       // Update SettingsContext
-      await saveSettings({
+      await saveAppSettings({
         onboarding: true,
         language: languageRef.current,
         location: locationRef.current,
-        notifications: notificationsRef.current,
+        fullAddress: fullAddressRef.current,
+        timeZone: timeZoneRef.current
       });
 
       // Redirect to HomeScreen

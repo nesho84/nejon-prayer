@@ -3,6 +3,13 @@ import * as Location from "expo-location";
 // Reverse-geocodes given coordinates into a human-readable timezone.
 export async function formatTimezone(location) {
     try {
+        // ✅ Location Permission check
+        const locationEnabled = await Location.hasServicesEnabledAsync();
+        if (!locationEnabled) {
+            console.warn("Location Access Denied");
+            return null;
+        }
+
         // ✅ Add safety check at the beginning
         if (!location?.latitude || !location?.longitude) {
             console.warn("formatTimezone: Invalid location provided", location);
@@ -52,8 +59,15 @@ export async function formatTimezone(location) {
 }
 
 // Reverse-geocodes given coordinates into a human-readable Address.
-export async function formatLocation(location) {
+export async function formatAddress(location) {
     try {
+        // ✅ Location Permission check
+        const locationEnabled = await Location.hasServicesEnabledAsync();
+        if (!locationEnabled) {
+            console.warn("Location Access Denied");
+            return null;
+        }
+
         // ✅ This check was already there - good!
         if (!location?.latitude || !location?.longitude) {
             console.warn("formatLocation: Invalid location provided", location);

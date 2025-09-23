@@ -8,42 +8,37 @@ export const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
     const THEME_KEY = "@app_theme_v1";
 
+    const [themeMode, setThemeMode] = useState("system"); // "light" | "dark" | "system"
+    const [theme, setTheme] = useState(lightTheme);       // actual theme object for UI
+    const [resolvedThemeName, setResolvedThemeName] = useState("light"); // "light" or "dark"
     const [themeLoading, setThemeLoading] = useState(true);
-    const [currentTheme, setCurrentTheme] = useState("system");
-    const [systemTheme, setSystemTheme] = useState(Appearance.getColorScheme() || "light");
-    const [appTheme, setAppTheme] = useState(lightTheme);
 
-    // Convert currentTheme or systemTheme to theme object
-    const resolveTheme = (value) => {
-        if (value === "system") {
-            return systemTheme === "dark" ? darkTheme : lightTheme;
-        }
-        return value === "dark" ? darkTheme : lightTheme;
+    // Helper to resolve theme
+    const resolveTheme = (mode) => {
+        const system = Appearance.getColorScheme() || "light";
+        const finalMode = mode === "system" ? system : mode;
+        setResolvedThemeName(finalMode); // store resolved name
+        return finalMode === "dark" ? darkTheme : lightTheme;
     };
+
+    // Whenever themeMode changes, resolve theme
+    useEffect(() => {
+        setTheme(resolveTheme(themeMode));
+    }, [themeMode]);
 
     // Load saved theme from storage
     const loadTheme = async () => {
         try {
             const saved = await AsyncStorage.getItem(THEME_KEY);
-            const value = saved || "system";
-            setCurrentTheme(value);
-            setAppTheme(resolveTheme(value));
-        } catch (e) {
-            console.warn("❌ Failed to load theme", e);
-            setAppTheme(lightTheme);
+            const mode = saved || "system";
+            setThemeMode(mode);
+            setTheme(resolveTheme(mode));
+        } catch (err) {
+            console.warn("❌ Failed to load theme, defaulting to light", err);
+            setThemeMode("system");
+            setTheme(lightTheme);
         } finally {
             setThemeLoading(false);
-        }
-    };
-
-    // Save theme to storage and update context
-    const changeTheme = async (value) => {
-        try {
-            setCurrentTheme(value);
-            setAppTheme(resolveTheme(value));
-            await AsyncStorage.setItem(THEME_KEY, value);
-        } catch (e) {
-            console.warn("❌ Failed to save theme", e);
         }
     };
 
@@ -52,27 +47,45 @@ export function ThemeProvider({ children }) {
         loadTheme();
     }, []);
 
-    // Listen for system changes if currentTheme is "system"
+    // Listen to system changes
     useEffect(() => {
+        if (themeMode !== "system") return;
+
         const listener = ({ colorScheme }) => {
-            setSystemTheme(colorScheme || "light");
-            if (currentTheme === "system") {
-                setAppTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+            if (themeMode === "system") {
+                const newResolvedName = colorScheme || "light";
+                setResolvedThemeName(newResolvedName);
+                setTheme(newResolvedName === "dark" ? darkTheme : lightTheme);
             }
         };
-        const subscribe = Appearance.addChangeListener(listener);
+
+        const subscription = Appearance.addChangeListener(listener);
 
         return () => {
-            if (subscribe?.remove) subscribe.remove();
+            if (subscription?.remove) subscription.remove();
         };
-    }, [currentTheme]);
+    }, [themeMode]);
+
+    // Change theme manually
+    const changeTheme = async (mode) => {
+        setThemeMode(mode);
+        setTheme(resolveTheme(mode));
+        try {
+            await AsyncStorage.setItem(THEME_KEY, mode);
+        } catch (err) {
+            console.warn("❌ Failed to save theme", err);
+        } finally {
+            setThemeLoading(false);
+        }
+    };
 
     return (
         <ThemeContext.Provider
             value={{
-                theme: appTheme,
-                currentTheme,
+                theme,
+                themeMode,
                 changeTheme,
+                resolvedThemeName,
                 themeLoading,
             }}
         >

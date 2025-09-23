@@ -1,4 +1,4 @@
-const { withProjectBuildGradle, withDangerousMod } = require('expo/config-plugins');
+const { withProjectBuildGradle, withDangerousMod, withAndroidManifest } = require('expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,6 +16,7 @@ module.exports = function withNotifeeRepo(config) {
         "maven { url 'https://www.jitpack.io' }",
         replacement
       );
+      console.log('📦 Added Notifee repository to build.gradle');
     }
 
     return config;
@@ -41,11 +42,34 @@ module.exports = function withNotifeeRepo(config) {
       const targetIcon = path.join(drawableFolder, 'ic_stat_prayer.png');
 
       fs.copyFileSync(sourceIcon, targetIcon);
-      console.log('✅ Copied notification icon to drawable folder');
+      console.log('🖼️  Copied Notifee notification icon → drawable/ic_stat_prayer.png');
 
       return config;
     },
   ]);
+
+  // Add required permissions to AndroidManifest.xml
+  config = withAndroidManifest(config, config => {
+    const manifest = config.modResults.manifest;
+
+    if (!manifest['uses-permission']) manifest['uses-permission'] = [];
+
+    const addPermission = (name, emoji, text) => {
+      const alreadyAdded = manifest['uses-permission'].some(
+        (p) => p.$['android:name'] === name
+      );
+      if (!alreadyAdded) {
+        manifest['uses-permission'].push({ $: { 'android:name': name } });
+        console.log(`${emoji} Added ${text} permission to AndroidManifest.xml`);
+      }
+    };
+
+    addPermission('android.permission.SCHEDULE_EXACT_ALARM', '⏰', 'SCHEDULE_EXACT_ALARM');
+    addPermission('android.permission.USE_EXACT_ALARM', '⏰', 'USE_EXACT_ALARM');
+    addPermission('android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS', '🔋', 'REQUEST_IGNORE_BATTERY_OPTIMIZATIONS');
+
+    return config;
+  });
 
   return config;
 };

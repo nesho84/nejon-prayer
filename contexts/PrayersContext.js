@@ -4,7 +4,7 @@ import { useSettingsContext } from "@/contexts/SettingsContext";
 export const PrayersContext = createContext();
 
 export function PrayersProvider({ children }) {
-    const { settings, settingsLoading } = useSettingsContext();
+    const { appSettings, settingsLoading } = useSettingsContext();
 
     const [prayersTimes, setPrayersTimes] = useState([]);
     const [prayersLoading, setPrayersLoading] = useState(true);
@@ -82,9 +82,9 @@ export function PrayersProvider({ children }) {
     // Fetch prayer data when settings load and location changes
     useEffect(() => {
         if (!settingsLoading) {
-            fetchPrayersTimes(settings.location);
+            fetchPrayersTimes(appSettings.location);
         }
-    }, [settings.location, settingsLoading]);
+    }, [appSettings.location, settingsLoading]);
 
     // Reset prayer data if settings are reloading
     useEffect(() => {
@@ -98,7 +98,7 @@ export function PrayersProvider({ children }) {
             prayersTimes,
             prayersLoading,
             prayersError,
-            refetchPrayersTimes: () => fetchPrayersTimes(settings.location),
+            refetchPrayersTimes: () => fetchPrayersTimes(appSettings.location),
             // Helper to check if we have valid data
             hasPrayersTimes: prayersTimes && typeof prayersTimes === 'object' && Object.keys(prayersTimes).length > 0,
         }}>
