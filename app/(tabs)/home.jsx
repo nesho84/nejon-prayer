@@ -1,82 +1,131 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import { loadSettings } from "@/hooks/storage";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
-import usePrayerService from "@/hooks/usePrayerService";
-import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useIsFocused } from "@react-navigation/native";
+import { router } from "expo-router";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import { useSettingsContext } from '@/contexts/SettingsContext';
+import { usePrayersContext } from '@/contexts/PrayersContext';
+import useTranslation from "@/hooks/useTranslation";
+import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import useNextPrayer from "@/hooks/useNextPrayer";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import LoadingScreen from "@/components/LoadingScreen";
 
-export default function Home() {
-    // ThemeContext
-    const { theme } = useTheme();
-    // LanguageContext
-    const { lang, currentLang } = useLanguage();
+export default function HomeScreen() {
+    const { theme } = useThemeContext();
+    const { tr } = useTranslation();
+    const { appSettings, deviceSettings, settingsLoading, settingsError } = useSettingsContext();
+    const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
+    const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
+    const { schedulePrayerNotifications, scheduleTestNotification } = usePrayerNotifications();
 
-    // Notifications hook
-    const {
-        schedulePrayerNotifications,
-        sendTestNotification,
-        logScheduledNotifications
-    } = usePrayerNotifications();
-
+    // Local state
     const isFocused = useIsFocused();
-
     const [warning, setWarning] = useState(null);
-    const [coords, setCoords] = useState(null);
 
-    // Load coords once from saved settings
-    useEffect(() => {
-        (async () => {
-            const saved = await loadSettings();
-            if (saved?.coords) {
-                setCoords(saved.coords);
-            }
-        })();
-    }, []);
+    // Show loading if either context is loading
+    const isLoading = settingsLoading || prayersLoading;
+    // Show error if either context has an error
+    const hasError = settingsError || prayersError;
 
-    // Prayer times hook for prayer times + next prayer countdown
-    const {
-        loadPrayerTimes,
-        prayerTimes,
-        nextPrayerName,
-        nextPrayerTime,
-        prayerCountdown,
-        loading,
-        timesError
-    } = usePrayerService(coords?.latitude, coords?.longitude);
-
+    // ----------------------------------------------------------------
     // Schedule notifications when prayer times are ready
+    // ----------------------------------------------------------------
     useEffect(() => {
-        if (prayerTimes) {
-            schedulePrayerNotifications(prayerTimes);
+        if (deviceSettings?.notificationPermission && hasPrayersTimes) {
+            schedulePrayerNotifications(prayersTimes);
         }
-    }, [prayerTimes]);
+    }, [prayersTimes, deviceSettings?.notificationPermission]);
 
+    // ----------------------------------------------------------------
     // Update warnings when screen is focused
+    // ----------------------------------------------------------------
     useEffect(() => {
-        (async () => {
-            // re-read storage on screen focus
-            const saved = await loadSettings();
-            setCoords(saved?.coords ?? null);
+        // Update warnings
+        if (!deviceSettings?.locationPermission && !deviceSettings?.notificationPermission) {
+            setWarning(tr("labels.warning1"));
+        } else if (!deviceSettings?.locationPermission) {
+            setWarning(tr("labels.warning2"));
+        } else if (!deviceSettings?.notificationPermission) {
+            setWarning(tr("labels.warning3"));
+        } else {
+            setWarning(null);
+        }
+    }, [isFocused, deviceSettings]);
 
-            // update warnings immediately
-            if (!saved?.coords && !saved?.notifications) {
-                setWarning(lang.tr("labels.warning1"));
-            } else if (!saved?.coords) {
-                setWarning(lang.tr("labels.warning2"));
-            } else if (!saved?.notifications) {
-                setWarning(lang.tr("labels.warning3"));
-            } else {
-                setWarning(null);
-            }
-        })();
-    }, [isFocused]);
+    // ----------------------------------------------------------------
+    // Handle prayers refresh
+    // ----------------------------------------------------------------
+    const handleRefresh = async () => {
+        try {
+            await refetchPrayersTimes();
+        } catch (err) {
+            console.warn("Prayers refresh failed:", err);
+        }
+    };
 
+    // Loading state
+    if (isLoading) {
+        return (
+            <LoadingScreen
+                message={settingsLoading ? tr("labels.loadingSettings") : tr("labels.loadingPrayers")}
+                style={{ backgroundColor: theme.background }}
+            />
+        );
+    }
+
+    // Error state
+    if (hasError) {
+        return (
+            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
+                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // No location set
+    if (!appSettings.locationPermission && !appSettings.location) {
+        return (
+            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
+                <Text style={styles.subText}>{tr("labels.locationSet")}</Text>
+                <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/(tabs)/settings")}>
+                    <Text style={styles.settingsButtonText}>{tr("labels.goToSettings")}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // No prayer times available
+    if (!hasPrayersTimes) {
+        return (
+            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
+                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
+                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // Main content
     return (
-        <SafeAreaView style={{ ...styles.container, backgroundColor: theme.background }}>
-            <View style={styles.inner}>
+        <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+                <RefreshControl
+                    refreshing={prayersLoading || settingsLoading}
+                    onRefresh={handleRefresh}
+                    tintColor={theme.accent}
+                    colors={[theme.accent]}
+                />
+            }
+            showsVerticalScrollIndicator={false}
+        >
+            <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.background }]}>
 
                 {/* Warnings box */}
                 {warning && (
@@ -85,50 +134,45 @@ export default function Home() {
                     </View>
                 )}
 
-                {/* Current date */}
-                <Text style={{ ...styles.date, color: theme.primaryText }}>{new Date().toDateString()}</Text>
+                {/* Timezone/Date */}
+                <View style={styles.timeZone}>
+                    <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>
+                        {appSettings.timeZone?.title || new Date().toDateString()}
+                    </Text>
+                    <Text style={[styles.timeZoneSubTitle, { color: theme.secondaryText }]}>
+                        {appSettings.timeZone?.subTitle || ""}
+                    </Text>
+                    <Text style={[styles.timeZoneDate, { color: theme.secondaryText }]}>
+                        {appSettings.timeZone?.date || ""}
+                    </Text>
+                </View>
 
                 {/* Next prayer countdown */}
                 {nextPrayerName && (
-                    <Text style={{ ...styles.countdown, color: theme.secondaryText }}>
-                        {prayerCountdown} » {nextPrayerName ? lang.tr(`prayers.${nextPrayerName}`) : ""}
+                    <Text style={[styles.countdown, { color: theme.secondaryText }]}>
+                        {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
                     </Text>
                 )}
 
-                {loading ? (
-                    /* Loading text */
-                    <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 20 }}>{lang.tr("labels.loading")}</Text>
-                ) : timesError ? (
-                    /* Prayer times error and retry */
-                    <View style={{ marginTop: 20, alignItems: "center" }}>
-                        <Text style={{ color: theme.primaryText, fontSize: 16, textAlign: "center", marginBottom: 16 }}>
-                            {lang.tr("labels.noPrayerTimes")}
-                        </Text>
-                        <Button title={lang.tr("labels.retryFetch")} onPress={loadPrayerTimes} />
-                    </View>
-                ) : (
-                    /* Prayer times list */
-                    <FlatList
-                        contentContainerStyle={{ padding: 20 }}
-                        data={Object.entries(prayerTimes)}
-                        keyExtractor={([name]) => name}
-                        renderItem={({ item: [name, time] }) => (
-                            <View style={styles.row}>
-                                <Text style={{ ...styles.prayer, color: theme.primaryText }}>
-                                    {lang.tr(`prayers.${name}`)}
-                                </Text>
-                                <Text style={{ ...styles.time, color: theme.primaryText }}>{time}</Text>
-                            </View>
-                        )}
-                    />
-                )}
+                {/* Prayer times list - Using map instead of FlatList */}
+                <View style={styles.prayersList}>
+                    {Object.entries(prayersTimes || {}).map(([name, time]) => (
+                        <View key={name} style={[styles.listContainer, { borderBottomColor: theme.border }]}>
+                            <Text style={[styles.prayerName, { color: theme.primaryText }]}>
+                                {tr(`prayers.${name}`) || name}
+                            </Text>
+                            <Text style={[styles.prayerTime, { color: theme.primaryText }]}>
+                                {time}
+                            </Text>
+                        </View>
+                    ))}
+                </View>
 
                 {/* Just for Testing... */}
-                {/* <Button title="Send Test Notification" onPress={sendTestNotification} /> */}
-                {/* <Button title="Log Scheduled Notifications" onPress={logScheduledNotifications} /> */}
+                {/* <Button title="Send Test Notification" onPress={scheduleTestNotification} /> */}
 
-            </View>
-        </SafeAreaView >
+            </SafeAreaView>
+        </ScrollView>
     );
 }
 
@@ -136,48 +180,120 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    inner: {
+    innerContainer: {
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 20,
         alignItems: "center",
         justifyContent: "center",
+        minHeight: '100%',
     },
-    date: {
-        fontSize: 20,
-        color: "#000",
-        marginTop: 100,
-        marginBottom: 38,
+    scrollContainer: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'center',
+    },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    timeZone: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 45,
+    },
+    timeZoneTitle: {
+        fontSize: 23,
+        marginBottom: 5,
+    },
+    timeZoneSubTitle: {
+        fontSize: 15,
+        fontWeight: "300",
+        color: '#666',
+        marginBottom: 4,
+    },
+    timeZoneDate: {
+        fontSize: 16,
+        fontWeight: "500",
+        color: '#666',
     },
     countdown: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: "500",
-        marginBottom: 30,
+        marginTop: 30,
+        marginBottom: 55,
     },
-    row: {
+    listContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        width: "100%",
-        paddingVertical: 10,
         borderBottomWidth: 0.5,
         borderBottomColor: "#333",
+        width: "100%",
+        paddingVertical: 10,
     },
-    prayer: {
-        fontSize: 18,
+    prayerName: {
+        fontSize: 20,
+        fontWeight: "500",
     },
-    time: {
-        fontSize: 18,
-        fontWeight: "700",
+    prayerTime: {
+        fontSize: 19,
+        fontWeight: "400",
     },
     warningBox: {
         padding: 8,
         backgroundColor: "#fdecea",
         borderWidth: 1,
         borderColor: "#f5c2c7",
-        borderRadius: 4
+        borderRadius: 4,
+        marginBottom: 30,
     },
     warningText: {
         color: "#856404",
         textAlign: "center",
         fontWeight: "500",
+    },
+    errorText: {
+        fontSize: 16,
+        color: '#FF3B30',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    messageText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    subText: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    retryButton: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    retryButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    settingsButton: {
+        backgroundColor: '#007AFF',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    settingsButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

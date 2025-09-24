@@ -1,14 +1,12 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
 
 export default function TabLayout() {
-    // ThemeContext
-    const { theme } = useTheme();
-    // LanguageContext
-    const { lang } = useLanguage();
+    const { theme } = useThemeContext();
+    const { tr } = useTranslation();
 
     return (
         <>
@@ -26,21 +24,21 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="home"
                     options={{
-                        title: lang.tr("labels.home"),
+                        title: tr("labels.home"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
                     name="settings"
                     options={{
-                        title: lang.tr("labels.settings"),
+                        title: tr("labels.settings"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
                     name="about"
                     options={{
-                        title: lang.tr("labels.about"),
+                        title: tr("labels.about"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
                     }}
                 />

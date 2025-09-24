@@ -1,64 +1,82 @@
-import { useLanguage } from "@/context/LanguageContext";
-import { loadSettings, saveSettings } from "@/hooks/storage";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Button, Platform, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Button, Platform, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import notifee, { AuthorizationStatus } from "@notifee/react-native";
+import { formatAddress, formatTimezone } from "@/utils/geoInfo";
+import LoadingScreen from "@/components/LoadingScreen";
 
-export default function Start() {
+export default function OnboardingScreen() {
   const router = useRouter();
-  // LanguageContext
-  const { changeLanguage, lang } = useLanguage();
+  const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
 
-  const [loading, setLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [language, setLanguage] = useState("en");
-  const [coords, setCoords] = useState(null);
 
-  // Check if settings exist on first load
+  // Refs for onboarding data
+  const languageRef = useRef("en");
+  const locationRef = useRef(null);
+  const prayerTimesRef = useRef(null);
+  const fullAddressRef = useRef(null);
+  const timeZoneRef = useRef(null);
+
+  // -----------------------------------------------------------------
+  // Onboarding check: Redirect once settings are loaded
+  // -----------------------------------------------------------------
   useEffect(() => {
-    (async () => {
-      const saved = await loadSettings();
-      if (saved) {
-        router.replace("/home");
-      } else {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    if (!settingsLoading && !localLoading && appSettings?.onboarding) {
+      // Show HomeScreen (if already onboarded)
+      router.replace("/(tabs)/home");
+    }
+  }, [settingsLoading, appSettings?.onboarding]);
 
+  // If still loading settings
+  if (settingsLoading) {
+    return <LoadingScreen message="Loading settings..." />;
+  }
+  // Redirecting...
+  if (appSettings?.onboarding) {
+    return <LoadingScreen message="Redirecting..." />;
+  }
+  // Show local loading
+  if (localLoading) {
+    return <LoadingScreen message="Please Wait..." />;
+  }
+
+  // ----------------------------
   // 1️⃣ (Step 1) Handle language
-  async function handleLanguage(value) {
-    setLoading(true);
+  // ----------------------------
+  async function handleLanguage() {
+    setLocalLoading(true);
     try {
-      setLanguage(value);
-      // Update LanguageContext
-      changeLanguage(value);
-    } catch (error) {
+      // Update languageRef: updated in the dropdown-picker
+      setStep(2);
+    } catch (err) {
       console.error("Language change error:", err);
       Alert.alert("Error", "Failed to save language setting.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
+  // ----------------------------------------
   // 2️⃣ (Step 2) Request location permission
+  // ----------------------------------------
   async function requestLocation() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
-          "Location required",
-          "You can skip, but prayer times will not be location-based."
+          "Location needed",
+          "You can skip for now, but prayer times won't load until you allow location access. You can update it later in Settings."
         );
         setStep(3);
         return;
       }
-
       // Try high accuracy first, fallback to balanced
       let loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
@@ -69,58 +87,74 @@ export default function Start() {
           timeout: 10000,
         })
       );
-
       if (!loc?.coords) {
-        Alert.alert("Error", "Failed to get location. Please try again.");
+        Alert.alert("Error", "Failed to request location. Please try again.");
         return;
       }
 
-      setCoords(loc.coords);
+      // Update Refs
+      locationRef.current = loc.coords;
+      fullAddressRef.current = await formatAddress(loc.coords);
+      timeZoneRef.current = await formatTimezone(loc.coords);
+
       setStep(3);
     } catch (err) {
-      console.error("❌ Location error:", err);
+      console.error("❌ Location access error:", err);
       Alert.alert("Error", "Failed to get location. Please try again.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
+  // --------------------------------------------
   // 3️⃣ (Step 3) Request notification permission
+  // --------------------------------------------
   async function requestNotifications() {
-    setLoading(true);
+    setLocalLoading(true);
     try {
-      const { status } = await Notifications.requestPermissionsAsync();
-      const notificationsStatus = status === "granted";
+      const settings = await notifee.requestPermission();
+      if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+        Alert.alert(
+          "Notifications needed",
+          "You can skip for now, but you won’t receive prayer time reminders until you allow notifications. You can enable them later in Settings."
+        );
+        await finishOnboarding();
+        return;
+      }
 
-      // Finish Onboarding (last step)
-      await finishOnboarding(notificationsStatus);
+      // Finish Onboarding (final step)
+      await finishOnboarding();
     } catch (err) {
-      console.error("Notification error:", err);
+      console.error("❌ Notification access error:", err);
       Alert.alert("Error", "Failed to request notifications. Please try again.");
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   }
 
-  // 🏁 (Finish) Save settings and redirect to home
-  async function finishOnboarding(notificationsStatus) {
-    const settings = {
-      theme: "system",
-      coords,
-      notifications: notificationsStatus,
-    };
-    // Save in AsyncStorage
-    await saveSettings(settings);
-    router.replace("/home");
-  }
+  // ----------------------------------------------------------------------------
+  // 🏁 (Finish) Update SettingsContext and redirect to HomeScreen
+  // ----------------------------------------------------------------------------
+  async function finishOnboarding() {
+    setLocalLoading(true);
+    try {
+      // Update SettingsContext
+      await saveAppSettings({
+        onboarding: true,
+        language: languageRef.current,
+        location: locationRef.current,
+        fullAddress: fullAddressRef.current,
+        timeZone: timeZoneRef.current
+      });
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={{ color: "#a78d8dff", fontSize: 20, marginVertical: 12 }}>Please Wait</Text>
-      </View>
-    );
+      // Redirect to HomeScreen
+      router.replace("/(tabs)/home");
+    } catch (err) {
+      console.error("❌ Onboarding error:", err);
+      Alert.alert("Error", "Failed to finish onboarding. Please try again.");
+    } finally {
+      setLocalLoading(false);
+    }
   }
 
   return (
@@ -133,8 +167,8 @@ export default function Start() {
             <Text style={{ color: "#a78d8dff", fontSize: 20, marginBottom: 12 }}>Select Language</Text>
             {Platform.OS === "android" ? (
               <Picker
-                selectedValue={language}
-                onValueChange={(value) => handleLanguage(value)}
+                selectedValue={languageRef.current}
+                onValueChange={(value) => languageRef.current = value}
                 dropdownIconColor={'#000'}
                 dropdownIconRippleColor={'#000'}
                 style={{ width: '100%', backgroundColor: '#cccccc', color: '#000' }}
@@ -145,11 +179,11 @@ export default function Start() {
               </Picker>
             ) : (
               <View style={{ width: '100%', marginVertical: 12 }}>
-                <Button title={`Language: ${language}`} onPress={() => Alert.alert("iOS", "Implement picker for iOS")} />
+                <Button title={`Language: ${languageRef.current}`} onPress={() => Alert.alert("iOS", "Implement picker for iOS")} />
               </View>
             )}
             <View style={{ width: '100%', marginVertical: 12 }}>
-              <Button title="Next" onPress={() => setStep(2)} />
+              <Button title="Next" onPress={handleLanguage} />
             </View>
           </>
         )}
@@ -169,7 +203,7 @@ export default function Start() {
             <View style={{ marginBottom: 12 }}>
               <Button title="Allow Notifications" onPress={requestNotifications} />
             </View>
-            <Button title="Skip" color="red" onPress={() => finishOnboarding(false, coords)} />
+            <Button title="Skip" color="red" onPress={finishOnboarding} />
           </>
         )}
       </View>

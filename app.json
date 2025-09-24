@@ -2,15 +2,16 @@
   "expo": {
     "name": "nejon-prayer",
     "slug": "nejon-prayer",
-    "version": "1.1.1",
+    "version": "1.1.4",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "buildNumber": "11",
+      "buildNumber": "14",
       "supportsTablet": true,
+      "jsEngine": "jsc",
       "icon": {
         "dark": "./assets/icons/ios-dark.png",
         "light": "./assets/icons/ios-light.png",
@@ -18,7 +19,7 @@
       }
     },
     "android": {
-      "versionCode": 11,
+      "versionCode": 14,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "monochromeImage": "./assets/icons/adaptive-icon.png",
@@ -33,6 +34,7 @@
       "favicon": "./assets/icons/favicon.png"
     },
     "plugins": [
+      "./plugins/notifee-mod.js",
       "expo-router",
       [
         "expo-splash-screen",
@@ -46,20 +48,11 @@
             "backgroundColor": "#000000"
           }
         }
-      ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icons/notification-icon.png",
-          "color": "#ffffff",
-          "defaultChannel": "default",
-          "sounds": [],
-          "enableBackgroundRemoteNotifications": false
-        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "jsEngine": "hermes"
   }
 }

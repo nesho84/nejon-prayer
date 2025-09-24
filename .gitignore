@@ -39,6 +39,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # IDE - VSCode
-**/.vscode/
+# **/.vscode/
 
 app-example
