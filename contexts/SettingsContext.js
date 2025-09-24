@@ -74,11 +74,12 @@ export function SettingsProvider({ children }) {
         try {
             // Location permissions
             const locationEnabled = await Location.hasServicesEnabledAsync();
+
             // Notification permissions
             const nSettings = await notifee.getNotificationSettings();
             const notificationsEnabled = nSettings.authorizationStatus === AuthorizationStatus.AUTHORIZED;
-            const alarmEnabled = nSettings.android.alarm === AndroidNotificationSetting.ENABLED;
             const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
+            const alarmEnabled = nSettings.android?.alarm === AndroidNotificationSetting.ENABLED;
 
             const newDeviceSettings = {
                 locationPermission: locationEnabled,
@@ -109,7 +110,8 @@ export function SettingsProvider({ children }) {
         const subscription = AppState.addEventListener('change', (nextAppState) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
                 console.log("👁‍🗨 AppState → foreground → syncing settings...");
-                syncDeviceSettings();
+                // Slight delay to let device settings apply
+                setTimeout(() => syncDeviceSettings(), 500);
             }
             appState.current = nextAppState;
             console.log('👁‍🗨 AppState →', appState.current);

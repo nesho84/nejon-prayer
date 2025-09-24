@@ -64,8 +64,9 @@ module.exports = function withNotifeeRepo(config) {
       }
     };
 
-    addPermission('android.permission.SCHEDULE_EXACT_ALARM', '⏰', 'SCHEDULE_EXACT_ALARM');
+    addPermission('android.permission.POST_NOTIFICATIONS', '⏰', 'POST_NOTIFICATIONS');
     addPermission('android.permission.USE_EXACT_ALARM', '⏰', 'USE_EXACT_ALARM');
+    addPermission('android.permission.SCHEDULE_EXACT_ALARM', '⏰', 'SCHEDULE_EXACT_ALARM');
     addPermission('android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS', '🔋', 'REQUEST_IGNORE_BATTERY_OPTIMIZATIONS');
 
     return config;

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import {
+    ActivityIndicator, Alert, Linking, Platform,
+    Pressable, ScrollView, StyleSheet,
+    Switch, Text, TouchableOpacity, View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
@@ -124,18 +128,44 @@ export default function SettingsScreen() {
     };
 
     // ----------------------------------------------------------------
-    // We should just show the status of the notifcations permission, but if they are disabled,
-    // we will show a button to navigate to app notification (openNotificationSettings)
-    // we will get the permission back AuthorizationStatus.DENIED or AuthorizationStatus.AUTHORIZED
-    // We should do this with the location, alarm, batery management also....
+    // Handle Notifications
     // ----------------------------------------------------------------
-    async function openAppNotificationSettings() {
+    async function handleNotifications() {
         setLocalLoading(true);
         try {
-            await notifee.openNotificationSettings();
-            console.log('Notification settings opened!');
+            if (!deviceSettings.notificationPermission) {
+                const settings = await notifee.requestPermission();
+                if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+                    // Not allowed → open system settings
+                    Alert.alert(
+                        tr("labels.notificationsDisabled"),
+                        tr("labels.notificationsDisabledMessage"),
+                        [
+                            { text: tr("buttons.cancel"), style: "cancel" },
+                            {
+                                text: tr("buttons.openSettings"),
+                                onPress: async () => {
+                                    if (Platform.OS === "android") {
+                                        await notifee.openNotificationSettings();
+                                    } else {
+                                        Linking.openSettings();
+                                    }
+                                }
+                            }
+                        ]
+                    );
+                }
+            }
+            else {
+                // Already allowed → open system settings
+                if (Platform.OS === "android") {
+                    await notifee.openNotificationSettings();
+                } else {
+                    Linking.openSettings();
+                }
+            }
         } catch (error) {
-            console.error('Failed to open notification settings:', error);
+            console.error('Error checking notifications permission:', error);
             Alert.alert(tr("labels.error"), tr("labels.notificationError"));
         } finally {
             setLocalLoading(false);
@@ -143,49 +173,24 @@ export default function SettingsScreen() {
     }
 
     // ----------------------------------------------------------------
-    // Toggle notifications
+    // Open Alarm & reminders settings
     // ----------------------------------------------------------------
-    const toggleNotifications = async (value) => {
-        setLocalLoading(true);
-        try {
-            if (value) {
-                const settings = await notifee.getNotificationSettings();
-                if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
-                    const newSettings = await notifee.requestPermission();
-                    if (newSettings === AuthorizationStatus.DENIED) {
-                        // Denied → open system settings
-                        Alert.alert(
-                            tr("labels.notificationsDisabled"),
-                            tr("labels.notificationsDisabledMessage"),
-                            [
-                                { text: tr("buttons.cancel"), style: "cancel" },
-                                {
-                                    text: tr("buttons.openSettings"),
-                                    onPress: await notifee.openNotificationSettings()
-                                },
-                            ]
-                        );
-                        return;
-                    }
-                }
-            }
+    const openAlarmPermissionSettings = async () => {
+        if (Platform.OS === "android") {
+            await notifee.openAlarmPermissionSettings();
+        } else {
+            Linking.openSettings();
+        }
+    };
 
-            // Save settings
-            await saveAppSettings({ notificationPermission: value });
-            console.log("✅ Notifications status changed to:", value);
-
-            //  If granted, schedule notifications
-            if (value && hasPrayersTimes) {
-                await schedulePrayerNotifications(prayersTimes);
-            } else {
-                // User turned off notifications → cancel all scheduled notifications
-                await cancelPrayerNotifications();
-            }
-        } catch (err) {
-            console.error("Notifications toggle error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.notificationError"));
-        } finally {
-            setLocalLoading(false);
+    // ----------------------------------------------------------------
+    // Open Battery settings
+    // ----------------------------------------------------------------
+    const openBatteryOptimizationSettings = async () => {
+        if (Platform.OS === "android") {
+            await notifee.openBatteryOptimizationSettings();
+        } else {
+            Linking.openSettings();
         }
     };
 
@@ -288,8 +293,8 @@ export default function SettingsScreen() {
                         <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
                             {tr("labels.location")}
                         </Text>
-                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
-                            {deviceSettings.locationPermission ? "✅ ON" : "❌ OFF"}
+                        <Text style={[styles.statusText, { color: theme.secondaryText, marginTop: -15, marginRight: 1 }]}>
+                            {deviceSettings.locationPermission ? "🟢" : "🔴"}
                         </Text>
                     </View>
                     <TouchableOpacity
@@ -313,41 +318,59 @@ export default function SettingsScreen() {
 
                 {/* Notifications Settings */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    {/* Notifications */}
+                    <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                        {tr("labels.notifications")}
+                    </Text>
+
+                    {/* Notifications status */}
+                    <View style={[styles.divider, { borderColor: theme.divider, marginTop: 0 }]}></View>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                        <Text style={[styles.statusText, { color: theme.primaryText }]}>
                             {tr("labels.notifications")}
                         </Text>
                         <Switch
-                            value={deviceSettings.notificationPermission || false}
-                            onValueChange={openAppNotificationSettings}
+                            value={deviceSettings.notificationPermission}
+                            onValueChange={handleNotifications}
                             disabled={localLoading}
-                            trackColor={{ false: theme.border, true: theme.accent }}
-                            thumbColor={deviceSettings.notificationPermission ? theme.primary : theme.placeholder}
+                            trackColor={{ false: theme.placeholder, true: theme.primary }}
+                            thumbColor={theme.primaryText}
                         />
                     </View>
 
-                    {/* Notifications status */}
+                    {/* Battery Optimization */}
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                    <Text style={[styles.statusText, { color: theme.primaryText }]}>
-                        {tr("labels.notifications")} {deviceSettings.notificationPermission ? "✅ ON" : "❌ OFF"}
-                    </Text>
+                    <>
+                        <View style={[styles.statusRow, { marginBottom: 3 }]}>
+                            <Text style={[styles.statusText, { color: theme.primaryText }]}>
+                                Battery status {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
+                            </Text>
+                            <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
+                                <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
+                            </Pressable>
+                        </View>
+                        {deviceSettings.batteryOptimization &&
+                            <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
+                                ⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.
+                            </Text>}
+                    </>
 
                     {/* Alarm & reminders (show only if Battery=Optimized) */}
                     {deviceSettings.batteryOptimization &&
                         <>
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                            <Text style={[styles.statusText, { color: theme.primaryText }]}>
-                                Alarms & reminders {deviceSettings.alarmPermission ? "✅ ON" : "❌ OFF"}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.primaryText }]}>
+                                    Alarms & reminders
+                                </Text>
+                                <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                    <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
+                                </Pressable>
+                            </View>
+                            <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
+                                ⚠️ Alarms & reminders may be disabled. Tap above to verify.
                             </Text>
                         </>
                     }
-
-                    {/* Battery Optimization */}
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                    <Text style={[styles.statusText, { color: theme.primaryText }]}>
-                        Battery Optimization status: {deviceSettings.batteryOptimization ? "⚠️ Optimized" : "✅ Unrestricted"}
-                    </Text>
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                 </View>
 
@@ -433,12 +456,12 @@ const styles = StyleSheet.create({
     divider: {
         width: "100%",
         borderWidth: 1,
-        marginVertical: 6,
+        marginVertical: 8,
     },
     resetLocationButton: {
         backgroundColor: '#007AFF',
-        padding: 15,
-        borderRadius: 10,
+        padding: 12,
+        borderRadius: 8,
         alignItems: 'center',
     },
     resetLocationButtonText: {
