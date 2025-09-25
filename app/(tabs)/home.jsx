@@ -1,14 +1,13 @@
-import { useEffect, useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
+import { useEffect } from "react";
+import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
 import useTranslation from "@/hooks/useTranslation";
 import useNotifications from "@/hooks/useNotifications";
 import useNextPrayer from "@/hooks/useNextPrayer";
-import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
@@ -19,9 +18,6 @@ export default function HomeScreen() {
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
     const { schedulePrayerNotifications, scheduleTestNotification } = useNotifications();
 
-    // Local state
-    const [warning, setWarning] = useState(null);
-
     // Show loading if either context is loading
     const isLoading = settingsLoading || prayersLoading;
     // Show error if either context has an error
@@ -31,30 +27,14 @@ export default function HomeScreen() {
     // Schedule notifications when prayer times are ready
     // ----------------------------------------------------------------
     useEffect(() => {
+        if (isLoading) return;
+
         if (deviceSettings?.notificationPermission && hasPrayersTimes) {
             schedulePrayerNotifications(prayersTimes);
         }
-    }, [prayersTimes, deviceSettings?.notificationPermission]);
+    }, [deviceSettings?.notificationPermission, prayersTimes]);
 
-    // ----------------------------------------------------------------
-    // Update warnings when screen is focused
-    // ----------------------------------------------------------------
-    useFocusEffect(() => {
-        // Update warnings
-        if (!deviceSettings?.locationPermission && !deviceSettings?.notificationPermission) {
-            setWarning(tr("labels.warning1"));
-        } else if (!deviceSettings?.locationPermission) {
-            setWarning(tr("labels.warning2"));
-        } else if (!deviceSettings?.notificationPermission) {
-            setWarning(tr("labels.warning3"));
-        } else {
-            setWarning(null);
-        }
-    });
-
-    // ----------------------------------------------------------------
-    // Handle prayers refresh
-    // ----------------------------------------------------------------
+    // Handle prayer times refresh
     const handleRefresh = async () => {
         try {
             await refetchPrayersTimes();
@@ -125,14 +105,6 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
         >
             <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.background }]}>
-
-                {/* Warnings box */}
-                {warning && (
-                    <View style={styles.warningBox}>
-                        <Text style={styles.warningText}>{warning}</Text>
-                    </View>
-                )}
-
                 {/* Timezone/Date */}
                 <View style={styles.timeZone}>
                     <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>

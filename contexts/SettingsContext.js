@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { AppState, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
+import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
+import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
 
 export const SettingsContext = createContext();
 
@@ -23,9 +24,9 @@ export function SettingsProvider({ children }) {
         fullAddress: null,
         timeZone: null,
     });
-
     // Live device/system settings (not stored)
     const [deviceSettings, setDeviceSettings] = useState({
+        internetConnection: false,
         locationPermission: false,
         notificationPermission: false,
         batteryOptimization: true,
@@ -81,7 +82,12 @@ export function SettingsProvider({ children }) {
             const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
             const alarmEnabled = nSettings.android?.alarm === AndroidNotificationSetting.ENABLED;
 
+            // Internet connection
+            const netIfo = await NetInfo.fetch();
+            const internetEnabled = !!(netIfo.isConnected && netIfo.isInternetReachable);
+
             const newDeviceSettings = {
+                internetConnection: internetEnabled,
                 locationPermission: locationEnabled,
                 notificationPermission: notificationsEnabled,
                 batteryOptimization: batteryOptimizationEnabled,

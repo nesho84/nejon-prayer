@@ -1,8 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-    ActivityIndicator, Alert, Linking, Platform,
-    Pressable, ScrollView, StyleSheet,
-    Switch, Text, TouchableOpacity, View
+    ActivityIndicator,
+    Alert,
+    Linking,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
@@ -387,15 +395,10 @@ export default function SettingsScreen() {
                             {hasPrayersTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                         </Text>
                         {/* Prayers loading... */}
-                        {prayersLoading && (
-                            <ActivityIndicator size="small" color={theme.accent} />
-                        )}
-                        {/* Reload prayers... */}
-                        {!prayersLoading &&
-                            <Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />
-                        }
+                        {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
+                            : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
                     </View>
-                    {/* fullAddress */}
+                    {/* lastFetchedDate */}
                     {lastFetchedDate && (
                         <Text style={[styles.addressText, { color: theme.secondaryText }]}>
                             {lastFetchedDate || (tr("labels.loading"))}

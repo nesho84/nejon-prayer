@@ -1,20 +1,23 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { Alert } from "react-native";
 import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
-import { Alert } from "react-native";
 
 export const PrayersContext = createContext();
 
 export function PrayersProvider({ children }) {
-    const { appSettings, saveAppSettings, settingsLoading } = useSettingsContext();
-    const { tr, currentLang } = useTranslation();
+    const PRAYERS_KEY = "@app_prayers_v1";
+
+    const { appSettings, settingsLoading } = useSettingsContext();
+    const { tr } = useTranslation();
+
+    const lastFetchedDate = useRef(null);
+    const lastFetchedLocation = useRef(null);
 
     const [prayersTimes, setPrayersTimes] = useState([]);
     const [prayersLoading, setPrayersLoading] = useState(true);
     const [prayersError, setPrayersError] = useState(null);
-    const [lastFetchedDate, setLastFetchedDate] = useState(null);
-    const [lastFetchedLocation, setLastFetchedLocation] = useState(null);
 
     // Fetch prayers times from API
     const fetchPrayersTimes = async (location) => {
@@ -22,12 +25,13 @@ export function PrayersProvider({ children }) {
         if (!location) {
             setPrayersTimes([]);
             setPrayersLoading(false);
-            setLastFetchedLocation(null);
+            lastFetchedLocation.current = null;
             return;
         }
 
         // Don't refetch if location hasn't changed
-        if (location === lastFetchedLocation && prayersTimes.length > 0) {
+        if (lastFetchedLocation.current == location && prayersTimes.length > 0) {
+            console.log("🟢 Location unchanged - keeping existing prayer times");
             setPrayersLoading(false);
             return;
         }
@@ -70,7 +74,7 @@ export function PrayersProvider({ children }) {
                 });
 
                 setPrayersTimes(filtered);
-                setLastFetchedLocation(location);
+                lastFetchedLocation.current = location;
 
                 // Formated date and time
                 const formatted = new Date().toLocaleString("en-GB", {
@@ -81,7 +85,7 @@ export function PrayersProvider({ children }) {
                     minute: "2-digit",
                     hour12: false
                 });
-                setLastFetchedDate(formatted);
+                lastFetchedDate.current = formatted;
             } else {
                 throw new Error("Invalid API response format");
             }
@@ -132,14 +136,14 @@ export function PrayersProvider({ children }) {
         if (!settingsLoading) {
             fetchPrayersTimes(appSettings.location);
         }
-    }, [appSettings.location, settingsLoading]);
+    }, [settingsLoading, appSettings.location]);
 
     return (
         <PrayersContext.Provider value={{
             prayersTimes,
             prayersLoading,
             prayersError,
-            lastFetchedDate,
+            lastFetchedDate: lastFetchedDate.current,
             hasPrayersTimes: prayersTimes && typeof prayersTimes === 'object' && Object.keys(prayersTimes).length > 0,
             refetchPrayersTimes,
         }}>
