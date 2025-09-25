@@ -295,15 +295,16 @@ export default function useNotifications() {
     };
 
     // ------------------------------------------------------------
-    // Foreground event listener
+    // Foreground event handler for Notifee
     // ------------------------------------------------------------
     useEffect(() => {
         return notifee.onForegroundEvent(async ({ type, detail }) => {
-            // console.log('🌙 Foreground notification event fired');
             const { notification, pressAction } = detail;
 
             // Ignore if no notification
             if (!notification) return;
+
+            // console.log(`🌞 [Foreground] Notification event fired: (prayer: "${notification?.data?.prayer || 'N/A'}")`);
 
             // Check Alarm & Reminders permission
             const settings = await notifee.getNotificationSettings();
@@ -313,10 +314,11 @@ export default function useNotifications() {
                 case EventType.ACTION_PRESS:
                     switch (pressAction?.id) {
                         case 'mark-prayed':
-                            console.log(`✅ Foreground: Marked ${notification?.data?.prayer} as prayed`);
+                            console.log(`✅ [Foreground] Marked "${notification?.data?.prayer}" as prayed`);
                             break;
                         case 'snooze-prayer':
-                            console.log(`⏰ Foreground: Snoozed ${notification?.data?.prayer}`);
+                            console.log(`⏰ [Foreground] Snoozed "${notification?.data?.prayer}"`);
+
                             try {
                                 // Create reminder-specific channel
                                 await notifee.createChannel({
@@ -329,7 +331,6 @@ export default function useNotifications() {
                                     vibration: true,
                                     bypassDnd: true,
                                 });
-
                                 // Schedule timestamp reminder
                                 await notifee.createTriggerNotification(
                                     {
@@ -351,15 +352,15 @@ export default function useNotifications() {
                                         alarmManager: hasAlarm,
                                     }
                                 );
-                                console.log("🔔 Foreground: Prayer reminder scheduled for later...");
+                                console.log(`🔔 [Foreground] Prayer reminder scheduled for "${notification?.data?.prayer}"`);
                             } catch (err) {
-                                console.error("Failed to schedule foreground reminder:", err);
+                                console.error("❌ [Foreground] Failed to schedule snooze reminder:", err);
                             }
                             break;
                     }
                     break;
                 case EventType.PRESS:
-                    console.log('👆 Background: Notification pressed - app will open');
+                    console.log(`👆 [Foreground] Notification pressed for ${notification?.data?.prayer || 'N/A'} - app will open...")`);
                     break;
             }
         });
