@@ -11,7 +11,7 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import { usePrayersContext } from "@/contexts/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
-import usePrayerNotifications from "@/hooks/usePrayerNotifications";
+import useNotifications from "@/hooks/useNotifications";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { formatAddress, formatTimezone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,8 +28,15 @@ export default function SettingsScreen() {
         settingsError,
         saveAppSettings
     } = useSettingsContext();
-    const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
-    const { schedulePrayerNotifications, cancelPrayerNotifications } = usePrayerNotifications();
+    const {
+        prayersTimes,
+        prayersLoading,
+        prayersError,
+        hasPrayersTimes,
+        lastFetchedDate,
+        refetchPrayersTimes
+    } = usePrayersContext();
+    const { schedulePrayerNotifications, cancelPrayerNotifications } = useNotifications();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -87,7 +94,6 @@ export default function SettingsScreen() {
                 Alert.alert(tr("labels.locationDenied"), tr("labels.locationDeniedMessage"));
                 return;
             }
-
             // Try high accuracy first, fallback to balanced
             const loc = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.Highest,
@@ -98,7 +104,6 @@ export default function SettingsScreen() {
                     timeout: 10000,
                 })
             );
-
             if (!loc?.coords) {
                 Alert.alert(tr("labels.error"), tr("labels.locationError"));
                 return;
@@ -293,9 +298,13 @@ export default function SettingsScreen() {
                         <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
                             {tr("labels.location")}
                         </Text>
-                        <Text style={[styles.statusText, { color: theme.secondaryText, marginTop: -15, marginRight: 1 }]}>
-                            {deviceSettings.locationPermission ? "🟢" : "🔴"}
-                        </Text>
+                        <Switch
+                            value={deviceSettings.locationPermission}
+                            onValueChange={null}
+                            disabled={true}
+                            trackColor={{ false: theme.placeholder, true: theme.primary }}
+                            thumbColor={theme.primaryText}
+                        />
                     </View>
                     <TouchableOpacity
                         style={styles.resetLocationButton}
@@ -318,14 +327,8 @@ export default function SettingsScreen() {
 
                 {/* Notifications Settings */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
-                        {tr("labels.notifications")}
-                    </Text>
-
-                    {/* Notifications status */}
-                    <View style={[styles.divider, { borderColor: theme.divider, marginTop: 0 }]}></View>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.primaryText }]}>
+                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
                             {tr("labels.notifications")}
                         </Text>
                         <Switch
@@ -340,9 +343,9 @@ export default function SettingsScreen() {
                     {/* Battery Optimization */}
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <>
-                        <View style={[styles.statusRow, { marginBottom: 3 }]}>
+                        <View style={styles.statusRow}>
                             <Text style={[styles.statusText, { color: theme.primaryText }]}>
-                                Battery status {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
+                                {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
                             </Text>
                             <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
                                 <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
@@ -350,28 +353,27 @@ export default function SettingsScreen() {
                         </View>
                         {deviceSettings.batteryOptimization &&
                             <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
-                                ⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.
+                                {tr("labels.batteryOptBody")}
                             </Text>}
                     </>
 
-                    {/* Alarm & reminders (show only if Battery=Optimized) */}
-                    {deviceSettings.batteryOptimization &&
+                    {/* Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) */}
+                    {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
                         <>
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.primaryText }]}>
-                                    Alarms & reminders
+                                    {tr("labels.alarmAccessTitle")}
                                 </Text>
                                 <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
                                     <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                                 </Pressable>
                             </View>
                             <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
-                                ⚠️ Alarms & reminders may be disabled. Tap above to verify.
+                                {tr("labels.alarmAccessBody")}
                             </Text>
                         </>
                     }
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                 </View>
 
                 {/* Prayer Times Status */}
@@ -379,6 +381,7 @@ export default function SettingsScreen() {
                     <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
                         {tr("labels.prayerTimesStatus")}
                     </Text>
+                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <View style={styles.statusRow}>
                         <Text style={[styles.statusText, { color: theme.secondaryText }]}>
                             {hasPrayersTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
@@ -392,6 +395,12 @@ export default function SettingsScreen() {
                             <Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />
                         }
                     </View>
+                    {/* fullAddress */}
+                    {lastFetchedDate && (
+                        <Text style={[styles.addressText, { color: theme.secondaryText }]}>
+                            {lastFetchedDate || (tr("labels.loading"))}
+                        </Text>
+                    )}
                 </View>
 
             </SafeAreaView>
@@ -433,10 +442,22 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 2,
     },
+    statusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 3,
+    },
     settingTitle: {
         fontSize: 18,
         fontWeight: '600',
-        marginBottom: 12,
+    },
+    statusText: {
+        fontSize: 16,
+    },
+    subText: {
+        fontSize: 14,
+        marginBottom: 20,
     },
     retryButton: {
         backgroundColor: '#FF3B30',
@@ -452,6 +473,7 @@ const styles = StyleSheet.create({
     picker: {
         width: '100%',
         borderRadius: 8,
+        marginTop: 12,
     },
     divider: {
         width: "100%",
@@ -459,38 +481,24 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     resetLocationButton: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: '#1f1f1fb9',
         alignItems: 'center',
+        padding: 10,
+        marginTop: 12,
+        borderRadius: 8,
     },
     resetLocationButtonText: {
-        color: 'white',
+        color: "#e2d5d5ff",
         fontSize: 16,
         fontWeight: '600',
     },
     addressText: {
-        marginTop: 12,
-        fontSize: 14,
-        fontStyle: 'italic',
-        lineHeight: 20,
-    },
-    statusRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    statusText: {
-        fontSize: 16,
+        marginTop: 8,
+        marginBottom: 1,
     },
     errorText: {
         fontSize: 16,
         color: '#FF3B30',
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    subText: {
-        fontSize: 14,
         textAlign: 'center',
         marginBottom: 20,
     },

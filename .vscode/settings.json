@@ -5,7 +5,7 @@
     "source.sortMembers": "explicit"
   },
   "files.associations": {
-    "*.js": "javascriptreact",
+    "*.js": "javascript",
     "*.jsx": "javascriptreact"
   },
   "javascript.validate.enable": false

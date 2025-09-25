@@ -1,14 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
+import useTranslation from "@/hooks/useTranslation";
+import { Alert } from "react-native";
 
 export const PrayersContext = createContext();
 
 export function PrayersProvider({ children }) {
-    const { appSettings, settingsLoading } = useSettingsContext();
+    const { appSettings, saveAppSettings, settingsLoading } = useSettingsContext();
+    const { tr, currentLang } = useTranslation();
 
     const [prayersTimes, setPrayersTimes] = useState([]);
     const [prayersLoading, setPrayersLoading] = useState(true);
     const [prayersError, setPrayersError] = useState(null);
+    const [lastFetchedDate, setLastFetchedDate] = useState(null);
     const [lastFetchedLocation, setLastFetchedLocation] = useState(null);
 
     // Fetch prayers times from API
@@ -30,7 +35,6 @@ export function PrayersProvider({ children }) {
         try {
             setPrayersLoading(true);
             setPrayersError(null);
-            // console.log("Fetching prayer times for location:", location);
 
             const now = new Date();
             const timestamp = Math.floor(now.getTime() / 1000);
@@ -67,6 +71,17 @@ export function PrayersProvider({ children }) {
 
                 setPrayersTimes(filtered);
                 setLastFetchedLocation(location);
+
+                // Formated date and time
+                const formatted = new Date().toLocaleString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false
+                });
+                setLastFetchedDate(formatted);
             } else {
                 throw new Error("Invalid API response format");
             }
@@ -79,6 +94,39 @@ export function PrayersProvider({ children }) {
         }
     }
 
+    // Re-fetch prayer times
+    const refetchPrayersTimes = async () => {
+        setPrayersLoading(true)
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert(tr("labels.locationDenied"), tr("labels.locationDeniedMessage"));
+                return;
+            }
+            // Try high accuracy first, fallback to balanced
+            const loc = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Highest,
+                timeout: 5000,
+            }).catch(() =>
+                Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
+                    timeout: 10000,
+                })
+            );
+            if (!loc?.coords) {
+                Alert.alert(tr("labels.error"), tr("labels.locationError"));
+                return;
+            }
+
+            await fetchPrayersTimes(loc.coords);
+        } catch (err) {
+            console.error("Location access error:", err);
+            Alert.alert(tr("labels.error"), tr("labels.locationError"));
+        } finally {
+            setPrayersLoading(false);
+        }
+    }
+
     // Fetch prayer data when settings load and location changes
     useEffect(() => {
         if (!settingsLoading) {
@@ -86,21 +134,14 @@ export function PrayersProvider({ children }) {
         }
     }, [appSettings.location, settingsLoading]);
 
-    // Reset prayer data if settings are reloading
-    useEffect(() => {
-        if (settingsLoading) {
-            setPrayersLoading(true);
-        }
-    }, [settingsLoading]);
-
     return (
         <PrayersContext.Provider value={{
             prayersTimes,
             prayersLoading,
             prayersError,
-            refetchPrayersTimes: () => fetchPrayersTimes(appSettings.location),
-            // Helper to check if we have valid data
+            lastFetchedDate,
             hasPrayersTimes: prayersTimes && typeof prayersTimes === 'object' && Object.keys(prayersTimes).length > 0,
+            refetchPrayersTimes,
         }}>
             {children}
         </PrayersContext.Provider>

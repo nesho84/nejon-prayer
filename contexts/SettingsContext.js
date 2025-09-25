@@ -28,8 +28,8 @@ export function SettingsProvider({ children }) {
     const [deviceSettings, setDeviceSettings] = useState({
         locationPermission: false,
         notificationPermission: false,
-        alarmPermission: false,
         batteryOptimization: true,
+        alarmPermission: false,
     });
 
     // Load settings from storage (if not found → fallback to defaults)
@@ -84,8 +84,8 @@ export function SettingsProvider({ children }) {
             const newDeviceSettings = {
                 locationPermission: locationEnabled,
                 notificationPermission: notificationsEnabled,
-                alarmPermission: alarmEnabled,
                 batteryOptimization: batteryOptimizationEnabled,
+                alarmPermission: alarmEnabled,
             };
 
             // Only update state if something actually changed

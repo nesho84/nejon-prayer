@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Constants from "expo-constants";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 
@@ -14,6 +15,8 @@ export default function AboutScreen() {
 
                 <Text style={styles.title}>{tr("labels.aboutText1")}</Text>
                 <Text style={styles.desc}>{tr("labels.aboutText2")}</Text>
+
+                <Text style={styles.versionText}>Version {Constants.manifest.version}</Text>
 
                 <Text style={styles.yearText}>
                     ©{(new Date()).getFullYear()} <Text style={styles.link}>nejon.net</Text>
@@ -36,7 +39,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     logo: {
-        marginBottom: 8,
+        marginBottom: 16,
         width: 150,
         height: 150,
     },
@@ -48,13 +51,19 @@ const styles = StyleSheet.create({
     },
     desc: {
         paddingBottom: 26,
-        fontSize: 16,
+        fontSize: 14,
         textAlign: "center",
+        color: "#888",
+    },
+    versionText: {
+        paddingBottom: 8,
+        fontWeight: "bold",
+        fontSize: 15,
         color: "#888",
     },
     yearText: {
         fontWeight: "bold",
-        fontSize: 16,
+        fontSize: 15,
         color: "#999",
     },
     link: {
