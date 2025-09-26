@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { PrayersProvider } from "@/contexts/PrayersContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
 import AppStatusBar from "@/components/AppStatusBar";
 
 export default function RootLayout() {
@@ -9,17 +10,19 @@ export default function RootLayout() {
     <ThemeProvider>
       <SettingsProvider>
         <PrayersProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: "transparent" },
-              animation: "fade",
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-          <AppStatusBar />
+          <NotificationsProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: "transparent" },
+                animation: "fade",
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+            <AppStatusBar />
+          </NotificationsProvider>
         </PrayersProvider>
       </SettingsProvider>
     </ThemeProvider>

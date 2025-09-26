@@ -37,6 +37,7 @@ export function PrayersProvider({ children }) {
 
             if (timings) {
                 const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
                 const filtered = {};
                 PRAYER_ORDER_FULL.forEach((key) => {
                     if (timings[key]) filtered[key] = timings[key]; // already HH:mm
@@ -89,6 +90,7 @@ export function PrayersProvider({ children }) {
                 fullAddress: newFullAddress,
                 timeZone: newTimeZone
             });
+
             console.log("📍 Location updated to:", loc.coords);
 
             await fetchPrayerTimes(loc.coords);
@@ -112,10 +114,10 @@ export function PrayersProvider({ children }) {
     return (
         <PrayersContext.Provider value={{
             prayerTimes,
+            hasPrayerTimes: prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0,
             prayersLoading,
             prayersError,
             lastFetchedDate: lastFetchedDate.current,
-            hasPrayerTimes: prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0,
             refetchPrayerTimes,
         }}>
             {children}

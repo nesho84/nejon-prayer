@@ -4,16 +4,16 @@ import { useSettingsContext } from "@/contexts/SettingsContext";
 export default function useTranslation() {
     const { appSettings } = useSettingsContext();
 
-    const currentLang = appSettings.language || "en";
+    const language = appSettings.language || "en";
 
     const tr = (path) => {
         const keys = path.split(".");
-        let result = translations[currentLang];
+        let result = translations[language];
         for (const key of keys) {
             result = result?.[key];
         }
         return result ?? path;
     };
 
-    return { tr, currentLang };
+    return { tr, language };
 }

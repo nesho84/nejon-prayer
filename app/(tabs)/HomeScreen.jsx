@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,40 +5,29 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
 import useTranslation from "@/hooks/useTranslation";
-import useNotifications from "@/hooks/useNotifications";
+import { useNotificationsContext } from "@/contexts/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
-    const { tr, currentLang } = useTranslation();
-    const { appSettings, deviceSettings, settingsLoading, settingsError } = useSettingsContext();
+    const { tr } = useTranslation();
+    const { appSettings, settingsLoading, settingsError } = useSettingsContext();
     const { prayerTimes, prayersLoading, prayersError, refetchPrayerTimes, hasPrayerTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayerTimes);
-    const { schedulePrayerNotifications, scheduleTestNotification } = useNotifications();
+    const { scheduleTestNotification } = useNotificationsContext();
 
     // Show loading if either context is loading
     const isLoading = settingsLoading || prayersLoading;
     // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
-    // ----------------------------------------------------------------
-    // Schedule notifications when prayers or settings change
-    // ----------------------------------------------------------------
-    useEffect(() => {
-        if (isLoading) return;
-
-        if (deviceSettings?.notificationPermission && hasPrayerTimes) {
-            schedulePrayerNotifications(prayerTimes, currentLang);
-        }
-    }, [deviceSettings?.notificationPermission, prayerTimes]);
-
     // Handle prayer times refresh
     const handleRefresh = async () => {
         try {
             await refetchPrayerTimes();
         } catch (err) {
-            console.warn("Prayers refresh failed:", err);
+            console.warn("Prayer times refresh failed:", err);
         }
     };
 

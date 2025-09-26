@@ -13,7 +13,8 @@ import notifee, {
 import useTranslation from "@/hooks/useTranslation";
 
 export default function useNotifications() {
-    const { tr, currentLang } = useTranslation();
+    const { tr, language } = useTranslation();
+
     const isSchedulingRef = useRef(false);
 
     // Custom prayers order
@@ -60,7 +61,7 @@ export default function useNotifications() {
                 }
             }
 
-            console.log("⚠️  All existing prayer notifications cancelled");
+            console.log("⚠️ All existing prayer notifications cancelled");
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }
@@ -69,8 +70,7 @@ export default function useNotifications() {
     // ------------------------------------------------------------
     // Check if the currently scheduled notifications match the desired times & language
     // ------------------------------------------------------------
-    const isSchedulingUpToDate = async (times, language) => {
-        const useLanguage = language || currentLang;
+    const isSchedulingUpToDate = async (times) => {
         const scheduled = await notifee.getTriggerNotifications();
 
         return PRAYER_ORDER.every(prayerName => {
@@ -81,7 +81,7 @@ export default function useNotifications() {
             if (!scheduledNotification) return false; // not scheduled yet
 
             // Check language
-            if (scheduledNotification.notification.data.language !== useLanguage) return false;
+            if (scheduledNotification.notification.data.language !== language) return false;
 
             // Compare trigger timestamp
             const [hourStr, minuteStr] = timeStringRaw.split(":");
@@ -102,12 +102,10 @@ export default function useNotifications() {
     // ------------------------------------------------------------
     // Schedule prayer notifications
     // ------------------------------------------------------------
-    const schedulePrayerNotifications = async (times, language = null, force = false) => {
-        // Use passed language or current
-        const useLanguage = language || currentLang;
-
-        // Prevent duplicate scheduling - only reschedule if forced and times or language changed
-        if (!force && await isSchedulingUpToDate(times, language)) {
+    const schedulePrayerNotifications = async (times) => {
+        // Prevent duplicate scheduling - only reschedule if times or language changed
+        const isUpdaToDate = await isSchedulingUpToDate(times)
+        if (isUpdaToDate) {
             console.log("🟢 Prayer notifications already up to date - skipping scheduling");
             return;
         }
@@ -171,10 +169,10 @@ export default function useNotifications() {
                         data: {
                             type: "prayer",
                             prayer: prayerName,
-                            language: useLanguage,
+                            language: language,
                             scheduledAt: new Date().toISOString(),
                             reminderTitle: tr("labels.prayerReminder"),
-                            reminderBody: `${tr("labels.timeFor")} ${prayerName}`,
+                            reminderBody: `${tr("labels.timeFor")} ${tr(`prayers.${prayerName}`)}`,
                         },
                         android: {
                             channelId: "prayer-notifications",
@@ -222,7 +220,7 @@ export default function useNotifications() {
                 console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}`);
             }
 
-            console.log(`🔔 ${scheduledCount} prayer notifications scheduled with language="${useLanguage}" and alarmManager="${hasAlarm}"`);
+            console.log(`🔔 ${scheduledCount} prayer notifications scheduled with language="${language}" and alarmManager="${hasAlarm}"`);
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications:", err);
         } finally {
@@ -261,15 +259,16 @@ export default function useNotifications() {
             // Schedule timestamp reminder
             await notifee.createTriggerNotification(
                 {
-                    id: 'simple-test',
-                    title: `${tr("prayers.Fajr") || "Fajr"} 05:30`,
+                    id: `prayer-test`,
+                    title: `${tr(`prayers.Fajr`)} 5:30` || "Prayer time",
                     body: tr("labels.alertBody") || "It's prayer time",
                     data: {
                         type: "prayer",
                         prayer: "Fajr",
+                        language: language,
                         scheduledAt: new Date().toLocaleString("en-GB"),
                         reminderTitle: tr("labels.prayerReminder"),
-                        reminderBody: `${tr("labels.timeFor")} Fajr`,
+                        reminderBody: `${tr("labels.timeFor")} ${tr(`prayers.Fajr`)}`,
                     },
                     android: {
                         channelId: 'test-notifcations',
@@ -281,12 +280,10 @@ export default function useNotifications() {
                             {
                                 title: tr("actions.prayed") || "Prayed",
                                 pressAction: { id: 'mark-prayed' },
-                                // icon: 'ic_check',
                             },
                             {
                                 title: tr("actions.remindLater") || "Remind Later",
                                 pressAction: { id: 'snooze-prayer' },
-                                // icon: 'ic_access_time',
                             },
                         ],
                         style: {
@@ -315,6 +312,8 @@ export default function useNotifications() {
                 `Test Notification scheduled`,
                 `Test notification will appear in ${remainingSeconds} seconds. Try the action buttons!`
             );
+
+            console.log(`🔔 Notification scheduled with language="${language}" and alarmManager="${hasAlarm}"`);
         } catch (err) {
             Alert.alert("Error", `Failed to schedule test notification: ${err.message}`);
             console.error(err);

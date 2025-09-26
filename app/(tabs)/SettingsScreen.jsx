@@ -19,7 +19,6 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import { usePrayersContext } from "@/contexts/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
-import useNotifications from "@/hooks/useNotifications";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { formatAddress, formatTimezone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,7 +26,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 
 export default function SettingsScreen() {
     const { theme, themeMode, changeTheme } = useThemeContext();
-    const { tr, currentLang } = useTranslation();
+    const { tr, language } = useTranslation();
     const {
         appSettings,
         deviceSettings,
@@ -44,7 +43,6 @@ export default function SettingsScreen() {
         lastFetchedDate,
         refetchPrayerTimes
     } = usePrayersContext();
-    const { schedulePrayerNotifications, cancelPrayerNotifications } = useNotifications();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -78,8 +76,7 @@ export default function SettingsScreen() {
             // Save settings
             await saveAppSettings({ language: value });
             console.log("🌐 Language changed to:", value);
-
-            // Reschedule notifications with new language (handled in HomeScreen)
+            // Reschedule notifications with new language (handled in NotificationsContext)
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr("labels.error"), tr("labels.languageError"));
@@ -125,8 +122,7 @@ export default function SettingsScreen() {
             });
 
             console.log("📍 Location updated to:", loc.coords);
-
-            // Reschedule notifications with new prayer times (handled in HomeScreen)
+            // Reschedule notifications with new location (handled in NotificationsContext)
         } catch (err) {
             console.error("Location access error:", err);
             Alert.alert(tr("labels.error"), tr("labels.locationError"));
@@ -282,7 +278,7 @@ export default function SettingsScreen() {
                         {tr("labels.language")}
                     </Text>
                     <Picker
-                        selectedValue={currentLang}
+                        selectedValue={language}
                         onValueChange={handleLanguage}
                         dropdownIconColor={theme.text}
                         dropdownIconRippleColor={theme.text}
@@ -323,7 +319,7 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                     {/* fullAddress */}
                     {appSettings.fullAddress && (
-                        <Text style={[styles.addressText, { color: theme.textMuted }]}>
+                        <Text style={[styles.addressText, { color: theme.placeholder }]}>
                             {appSettings.fullAddress || (tr("labels.loading"))}
                         </Text>
                     )}
@@ -356,7 +352,7 @@ export default function SettingsScreen() {
                             </Pressable>
                         </View>
                         {deviceSettings.batteryOptimization &&
-                            <Text style={[styles.subText, { color: theme.text2, marginTop: 4, marginBottom: 3 }]}>
+                            <Text style={[styles.subText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                 {tr("labels.batteryOptBody")}
                             </Text>}
                     </>
@@ -373,7 +369,7 @@ export default function SettingsScreen() {
                                     <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                                 </Pressable>
                             </View>
-                            <Text style={[styles.subText, { color: theme.text2, marginTop: 4, marginBottom: 3 }]}>
+                            <Text style={[styles.subText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                 {tr("labels.alarmAccessBody")}
                             </Text>
                         </>
@@ -396,7 +392,7 @@ export default function SettingsScreen() {
                     </View>
                     {/* lastFetchedDate */}
                     {lastFetchedDate && (
-                        <Text style={[styles.addressText, { color: theme.textMuted }]}>
+                        <Text style={[styles.addressText, { color: theme.placeholder }]}>
                             {lastFetchedDate || (tr("labels.loading"))}
                         </Text>
                     )}
