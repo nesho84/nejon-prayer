@@ -38,5 +38,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-.vscode/
+# IDE - VSCode
+# **/.vscode/
+
 app-example

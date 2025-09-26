@@ -1,50 +1,49 @@
-import { useLanguage } from "@/context/LanguageContext";
-import useTheme from "@/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
+import AppStatusBar from "@/components/AppStatusBar";
 
 export default function TabLayout() {
-    const { theme } = useTheme();
-    // LanguageContext
-    const { lang } = useLanguage();
+    const { theme } = useThemeContext();
+    const { tr } = useTranslation();
 
     return (
         <>
+            <AppStatusBar />
             <Tabs
                 screenOptions={{
                     headerShown: false,
                     tabBarActiveTintColor: theme.primary,
-                    tabBarInactiveTintColor: theme.secondaryText,
+                    tabBarInactiveTintColor: theme.text2,
                     tabBarStyle: {
-                        backgroundColor: theme.tabs,
-                        borderTopColor: theme.border,
+                        backgroundColor: theme.bg,
+                        bottom: "0.6%",
                     },
                 }}
             >
                 <Tabs.Screen
-                    name="home"
+                    name="HomeScreen"
                     options={{
-                        title: lang("labels.home"),
+                        title: tr("labels.home"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
-                    name="settings"
+                    name="SettingsScreen"
                     options={{
-                        title: lang("labels.settings"),
+                        title: tr("labels.settings"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
                     }}
                 />
                 <Tabs.Screen
-                    name="about"
+                    name="AboutScreen"
                     options={{
-                        title: lang("labels.about"),
+                        title: tr("labels.about"),
                         tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
                     }}
                 />
             </Tabs>
-            <StatusBar style="auto" />
         </>
     );
 }

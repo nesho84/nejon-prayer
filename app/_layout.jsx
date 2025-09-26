@@ -1,20 +1,30 @@
-import { LanguageProvider } from "@/context/LanguageContext";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
+import { PrayersProvider } from "@/contexts/PrayersContext";
+import { NotificationsProvider } from "@/contexts/NotificationsContext";
+import AppStatusBar from "@/components/AppStatusBar";
 
 export default function RootLayout() {
   return (
-    <>
-      <LanguageProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: "transparent" },
-            animation: "fade",
-          }}
-        />
-      </LanguageProvider>
-      <StatusBar style="auto" />
-    </>
+    <ThemeProvider>
+      <SettingsProvider>
+        <PrayersProvider>
+          <NotificationsProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: "transparent" },
+                animation: "fade",
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+            <AppStatusBar />
+          </NotificationsProvider>
+        </PrayersProvider>
+      </SettingsProvider>
+    </ThemeProvider>
   );
 }
