@@ -16,8 +16,8 @@
     "app/_layout.jsx",
     "app/index.jsx",
     "app/(tabs)/_layout.jsx",
-    "app/(tabs)/about.jsx",
-    "app/(tabs)/home.jsx",
-    "app/(tabs)/settings.jsx"
+    "app/(tabs)/AboutScreen.jsx",
+    "app/(tabs)/HomeScreen.jsx",
+    "app/(tabs)/SettingsScreen.jsx"
   ]
 }

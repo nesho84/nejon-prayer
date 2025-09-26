@@ -3,35 +3,28 @@ import { Alert } from "react-native";
 import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
+import { getPrayerTimes } from "@/utils/prayersApi";
+import { formatAddress, formatTimezone } from "@/utils/geoInfo";
 
 export const PrayersContext = createContext();
 
 export function PrayersProvider({ children }) {
     const PRAYERS_KEY = "@app_prayers_v1";
 
-    const { appSettings, settingsLoading } = useSettingsContext();
+    const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
     const { tr } = useTranslation();
 
     const lastFetchedDate = useRef(null);
-    const lastFetchedLocation = useRef(null);
 
-    const [prayersTimes, setPrayersTimes] = useState([]);
+    const [prayerTimes, setPrayerTimes] = useState([]);
     const [prayersLoading, setPrayersLoading] = useState(true);
     const [prayersError, setPrayersError] = useState(null);
 
-    // Fetch prayers times from API
-    const fetchPrayersTimes = async (location) => {
+    // Fetch prayers times from aladhan API
+    const fetchPrayerTimes = async (location) => {
         // Don't fetch if no location
         if (!location) {
-            setPrayersTimes([]);
-            setPrayersLoading(false);
-            lastFetchedLocation.current = null;
-            return;
-        }
-
-        // Don't refetch if location hasn't changed
-        if (lastFetchedLocation.current == location && prayersTimes.length > 0) {
-            console.log("🟢 Location unchanged - keeping existing prayer times");
+            setPrayerTimes([]);
             setPrayersLoading(false);
             return;
         }
@@ -40,66 +33,31 @@ export function PrayersProvider({ children }) {
             setPrayersLoading(true);
             setPrayersError(null);
 
-            const now = new Date();
-            const timestamp = Math.floor(now.getTime() / 1000);
-            const url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${location.latitude}&longitude=${location.longitude}&method=2`;
+            const timings = await getPrayerTimes(location);
 
-            const response = await fetch(url);
-            const result = await response.json();
-            const allTimes = result.data.timings;
-
-            if (result.data && result.data.timings) {
-                // Parse Fajr -> Date
-                const [fajrH, fajrM] = allTimes["Fajr"].split(":").map(Number);
-                const fajrDate = new Date();
-                fajrDate.setHours(fajrH, fajrM, 0, 0);
-                // Imsak = Fajr - 20 minutes
-                const imsakDate = new Date(fajrDate.getTime() - 20 * 60000);
-                // Ensure spacing rule (Imsak vs Fajr)
-                if ((fajrDate - imsakDate) / 60000 < 25) {
-                    fajrDate.setMinutes(imsakDate.getMinutes() + 5);
-                }
-                //  format Date -> "HH:mm" (always 24h, no AM/PM)
-                const formatTime = (date) =>
-                    `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
-                const correctedFajr = formatTime(fajrDate);
-                const correctedImsak = formatTime(imsakDate);
-                // Final object e.g. { Fajr: "05:46", Dhuhr: "12:50", ... }
+            if (timings) {
                 const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
                 const filtered = {};
                 PRAYER_ORDER_FULL.forEach((key) => {
-                    if (key === "Fajr") filtered[key] = correctedFajr;
-                    else if (key === "Imsak") filtered[key] = correctedImsak;
-                    else if (allTimes[key]) filtered[key] = allTimes[key]; // API is already "HH:mm"
+                    if (timings[key]) filtered[key] = timings[key]; // already HH:mm
                 });
 
-                setPrayersTimes(filtered);
-                lastFetchedLocation.current = location;
-
-                // Formated date and time
-                const formatted = new Date().toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false
-                });
-                lastFetchedDate.current = formatted;
+                setPrayerTimes(filtered);
+                lastFetchedDate.current = new Date().toLocaleString("en-GB");
             } else {
                 throw new Error("Invalid API response format");
             }
         } catch (err) {
             console.warn("❌ Failed to fetch prayer data:", err);
             setPrayersError(err.message);
-            setPrayersTimes([]);
+            setPrayerTimes([]);
         } finally {
             setPrayersLoading(false);
         }
     }
 
     // Re-fetch prayer times
-    const refetchPrayersTimes = async () => {
+    const refetchPrayerTimes = async () => {
         setPrayersLoading(true)
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -122,7 +80,20 @@ export function PrayersProvider({ children }) {
                 return;
             }
 
-            await fetchPrayersTimes(loc.coords);
+            const newFullAddress = await formatAddress(loc.coords);
+            const newTimeZone = await formatTimezone(loc.coords);
+
+            // Save settings
+            await saveAppSettings({
+                location: loc.coords,
+                fullAddress: newFullAddress,
+                timeZone: newTimeZone
+            });
+            console.log("📍 Location updated to:", loc.coords);
+
+            await fetchPrayerTimes(loc.coords);
+
+            console.log("✅ Prayer times updated");
         } catch (err) {
             console.error("Location access error:", err);
             Alert.alert(tr("labels.error"), tr("labels.locationError"));
@@ -134,18 +105,18 @@ export function PrayersProvider({ children }) {
     // Fetch prayer data when settings load and location changes
     useEffect(() => {
         if (!settingsLoading) {
-            fetchPrayersTimes(appSettings.location);
+            fetchPrayerTimes(appSettings.location);
         }
     }, [settingsLoading, appSettings.location]);
 
     return (
         <PrayersContext.Provider value={{
-            prayersTimes,
+            prayerTimes,
             prayersLoading,
             prayersError,
             lastFetchedDate: lastFetchedDate.current,
-            hasPrayersTimes: prayersTimes && typeof prayersTimes === 'object' && Object.keys(prayersTimes).length > 0,
-            refetchPrayersTimes,
+            hasPrayerTimes: prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0,
+            refetchPrayerTimes,
         }}>
             {children}
         </PrayersContext.Provider>

@@ -12,14 +12,12 @@ import notifee, {
 } from "@notifee/react-native";
 import useTranslation from "@/hooks/useTranslation";
 
-// Constants
-const NOTIFICATION_CHANNEL_ID = 'prayer-notifications';
-const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
 export default function useNotifications() {
     const { tr, currentLang } = useTranslation();
-    const lastScheduledTimes = useRef(null);
     const isSchedulingRef = useRef(false);
+
+    // Custom prayers order
+    const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
     // ------------------------------------------------------------
     // Create notification channel (Android only)
@@ -29,7 +27,7 @@ export default function useNotifications() {
 
         try {
             await notifee.createChannel({
-                id: NOTIFICATION_CHANNEL_ID,
+                id: "prayer-notifications",
                 name: "Prayer Time Notifications",
                 description: "Notifications for daily prayer times",
                 importance: AndroidImportance.HIGH,
@@ -63,10 +61,42 @@ export default function useNotifications() {
             }
 
             console.log("⚠️  All existing prayer notifications cancelled");
-            lastScheduledTimes.current = null;
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
         }
+    };
+
+    // ------------------------------------------------------------
+    // Check if the currently scheduled notifications match the desired times & language
+    // ------------------------------------------------------------
+    const isSchedulingUpToDate = async (times, language) => {
+        const useLanguage = language || currentLang;
+        const scheduled = await notifee.getTriggerNotifications();
+
+        return PRAYER_ORDER.every(prayerName => {
+            const timeStringRaw = times[prayerName];
+            if (!timeStringRaw) return true; // skip missing
+
+            const scheduledNotification = scheduled.find(n => n.notification.id === `prayer-${prayerName.toLowerCase()}`);
+            if (!scheduledNotification) return false; // not scheduled yet
+
+            // Check language
+            if (scheduledNotification.notification.data.language !== useLanguage) return false;
+
+            // Compare trigger timestamp
+            const [hourStr, minuteStr] = timeStringRaw.split(":");
+            const hour = Number(hourStr);
+            const minute = Number(minuteStr);
+
+            const now = new Date();
+            const targetTime = new Date();
+            targetTime.setHours(hour, minute, 0, 0);
+            if (targetTime <= now) targetTime.setDate(targetTime.getDate() + 1);
+
+            const triggerTimestamp = scheduledNotification.trigger.timestamp;
+
+            return triggerTimestamp === targetTime.getTime();
+        });
     };
 
     // ------------------------------------------------------------
@@ -76,12 +106,9 @@ export default function useNotifications() {
         // Use passed language or current
         const useLanguage = language || currentLang;
 
-        // Create a unique key for this scheduling request
-        const timesKey = JSON.stringify({ times, language: useLanguage });
-
-        // Prevent duplicate scheduling - only reschedule if times changed or forced
-        if (!force && lastScheduledTimes.current === timesKey) {
-            console.log("🟢 Prayer times unchanged - keeping existing scheduled Notifications");
+        // Prevent duplicate scheduling - only reschedule if forced and times or language changed
+        if (!force && await isSchedulingUpToDate(times, language)) {
+            console.log("🟢 Prayer notifications already up to date - skipping scheduling");
             return;
         }
 
@@ -108,10 +135,10 @@ export default function useNotifications() {
             const now = new Date();
             let scheduledCount = 0;
 
-            for (const name of PRAYER_ORDER) {
-                const timeStringRaw = times[name];
+            for (const prayerName of PRAYER_ORDER) {
+                const timeStringRaw = times[prayerName];
                 if (!timeStringRaw) {
-                    console.log(`⚠️ No time for ${name}`);
+                    console.log(`⚠️ No time for ${prayerName}`);
                     continue;
                 }
 
@@ -120,7 +147,7 @@ export default function useNotifications() {
                 // Parse "HH:mm" strictly
                 const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
                 if (!match) {
-                    console.warn(`⚠️ Invalid time format for ${name}:`, timeStringRaw);
+                    console.warn(`⚠️ Invalid time format for ${prayerName}:`, timeStringRaw);
                     continue;
                 }
 
@@ -138,17 +165,19 @@ export default function useNotifications() {
                 // Schedule the notification
                 await notifee.createTriggerNotification(
                     {
-                        id: `prayer-${name.toLowerCase()}`,
-                        title: `${tr(`prayers.${name}`)} ${timeString}` || "Prayer time",
+                        id: `prayer-${prayerName.toLowerCase()}`,
+                        title: `${tr(`prayers.${prayerName}`)} ${timeString}` || "Prayer time",
                         body: tr("labels.alertBody") || "It's prayer time",
                         data: {
                             type: "prayer",
-                            prayer: name,
-                            time: timeString,
-                            scheduledAt: new Date().toISOString()
+                            prayer: prayerName,
+                            language: useLanguage,
+                            scheduledAt: new Date().toISOString(),
+                            reminderTitle: tr("labels.prayerReminder"),
+                            reminderBody: `${tr("labels.timeFor")} ${prayerName}`,
                         },
                         android: {
-                            channelId: NOTIFICATION_CHANNEL_ID,
+                            channelId: "prayer-notifications",
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
                             largeIcon: require('../assets/images/alarm-clock.png'), // Custom large icon
                             color: AndroidColor.RED,
@@ -190,13 +219,10 @@ export default function useNotifications() {
                 // Debugg logging: Format date as DD/MM/YYYY, HH:mm:ss
                 const formattedDate = triggerTime.toLocaleDateString('en-GB') + ', ' +
                     triggerTime.toLocaleTimeString('en-GB', { hour12: false });
-                console.log(`⏰ Scheduled ${name} at ${formattedDate} (alarmManager=${hasAlarm})`);
+                console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}`);
             }
 
-            // Update the stored times key after successful scheduling
-            lastScheduledTimes.current = JSON.stringify({ times, language: useLanguage });
-
-            console.log(`🔔 ${scheduledCount} prayer notifications scheduled with language "${useLanguage}"`);
+            console.log(`🔔 ${scheduledCount} prayer notifications scheduled with language="${useLanguage}" and alarmManager="${hasAlarm}"`);
         } catch (err) {
             console.error("❌ Failed to schedule prayer notifications:", err);
         } finally {
@@ -241,8 +267,9 @@ export default function useNotifications() {
                     data: {
                         type: "prayer",
                         prayer: "Fajr",
-                        time: "05:30",
-                        scheduledAt: new Date().toISOString()
+                        scheduledAt: new Date().toLocaleString("en-GB"),
+                        reminderTitle: tr("labels.prayerReminder"),
+                        reminderBody: `${tr("labels.timeFor")} Fajr`,
                     },
                     android: {
                         channelId: 'test-notifcations',
@@ -310,6 +337,7 @@ export default function useNotifications() {
             const settings = await notifee.getNotificationSettings();
             const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
+            // Handle event types
             switch (type) {
                 case EventType.ACTION_PRESS:
                     switch (pressAction?.id) {
@@ -318,7 +346,6 @@ export default function useNotifications() {
                             break;
                         case 'snooze-prayer':
                             console.log(`⏰ [Foreground] Snoozed "${notification?.data?.prayer}"`);
-
                             try {
                                 // Create reminder-specific channel
                                 await notifee.createChannel({
@@ -334,9 +361,9 @@ export default function useNotifications() {
                                 // Schedule timestamp reminder
                                 await notifee.createTriggerNotification(
                                     {
-                                        id: `prayer-snooze-${notification?.data?.prayer || 'unknown'}`,
-                                        title: tr("labels.prayerReminder") || "Prayer Reminder",
-                                        body: `${tr("labels.timeFor") || "Time for"} ${tr(`prayers.${notification?.data?.prayer}`) || notification?.data?.prayer || "prayer"}`,
+                                        id: `prayer-snooze-${notification?.data?.prayer}`,
+                                        title: notification?.data?.reminderTitle,
+                                        body: notification?.data?.reminderBody,
                                         data: { type: "prayer-reminder" },
                                         android: {
                                             channelId: 'prayer-reminders',

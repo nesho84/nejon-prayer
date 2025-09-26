@@ -12,10 +12,10 @@ import LoadingScreen from "@/components/LoadingScreen";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
-    const { tr } = useTranslation();
+    const { tr, currentLang } = useTranslation();
     const { appSettings, deviceSettings, settingsLoading, settingsError } = useSettingsContext();
-    const { prayersTimes, prayersLoading, prayersError, refetchPrayersTimes, hasPrayersTimes } = usePrayersContext();
-    const { nextPrayerName, prayerCountdown } = useNextPrayer(prayersTimes);
+    const { prayerTimes, prayersLoading, prayersError, refetchPrayerTimes, hasPrayerTimes } = usePrayersContext();
+    const { nextPrayerName, prayerCountdown } = useNextPrayer(prayerTimes);
     const { schedulePrayerNotifications, scheduleTestNotification } = useNotifications();
 
     // Show loading if either context is loading
@@ -24,20 +24,20 @@ export default function HomeScreen() {
     const hasError = settingsError || prayersError;
 
     // ----------------------------------------------------------------
-    // Schedule notifications when prayer times are ready
+    // Schedule notifications when prayers or settings change
     // ----------------------------------------------------------------
     useEffect(() => {
         if (isLoading) return;
 
-        if (deviceSettings?.notificationPermission && hasPrayersTimes) {
-            schedulePrayerNotifications(prayersTimes);
+        if (deviceSettings?.notificationPermission && hasPrayerTimes) {
+            schedulePrayerNotifications(prayerTimes, currentLang);
         }
-    }, [deviceSettings?.notificationPermission, prayersTimes]);
+    }, [deviceSettings?.notificationPermission, prayerTimes]);
 
     // Handle prayer times refresh
     const handleRefresh = async () => {
         try {
-            await refetchPrayersTimes();
+            await refetchPrayerTimes();
         } catch (err) {
             console.warn("Prayers refresh failed:", err);
         }
@@ -48,7 +48,7 @@ export default function HomeScreen() {
         return (
             <LoadingScreen
                 message={settingsLoading ? tr("labels.loadingSettings") : tr("labels.loadingPrayers")}
-                style={{ backgroundColor: theme.background }}
+                style={{ backgroundColor: theme.bg }}
             />
         );
     }
@@ -56,8 +56,8 @@ export default function HomeScreen() {
     // Error state
     if (hasError) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
-                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
+            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
+                <Text style={styles.errorText}>{tr("labels.noPrayerTimes")}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
                     <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
@@ -68,7 +68,7 @@ export default function HomeScreen() {
     // No location set
     if (!appSettings.locationPermission && !appSettings.location) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
+            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
                 <Text style={styles.subText}>{tr("labels.locationSet")}</Text>
                 <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/(tabs)/settings")}>
                     <Text style={styles.settingsButtonText}>{tr("labels.goToSettings")}</Text>
@@ -78,10 +78,10 @@ export default function HomeScreen() {
     }
 
     // No prayer times available
-    if (!hasPrayersTimes) {
+    if (!hasPrayerTimes) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.background }]}>
-                <Text style={styles.errorText}>{tr("labels.noPrayersTimes")}</Text>
+            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
+                <Text style={styles.errorText}>{tr("labels.noPrayerTimes")}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
                     <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
@@ -89,7 +89,6 @@ export default function HomeScreen() {
         );
     }
 
-    // Main content
     return (
         <ScrollView
             style={styles.scrollContainer}
@@ -104,35 +103,35 @@ export default function HomeScreen() {
             }
             showsVerticalScrollIndicator={false}
         >
-            <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.background }]}>
+            <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.bg }]}>
                 {/* Timezone/Date */}
                 <View style={styles.timeZone}>
-                    <Text style={[styles.timeZoneTitle, { color: theme.primaryText }]}>
+                    <Text style={[styles.timeZoneTitle, { color: theme.text }]}>
                         {appSettings.timeZone?.title || new Date().toDateString()}
                     </Text>
-                    <Text style={[styles.timeZoneSubTitle, { color: theme.secondaryText }]}>
+                    <Text style={[styles.timeZoneSubTitle, { color: theme.placeholder }]}>
                         {appSettings.timeZone?.subTitle || ""}
                     </Text>
-                    <Text style={[styles.timeZoneDate, { color: theme.secondaryText }]}>
-                        {appSettings.timeZone?.date || ""}
+                    <Text style={[styles.timeZoneDate, { color: theme.placeholder }]}>
+                        {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
                     </Text>
                 </View>
 
                 {/* Next prayer countdown */}
                 {nextPrayerName && (
-                    <Text style={[styles.countdown, { color: theme.secondaryText }]}>
+                    <Text style={[styles.countdown, { color: theme.placeholder }]}>
                         {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
                     </Text>
                 )}
 
                 {/* Prayer times list - Using map instead of FlatList */}
                 <View style={styles.prayersList}>
-                    {Object.entries(prayersTimes || {}).map(([name, time]) => (
+                    {Object.entries(prayerTimes || {}).map(([name, time]) => (
                         <View key={name} style={[styles.listContainer, { borderBottomColor: theme.border }]}>
-                            <Text style={[styles.prayerName, { color: theme.primaryText }]}>
+                            <Text style={[styles.prayerName, { color: theme.text2 }]}>
                                 {tr(`prayers.${name}`) || name}
                             </Text>
-                            <Text style={[styles.prayerTime, { color: theme.primaryText }]}>
+                            <Text style={[styles.prayerTime, { color: theme.text2 }]}>
                                 {time}
                             </Text>
                         </View>
@@ -184,7 +183,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "300",
         color: '#666',
-        marginBottom: 4,
+        marginBottom: 8,
     },
     timeZoneDate: {
         fontSize: 16,

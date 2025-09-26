@@ -20,7 +20,6 @@ export function SettingsProvider({ children }) {
         onboarding: false,
         language: null,
         location: null,
-        prayerTimes: null,
         fullAddress: null,
         timeZone: null,
     });

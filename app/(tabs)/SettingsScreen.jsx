@@ -37,12 +37,12 @@ export default function SettingsScreen() {
         saveAppSettings
     } = useSettingsContext();
     const {
-        prayersTimes,
+        prayerTimes,
         prayersLoading,
         prayersError,
-        hasPrayersTimes,
+        hasPrayerTimes,
         lastFetchedDate,
-        refetchPrayersTimes
+        refetchPrayerTimes
     } = usePrayersContext();
     const { schedulePrayerNotifications, cancelPrayerNotifications } = useNotifications();
 
@@ -79,10 +79,7 @@ export default function SettingsScreen() {
             await saveAppSettings({ language: value });
             console.log("🌐 Language changed to:", value);
 
-            // Reschedule notifications with new language
-            if (deviceSettings.notificationPermission && hasPrayersTimes) {
-                await schedulePrayerNotifications(prayersTimes, value);
-            }
+            // Reschedule notifications with new language (handled in HomeScreen)
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr("labels.error"), tr("labels.languageError"));
@@ -126,12 +123,10 @@ export default function SettingsScreen() {
                 fullAddress: newFullAddress,
                 timeZone: newTimeZone
             });
-            console.log("📍 Location changed to:", loc.coords);
 
-            // Reschedule notifications with new prayer times
-            if (deviceSettings.notificationPermission && hasPrayersTimes) {
-                await schedulePrayerNotifications(prayersTimes);
-            }
+            console.log("📍 Location updated to:", loc.coords);
+
+            // Reschedule notifications with new prayer times (handled in HomeScreen)
         } catch (err) {
             console.error("Location access error:", err);
             Alert.alert(tr("labels.error"), tr("labels.locationError"));
@@ -223,7 +218,7 @@ export default function SettingsScreen() {
     // ----------------------------------------------------------------
     const handlePrayersRefresh = async () => {
         try {
-            await refetchPrayersTimes();
+            await refetchPrayerTimes();
         } catch (err) {
             console.warn("Prayers refresh failed:", err);
         }
@@ -234,7 +229,7 @@ export default function SettingsScreen() {
         return (
             <LoadingScreen
                 message={tr("labels.loadingSettings")}
-                style={{ backgroundColor: theme.background }}
+                style={{ backgroundColor: theme.bg }}
             />
         );
     }
@@ -242,7 +237,7 @@ export default function SettingsScreen() {
     // Error State - settings
     if (settingsError) {
         return (
-            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
                 <View style={styles.centerContainer}>
                     <Text style={styles.errorText}>{tr("labels.settingsError")}</Text>
                     <TouchableOpacity style={styles.retryButton} onPress={handleSettingsRefresh}>
@@ -256,7 +251,7 @@ export default function SettingsScreen() {
     // Main Content
     return (
         <ScrollView
-            style={[styles.scrollContainer, { backgroundColor: theme.background }]}
+            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
         >
@@ -264,15 +259,15 @@ export default function SettingsScreen() {
 
                 {/* Theme Setting */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                    <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.theme")}
                     </Text>
                     <Picker
                         selectedValue={themeMode}
                         onValueChange={handleTheme}
-                        dropdownIconColor={theme.primaryText}
-                        dropdownIconRippleColor={theme.primaryText}
-                        style={[styles.picker, { backgroundColor: theme.background, color: theme.primaryText }]}
+                        dropdownIconColor={theme.text}
+                        dropdownIconRippleColor={theme.text}
+                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                         enabled={!localLoading}
                     >
                         <Picker.Item label="Dark" value="dark" />
@@ -283,15 +278,15 @@ export default function SettingsScreen() {
 
                 {/* Language Setting */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                    <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.language")}
                     </Text>
                     <Picker
                         selectedValue={currentLang}
                         onValueChange={handleLanguage}
-                        dropdownIconColor={theme.primaryText}
-                        dropdownIconRippleColor={theme.primaryText}
-                        style={[styles.picker, { backgroundColor: theme.background, color: theme.primaryText }]}
+                        dropdownIconColor={theme.text}
+                        dropdownIconRippleColor={theme.text}
+                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                         enabled={!localLoading}
                     >
                         <Picker.Item label="English" value="en" />
@@ -303,7 +298,7 @@ export default function SettingsScreen() {
                 {/* Location Setting */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                        <Text style={[styles.settingTitle, { color: theme.text }]}>
                             {tr("labels.location")}
                         </Text>
                         <Switch
@@ -311,15 +306,16 @@ export default function SettingsScreen() {
                             onValueChange={null}
                             disabled={true}
                             trackColor={{ false: theme.placeholder, true: theme.primary }}
-                            thumbColor={theme.primaryText}
+                            thumbColor={theme.text}
                         />
                     </View>
+                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <TouchableOpacity
-                        style={styles.resetLocationButton}
+                        style={[styles.resetLocationButton, { backgroundColor: theme.overlay }]}
                         onPress={resetLocation}
                         disabled={localLoading}
                     >
-                        <Text style={styles.resetLocationButtonText}>
+                        <Text style={[styles.resetLocationButtonText, { color: theme.text }]}>
                             {appSettings.location
                                 ? (tr("labels.locationButtonText1"))
                                 : (tr("labels.locationButtonText2"))}
@@ -327,7 +323,7 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                     {/* fullAddress */}
                     {appSettings.fullAddress && (
-                        <Text style={[styles.addressText, { color: theme.secondaryText }]}>
+                        <Text style={[styles.addressText, { color: theme.textMuted }]}>
                             {appSettings.fullAddress || (tr("labels.loading"))}
                         </Text>
                     )}
@@ -336,7 +332,7 @@ export default function SettingsScreen() {
                 {/* Notifications Settings */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                        <Text style={[styles.settingTitle, { color: theme.text }]}>
                             {tr("labels.notifications")}
                         </Text>
                         <Switch
@@ -344,7 +340,7 @@ export default function SettingsScreen() {
                             onValueChange={handleNotifications}
                             disabled={localLoading}
                             trackColor={{ false: theme.placeholder, true: theme.primary }}
-                            thumbColor={theme.primaryText}
+                            thumbColor={theme.text}
                         />
                     </View>
 
@@ -352,7 +348,7 @@ export default function SettingsScreen() {
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <>
                         <View style={styles.statusRow}>
-                            <Text style={[styles.statusText, { color: theme.primaryText }]}>
+                            <Text style={[styles.statusText, { color: theme.text }]}>
                                 {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
                             </Text>
                             <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
@@ -360,7 +356,7 @@ export default function SettingsScreen() {
                             </Pressable>
                         </View>
                         {deviceSettings.batteryOptimization &&
-                            <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
+                            <Text style={[styles.subText, { color: theme.text2, marginTop: 4, marginBottom: 3 }]}>
                                 {tr("labels.batteryOptBody")}
                             </Text>}
                     </>
@@ -370,14 +366,14 @@ export default function SettingsScreen() {
                         <>
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                             <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.primaryText }]}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr("labels.alarmAccessTitle")}
                                 </Text>
                                 <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
                                     <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                                 </Pressable>
                             </View>
-                            <Text style={[styles.subText, { color: theme.secondaryText, marginTop: 4, marginBottom: 3 }]}>
+                            <Text style={[styles.subText, { color: theme.text2, marginTop: 4, marginBottom: 3 }]}>
                                 {tr("labels.alarmAccessBody")}
                             </Text>
                         </>
@@ -386,13 +382,13 @@ export default function SettingsScreen() {
 
                 {/* Prayer Times Status */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.settingTitle, { color: theme.primaryText }]}>
+                    <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.prayerTimesStatus")}
                     </Text>
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                    <View style={[styles.divider, { borderColor: theme.divider, marginBottom: 12 }]}></View>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.secondaryText }]}>
-                            {hasPrayersTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
+                        <Text style={[styles.statusText, { color: theme.text2 }]}>
+                            {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                         </Text>
                         {/* Prayers loading... */}
                         {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
@@ -400,7 +396,7 @@ export default function SettingsScreen() {
                     </View>
                     {/* lastFetchedDate */}
                     {lastFetchedDate && (
-                        <Text style={[styles.addressText, { color: theme.secondaryText }]}>
+                        <Text style={[styles.addressText, { color: theme.textMuted }]}>
                             {lastFetchedDate || (tr("labels.loading"))}
                         </Text>
                     )}
@@ -484,14 +480,12 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     resetLocationButton: {
-        backgroundColor: '#1f1f1fb9',
         alignItems: 'center',
         padding: 10,
-        marginTop: 12,
+        marginTop: 5,
         borderRadius: 8,
     },
     resetLocationButtonText: {
-        color: "#e2d5d5ff",
         fontSize: 16,
         fontWeight: '600',
     },

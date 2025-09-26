@@ -35,7 +35,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                     break;
                 case 'snooze-prayer':
                     console.log(`⏰ [Background] Action: Snoozed "${notification?.data?.prayer}"`);
-
                     try {
                         // Create reminder-specific channel
                         await notifee.createChannel({
@@ -51,9 +50,9 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                         // Schedule timestamp reminder
                         await notifee.createTriggerNotification(
                             {
-                                id: `prayer-snooze-${notification?.data?.prayer || 'unknown'}`,
-                                title: "Prayer Reminder",
-                                body: `Don't forget your ${notification?.data?.prayer || 'prayer'} time`,
+                                id: `prayer-snooze-${notification?.data?.prayer}`,
+                                title: notification?.data?.reminderTitle,
+                                body: notification?.data?.reminderBody,
                                 data: { type: "prayer-reminder" },
                                 android: {
                                     channelId: 'prayer-notifications',

@@ -1,4 +1,5 @@
 export const translations = {
+    // English
     en: {
         prayers: {
             Imsak: "Imsak",
@@ -43,7 +44,7 @@ export const translations = {
             notificationError: "Failed to update notifications setting.",
             settingsError: "Failed to load settings.",
             loadingPrayers: "Loading prayers...",
-            noPrayersTimes: "Prayer times could not be loaded. Please check your internet connection.",
+            noPrayerTimes: "Prayer times could not be loaded. Please check your internet connection.",
             prayerReminder: "Prayer Reminder",
             timeFor: "Time for",
             prayerTimesStatus: "Prayers Times Status",
@@ -66,6 +67,7 @@ export const translations = {
             remindLater: "Remind Later"
         },
     },
+    // Shqip
     sq: {
         prayers: {
             Imsak: "Imsaku",
@@ -93,7 +95,7 @@ export const translations = {
             warning1: "Nuk ka internet. Oraret mund të mos përditësohen.",
             warning2: "Vendodhja e çaktivizuar. Oraret mund të jenë të pasakta.",
             warning3: "Njoftimet e çaktivizuara. Nuk ka njoftime.",
-            aboutText1: "Rreth Këtij Aplikacioni",
+            aboutText1: "Rreth këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t'ju kujtuar kohët e lutjeve.",
             loadingSettings: "Duke ngarkuar cilësimet...",
             updatingSettings: "Duke përditësuar cilësimet...",
@@ -110,7 +112,7 @@ export const translations = {
             notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
             settingsError: "Cilësimet nuk mund të ngarkohen.",
             loadingPrayers: "Duke ngarkuar lutjet...",
-            noPrayersTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
+            noPrayerTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             prayerReminder: "Kujtesë lutjeje",
             timeFor: "Koha për",
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
@@ -133,6 +135,7 @@ export const translations = {
             remindLater: "Më kujto më vonë"
         },
     },
+    // Deutsch
     de: {
         prayers: {
             Imsak: "Imsak",
@@ -177,7 +180,7 @@ export const translations = {
             notificationError: "Benachrichtigungseinstellung konnte nicht aktualisiert werden.",
             settingsError: "Einstellungen konnten nicht geladen werden.",
             loadingPrayers: "Gebete werden geladen...",
-            noPrayersTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
+            noPrayerTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             prayerReminder: "Gebetserinnerung",
             timeFor: "Zeit für",
             prayerTimesStatus: "Status der Gebetszeiten",

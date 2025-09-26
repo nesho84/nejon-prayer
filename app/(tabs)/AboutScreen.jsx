@@ -9,17 +9,18 @@ export default function AboutScreen() {
     const { tr } = useTranslation();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
             <View style={styles.inner}>
                 <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 
-                <Text style={styles.title}>{tr("labels.aboutText1")}</Text>
-                <Text style={styles.desc}>{tr("labels.aboutText2")}</Text>
+                <Text style={[styles.title, { color: theme.text2 }]}>{tr("labels.aboutText1")}</Text>
+                <Text style={[styles.desc, { color: theme.placeholder }]}>{tr("labels.aboutText2")}</Text>
 
-                <Text style={styles.versionText}>Version {Constants.manifest.version}</Text>
-
-                <Text style={styles.yearText}>
-                    ©{(new Date()).getFullYear()} <Text style={styles.link}>nejon.net</Text>
+                <Text style={[styles.yearText, { color: theme.text2 }]}>
+                    ©{(new Date()).getFullYear()} <Text style={{ fontSize: 16, color: theme.info }}>nejon.net</Text>
+                </Text>
+                <Text style={[styles.versionText, { color: theme.placeholder }]}>
+                    Version {Constants.expoConfig.version}
                 </Text>
             </View>
         </SafeAreaView>
@@ -47,27 +48,18 @@ const styles = StyleSheet.create({
         paddingBottom: 12,
         fontWeight: "bold",
         fontSize: 25,
-        color: "#777",
     },
     desc: {
         paddingBottom: 26,
-        fontSize: 14,
+        fontSize: 15,
         textAlign: "center",
-        color: "#888",
     },
     versionText: {
-        paddingBottom: 8,
+        marginVertical: 8,
         fontWeight: "bold",
-        fontSize: 15,
-        color: "#888",
     },
     yearText: {
         fontWeight: "bold",
         fontSize: 15,
-        color: "#999",
-    },
-    link: {
-        color: "skyblue",
-        fontSize: 16,
     },
 });

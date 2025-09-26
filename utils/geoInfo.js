@@ -38,19 +38,9 @@ export async function formatTimezone(location) {
             timeZoneName: "shortOffset",
         }).format(now).split(" ").pop();
 
-        const formattedTime = new Intl.DateTimeFormat(userLocale, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        }).format(now);
-
         return {
             title: fullTimeZoneName,
             subTitle: `Time zone in ${area || city}, ${country} (${tzOffset})`,
-            date: formattedTime,
         }
     } catch (err) {
         console.error("❌ Location formatting error:", err);

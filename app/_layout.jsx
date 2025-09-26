@@ -1,5 +1,4 @@
 import { Stack } from "expo-router";
-import Toast from "react-native-toast-message";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { PrayersProvider } from "@/contexts/PrayersContext";
@@ -20,7 +19,6 @@ export default function RootLayout() {
             <Stack.Screen name="index" />
             <Stack.Screen name="(tabs)" />
           </Stack>
-          <Toast />
           <AppStatusBar />
         </PrayersProvider>
       </SettingsProvider>
