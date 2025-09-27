@@ -1,3 +1,4 @@
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -5,12 +6,12 @@ import useTranslation from "@/hooks/useTranslation";
 import AppStatusBar from "@/components/AppStatusBar";
 
 export default function TabLayout() {
+    const insets = useSafeAreaInsets();
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     return (
         <>
-            <AppStatusBar />
             <Tabs
                 screenOptions={{
                     headerShown: false,
@@ -18,7 +19,7 @@ export default function TabLayout() {
                     tabBarInactiveTintColor: theme.text2,
                     tabBarStyle: {
                         backgroundColor: theme.bg,
-                        bottom: "0.6%",
+                        height: insets.bottom + 53,
                     },
                 }}
             >
@@ -44,6 +45,7 @@ export default function TabLayout() {
                     }}
                 />
             </Tabs>
+            <AppStatusBar />
         </>
     );
 }

@@ -1,4 +1,4 @@
-import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -8,6 +8,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { useNotificationsContext } from "@/contexts/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import LoadingScreen from "@/components/LoadingScreen";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -45,9 +46,14 @@ export default function HomeScreen() {
     if (hasError) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
-                <Text style={styles.errorText}>{tr("labels.noPrayerTimes")}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
+                <View style={styles.errorBanner}>
+                    <Ionicons name="alert-circle-outline" size={80} color={theme.primary} />
+                </View>
+                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: theme.danger }]}
+                    onPress={handleRefresh}>
+                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -57,9 +63,14 @@ export default function HomeScreen() {
     if (!appSettings.locationPermission && !appSettings.location) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
-                <Text style={styles.subText}>{tr("labels.locationSet")}</Text>
-                <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/(tabs)/settings")}>
-                    <Text style={styles.settingsButtonText}>{tr("labels.goToSettings")}</Text>
+                <View style={styles.errorBanner}>
+                    <Ionicons name="location-outline" size={80} color={theme.primary} />
+                </View>
+                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.locationSet")}</Text>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: theme.primary }]}
+                    onPress={() => router.navigate("/(tabs)/settings")}>
+                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -69,9 +80,14 @@ export default function HomeScreen() {
     if (!hasPrayerTimes) {
         return (
             <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
-                <Text style={styles.errorText}>{tr("labels.noPrayerTimes")}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-                    <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
+                <View style={styles.errorBanner}>
+                    <Ionicons name="time-outline" size={80} color={theme.primary} />
+                </View>
+                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
+                <TouchableOpacity
+                    style={[styles.button, { backgroundColor: theme.primary }]}
+                    onPress={handleRefresh}>
+                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -127,7 +143,11 @@ export default function HomeScreen() {
                 </View>
 
                 {/* Just for Testing... */}
-                {/* <Button title="Send Test Notification" onPress={scheduleTestNotification} /> */}
+                {/* <TouchableOpacity
+                    style={[styles.button, { backgroundColor: theme.primary }]}
+                    onPress={scheduleTestNotification}>
+                    <Text style={[styles.buttonText, { color: theme.white }]}>Schedule Test Notification</Text>
+                </TouchableOpacity> */}
 
             </SafeAreaView>
         </ScrollView>
@@ -161,36 +181,39 @@ const styles = StyleSheet.create({
     timeZone: {
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 45,
+        marginBottom: 30,
     },
     timeZoneTitle: {
-        fontSize: 23,
-        marginBottom: 5,
+        fontSize: 24,
+        fontWeight: "600",
     },
     timeZoneSubTitle: {
-        fontSize: 15,
-        fontWeight: "300",
-        color: '#666',
-        marginBottom: 8,
+        fontSize: 16,
+        fontWeight: "400",
+        marginBottom: 4,
     },
     timeZoneDate: {
         fontSize: 16,
         fontWeight: "500",
-        color: '#666',
     },
     countdown: {
         fontSize: 28,
-        fontWeight: "500",
-        marginTop: 30,
+        fontWeight: "600",
+        marginTop: 20,
         marginBottom: 55,
+    },
+    prayersList: {
+        width: "100%",
+        marginBottom: 30,
     },
     listContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        borderBottomWidth: 0.5,
-        borderBottomColor: "#333",
+        borderBottomWidth: 1,
         width: "100%",
-        paddingVertical: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 6,
+        borderBottomColor: '#ccc',
     },
     prayerName: {
         fontSize: 20,
@@ -200,57 +223,24 @@ const styles = StyleSheet.create({
         fontSize: 19,
         fontWeight: "400",
     },
-    warningBox: {
-        padding: 8,
-        backgroundColor: "#fdecea",
-        borderWidth: 1,
-        borderColor: "#f5c2c7",
-        borderRadius: 4,
-        marginBottom: 30,
-    },
-    warningText: {
-        color: "#856404",
-        textAlign: "center",
-        fontWeight: "500",
+    errorBanner: {
+        marginBottom: 32,
+        alignItems: "center",
+        justifyContent: "center",
     },
     errorText: {
         fontSize: 16,
-        color: '#FF3B30',
         textAlign: 'center',
         marginBottom: 20,
     },
-    messageText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-        textAlign: 'center',
-        marginBottom: 10,
+    button: {
+        paddingVertical: 14,
+        borderRadius: 12,
+        width: "100%",
+        alignItems: "center",
+        marginBottom: 12,
     },
-    subText: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    retryButton: {
-        backgroundColor: '#FF3B30',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    settingsButton: {
-        backgroundColor: '#007AFF',
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    settingsButtonText: {
-        color: 'white',
+    buttonText: {
         fontSize: 16,
         fontWeight: '600',
     },
