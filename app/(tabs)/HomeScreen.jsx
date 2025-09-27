@@ -8,7 +8,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { useNotificationsContext } from "@/contexts/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import LoadingScreen from "@/components/LoadingScreen";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -32,6 +32,19 @@ export default function HomeScreen() {
         }
     };
 
+    // Prayer icon resolver
+    const resolvePrayerIcon = (name) => {
+        const p = String(name || "").toLowerCase();
+        if (p.includes("imsak")) return { lib: 'Ionicons', name: 'time-outline' };
+        if (p.includes("fajr")) return { lib: 'Ionicons', name: 'moon-outline' };
+        if (p.includes("sunrise")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-up' };
+        if (p.includes("dhuhr")) return { lib: 'Ionicons', name: 'sunny' };
+        if (p.includes("asr")) return { lib: 'Ionicons', name: 'partly-sunny-outline' };
+        if (p.includes("maghrib")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-down' };
+        if (p.includes("isha")) return { lib: 'Ionicons', name: 'star-outline' };
+        return "time-outline";
+    };
+
     // Loading state
     if (isLoading) {
         return (
@@ -45,7 +58,7 @@ export default function HomeScreen() {
     // Error state
     if (hasError) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
+            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
                     <Ionicons name="alert-circle-outline" size={80} color={theme.primary} />
                 </View>
@@ -62,7 +75,7 @@ export default function HomeScreen() {
     // No location set
     if (!appSettings.locationPermission && !appSettings.location) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
+            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
                     <Ionicons name="location-outline" size={80} color={theme.primary} />
                 </View>
@@ -79,7 +92,7 @@ export default function HomeScreen() {
     // No prayer times available
     if (!hasPrayerTimes) {
         return (
-            <View style={[styles.centerContainer, { backgroundColor: theme.bg }]}>
+            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
                     <Ionicons name="time-outline" size={80} color={theme.primary} />
                 </View>
@@ -108,46 +121,63 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
         >
             <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.bg }]}>
-                {/* Timezone/Date */}
-                <View style={styles.timeZone}>
-                    <Text style={[styles.timeZoneTitle, { color: theme.text }]}>
-                        {appSettings.timeZone?.title || new Date().toDateString()}
-                    </Text>
-                    <Text style={[styles.timeZoneSubTitle, { color: theme.placeholder }]}>
-                        {appSettings.timeZone?.subTitle || ""}
-                    </Text>
-                    <Text style={[styles.timeZoneDate, { color: theme.placeholder }]}>
-                        {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-                    </Text>
+
+                {/* Hero Card */}
+                <View style={[styles.heroCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
+                    {/* Timezone & Date */}
+                    <View style={styles.heroTimeZone}>
+                        <Text style={[styles.timeZoneDate, { color: theme.text }]}>
+                            {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "2-digit", month: "long", year: "numeric", })}
+                        </Text>
+                        <Text style={[styles.timeZoneTitle, { color: theme.text2 }]}>
+                            {appSettings.timeZone?.title || new Date().toDateString()}
+                        </Text>
+                        <Text style={[styles.timeZoneSubTitle, { color: theme.placeholder }]}>
+                            {appSettings.timeZone?.subTitle || ""}
+                        </Text>
+                    </View>
+
+                    {/* Next prayer countdown */}
+                    {nextPrayerName && (
+                        <Text style={[styles.heroCountdown, { color: theme.accent }]}>
+                            {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
+                        </Text>
+                    )}
                 </View>
 
-                {/* Next prayer countdown */}
-                {nextPrayerName && (
-                    <Text style={[styles.countdown, { color: theme.placeholder }]}>
-                        {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
-                    </Text>
-                )}
-
-                {/* Prayer times list - Using map instead of FlatList */}
+                {/* Prayer Times */}
                 <View style={styles.prayersList}>
-                    {Object.entries(prayerTimes || {}).map(([name, time]) => (
-                        <View key={name} style={[styles.listContainer, { borderBottomColor: theme.border }]}>
-                            <Text style={[styles.prayerName, { color: theme.text2 }]}>
-                                {tr(`prayers.${name}`) || name}
-                            </Text>
-                            <Text style={[styles.prayerTime, { color: theme.text2 }]}>
-                                {time}
-                            </Text>
-                        </View>
-                    ))}
+                    {Object.entries(prayerTimes || {}).map(([name, time]) => {
+                        const isNext = nextPrayerName === name;
+                        const iconData = resolvePrayerIcon(name);
+                        const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
+                        return (
+                            <View
+                                key={name}
+                                style={[
+                                    styles.prayerRow,
+                                    { backgroundColor: theme.card, borderColor: theme.border },
+                                    isNext && { borderWidth: 2, borderColor: theme.accent },
+                                ]}
+                            >
+                                <View style={styles.prayerLeft}>
+                                    <IconComponent
+                                        name={iconData.name}
+                                        size={24}
+                                        color={isNext ? theme.accent : theme.text2}
+                                    />
+                                    <Text
+                                        style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
+                                        {tr(`prayers.${name}`) || name}
+                                    </Text>
+                                </View>
+                                <Text style={[styles.prayerTime, { color: isNext ? theme.accent : theme.text2 }]}>
+                                    {time}
+                                </Text>
+                            </View>
+                        );
+                    })}
                 </View>
-
-                {/* Just for Testing... */}
-                {/* <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.primary }]}
-                    onPress={scheduleTestNotification}>
-                    <Text style={[styles.buttonText, { color: theme.white }]}>Schedule Test Notification</Text>
-                </TouchableOpacity> */}
 
             </SafeAreaView>
         </ScrollView>
@@ -155,45 +185,76 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    innerContainer: {
-        flex: 1,
-        paddingHorizontal: 20,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: '100%',
-    },
     scrollContainer: {
         flex: 1,
     },
     scrollContent: {
         flexGrow: 1,
-        justifyContent: 'center',
     },
-    centerContainer: {
+    innerContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: "center",
         padding: 20,
     },
-    timeZone: {
+    heroCard: {
+        width: "100%",
+        paddingVertical: 24,
+        paddingHorizontal: 18,
+        borderRadius: 16,
         alignItems: "center",
-        justifyContent: "center",
-        marginBottom: 30,
+        marginBottom: 32,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
     },
-    timeZoneTitle: {
-        fontSize: 24,
-        fontWeight: "600",
-    },
-    timeZoneSubTitle: {
-        fontSize: 16,
-        fontWeight: "400",
-        marginBottom: 4,
+    heroTimeZone: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 12,
     },
     timeZoneDate: {
-        fontSize: 16,
+        fontSize: 22,
+        fontWeight: "600",
+        marginBottom: 8,
+    },
+    timeZoneTitle: {
+        fontSize: 18,
+        marginBottom: 3,
+    },
+    timeZoneSubTitle: {
+        fontSize: 13,
+        fontWeight: "400",
+    },
+    heroCountdown: {
+        fontSize: 28,
+        fontWeight: "700",
+        marginTop: 14,
+    },
+    prayersList: {
+        width: "100%",
+        gap: 12,
+    },
+    prayerRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingVertical: 14,
+        paddingHorizontal: 18,
+        borderRadius: 12,
+        borderWidth: 1,
+    },
+    prayerLeft: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    prayerName: {
+        fontSize: 18,
+        fontWeight: "600",
+        paddingLeft: 8,
+    },
+    prayerTime: {
+        fontSize: 17,
         fontWeight: "500",
     },
     countdown: {
@@ -202,26 +263,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 55,
     },
-    prayersList: {
-        width: "100%",
-        marginBottom: 30,
-    },
-    listContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        borderBottomWidth: 1,
-        width: "100%",
-        paddingVertical: 12,
-        paddingHorizontal: 6,
-        borderBottomColor: '#ccc',
-    },
-    prayerName: {
-        fontSize: 20,
-        fontWeight: "500",
-    },
-    prayerTime: {
-        fontSize: 19,
-        fontWeight: "400",
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
     errorBanner: {
         marginBottom: 32,

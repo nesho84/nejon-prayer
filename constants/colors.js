@@ -18,7 +18,7 @@ export const lightTheme = {
     // Status colors
     danger: "#dc2626",
     success: "#16a34a",
-    warning: "#facc15",
+    warning: "#facc15de",
     info: "#0284c7",
 
     // Surfaces
@@ -26,6 +26,11 @@ export const lightTheme = {
     border: "#e5e7eb",
     divider: "#d1d5db",
     placeholder: "#9ca3af",
+
+    // Tabs
+    tabActive: "#374151",
+    tabInactive: "#9ca3af",
+    tabDivider: "#e5e7eb",
 
     // Special use
     shadow: "#00000020",
@@ -52,7 +57,7 @@ export const darkTheme = {
     // Main brand colors
     primary: "#3b82f6",
     secondary: "#38bdf8",
-    accent: "#fbbf24",
+    accent: "#fbbe24e1",
     highlight: "#22c55e",
 
     // Status colors
@@ -66,6 +71,11 @@ export const darkTheme = {
     border: "#374151",
     divider: "#4b5563",
     placeholder: "#6b7280",
+
+    // Tabs
+    tabActive: '#f3f4f6',
+    tabInactive: '#9ca3af',
+    tabDivider: "#232527ff",
 
     // Special use
     shadow: "#00000080",
