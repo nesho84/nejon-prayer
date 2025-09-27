@@ -164,7 +164,7 @@ export default function useNotifications() {
                 await notifee.createTriggerNotification(
                     {
                         id: `prayer-${prayerName.toLowerCase()}`,
-                        title: `${tr(`prayers.${prayerName}`)} ${timeString}` || "Prayer time",
+                        title: `» ${tr(`prayers.${prayerName}`)} « ${timeString}` || "Prayer time",
                         body: tr("labels.alertBody") || "It's prayer time",
                         data: {
                             type: "prayer",
@@ -172,12 +172,12 @@ export default function useNotifications() {
                             language: language,
                             scheduledAt: new Date().toISOString(),
                             reminderTitle: tr("labels.prayerReminder"),
-                            reminderBody: `${tr("labels.timeFor")} ${tr(`prayers.${prayerName}`)}`,
+                            reminderBody: `» ${tr(`prayers.${prayerName}`)} «`,
                         },
                         android: {
                             channelId: "prayer-notifications",
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                            largeIcon: require('../assets/images/alarm-clock.png'), // Custom large icon
+                            largeIcon: require('../assets/images/prayer-mat.png'), // Custom large icon
                             color: AndroidColor.RED,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [
@@ -268,12 +268,12 @@ export default function useNotifications() {
                         language: language,
                         scheduledAt: new Date().toLocaleString("en-GB"),
                         reminderTitle: tr("labels.prayerReminder"),
-                        reminderBody: `${tr("labels.timeFor")} ${tr(`prayers.Fajr`)}`,
+                        reminderBody: `» ${tr(`prayers.Fajr`)} «`,
                     },
                     android: {
                         channelId: 'test-notifcations',
                         smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                        largeIcon: require('../assets/images/alarm-clock.png'), // Custom large icon
+                        largeIcon: require('../assets/images/prayer-mat.png'), // Custom large icon
                         color: AndroidColor.RED,
                         pressAction: { id: 'default', launchActivity: 'default' },
                         actions: [
@@ -367,7 +367,7 @@ export default function useNotifications() {
                                         android: {
                                             channelId: 'prayer-reminders',
                                             smallIcon: 'ic_stat_prayer',
-                                            largeIcon: require('../assets/images/alarm-clock.png'),
+                                            largeIcon: require('../assets/images/past4.png'),
                                             color: AndroidColor.RED,
                                             pressAction: { id: 'default', launchActivity: 'default' },
                                         }

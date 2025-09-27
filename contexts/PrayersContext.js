@@ -49,7 +49,7 @@ export function PrayersProvider({ children }) {
                 throw new Error("Invalid API response format");
             }
         } catch (err) {
-            console.warn("❌ Failed to fetch prayer data:", err);
+            console.warn("❌ Failed to fetch prayer times:", err);
             setPrayersError(err.message);
             setPrayerTimes([]);
         } finally {
@@ -97,8 +97,7 @@ export function PrayersProvider({ children }) {
 
             console.log("✅ Prayer times updated");
         } catch (err) {
-            console.error("Location access error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.locationError"));
+            console.warn("❌ Failed to re-fetch prayer times:", err);
         } finally {
             setPrayersLoading(false);
         }

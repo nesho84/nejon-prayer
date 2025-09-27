@@ -16,11 +16,8 @@ export default function TabLayout() {
                 screenOptions={{
                     headerShown: false,
                     tabBarActiveTintColor: theme.tabActive,
-                    tabBarInactiveTintColor: theme.tabInactive,
                     tabBarStyle: {
                         backgroundColor: theme.bg,
-                        borderTopWidth: 0.5,
-                        borderTopColor: theme.tabDivider,
                         height: insets.bottom + 53,
                         elevation: 0,
                     },

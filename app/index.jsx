@@ -36,19 +36,6 @@ export default function OnboardingScreen() {
     }
   }, [settingsLoading, appSettings?.onboarding]);
 
-  // If still loading settings
-  if (settingsLoading) {
-    return <LoadingScreen message="Loading settings..." style={{ backgroundColor: theme.bg }} />;
-  }
-  // Redirecting...
-  if (appSettings?.onboarding) {
-    return <LoadingScreen message="Redirecting..." style={{ backgroundColor: theme.bg }} />;
-  }
-  // Show local loading
-  if (localLoading) {
-    return <LoadingScreen message="Please Wait..." style={{ backgroundColor: theme.bg }} />;
-  }
-
   // ----------------------------
   // 1️⃣ (Step 1) Handle language
   // ----------------------------
@@ -163,6 +150,19 @@ export default function OnboardingScreen() {
     }
   }
 
+  // If still loading settings
+  if (settingsLoading) {
+    return <LoadingScreen message="Loading settings..." style={{ backgroundColor: theme.bg }} />;
+  }
+  // Redirecting...
+  if (appSettings?.onboarding) {
+    return <LoadingScreen message="Redirecting..." style={{ backgroundColor: theme.bg }} />;
+  }
+  // Show local loading
+  if (localLoading) {
+    return <LoadingScreen message="Please Wait..." style={{ backgroundColor: theme.bg }} />;
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       <View style={styles.content}>
@@ -263,6 +263,7 @@ export default function OnboardingScreen() {
             />
           ))}
         </View>
+
       </View>
     </SafeAreaView>
   );

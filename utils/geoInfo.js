@@ -58,7 +58,7 @@ export async function formatAddress(location) {
             return null;
         }
 
-        // ✅ This check was already there - good!
+        // ✅ Add safety check at the beginning
         if (!location?.latitude || !location?.longitude) {
             console.warn("formatLocation: Invalid location provided", location);
             return null;

@@ -12,15 +12,19 @@ export default function useNextPrayer(prayerTimes) {
         const now = new Date();
         let upcoming = null;
 
-        Object.entries(prayerTimes).forEach(([name, time]) => {
-            const [hour, minute] = time.split(":").map(Number);
+        const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+        for (const name of PRAYER_ORDER) {
+            if (!prayerTimes[name]) continue; // skip if missing
+
+            const [hour, minute] = prayerTimes[name].split(":").map(Number);
             const prayerDate = new Date();
             prayerDate.setHours(hour, minute, 0, 0);
 
-            if (prayerDate > now && !upcoming) {
-                upcoming = { name, time: prayerDate };
+            if (prayerDate > now) {
+                upcoming = { name: name, time: prayerDate };
+                break; // stop at first upcoming prayer
             }
-        });
+        }
 
         // If no more today, pick tomorrow's Fajr
         if (!upcoming && prayerTimes["Fajr"]) {

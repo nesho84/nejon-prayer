@@ -57,7 +57,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                                 android: {
                                     channelId: 'prayer-notifications',
                                     smallIcon: 'ic_stat_prayer',
-                                    largeIcon: require('./assets/images/alarm-clock.png'),
+                                    largeIcon: require('./assets/images/past4.png'),
                                     color: AndroidColor.RED,
                                     pressAction: { id: 'default', launchActivity: 'default' },
                                 }

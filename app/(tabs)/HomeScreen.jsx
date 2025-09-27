@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -41,7 +41,7 @@ export default function HomeScreen() {
         if (p.includes("dhuhr")) return { lib: 'Ionicons', name: 'sunny' };
         if (p.includes("asr")) return { lib: 'Ionicons', name: 'partly-sunny-outline' };
         if (p.includes("maghrib")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-down' };
-        if (p.includes("isha")) return { lib: 'Ionicons', name: 'star-outline' };
+        if (p.includes("isha")) return { lib: 'Ionicons', name: 'moon-sharp' };
         return "time-outline";
     };
 
@@ -123,7 +123,7 @@ export default function HomeScreen() {
             <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.bg }]}>
 
                 {/* Hero Card */}
-                <View style={[styles.heroCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
+                <View style={[styles.heroCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
                     {/* Timezone & Date */}
                     <View style={styles.heroTimeZone}>
                         <Text style={[styles.timeZoneDate, { color: theme.text }]}>
@@ -166,8 +166,7 @@ export default function HomeScreen() {
                                         size={24}
                                         color={isNext ? theme.accent : theme.text2}
                                     />
-                                    <Text
-                                        style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
+                                    <Text style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
                                         {tr(`prayers.${name}`) || name}
                                     </Text>
                                 </View>
@@ -177,6 +176,10 @@ export default function HomeScreen() {
                             </View>
                         );
                     })}
+                </View>
+
+                <View style={{ marginTop: 20 }}>
+                    <Button title="Test Notifications" onPress={scheduleTestNotification} />
                 </View>
 
             </SafeAreaView>
@@ -198,15 +201,12 @@ const styles = StyleSheet.create({
     },
     heroCard: {
         width: "100%",
-        paddingVertical: 24,
-        paddingHorizontal: 18,
-        borderRadius: 16,
         alignItems: "center",
+        borderRadius: 16,
         marginBottom: 32,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 3,
+        paddingHorizontal: 18,
+        paddingVertical: 24,
+        borderWidth: 1,
     },
     heroTimeZone: {
         alignItems: 'center',
@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: "700",
         marginTop: 14,
+        marginBottom: 6,
     },
     prayersList: {
         width: "100%",

@@ -86,9 +86,9 @@ export default function SettingsScreen() {
     };
 
     // ----------------------------------------------------------------
-    // Reset Location
+    // Update Location
     // ----------------------------------------------------------------
-    const resetLocation = async () => {
+    const updateLocation = async () => {
         setLocalLoading(true);
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -301,17 +301,17 @@ export default function SettingsScreen() {
                             value={deviceSettings.locationPermission}
                             onValueChange={null}
                             disabled={true}
-                            trackColor={{ false: theme.placeholder, true: theme.primary }}
-                            thumbColor={theme.text}
+                            trackColor={{ false: theme.overlay, true: theme.placeholder }}
+                            thumbColor={deviceSettings.locationPermission ? theme.border : theme.border}
                         />
                     </View>
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <TouchableOpacity
-                        style={[styles.resetLocationButton, { backgroundColor: theme.overlay }]}
-                        onPress={resetLocation}
+                        style={[styles.updateLocationButton, { backgroundColor: theme.overlay }]}
+                        onPress={updateLocation}
                         disabled={localLoading}
                     >
-                        <Text style={[styles.resetLocationButtonText, { color: theme.text }]}>
+                        <Text style={[styles.updateLocationButtonText, { color: theme.text }]}>
                             {appSettings.location
                                 ? (tr("labels.locationButtonText1"))
                                 : (tr("labels.locationButtonText2"))}
@@ -335,8 +335,8 @@ export default function SettingsScreen() {
                             value={deviceSettings.notificationPermission}
                             onValueChange={handleNotifications}
                             disabled={localLoading}
-                            trackColor={{ false: theme.placeholder, true: theme.primary }}
-                            thumbColor={theme.text}
+                            trackColor={{ false: theme.overlay, true: theme.accent }}
+                            thumbColor={deviceSettings.notificationPermission ? theme.border : theme.border}
                         />
                     </View>
 
@@ -431,11 +431,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         paddingTop: 12,
         paddingBottom: 14,
-        elevation: 2,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
+        elevation: 2,
     },
     statusRow: {
         flexDirection: 'row',
@@ -475,13 +475,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginVertical: 8,
     },
-    resetLocationButton: {
+    updateLocationButton: {
         alignItems: 'center',
         padding: 10,
         marginTop: 5,
         borderRadius: 8,
     },
-    resetLocationButtonText: {
+    updateLocationButtonText: {
         fontSize: 16,
         fontWeight: '600',
     },
