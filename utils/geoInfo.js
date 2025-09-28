@@ -1,6 +1,8 @@
 import * as Location from "expo-location";
 
+// ------------------------------------------------------------
 // Reverse-geocodes given coordinates into a human-readable timezone.
+// ------------------------------------------------------------
 export async function formatTimezone(location) {
     try {
         // ✅ Location Permission check
@@ -48,7 +50,9 @@ export async function formatTimezone(location) {
     }
 }
 
+// ------------------------------------------------------------
 // Reverse-geocodes given coordinates into a human-readable Address.
+// ------------------------------------------------------------
 export async function formatAddress(location) {
     try {
         // ✅ Location Permission check

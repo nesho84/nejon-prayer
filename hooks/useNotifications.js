@@ -330,8 +330,6 @@ export default function useNotifications() {
             // Ignore if no notification
             if (!notification) return;
 
-            // console.log(`🌞 [Foreground] Notification event fired: (prayer: "${notification?.data?.prayer || 'N/A'}")`);
-
             // Check Alarm & Reminders permission
             const settings = await notifee.getNotificationSettings();
             const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
@@ -367,7 +365,7 @@ export default function useNotifications() {
                                         android: {
                                             channelId: 'prayer-reminders',
                                             smallIcon: 'ic_stat_prayer',
-                                            largeIcon: require('../assets/images/past4.png'),
+                                            largeIcon: require('../assets/images/past.png'),
                                             color: AndroidColor.RED,
                                             pressAction: { id: 'default', launchActivity: 'default' },
                                         }

@@ -57,7 +57,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                                 android: {
                                     channelId: 'prayer-notifications',
                                     smallIcon: 'ic_stat_prayer',
-                                    largeIcon: require('./assets/images/past4.png'),
+                                    largeIcon: require('./assets/images/past.png'),
                                     color: AndroidColor.RED,
                                     pressAction: { id: 'default', launchActivity: 'default' },
                                 }
@@ -79,9 +79,3 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             break;
     }
 });
-
-// (Optional) If you also use Firebase messaging
-// import messaging from '@react-native-firebase/messaging';
-// messaging().setBackgroundMessageHandler(async remoteMessage => {
-//   console.log('Received background message:', remoteMessage);
-// });

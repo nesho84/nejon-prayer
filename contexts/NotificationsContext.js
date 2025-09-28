@@ -17,16 +17,18 @@ export function NotificationsProvider({ children }) {
     // Show loading if either context is loading
     const isLoading = settingsLoading || prayersLoading;
 
+    // ------------------------------------------------------------
     // Schedule notifications when deviceSettings or prayerTimes change
+    // ------------------------------------------------------------
     useEffect(() => {
-        if (isLoading && deviceSettings?.notificationPermission && hasPrayerTimes) {
+        if (!isLoading && deviceSettings?.notificationPermission && hasPrayerTimes) {
             schedulePrayerNotifications(prayerTimes);
         }
     }, [
         deviceSettings?.notificationPermission,
-        prayerTimes,
         appSettings.location,
         appSettings?.language,
+        prayerTimes,
     ]);
 
     return (

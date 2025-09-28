@@ -5,7 +5,9 @@ export default function useNextPrayer(prayerTimes) {
     const [nextPrayerTime, setNextPrayerTime] = useState(null);
     const [prayerCountdown, setPrayerCountdown] = useState("");
 
+    // ------------------------------------------------------------
     // Determine next prayer and countdown
+    // ------------------------------------------------------------
     const updateNextPrayer = () => {
         if (!prayerTimes) return;
 
@@ -48,7 +50,9 @@ export default function useNextPrayer(prayerTimes) {
         setPrayerCountdown(`${hours}h ${minutes}m ${seconds}s`);
     };
 
+    // ------------------------------------------------------------
     // Start interval ticking every second
+    // ------------------------------------------------------------
     useEffect(() => {
         if (!prayerTimes) return;
 

@@ -1,3 +1,6 @@
+// ------------------------------------------------------------
+// Fetch prayer times from aladhan.com API
+// ------------------------------------------------------------
 export async function getPrayerTimes(location) {
     const { latitude, longitude } = location;
 

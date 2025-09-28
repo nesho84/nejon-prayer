@@ -14,7 +14,7 @@ export default function HomeScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
     const { appSettings, settingsLoading, settingsError } = useSettingsContext();
-    const { prayerTimes, prayersLoading, prayersError, refetchPrayerTimes, hasPrayerTimes } = usePrayersContext();
+    const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayerTimes);
     const { scheduleTestNotification } = useNotificationsContext();
 
@@ -23,16 +23,20 @@ export default function HomeScreen() {
     // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
+    // ------------------------------------------------------------
     // Handle prayer times refresh
+    // ------------------------------------------------------------
     const handleRefresh = async () => {
         try {
-            await refetchPrayerTimes();
+            await reloadPrayerTimes();
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }
     };
 
+    // ------------------------------------------------------------
     // Prayer icon resolver
+    // ------------------------------------------------------------
     const resolvePrayerIcon = (name) => {
         const p = String(name || "").toLowerCase();
         if (p.includes("imsak")) return { lib: 'Ionicons', name: 'time-outline' };
@@ -178,9 +182,9 @@ export default function HomeScreen() {
                     })}
                 </View>
 
-                <View style={{ marginTop: 20 }}>
+                {/* <View style={{ marginTop: 20 }}>
                     <Button title="Test Notifications" onPress={scheduleTestNotification} />
-                </View>
+                </View> */}
 
             </SafeAreaView>
         </ScrollView>

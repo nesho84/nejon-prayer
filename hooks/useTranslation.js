@@ -6,6 +6,9 @@ export default function useTranslation() {
 
     const language = appSettings.language || "en";
 
+    // ------------------------------------------------------------
+    // Resolve translation
+    // ------------------------------------------------------------
     const tr = (path) => {
         const keys = path.split(".");
         let result = translations[language];

@@ -12,9 +12,6 @@ export function SettingsProvider({ children }) {
 
     const appState = useRef(AppState.currentState);
 
-    const [settingsLoading, setSettingsLoading] = useState(true);
-    const [settingsError, setSettingsError] = useState(null);
-
     // Persistent storage app-level settings
     const [appSettings, setAppSettings] = useState({
         onboarding: false,
@@ -31,14 +28,18 @@ export function SettingsProvider({ children }) {
         batteryOptimization: true,
         alarmPermission: false,
     });
+    const [settingsLoading, setSettingsLoading] = useState(true);
+    const [settingsError, setSettingsError] = useState(null);
 
+    // ------------------------------------------------------------
     // Load settings from storage (if not found → fallback to defaults)
+    // ------------------------------------------------------------
     const loadAppSettings = async () => {
         // Loading already started...
         try {
             setSettingsError(null);
             const saved = await AsyncStorage.getItem(SETTINGS_KEY);
-            if (saved) setAppSettings(JSON.parse(saved));
+            if (saved !== null) setAppSettings(JSON.parse(saved));
         } catch (e) {
             console.warn("❌ Failed to load settings", e);
             setSettingsError("Failed to load settings");
@@ -47,7 +48,9 @@ export function SettingsProvider({ children }) {
         }
     };
 
+    // ------------------------------------------------------------
     // Save settings to storage (merge with current)
+    // ------------------------------------------------------------
     const saveAppSettings = async (newSettings) => {
         setSettingsLoading(true);
         try {
@@ -62,12 +65,16 @@ export function SettingsProvider({ children }) {
         }
     };
 
+    // ------------------------------------------------------------
     // Load settings once on mount
+    // ------------------------------------------------------------
     useEffect(() => {
         loadAppSettings();
     }, []);
 
+    // ------------------------------------------------------------
     // Sync Device settings (Android only)
+    // ------------------------------------------------------------
     const syncDeviceSettings = async () => {
         if (Platform.OS !== 'android') return;
 
@@ -107,11 +114,12 @@ export function SettingsProvider({ children }) {
         }
     };
 
+    // ------------------------------------------------------------
     // AppState listener - re-check on return to foreground
+    // ------------------------------------------------------------
     useEffect(() => {
         // Initial sync
         syncDeviceSettings();
-
         const subscription = AppState.addEventListener('change', (nextAppState) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
                 // console.log("👁‍🗨 AppState → foreground → syncing settings...");

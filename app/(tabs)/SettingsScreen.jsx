@@ -36,23 +36,20 @@ export default function SettingsScreen() {
         saveAppSettings
     } = useSettingsContext();
     const {
-        prayerTimes,
         prayersLoading,
-        prayersError,
         hasPrayerTimes,
         lastFetchedDate,
-        refetchPrayerTimes
+        reloadPrayerTimes
     } = usePrayersContext();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
-
     // Show loading if contexts are loading or local operations
-    const isLoading = settingsLoading || localLoading;
+    const isLoading = settingsLoading || prayersLoading || localLoading;
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Change theme
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const handleTheme = async (value) => {
         setLocalLoading(true);
         try {
@@ -67,9 +64,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Change Language
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const handleLanguage = async (value) => {
         setLocalLoading(true);
         try {
@@ -85,9 +82,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Update Location
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const updateLocation = async () => {
         setLocalLoading(true);
         try {
@@ -131,9 +128,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Handle Notifications
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     async function handleNotifications() {
         setLocalLoading(true);
         try {
@@ -176,9 +173,9 @@ export default function SettingsScreen() {
         }
     }
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Open Alarm & reminders settings
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const openAlarmPermissionSettings = async () => {
         if (Platform.OS === "android") {
             await notifee.openAlarmPermissionSettings();
@@ -187,9 +184,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Open Battery settings
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const openBatteryOptimizationSettings = async () => {
         if (Platform.OS === "android") {
             await notifee.openBatteryOptimizationSettings();
@@ -198,9 +195,9 @@ export default function SettingsScreen() {
         }
     };
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Handle settings refresh
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const handleSettingsRefresh = async () => {
         try {
             await reloadAppSettings();
@@ -209,12 +206,12 @@ export default function SettingsScreen() {
         }
     }
 
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     // Handle prayers refresh
-    // ----------------------------------------------------------------
+    // ------------------------------------------------------------
     const handlePrayersRefresh = async () => {
         try {
-            await refetchPrayerTimes();
+            await reloadPrayerTimes();
         } catch (err) {
             console.warn("Prayers refresh failed:", err);
         }
@@ -409,8 +406,8 @@ const styles = StyleSheet.create({
     },
     innerContainer: {
         flex: 1,
-        padding: 16,
         minHeight: '100%',
+        padding: 16,
     },
     scrollContainer: {
         flex: 1,
@@ -427,7 +424,7 @@ const styles = StyleSheet.create({
     },
     settingCard: {
         borderRadius: 12,
-        marginBottom: 16,
+        marginBottom: 12,
         paddingHorizontal: 14,
         paddingTop: 12,
         paddingBottom: 14,

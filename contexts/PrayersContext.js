@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -11,7 +12,7 @@ export const PrayersContext = createContext();
 export function PrayersProvider({ children }) {
     const PRAYERS_KEY = "@app_prayers_v1";
 
-    const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
+    const { appSettings, deviceSettings, settingsLoading, saveAppSettings } = useSettingsContext();
     const { tr } = useTranslation();
 
     const lastFetchedDate = useRef(null);
@@ -20,8 +21,10 @@ export function PrayersProvider({ children }) {
     const [prayersLoading, setPrayersLoading] = useState(true);
     const [prayersError, setPrayersError] = useState(null);
 
-    // Fetch prayers times from aladhan API
-    const fetchPrayerTimes = async (location) => {
+    // ------------------------------------------------------------
+    // Fetch prayers times from aladhan API or Storage
+    // ------------------------------------------------------------
+    const loadPrayerTimes = async (location) => {
         // Don't fetch if no location
         if (!location) {
             setPrayerTimes([]);
@@ -33,11 +36,22 @@ export function PrayersProvider({ children }) {
             setPrayersLoading(true);
             setPrayersError(null);
 
-            const timings = await getPrayerTimes(location);
+            let timings = null;
+
+            // Load from API or storage
+            if (deviceSettings.internetConnection) {
+                timings = await getPrayerTimes(location);
+                console.log("📶 Prayer times Loaded from API");
+            } else {
+                const saved = await AsyncStorage.getItem(PRAYERS_KEY);
+                if (saved !== null) {
+                    timings = JSON.parse(saved);
+                    console.log("🔧 Prayer times Loaded from Storage");
+                }
+            }
 
             if (timings) {
                 const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
                 const filtered = {};
                 PRAYER_ORDER_FULL.forEach((key) => {
                     if (timings[key]) filtered[key] = timings[key]; // already HH:mm
@@ -45,11 +59,9 @@ export function PrayersProvider({ children }) {
 
                 setPrayerTimes(filtered);
                 lastFetchedDate.current = new Date().toLocaleString("en-GB");
-            } else {
-                throw new Error("Invalid API response format");
             }
         } catch (err) {
-            console.warn("❌ Failed to fetch prayer times:", err);
+            console.warn("⚠️ Failed to load prayer times:", err);
             setPrayersError(err.message);
             setPrayerTimes([]);
         } finally {
@@ -57,8 +69,36 @@ export function PrayersProvider({ children }) {
         }
     }
 
+    // ------------------------------------------------------------
+    // Save prater times to storage (merge with current)
+    // ------------------------------------------------------------
+    const savePrayerTimes = async (newTimes) => {
+        setPrayersLoading(true);
+        try {
+            const updated = { ...prayerTimes, ...newTimes };
+            await AsyncStorage.setItem(PRAYERS_KEY, JSON.stringify(updated));
+            setPrayerTimes(updated);
+        } catch (e) {
+            console.warn("❌ Failed to save prayer times", e);
+            setPrayersError("❌ Failed to save prayer times");
+        } finally {
+            setPrayersLoading(false);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Load prayer times when appSettings and deviceSettings changes
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!settingsLoading) {
+            loadPrayerTimes(appSettings.location);
+        }
+    }, [deviceSettings.internetConnection, appSettings.location]);
+
+    // ------------------------------------------------------------
     // Re-fetch prayer times
-    const refetchPrayerTimes = async () => {
+    // ------------------------------------------------------------
+    const reloadPrayerTimes = async () => {
         setPrayersLoading(true)
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
@@ -93,7 +133,7 @@ export function PrayersProvider({ children }) {
 
             console.log("📍 Location updated to:", loc.coords);
 
-            await fetchPrayerTimes(loc.coords);
+            await loadPrayerTimes(loc.coords);
 
             console.log("✅ Prayer times updated");
         } catch (err) {
@@ -103,21 +143,15 @@ export function PrayersProvider({ children }) {
         }
     }
 
-    // Fetch prayer data when settings load and location changes
-    useEffect(() => {
-        if (!settingsLoading) {
-            fetchPrayerTimes(appSettings.location);
-        }
-    }, [settingsLoading, appSettings.location]);
-
     return (
         <PrayersContext.Provider value={{
             prayerTimes,
             hasPrayerTimes: prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0,
+            savePrayerTimes,
             prayersLoading,
             prayersError,
             lastFetchedDate: lastFetchedDate.current,
-            refetchPrayerTimes,
+            reloadPrayerTimes,
         }}>
             {children}
         </PrayersContext.Provider>

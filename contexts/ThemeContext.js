@@ -13,7 +13,9 @@ export function ThemeProvider({ children }) {
     const [resolvedThemeName, setResolvedThemeName] = useState("light"); // "light" or "dark"
     const [themeLoading, setThemeLoading] = useState(true);
 
-    // Helper to resolve theme
+    // ------------------------------------------------------------
+    // Resolve theme
+    // ------------------------------------------------------------
     const resolveTheme = (mode) => {
         const system = Appearance.getColorScheme() || "light";
         const finalMode = mode === "system" ? system : mode;
@@ -21,12 +23,16 @@ export function ThemeProvider({ children }) {
         return finalMode === "dark" ? darkTheme : lightTheme;
     };
 
+    // ------------------------------------------------------------
     // Whenever themeMode changes, resolve theme
+    // ------------------------------------------------------------
     useEffect(() => {
         setTheme(resolveTheme(themeMode));
     }, [themeMode]);
 
+    // ------------------------------------------------------------
     // Load saved theme from storage
+    // ------------------------------------------------------------
     const loadTheme = async () => {
         try {
             const saved = await AsyncStorage.getItem(THEME_KEY);
@@ -42,12 +48,16 @@ export function ThemeProvider({ children }) {
         }
     };
 
+    // ------------------------------------------------------------
     // Load theme once on mount
+    // ------------------------------------------------------------
     useEffect(() => {
         loadTheme();
     }, []);
 
+    // ------------------------------------------------------------
     // Listen to system changes
+    // ------------------------------------------------------------
     useEffect(() => {
         if (themeMode !== "system") return;
 
@@ -66,7 +76,9 @@ export function ThemeProvider({ children }) {
         };
     }, [themeMode]);
 
+    // ------------------------------------------------------------
     // Change theme manually
+    // ------------------------------------------------------------
     const changeTheme = async (mode) => {
         setThemeMode(mode);
         setTheme(resolveTheme(mode));

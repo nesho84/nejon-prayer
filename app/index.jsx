@@ -26,9 +26,9 @@ export default function OnboardingScreen() {
   const fullAddressRef = useRef(null);
   const timeZoneRef = useRef(null);
 
-  // -----------------------------------------------------------------
+  // ------------------------------------------------------------
   // Onboarding check: Redirect once settings are loaded
-  // -----------------------------------------------------------------
+  // ------------------------------------------------------------
   useEffect(() => {
     if (!settingsLoading && !localLoading && appSettings?.onboarding) {
       // Show HomeScreen (if already onboarded)
@@ -52,9 +52,9 @@ export default function OnboardingScreen() {
     }
   }
 
-  // ----------------------------------------
+  // ------------------------------------------------------------
   // 2️⃣ (Step 2) Request location permission
-  // ----------------------------------------
+  // ------------------------------------------------------------
   async function requestLocation() {
     setLocalLoading(true);
     try {
@@ -96,9 +96,9 @@ export default function OnboardingScreen() {
     }
   }
 
-  // --------------------------------------------
+  // ------------------------------------------------------------
   // 3️⃣ (Step 3) Request notification permission
-  // --------------------------------------------
+  // ------------------------------------------------------------
   async function requestNotifications() {
     setLocalLoading(true);
     try {
@@ -122,9 +122,9 @@ export default function OnboardingScreen() {
     }
   }
 
-  // ----------------------------------------------------------------------------
+  // ------------------------------------------------------------
   // 🏁 (Finish) Update SettingsContext and redirect to HomeScreen
-  // ----------------------------------------------------------------------------
+  // ------------------------------------------------------------
   async function finishOnboarding() {
     setLocalLoading(true);
     try {
