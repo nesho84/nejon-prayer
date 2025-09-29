@@ -39,8 +39,18 @@ export async function getPrayerTimes(location) {
         // 5. Fetch prayer times
         const response = await fetch(url);
         const result = await response.json();
+        // console.log("aladhan api response:", JSON.stringify(result, null, 2));
 
-        return result.data.timings; // { Fajr: "06:00", Dhuhr: "12:50", ... }
+        let timings = result.data.timings;
+
+        // Custom prayers order
+        const PRAYER_ORDER_FULL = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+        const filtered = {};
+        PRAYER_ORDER_FULL.forEach((key) => {
+            if (timings[key]) filtered[key] = timings[key];
+        });
+
+        return filtered; // { Fajr: "06:00", Dhuhr: "12:50", ... }
     } catch (err) {
         console.error("❌ API fetch error:", err);
         return null;

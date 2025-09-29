@@ -49,7 +49,7 @@ export function ThemeProvider({ children }) {
     };
 
     // ------------------------------------------------------------
-    // Load theme once on mount
+    // Auto-load on mount
     // ------------------------------------------------------------
     useEffect(() => {
         loadTheme();

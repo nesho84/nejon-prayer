@@ -23,8 +23,11 @@ export function NotificationsProvider({ children }) {
     useEffect(() => {
         if (!isLoading && deviceSettings?.notificationPermission && hasPrayerTimes) {
             schedulePrayerNotifications(prayerTimes);
+        } else if (!isLoading && !deviceSettings?.notificationPermission) {
+            console.log("🔴 Prayer notifications permission disabled - skipping scheduling");
         }
     }, [
+        isLoading,
         deviceSettings?.notificationPermission,
         appSettings.location,
         appSettings?.language,

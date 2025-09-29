@@ -1,22 +1,21 @@
 import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
 import useTranslation from "@/hooks/useTranslation";
-import { useNotificationsContext } from "@/contexts/NotificationsContext";
+import { testNotification } from "@/utils/testNotification";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import LoadingScreen from "@/components/LoadingScreen";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
-    const { tr } = useTranslation();
+    const { tr, language } = useTranslation();
     const { appSettings, settingsLoading, settingsError } = useSettingsContext();
     const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
     const { nextPrayerName, prayerCountdown } = useNextPrayer(prayerTimes);
-    const { scheduleTestNotification } = useNotificationsContext();
 
     // Show loading if either context is loading
     const isLoading = settingsLoading || prayersLoading;
@@ -81,12 +80,12 @@ export default function HomeScreen() {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
-                    <Ionicons name="location-outline" size={80} color={theme.primary} />
+                    <Ionicons name="location-outline" size={80} color={theme.danger} />
                 </View>
-                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.locationSet")}</Text>
+                <Text style={[styles.errorText, { color: theme.warning }]}>{tr("labels.locationSet")}</Text>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.primary }]}
-                    onPress={() => router.navigate("/(tabs)/settings")}>
+                    style={[styles.button, { backgroundColor: theme.danger }]}
+                    onPress={() => router.navigate("/(tabs)/SettingsScreen")}>
                     <Text style={[styles.buttonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
             </View>
@@ -94,7 +93,7 @@ export default function HomeScreen() {
     }
 
     // No prayer times available
-    if (!hasPrayerTimes) {
+    if (!prayerTimes || !hasPrayerTimes) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
@@ -182,8 +181,9 @@ export default function HomeScreen() {
                     })}
                 </View>
 
+                {/* Debug utility */}
                 {/* <View style={{ marginTop: 20 }}>
-                    <Button title="Test Notifications" onPress={scheduleTestNotification} />
+                    <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
                 </View> */}
 
             </SafeAreaView>

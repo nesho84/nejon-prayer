@@ -14,8 +14,8 @@ export default function useNextPrayer(prayerTimes) {
         const now = new Date();
         let upcoming = null;
 
-        const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-        for (const name of PRAYER_ORDER) {
+        const PRAYER_ORDER_SHORT = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+        for (const name of PRAYER_ORDER_SHORT) {
             if (!prayerTimes[name]) continue; // skip if missing
 
             const [hour, minute] = prayerTimes[name].split(":").map(Number);

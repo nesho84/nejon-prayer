@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Location from "expo-location";
@@ -16,13 +16,15 @@ export default function OnboardingScreen() {
   const { theme } = useThemeContext();
   const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
 
+  // Local state
   const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
+  // Show loading if contexts or local operations are loading
+  const isLoading = settingsLoading || localLoading;
 
   // Refs for onboarding data
   const languageRef = useRef("en");
   const locationRef = useRef(null);
-  const prayerTimesRef = useRef(null); // this will be saved in PrayersContext and storage
   const fullAddressRef = useRef(null);
   const timeZoneRef = useRef(null);
 
@@ -30,7 +32,7 @@ export default function OnboardingScreen() {
   // Onboarding check: Redirect once settings are loaded
   // ------------------------------------------------------------
   useEffect(() => {
-    if (!settingsLoading && !localLoading && appSettings?.onboarding) {
+    if (!isLoading && appSettings?.onboarding) {
       // Show HomeScreen (if already onboarded)
       router.replace("/(tabs)/HomeScreen");
     }
@@ -137,9 +139,6 @@ export default function OnboardingScreen() {
         timeZone: timeZoneRef.current,
       });
 
-      // @TODO: this will be saved in PrayersContext and storage, not in appSettings!
-      // prayerTimes: prayerTimesRef.current
-
       // Redirect to HomeScreen
       router.replace("/(tabs)/HomeScreen");
     } catch (err) {
@@ -156,7 +155,7 @@ export default function OnboardingScreen() {
   }
   // Redirecting...
   if (appSettings?.onboarding) {
-    return <LoadingScreen message="Redirecting..." style={{ backgroundColor: theme.bg }} />;
+    return <LoadingScreen message="Loading..." style={{ backgroundColor: theme.bg }} />;
   }
   // Show local loading
   if (localLoading) {

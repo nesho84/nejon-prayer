@@ -38,14 +38,15 @@ export default function SettingsScreen() {
     const {
         prayersLoading,
         hasPrayerTimes,
+        prayersOutdated,
         lastFetchedDate,
         reloadPrayerTimes
     } = usePrayersContext();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
-    // Show loading if contexts are loading or local operations
-    const isLoading = settingsLoading || prayersLoading || localLoading;
+    // Show loading if contexts or local operations are loading
+    const isLoading = settingsLoading || localLoading;
 
     // ------------------------------------------------------------
     // Change theme
@@ -378,21 +379,30 @@ export default function SettingsScreen() {
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.prayerTimesStatus")}
                     </Text>
-                    <View style={[styles.divider, { borderColor: theme.divider, marginBottom: 12 }]}></View>
+                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                     <View style={styles.statusRow}>
                         <Text style={[styles.statusText, { color: theme.text2 }]}>
                             {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                         </Text>
-                        {/* Prayers loading... */}
+                        {/* lastFetchedDate */}
+                        {lastFetchedDate && (
+                            <Text style={[styles.fetchedDateText, { color: theme.placeholder }]}>
+                                {lastFetchedDate || (tr("labels.loading"))}
+                            </Text>
+                        )}
+                        {/* Prayers loading icon */}
                         {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
                             : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
                     </View>
-                    {/* lastFetchedDate */}
-                    {lastFetchedDate && (
-                        <Text style={[styles.addressText, { color: theme.placeholder }]}>
-                            {lastFetchedDate || (tr("labels.loading"))}
-                        </Text>
-                    )}
+                    {/* prayersOutdated */}
+                    {prayersOutdated &&
+                        <>
+                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                            <Text style={[styles.subText, { color: theme.text2, marginBottom: 3 }]}>
+                                {tr("labels.prayerTimesOutdated")}
+                            </Text>
+                        </>
+                    }
                 </View>
 
             </SafeAreaView>
@@ -438,7 +448,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 3,
     },
     settingTitle: {
         fontSize: 18,
@@ -464,8 +473,7 @@ const styles = StyleSheet.create({
     },
     picker: {
         width: '100%',
-        borderRadius: 8,
-        marginTop: 12,
+        marginTop: 8,
     },
     divider: {
         width: "100%",
@@ -485,6 +493,9 @@ const styles = StyleSheet.create({
     addressText: {
         marginTop: 8,
         marginBottom: 1,
+    },
+    fetchedDateText: {
+        fontSize: 12,
     },
     errorText: {
         fontSize: 16,

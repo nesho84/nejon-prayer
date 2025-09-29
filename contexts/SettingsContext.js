@@ -40,9 +40,9 @@ export function SettingsProvider({ children }) {
             setSettingsError(null);
             const saved = await AsyncStorage.getItem(SETTINGS_KEY);
             if (saved !== null) setAppSettings(JSON.parse(saved));
-        } catch (e) {
+        } catch (err) {
             console.warn("❌ Failed to load settings", e);
-            setSettingsError("Failed to load settings");
+            setSettingsError(err.message);
         } finally {
             setSettingsLoading(false);
         }
@@ -57,16 +57,16 @@ export function SettingsProvider({ children }) {
             const updated = { ...appSettings, ...newSettings };
             await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
             setAppSettings(updated);
-        } catch (e) {
+        } catch (err) {
             console.warn("❌ Failed to save settings", e);
-            setSettingsError("❌ Failed to save settings");
+            setSettingsError(err.message);
         } finally {
             setSettingsLoading(false);
         }
     };
 
     // ------------------------------------------------------------
-    // Load settings once on mount
+    // Auto-load on mount
     // ------------------------------------------------------------
     useEffect(() => {
         loadAppSettings();
@@ -122,7 +122,7 @@ export function SettingsProvider({ children }) {
         syncDeviceSettings();
         const subscription = AppState.addEventListener('change', (nextAppState) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-                // console.log("👁‍🗨 AppState → foreground → syncing settings...");
+                // console.log("⚡ AppState → foreground → syncing settings...");
                 // Slight delay to let device settings apply
                 setTimeout(() => syncDeviceSettings(), 500);
             }

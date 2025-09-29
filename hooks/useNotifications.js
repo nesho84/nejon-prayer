@@ -18,7 +18,7 @@ export default function useNotifications() {
     const isSchedulingRef = useRef(false);
 
     // Custom prayers order
-    const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+    const PRAYER_ORDER_SHORT = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
     // ------------------------------------------------------------
     // Create notification channel (Android only)
@@ -73,7 +73,7 @@ export default function useNotifications() {
     const isSchedulingUpToDate = async (times) => {
         const scheduled = await notifee.getTriggerNotifications();
 
-        return PRAYER_ORDER.every(prayerName => {
+        return PRAYER_ORDER_SHORT.every(prayerName => {
             const timeStringRaw = times[prayerName];
             if (!timeStringRaw) return true; // skip missing
 
@@ -133,7 +133,7 @@ export default function useNotifications() {
             const now = new Date();
             let scheduledCount = 0;
 
-            for (const prayerName of PRAYER_ORDER) {
+            for (const prayerName of PRAYER_ORDER_SHORT) {
                 const timeStringRaw = times[prayerName];
                 if (!timeStringRaw) {
                     console.log(`⚠️ No time for ${prayerName}`);
@@ -177,7 +177,7 @@ export default function useNotifications() {
                         android: {
                             channelId: "prayer-notifications",
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                            largeIcon: require('../assets/images/prayer-mat.png'), // Custom large icon
+                            largeIcon: require('../assets/images/prayer-mat-mixed.png'), // Custom large icon
                             color: AndroidColor.RED,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [
@@ -226,97 +226,6 @@ export default function useNotifications() {
         } finally {
             // Always release the scheduling lock
             isSchedulingRef.current = false;
-        }
-    };
-
-    // ------------------------------------------------------------
-    // Debug utility: send a test notification
-    // ------------------------------------------------------------
-    const scheduleTestNotification = async () => {
-        try {
-            const timestamp = Date.now() + (10 * 1000); // 10 sec.
-
-            // Get Run Alarm & Reminders permission
-            const settings = await notifee.getNotificationSettings();
-            const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
-
-            // Create test-specific channel
-            await notifee.createChannel({
-                id: 'test-notifcations',
-                name: 'Test Notifcations',
-                description: "Notifications for daily prayer times",
-                importance: AndroidImportance.HIGH,
-                visibility: AndroidVisibility.PUBLIC,
-                sound: "default",
-                vibration: true,
-                vibrationPattern: [300, 500, 300, 500],
-                lights: true,
-                lightColor: AndroidColor.WHITE,
-                badge: true,
-                bypassDnd: true,
-            });
-
-            // Schedule timestamp reminder
-            await notifee.createTriggerNotification(
-                {
-                    id: `prayer-test`,
-                    title: `${tr(`prayers.Fajr`)} 5:30` || "Prayer time",
-                    body: tr("labels.alertBody") || "It's prayer time",
-                    data: {
-                        type: "prayer",
-                        prayer: "Fajr",
-                        language: language,
-                        scheduledAt: new Date().toLocaleString("en-GB"),
-                        reminderTitle: tr("labels.prayerReminder"),
-                        reminderBody: `» ${tr(`prayers.Fajr`)} «`,
-                    },
-                    android: {
-                        channelId: 'test-notifcations',
-                        smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                        largeIcon: require('../assets/images/prayer-mat.png'), // Custom large icon
-                        color: AndroidColor.RED,
-                        pressAction: { id: 'default', launchActivity: 'default' },
-                        actions: [
-                            {
-                                title: tr("actions.prayed") || "Prayed",
-                                pressAction: { id: 'mark-prayed' },
-                            },
-                            {
-                                title: tr("actions.remindLater") || "Remind Later",
-                                pressAction: { id: 'snooze-prayer' },
-                            },
-                        ],
-                        style: {
-                            type: AndroidStyle.INBOX, // Show all action buttons immediately
-                            lines: [`${tr("labels.alertBody") || "It's prayer time"}`],
-                        },
-                        autoCancel: true, // Auto dismiss when tapped
-                        ongoing: false, // Can be dismissed
-                    },
-                    ios: {
-                        categoryId: 'prayer-category',
-                        critical: false,
-                        interruptionLevel: 'active',
-                    }
-                },
-                {
-                    type: TriggerType.TIMESTAMP,
-                    timestamp: timestamp,
-                    alarmManager: hasAlarm,
-                }
-            );
-
-            // Convert timestamp to seconds
-            const remainingSeconds = Math.max(0, Math.floor((timestamp - Date.now()) / 1000) + 1);
-            Alert.alert(
-                `Test Notification scheduled`,
-                `Test notification will appear in ${remainingSeconds} seconds. Try the action buttons!`
-            );
-
-            console.log(`🔔 Notification scheduled with language="${language}" and alarmManager="${hasAlarm}"`);
-        } catch (err) {
-            Alert.alert("Error", `Failed to schedule test notification: ${err.message}`);
-            console.error(err);
         }
     };
 
@@ -393,6 +302,5 @@ export default function useNotifications() {
     return {
         schedulePrayerNotifications,
         cancelPrayerNotifications,
-        scheduleTestNotification,
     };
 }
