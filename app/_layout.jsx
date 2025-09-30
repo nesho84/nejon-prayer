@@ -3,7 +3,6 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { PrayersProvider } from "@/contexts/PrayersContext";
 import { NotificationsProvider } from "@/contexts/NotificationsContext";
-import AppStatusBar from "@/components/AppStatusBar";
 
 export default function RootLayout() {
   return (
@@ -20,7 +19,6 @@ export default function RootLayout() {
               <Stack.Screen name="index" />
               <Stack.Screen name="(tabs)" />
             </Stack>
-            <AppStatusBar />
           </NotificationsProvider>
         </PrayersProvider>
       </SettingsProvider>

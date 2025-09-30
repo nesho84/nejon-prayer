@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatAddress, formatTimezone } from "@/utils/geoInfo";
+import { formatAddress, getTimeZone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
-import LoadingScreen from "@/components/LoadingScreen";
+import AppScreen from "@/components/AppScreen";
+import AppLoading from "@/components/AppLoading";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -87,7 +87,7 @@ export default function OnboardingScreen() {
       // Update Refs
       locationRef.current = loc.coords;
       fullAddressRef.current = await formatAddress(loc.coords);
-      timeZoneRef.current = await formatTimezone(loc.coords);
+      timeZoneRef.current = await getTimeZone(loc.coords); // not used!
 
       setStep(3);
     } catch (err) {
@@ -151,19 +151,19 @@ export default function OnboardingScreen() {
 
   // If still loading settings
   if (settingsLoading) {
-    return <LoadingScreen message="Loading settings..." style={{ backgroundColor: theme.bg }} />;
+    return <AppLoading text="Loading settings..." />;
   }
   // Redirecting...
   if (appSettings?.onboarding) {
-    return <LoadingScreen message="Loading..." style={{ backgroundColor: theme.bg }} />;
+    return <AppLoading text="Loading..." />;
   }
   // Show local loading
   if (localLoading) {
-    return <LoadingScreen message="Please Wait..." style={{ backgroundColor: theme.bg }} />;
+    return <AppLoading text="Please Wait..." />;
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
+    <AppScreen>
       <View style={styles.content}>
 
         {/* Step 1: Language */}
@@ -256,7 +256,7 @@ export default function OnboardingScreen() {
             <View
               key={i}
               style={[
-                styles.dot,
+                styles.stepDot,
                 { backgroundColor: step === i ? theme.primary : theme.divider },
               ]}
             />
@@ -264,14 +264,11 @@ export default function OnboardingScreen() {
         </View>
 
       </View>
-    </SafeAreaView>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     padding: 24,
@@ -319,7 +316,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     gap: 8,
   },
-  dot: {
+  stepDot: {
     width: 8,
     height: 8,
     borderRadius: 4,

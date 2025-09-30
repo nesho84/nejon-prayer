@@ -10,7 +10,7 @@ export function ThemeProvider({ children }) {
 
     const [themeMode, setThemeMode] = useState("system"); // "light" | "dark" | "system"
     const [theme, setTheme] = useState(lightTheme);       // actual theme object for UI
-    const [resolvedThemeName, setResolvedThemeName] = useState("light"); // "light" or "dark"
+    const [resolvedTheme, setResolvedTheme] = useState("light"); // "light" or "dark"
     const [themeLoading, setThemeLoading] = useState(true);
 
     // ------------------------------------------------------------
@@ -19,7 +19,7 @@ export function ThemeProvider({ children }) {
     const resolveTheme = (mode) => {
         const system = Appearance.getColorScheme() || "light";
         const finalMode = mode === "system" ? system : mode;
-        setResolvedThemeName(finalMode); // store resolved name
+        setResolvedTheme(finalMode); // store resolved name
         return finalMode === "dark" ? darkTheme : lightTheme;
     };
 
@@ -64,7 +64,7 @@ export function ThemeProvider({ children }) {
         const listener = ({ colorScheme }) => {
             if (themeMode === "system") {
                 const newResolvedName = colorScheme || "light";
-                setResolvedThemeName(newResolvedName);
+                setResolvedTheme(newResolvedName);
                 setTheme(newResolvedName === "dark" ? darkTheme : lightTheme);
             }
         };
@@ -97,7 +97,7 @@ export function ThemeProvider({ children }) {
                 theme,
                 themeMode,
                 changeTheme,
-                resolvedThemeName,
+                resolvedTheme,
                 themeLoading,
             }}
         >

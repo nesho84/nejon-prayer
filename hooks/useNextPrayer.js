@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 export default function useNextPrayer(prayerTimes) {
     const [nextPrayerName, setNextPrayerName] = useState(null);
     const [nextPrayerTime, setNextPrayerTime] = useState(null);
-    const [prayerCountdown, setPrayerCountdown] = useState("");
+    const [prayerCountdown, setPrayerCountdown] = useState({});
 
     // ------------------------------------------------------------
     // Determine next prayer and countdown
@@ -42,12 +42,14 @@ export default function useNextPrayer(prayerTimes) {
         setNextPrayerName(upcoming.name);
         setNextPrayerTime(upcoming.time);
 
-        const diff = upcoming.time - now;
-        const hours = Math.floor(diff / 3600000);
-        const minutes = Math.floor((diff % 3600000) / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2, "0");
 
-        setPrayerCountdown(`${hours}h ${minutes}m ${seconds}s`);
+        const diff = upcoming.time - now;
+        const hours = pad(Math.floor(diff / 3600000));
+        const minutes = pad(Math.floor((diff % 3600000) / 60000));
+        const seconds = pad(Math.floor((diff % 60000) / 1000));
+
+        setPrayerCountdown({ hours, minutes, seconds });
     };
 
     // ------------------------------------------------------------

@@ -22,9 +22,10 @@ export const lightTheme = {
     info: "#0284c7",
 
     // Surfaces
-    card: "#ffffff",
+    card: "#f1f1f1",
     border: "#e5e7eb",
     divider: "#d1d5db",
+    divider2: "#dde0e6ff",
     placeholder: "#9ca3af",
 
     // Tabs
@@ -70,6 +71,7 @@ export const darkTheme = {
     card: "#1f2937",
     border: "#374151",
     divider: "#4b5563",
+    divider2: "#2f3d50ff",
     placeholder: "#6b7280",
 
     // Tabs

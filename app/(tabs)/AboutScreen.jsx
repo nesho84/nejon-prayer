@@ -1,16 +1,17 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
+import AppScreen from "@/components/AppScreen";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
-            <View style={styles.inner}>
+        <AppScreen>
+            <View style={styles.content}>
+
                 {/* App Logo */}
                 <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 
@@ -33,29 +34,24 @@ export default function AboutScreen() {
                 <Text style={[styles.versionText, { color: theme.placeholder }]}>
                     Version {Constants.expoConfig.version}
                 </Text>
+
             </View>
-        </SafeAreaView>
+        </AppScreen>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    content: {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 20,
-    },
-    inner: {
-        flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 40,
+        justifyContent: 'center',
+        padding: 20,
     },
     logo: {
         width: 150,
         height: 150,
         marginBottom: 24,
-        borderRadius: 30, // subtle rounding for modern feel
+        borderRadius: 30,
     },
     title: {
         fontSize: 24,

@@ -1,14 +1,14 @@
 import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
 import useTranslation from "@/hooks/useTranslation";
 import { testNotification } from "@/utils/testNotification";
 import useNextPrayer from "@/hooks/useNextPrayer";
-import LoadingScreen from "@/components/LoadingScreen";
+import AppLoading from "@/components/AppLoading";
+import AppScreen from "@/components/AppScreen";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -50,12 +50,7 @@ export default function HomeScreen() {
 
     // Loading state
     if (isLoading) {
-        return (
-            <LoadingScreen
-                message={settingsLoading ? tr("labels.loadingSettings") : tr("labels.loadingPrayers")}
-                style={{ backgroundColor: theme.bg }}
-            />
-        );
+        return <AppLoading text={tr("labels.loading")} />
     }
 
     // Error state
@@ -67,9 +62,9 @@ export default function HomeScreen() {
                 </View>
                 <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.danger }]}
+                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
                     onPress={handleRefresh}>
-                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
+                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -84,9 +79,9 @@ export default function HomeScreen() {
                 </View>
                 <Text style={[styles.errorText, { color: theme.warning }]}>{tr("labels.locationSet")}</Text>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.danger }]}
+                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
                     onPress={() => router.navigate("/(tabs)/SettingsScreen")}>
-                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
+                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -101,18 +96,20 @@ export default function HomeScreen() {
                 </View>
                 <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
                 <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.primary }]}
+                    style={[styles.errorButton, { backgroundColor: theme.primary }]}
                     onPress={handleRefresh}>
-                    <Text style={[styles.buttonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
+                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
                 </TouchableOpacity>
             </View>
         );
     }
 
+    // Main Content
     return (
         <ScrollView
             style={styles.scrollContainer}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.bg }]}
+            showsVerticalScrollIndicator={false}
             refreshControl={
                 <RefreshControl
                     refreshing={prayersLoading || settingsLoading}
@@ -121,30 +118,41 @@ export default function HomeScreen() {
                     colors={[theme.accent]}
                 />
             }
-            showsVerticalScrollIndicator={false}
         >
-            <SafeAreaView style={[styles.innerContainer, { backgroundColor: theme.bg }]}>
+            <AppScreen>
 
-                {/* Hero Card */}
-                <View style={[styles.heroCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                    {/* Timezone & Date */}
-                    <View style={styles.heroTimeZone}>
-                        <Text style={[styles.timeZoneDate, { color: theme.text }]}>
-                            {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "2-digit", month: "long", year: "numeric", })}
+                {/* Hero Header */}
+                <View style={[styles.heroHeader, { backgroundColor: theme.card }]}>
+                    {/* Date + Timezone */}
+                    <View style={styles.heroLocale}>
+                        <Text style={[styles.heroLocaleLabel, { color: theme.text2 }]}>
+                            {new Date().toLocaleDateString(tr("labels.localeDate"), {
+                                weekday: "long",
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                            }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                         </Text>
-                        <Text style={[styles.timeZoneTitle, { color: theme.text2 }]}>
-                            {appSettings.timeZone?.title || new Date().toDateString()}
-                        </Text>
-                        <Text style={[styles.timeZoneSubTitle, { color: theme.placeholder }]}>
+                        <Text style={[styles.heroTimezone, { color: theme.placeholder }]}>
                             {appSettings.timeZone?.subTitle || ""}
                         </Text>
                     </View>
 
-                    {/* Next prayer countdown */}
+                    {/* Divider */}
+                    <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+                    {/* Countdown Circle */}
                     {nextPrayerName && (
-                        <Text style={[styles.heroCountdown, { color: theme.accent }]}>
-                            {prayerCountdown} » {nextPrayerName ? tr(`prayers.${nextPrayerName}`) : ""}
-                        </Text>
+                        <View style={[styles.countdownCircle, { borderColor: theme.text2 }]}>
+                            <Text style={[styles.countdownLabel, { color: theme.text2 }]}>
+                                » {tr(`prayers.${nextPrayerName}`)} «
+                            </Text>
+                            <Text style={[styles.countdownTime, { color: theme.accent }]}>
+                                {prayerCountdown.hours}<Text style={styles.countdownHms}>h </Text>
+                                {prayerCountdown.minutes}<Text style={styles.countdownHms}>m </Text>
+                                {prayerCountdown.seconds}<Text style={styles.countdownHms}>s</Text>
+                            </Text>
+                        </View>
                     )}
                 </View>
 
@@ -159,7 +167,7 @@ export default function HomeScreen() {
                                 key={name}
                                 style={[
                                     styles.prayerRow,
-                                    { backgroundColor: theme.card, borderColor: theme.border },
+                                    { backgroundColor: theme.card },
                                     isNext && { borderWidth: 2, borderColor: theme.accent },
                                 ]}
                             >
@@ -186,7 +194,7 @@ export default function HomeScreen() {
                     <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
                 </View> */}
 
-            </SafeAreaView>
+            </AppScreen>
         </ScrollView>
     );
 }
@@ -197,44 +205,59 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
+        paddingHorizontal: 12,
     },
-    innerContainer: {
-        flex: 1,
-        alignItems: "center",
-        padding: 20,
-    },
-    heroCard: {
+    heroHeader: {
         width: "100%",
         alignItems: "center",
-        borderRadius: 16,
-        marginBottom: 32,
-        paddingHorizontal: 18,
-        paddingVertical: 24,
-        borderWidth: 1,
-    },
-    heroTimeZone: {
-        alignItems: 'center',
-        justifyContent: 'center',
         marginBottom: 12,
+        paddingVertical: 18,
+        borderRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
     },
-    timeZoneDate: {
-        fontSize: 22,
+    heroLocale: {
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: 16,
+        paddingVertical: 0,
+    },
+    heroLocaleLabel: {
+        fontSize: 24,
         fontWeight: "600",
-        marginBottom: 8,
-    },
-    timeZoneTitle: {
-        fontSize: 18,
         marginBottom: 3,
     },
-    timeZoneSubTitle: {
+    heroTimezone: {
         fontSize: 13,
         fontWeight: "400",
     },
-    heroCountdown: {
-        fontSize: 28,
-        fontWeight: "700",
-        marginTop: 14,
-        marginBottom: 6,
+    divider: {
+        width: "85%",
+        height: 1,
+        marginVertical: 18,
+    },
+    countdownCircle: {
+        width: 150,
+        height: 150,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 2,
+        borderRadius: 100,
+    },
+    countdownLabel: {
+        fontSize: 18,
+        fontWeight: "400",
+        marginBottom: 3,
+    },
+    countdownTime: {
+        fontSize: 24,
+        fontWeight: "500",
+    },
+    countdownHms: {
+        fontSize: 14,
+        fontWeight: "400",
     },
     prayersList: {
         width: "100%",
@@ -245,9 +268,12 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 14,
-        paddingHorizontal: 18,
-        borderRadius: 12,
-        borderWidth: 1,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 1,
     },
     prayerLeft: {
         flexDirection: "row",
@@ -262,17 +288,11 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "500",
     },
-    countdown: {
-        fontSize: 28,
-        fontWeight: "600",
-        marginTop: 20,
-        marginBottom: 55,
-    },
     errorContainer: {
         flex: 1,
-        justifyContent: 'center',
+        padding: 24,
         alignItems: 'center',
-        padding: 20,
+        justifyContent: 'center',
     },
     errorBanner: {
         marginBottom: 32,
@@ -284,14 +304,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
     },
-    button: {
+    errorButton: {
         paddingVertical: 14,
         borderRadius: 12,
         width: "100%",
         alignItems: "center",
         marginBottom: 12,
     },
-    buttonText: {
+    errorButtonText: {
         fontSize: 16,
         fontWeight: '600',
     },

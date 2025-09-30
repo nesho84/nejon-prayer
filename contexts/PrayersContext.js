@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
 import { getPrayerTimes } from "@/utils/prayersApi";
-import { formatAddress, formatTimezone } from "@/utils/geoInfo";
+import { formatAddress, getTimeZone } from "@/utils/geoInfo";
 
 export const PrayersContext = createContext();
 
@@ -210,7 +210,7 @@ export function PrayersProvider({ children }) {
         await saveAppSettings({
             location: loc.coords,
             fullAddress: await formatAddress(loc.coords),
-            timeZone: await formatTimezone(loc.coords),
+            timeZone: await getTimeZone(loc.coords), // not used!
         });
 
         console.log("📍 Prayer times updated Location to:", loc.coords);

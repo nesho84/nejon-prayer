@@ -12,7 +12,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -20,9 +19,10 @@ import { useSettingsContext } from "@/contexts/SettingsContext";
 import { usePrayersContext } from "@/contexts/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatAddress, formatTimezone } from "@/utils/geoInfo";
+import { formatAddress, getTimeZone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
-import LoadingScreen from "@/components/LoadingScreen";
+import AppLoading from "@/components/AppLoading";
+import AppScreen from "@/components/AppScreen";
 
 export default function SettingsScreen() {
     const { theme, themeMode, changeTheme } = useThemeContext();
@@ -37,6 +37,7 @@ export default function SettingsScreen() {
     } = useSettingsContext();
     const {
         prayersLoading,
+        prayersError,
         hasPrayerTimes,
         prayersOutdated,
         lastFetchedDate,
@@ -47,6 +48,8 @@ export default function SettingsScreen() {
     const [localLoading, setLocalLoading] = useState(false);
     // Show loading if contexts or local operations are loading
     const isLoading = settingsLoading || localLoading;
+    // Show error if either context has an error
+    const hasError = settingsError || prayersError;
 
     // ------------------------------------------------------------
     // Change theme
@@ -110,7 +113,7 @@ export default function SettingsScreen() {
             }
 
             const newFullAddress = await formatAddress(loc.coords);
-            const newTimeZone = await formatTimezone(loc.coords);
+            const newTimeZone = await getTimeZone(loc.coords); // not used!
 
             // Save settings
             await saveAppSettings({
@@ -166,8 +169,8 @@ export default function SettingsScreen() {
                     Linking.openSettings();
                 }
             }
-        } catch (error) {
-            console.error('Error checking notifications permission:', error);
+        } catch (err) {
+            console.error('Error checking notifications permission:', err);
             Alert.alert(tr("labels.error"), tr("labels.notificationError"));
         } finally {
             setLocalLoading(false);
@@ -218,27 +221,25 @@ export default function SettingsScreen() {
         }
     }
 
-    // Loading State
+    // Loading state
     if (isLoading) {
-        return (
-            <LoadingScreen
-                message={tr("labels.loadingSettings")}
-                style={{ backgroundColor: theme.bg }}
-            />
-        );
+        return <AppLoading text={tr("labels.loadingSettings")} />
     }
 
-    // Error State - settings
-    if (settingsError) {
+    // Error state
+    if (hasError) {
         return (
-            <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
-                <View style={styles.centerContainer}>
-                    <Text style={styles.errorText}>{tr("labels.settingsError")}</Text>
-                    <TouchableOpacity style={styles.retryButton} onPress={handleSettingsRefresh}>
-                        <Text style={styles.retryButtonText}>{tr("buttons.retry")}</Text>
-                    </TouchableOpacity>
+            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
+                <View style={styles.errorBanner}>
+                    <Ionicons name="settings-outline" size={80} color={theme.primary} />
                 </View>
-            </SafeAreaView>
+                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.settingsError")}</Text>
+                <TouchableOpacity
+                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
+                    onPress={handleSettingsRefresh}>
+                    <Text style={styles.errorButtonText}>{tr("buttons.retry")}</Text>
+                </TouchableOpacity>
+            </View>
         );
     }
 
@@ -249,7 +250,7 @@ export default function SettingsScreen() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
         >
-            <SafeAreaView style={styles.innerContainer}>
+            <AppScreen>
 
                 {/* Theme Setting */}
                 <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
@@ -350,7 +351,7 @@ export default function SettingsScreen() {
                             </Pressable>
                         </View>
                         {deviceSettings.batteryOptimization &&
-                            <Text style={[styles.subText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                 {tr("labels.batteryOptBody")}
                             </Text>}
                     </>
@@ -367,7 +368,7 @@ export default function SettingsScreen() {
                                     <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                                 </Pressable>
                             </View>
-                            <Text style={[styles.subText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                 {tr("labels.alarmAccessBody")}
                             </Text>
                         </>
@@ -398,78 +399,52 @@ export default function SettingsScreen() {
                     {prayersOutdated &&
                         <>
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                            <Text style={[styles.subText, { color: theme.text2, marginBottom: 3 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
                                 {tr("labels.prayerTimesOutdated")}
                             </Text>
                         </>
                     }
                 </View>
 
-            </SafeAreaView>
+            </AppScreen>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    innerContainer: {
-        flex: 1,
-        minHeight: '100%',
-        padding: 16,
-    },
     scrollContainer: {
         flex: 1,
     },
     scrollContent: {
         flexGrow: 1,
-        justifyContent: 'center',
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+        paddingHorizontal: 12,
     },
     settingCard: {
-        borderRadius: 12,
+        borderRadius: 8,
         marginBottom: 12,
         paddingHorizontal: 14,
         paddingTop: 12,
         paddingBottom: 14,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        elevation: 2,
+        elevation: 1,
+    },
+    settingTitle: {
+        fontSize: 18,
+        fontWeight: '600',
     },
     statusRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    settingTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-    },
     statusText: {
         fontSize: 16,
     },
-    subText: {
+    statusSubText: {
         fontSize: 14,
         marginBottom: 20,
-    },
-    retryButton: {
-        backgroundColor: '#FF3B30',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
     },
     picker: {
         width: '100%',
@@ -497,10 +472,31 @@ const styles = StyleSheet.create({
     fetchedDateText: {
         fontSize: 12,
     },
+    errorContainer: {
+        flex: 1,
+        padding: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    errorBanner: {
+        marginBottom: 32,
+        alignItems: "center",
+        justifyContent: "center",
+    },
     errorText: {
         fontSize: 16,
-        color: '#FF3B30',
         textAlign: 'center',
         marginBottom: 20,
+    },
+    errorButton: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    errorButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

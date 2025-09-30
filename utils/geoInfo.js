@@ -3,7 +3,7 @@ import * as Location from "expo-location";
 // ------------------------------------------------------------
 // Reverse-geocodes given coordinates into a human-readable timezone.
 // ------------------------------------------------------------
-export async function formatTimezone(location) {
+export async function getTimeZone(location) {
     try {
         // ✅ Location Permission check
         const locationEnabled = await Location.hasServicesEnabledAsync();
@@ -14,7 +14,7 @@ export async function formatTimezone(location) {
 
         // ✅ Add safety check at the beginning
         if (!location?.latitude || !location?.longitude) {
-            console.warn("formatTimezone: Invalid location provided", location);
+            console.warn("getTimeZone: Invalid location provided", location);
             return null;
         }
 
