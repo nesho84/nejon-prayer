@@ -244,167 +244,165 @@ export default function SettingsScreen() {
     // Main Content
     return (
         <ScrollView
-            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={styles.scrollContent}
+            style={styles.scrollContainer}
+            contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.bg }]}
             showsVerticalScrollIndicator={false}
         >
-            <AppScreen>
 
-                {/* Theme Setting */}
-                <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            {/* Theme Setting */}
+            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                <Text style={[styles.settingTitle, { color: theme.text }]}>
+                    {tr("labels.theme")}
+                </Text>
+                <Picker
+                    selectedValue={themeMode}
+                    onValueChange={handleTheme}
+                    dropdownIconColor={theme.text}
+                    dropdownIconRippleColor={theme.text}
+                    style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
+                    enabled={!localLoading}
+                >
+                    <Picker.Item label="Dark" value="dark" />
+                    <Picker.Item label="Light" value="light" />
+                    <Picker.Item label="System" value="system" />
+                </Picker>
+            </View>
+
+            {/* Language Setting */}
+            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                <Text style={[styles.settingTitle, { color: theme.text }]}>
+                    {tr("labels.language")}
+                </Text>
+                <Picker
+                    selectedValue={language}
+                    onValueChange={handleLanguage}
+                    dropdownIconColor={theme.text}
+                    dropdownIconRippleColor={theme.text}
+                    style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
+                    enabled={!localLoading}
+                >
+                    <Picker.Item label="English" value="en" />
+                    <Picker.Item label="Shqip" value="sq" />
+                    <Picker.Item label="Deutsch" value="de" />
+                </Picker>
+            </View>
+
+            {/* Location Setting */}
+            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                <View style={styles.statusRow}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
-                        {tr("labels.theme")}
+                        {tr("labels.location")}
                     </Text>
-                    <Picker
-                        selectedValue={themeMode}
-                        onValueChange={handleTheme}
-                        dropdownIconColor={theme.text}
-                        dropdownIconRippleColor={theme.text}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
-                        enabled={!localLoading}
-                    >
-                        <Picker.Item label="Dark" value="dark" />
-                        <Picker.Item label="Light" value="light" />
-                        <Picker.Item label="System" value="system" />
-                    </Picker>
+                    <Switch
+                        value={deviceSettings.locationPermission}
+                        onValueChange={null}
+                        disabled={true}
+                        trackColor={{ false: theme.overlay, true: theme.placeholder }}
+                        thumbColor={deviceSettings.locationPermission ? theme.border : theme.border}
+                    />
                 </View>
+                <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                <TouchableOpacity
+                    style={[styles.updateLocationButton, { backgroundColor: theme.overlay }]}
+                    onPress={updateLocation}
+                    disabled={localLoading}
+                >
+                    <Text style={[styles.updateLocationButtonText, { color: theme.text }]}>
+                        {appSettings.location
+                            ? (tr("labels.locationButtonText1"))
+                            : (tr("labels.locationButtonText2"))}
+                    </Text>
+                </TouchableOpacity>
+                {/* fullAddress */}
+                {appSettings.fullAddress && (
+                    <Text style={[styles.addressText, { color: theme.placeholder }]}>
+                        {appSettings.fullAddress || (tr("labels.loading"))}
+                    </Text>
+                )}
+            </View>
 
-                {/* Language Setting */}
-                <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            {/* Notifications Settings */}
+            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                <View style={styles.statusRow}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
-                        {tr("labels.language")}
+                        {tr("labels.notifications")}
                     </Text>
-                    <Picker
-                        selectedValue={language}
-                        onValueChange={handleLanguage}
-                        dropdownIconColor={theme.text}
-                        dropdownIconRippleColor={theme.text}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
-                        enabled={!localLoading}
-                    >
-                        <Picker.Item label="English" value="en" />
-                        <Picker.Item label="Shqip" value="sq" />
-                        <Picker.Item label="Deutsch" value="de" />
-                    </Picker>
-                </View>
-
-                {/* Location Setting */}
-                <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.settingTitle, { color: theme.text }]}>
-                            {tr("labels.location")}
-                        </Text>
-                        <Switch
-                            value={deviceSettings.locationPermission}
-                            onValueChange={null}
-                            disabled={true}
-                            trackColor={{ false: theme.overlay, true: theme.placeholder }}
-                            thumbColor={deviceSettings.locationPermission ? theme.border : theme.border}
-                        />
-                    </View>
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                    <TouchableOpacity
-                        style={[styles.updateLocationButton, { backgroundColor: theme.overlay }]}
-                        onPress={updateLocation}
+                    <Switch
+                        value={deviceSettings.notificationPermission}
+                        onValueChange={handleNotifications}
                         disabled={localLoading}
-                    >
-                        <Text style={[styles.updateLocationButtonText, { color: theme.text }]}>
-                            {appSettings.location
-                                ? (tr("labels.locationButtonText1"))
-                                : (tr("labels.locationButtonText2"))}
-                        </Text>
-                    </TouchableOpacity>
-                    {/* fullAddress */}
-                    {appSettings.fullAddress && (
-                        <Text style={[styles.addressText, { color: theme.placeholder }]}>
-                            {appSettings.fullAddress || (tr("labels.loading"))}
-                        </Text>
-                    )}
+                        trackColor={{ false: theme.overlay, true: theme.accent }}
+                        thumbColor={deviceSettings.notificationPermission ? theme.border : theme.border}
+                    />
                 </View>
 
-                {/* Notifications Settings */}
-                <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                {/* Battery Optimization */}
+                <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                <>
                     <View style={styles.statusRow}>
-                        <Text style={[styles.settingTitle, { color: theme.text }]}>
-                            {tr("labels.notifications")}
+                        <Text style={[styles.statusText, { color: theme.text }]}>
+                            {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
                         </Text>
-                        <Switch
-                            value={deviceSettings.notificationPermission}
-                            onValueChange={handleNotifications}
-                            disabled={localLoading}
-                            trackColor={{ false: theme.overlay, true: theme.accent }}
-                            thumbColor={deviceSettings.notificationPermission ? theme.border : theme.border}
-                        />
+                        <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
+                            <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
+                        </Pressable>
                     </View>
+                    {deviceSettings.batteryOptimization &&
+                        <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                            {tr("labels.batteryOptBody")}
+                        </Text>}
+                </>
 
-                    {/* Battery Optimization */}
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                {/* Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) */}
+                {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
                     <>
+                        <View style={[styles.divider, { borderColor: theme.divider }]}></View>
                         <View style={styles.statusRow}>
                             <Text style={[styles.statusText, { color: theme.text }]}>
-                                {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
+                                {tr("labels.alarmAccessTitle")}
                             </Text>
-                            <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
+                            <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
                                 <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                             </Pressable>
                         </View>
-                        {deviceSettings.batteryOptimization &&
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                {tr("labels.batteryOptBody")}
-                            </Text>}
-                    </>
-
-                    {/* Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) */}
-                    {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
-                        <>
-                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr("labels.alarmAccessTitle")}
-                                </Text>
-                                <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
-                                    <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
-                                </Pressable>
-                            </View>
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                {tr("labels.alarmAccessBody")}
-                            </Text>
-                        </>
-                    }
-                </View>
-
-                {/* Prayer Times Status */}
-                <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
-                    <Text style={[styles.settingTitle, { color: theme.text }]}>
-                        {tr("labels.prayerTimesStatus")}
-                    </Text>
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.text2 }]}>
-                            {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
+                        <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                            {tr("labels.alarmAccessBody")}
                         </Text>
-                        {/* lastFetchedDate */}
-                        {lastFetchedDate && (
-                            <Text style={[styles.fetchedDateText, { color: theme.placeholder }]}>
-                                {lastFetchedDate || (tr("labels.loading"))}
-                            </Text>
-                        )}
-                        {/* Prayers loading icon */}
-                        {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
-                            : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
-                    </View>
-                    {/* prayersOutdated */}
-                    {prayersOutdated &&
-                        <>
-                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
-                                {tr("labels.prayerTimesOutdated")}
-                            </Text>
-                        </>
-                    }
-                </View>
+                    </>
+                }
+            </View>
 
-            </AppScreen>
+            {/* Prayer Times Status */}
+            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+                <Text style={[styles.settingTitle, { color: theme.text }]}>
+                    {tr("labels.prayerTimesStatus")}
+                </Text>
+                <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                <View style={styles.statusRow}>
+                    <Text style={[styles.statusText, { color: theme.text2 }]}>
+                        {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
+                    </Text>
+                    {/* lastFetchedDate */}
+                    {lastFetchedDate && (
+                        <Text style={[styles.fetchedDateText, { color: theme.placeholder }]}>
+                            {lastFetchedDate || (tr("labels.loading"))}
+                        </Text>
+                    )}
+                    {/* Prayers loading icon */}
+                    {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
+                        : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
+                </View>
+                {/* prayersOutdated */}
+                {prayersOutdated &&
+                    <>
+                        <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                        <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
+                            {tr("labels.prayerTimesOutdated")}
+                        </Text>
+                    </>
+                }
+            </View>
+
         </ScrollView>
     );
 }

@@ -2,41 +2,38 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     return (
-        <AppScreen>
-            <View style={styles.content}>
+        <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
-                {/* App Logo */}
-                <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
+            {/* App Logo */}
+            <Image style={styles.logo} source={require("../../assets/icons/icon.png")} />
 
-                {/* About Title */}
-                <Text style={[styles.title, { color: theme.text }]}>
-                    {tr("labels.aboutText1")}
-                </Text>
+            {/* About Title */}
+            <Text style={[styles.title, { color: theme.text }]}>
+                {tr("labels.aboutText1")}
+            </Text>
 
-                {/* About Description */}
-                <Text style={[styles.desc, { color: theme.placeholder }]}>
-                    {tr("labels.aboutText2")}
-                </Text>
+            {/* About Description */}
+            <Text style={[styles.desc, { color: theme.placeholder }]}>
+                {tr("labels.aboutText2")}
+            </Text>
 
-                {/* Year & Website */}
-                <Text style={[styles.yearText, { color: theme.text2 }]}>
-                    ©{new Date().getFullYear()} <Text style={{ fontSize: 16, color: theme.info }}>nejon.net</Text>
-                </Text>
+            {/* Year & Website */}
+            <Text style={[styles.yearText, { color: theme.text2 }]}>
+                ©{new Date().getFullYear()} <Text style={{ fontSize: 16, color: theme.info }}>nejon.net</Text>
+            </Text>
 
-                {/* App Version */}
-                <Text style={[styles.versionText, { color: theme.placeholder }]}>
-                    Version {Constants.expoConfig.version}
-                </Text>
+            {/* App Version */}
+            <Text style={[styles.versionText, { color: theme.placeholder }]}>
+                Version {Constants.expoConfig.version}
+            </Text>
 
-            </View>
-        </AppScreen>
+        </View>
     );
 }
 

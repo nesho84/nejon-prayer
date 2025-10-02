@@ -161,108 +161,106 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <AppScreen>
-      <View style={styles.content}>
+    <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
-        {/* Step 1: Language */}
-        {step === 1 && (
-          <>
-            <View style={styles.banner}>
-              <Ionicons name="language" size={80} color={theme.primary} />
-            </View>
-            <Text style={[styles.title, { color: theme.text }]}>Choose Your Language</Text>
-            <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-              Select your preferred language to continue
-            </Text>
-            <View style={styles.inputArea}>
-              {Platform.OS === "android" ? (
-                <Picker
-                  selectedValue={languageRef.current}
-                  onValueChange={(value) => (languageRef.current = value)}
-                  dropdownIconColor={theme.text}
-                  style={{ color: theme.text }}
-                >
-                  <Picker.Item label="English" value="en" />
-                  <Picker.Item label="Shqip" value="sq" />
-                  <Picker.Item label="Deutsch" value="de" />
-                </Picker>
-              ) : (
-                <TouchableOpacity
-                  style={[styles.pickerButton, { backgroundColor: theme.card }]}
-                  onPress={() => Alert.alert("iOS", "Implement picker for iOS")}
-                >
-                  <Text style={{ color: theme.text }}>Language: {languageRef.current}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.primary }]}
-              onPress={handleLanguage}
-            >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Next</Text>
-            </TouchableOpacity>
-          </>
-        )}
+      {/* Step 1: Language */}
+      {step === 1 && (
+        <>
+          <View style={styles.banner}>
+            <Ionicons name="language" size={80} color={theme.primary} />
+          </View>
+          <Text style={[styles.title, { color: theme.text }]}>Choose Your Language</Text>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
+            Select your preferred language to continue
+          </Text>
+          <View style={styles.inputArea}>
+            {Platform.OS === "android" ? (
+              <Picker
+                selectedValue={languageRef.current}
+                onValueChange={(value) => (languageRef.current = value)}
+                dropdownIconColor={theme.text}
+                style={{ color: theme.text }}
+              >
+                <Picker.Item label="English" value="en" />
+                <Picker.Item label="Shqip" value="sq" />
+                <Picker.Item label="Deutsch" value="de" />
+              </Picker>
+            ) : (
+              <TouchableOpacity
+                style={[styles.pickerButton, { backgroundColor: theme.card }]}
+                onPress={() => Alert.alert("iOS", "Implement picker for iOS")}
+              >
+                <Text style={{ color: theme.text }}>Language: {languageRef.current}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.primary }]}
+            onPress={handleLanguage}
+          >
+            <Text style={[styles.buttonText, { color: theme.white }]}>Next</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
-        {/* Step 2: Location */}
-        {step === 2 && (
-          <>
-            <View style={styles.banner}>
-              <Ionicons name="location-outline" size={80} color={theme.primary} />
-            </View>
-            <Text style={[styles.title, { color: theme.text }]}>Enable Location</Text>
-            <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-              Enable location to get accurate prayer times for your area.
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.primary }]}
-              onPress={requestLocation}
-            >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Allow Location</Text>
-            </TouchableOpacity>
-          </>
-        )}
+      {/* Step 2: Location */}
+      {step === 2 && (
+        <>
+          <View style={styles.banner}>
+            <Ionicons name="location-outline" size={80} color={theme.primary} />
+          </View>
+          <Text style={[styles.title, { color: theme.text }]}>Enable Location</Text>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
+            Enable location to get accurate prayer times for your area.
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.primary }]}
+            onPress={requestLocation}
+          >
+            <Text style={[styles.buttonText, { color: theme.white }]}>Allow Location</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
-        {/* Step 3: Notifications */}
-        {step === 3 && (
-          <>
-            <View style={styles.banner}>
-              <Ionicons name="alarm-outline" size={80} color={theme.primary} />
-            </View>
-            <Text style={[styles.title, { color: theme.text }]}>Stay Updated</Text>
-            <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-              Allow notifications to stay on track with your daily prayers.
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.primary }]}
-              onPress={requestNotifications}
-            >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Allow Notifications</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.danger }]}
-              onPress={finishOnboarding}
-            >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Skip</Text>
-            </TouchableOpacity>
-          </>
-        )}
+      {/* Step 3: Notifications */}
+      {step === 3 && (
+        <>
+          <View style={styles.banner}>
+            <Ionicons name="alarm-outline" size={80} color={theme.primary} />
+          </View>
+          <Text style={[styles.title, { color: theme.text }]}>Stay Updated</Text>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
+            Allow notifications to stay on track with your daily prayers.
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.primary }]}
+            onPress={requestNotifications}
+          >
+            <Text style={[styles.buttonText, { color: theme.white }]}>Allow Notifications</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.danger }]}
+            onPress={finishOnboarding}
+          >
+            <Text style={[styles.buttonText, { color: theme.white }]}>Skip</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
-        {/* Step indicator */}
-        <View style={styles.stepIndicator}>
-          {[1, 2, 3].map((i) => (
-            <View
-              key={i}
-              style={[
-                styles.stepDot,
-                { backgroundColor: step === i ? theme.primary : theme.divider },
-              ]}
-            />
-          ))}
-        </View>
-
+      {/* Step indicator */}
+      <View style={styles.stepIndicator}>
+        {[1, 2, 3].map((i) => (
+          <View
+            key={i}
+            style={[
+              styles.stepDot,
+              { backgroundColor: step === i ? theme.primary : theme.divider },
+            ]}
+          />
+        ))}
       </View>
-    </AppScreen>
+
+    </View>
   );
 }
 

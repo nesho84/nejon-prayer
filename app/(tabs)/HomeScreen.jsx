@@ -16,7 +16,7 @@ export default function HomeScreen() {
     const { tr, language } = useTranslation();
     const { appSettings, settingsLoading, settingsError } = useSettingsContext();
     const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
-    const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
+    const { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
 
     // Local state
     const isLoading = settingsLoading || prayersLoading;
@@ -119,84 +119,82 @@ export default function HomeScreen() {
                 />
             }
         >
-            <AppScreen>
 
-                {/* Hero Header */}
-                <View style={[styles.heroHeader, { backgroundColor: theme.card }]}>
-                    {/* Date + Timezone */}
-                    <View style={styles.heroLocale}>
-                        <Text style={[styles.heroLocaleLabel, { color: theme.text2 }]}>
-                            {new Date().toLocaleDateString(tr("labels.localeDate"), {
-                                weekday: "long",
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                            }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
-                        </Text>
-                        <Text style={[styles.heroTimezone, { color: theme.placeholder }]}>
-                            {appSettings.timeZone?.subTitle || ""}
-                        </Text>
-                    </View>
-
-                    {/* Divider */}
-                    <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-
-                    {/* Countdown Circle */}
-                    {nextPrayerName && (
-                        <CountdownCircle
-                            nextPrayerName={nextPrayerName}
-                            prayerCountdown={prayerCountdown}
-                            remainingSeconds={remainingSeconds}
-                            totalSeconds={totalSeconds}
-                            theme={theme}
-                            tr={tr}
-                            size={160}
-                            strokeWidth={8}
-                            backgroundColor={theme.border}
-                            color={theme.accent}
-                        />
-                    )}
+            {/* Hero Header */}
+            <View style={[styles.heroHeader, { backgroundColor: theme.card }]}>
+                {/* Date + Timezone */}
+                <View style={styles.heroLocale}>
+                    <Text style={[styles.heroLocaleLabel, { color: theme.text2 }]}>
+                        {new Date().toLocaleDateString(tr("labels.localeDate"), {
+                            weekday: "long",
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                        }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
+                    </Text>
+                    <Text style={[styles.heroTimezone, { color: theme.placeholder }]}>
+                        {appSettings.timeZone?.subTitle || ""}
+                    </Text>
                 </View>
 
-                {/* Prayer Times */}
-                <View style={styles.prayersList}>
-                    {Object.entries(prayerTimes || {}).map(([name, time]) => {
-                        const isNext = nextPrayerName === name;
-                        const iconData = resolvePrayerIcon(name);
-                        const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
-                        return (
-                            <View
-                                key={name}
-                                style={[
-                                    styles.prayerRow,
-                                    { backgroundColor: theme.card },
-                                    isNext && { borderWidth: 2, borderColor: theme.accent },
-                                ]}
-                            >
-                                <View style={styles.prayerLeft}>
-                                    <IconComponent
-                                        name={iconData.name}
-                                        size={24}
-                                        color={isNext ? theme.accent : theme.text2}
-                                    />
-                                    <Text style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
-                                        {tr(`prayers.${name}`) || name}
-                                    </Text>
-                                </View>
-                                <Text style={[styles.prayerTime, { color: isNext ? theme.accent : theme.text2 }]}>
-                                    {time}
+                {/* Divider */}
+                <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+                {/* Countdown Circle */}
+                {nextPrayerName && (
+                    <CountdownCircle
+                        nextPrayerName={nextPrayerName}
+                        prayerCountdown={prayerCountdown}
+                        remainingSeconds={remainingSeconds}
+                        totalSeconds={totalSeconds}
+                        theme={theme}
+                        tr={tr}
+                        size={160}
+                        strokeWidth={8}
+                        backgroundColor={theme.border}
+                        color={theme.accent}
+                    />
+                )}
+            </View>
+
+            {/* Prayer Times */}
+            <View style={styles.prayersList}>
+                {Object.entries(prayerTimes || {}).map(([name, time]) => {
+                    const isNext = nextPrayerName === name;
+                    const iconData = resolvePrayerIcon(name);
+                    const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
+                    return (
+                        <View
+                            key={name}
+                            style={[
+                                styles.prayerRow,
+                                { backgroundColor: theme.card },
+                                isNext && { borderWidth: 2, borderColor: theme.accent },
+                            ]}
+                        >
+                            <View style={styles.prayerLeft}>
+                                <IconComponent
+                                    name={iconData.name}
+                                    size={24}
+                                    color={isNext ? theme.accent : theme.text2}
+                                />
+                                <Text style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
+                                    {tr(`prayers.${name}`) || name}
                                 </Text>
                             </View>
-                        );
-                    })}
-                </View>
+                            <Text style={[styles.prayerTime, { color: isNext ? theme.accent : theme.text2 }]}>
+                                {time}
+                            </Text>
+                        </View>
+                    );
+                })}
+            </View>
 
-                {/* Debug utility */}
-                {/* <View style={{ marginTop: 20 }}>
-                    <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
-                </View> */}
+            {/* Debug utility */}
+            <View style={{ marginTop: 20 }}>
+                <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
+            </View>
 
-            </AppScreen>
         </ScrollView>
     );
 }
@@ -212,7 +210,7 @@ const styles = StyleSheet.create({
     heroHeader: {
         width: "100%",
         alignItems: "center",
-        marginBottom: 12,
+        marginBottom: 14,
         paddingVertical: 18,
         borderRadius: 8,
         shadowOffset: { width: 0, height: 1 },
@@ -242,7 +240,7 @@ const styles = StyleSheet.create({
     },
     prayersList: {
         width: "100%",
-        gap: 12,
+        gap: 10,
     },
     prayerRow: {
         flexDirection: "row",

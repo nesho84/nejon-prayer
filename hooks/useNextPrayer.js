@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function useNextPrayer(prayerTimes) {
     const [nextPrayerName, setNextPrayerName] = useState(null);
@@ -6,6 +6,9 @@ export default function useNextPrayer(prayerTimes) {
     const [prayerCountdown, setPrayerCountdown] = useState({});
     const [remainingSeconds, setRemainingSeconds] = useState(null);
     const [totalSeconds, setTotalSeconds] = useState(null);
+
+    // to detect when nextPrayer changes
+    const prevNextTimestampRef = useRef(null);
 
     // ------------------------------------------------------------
     // Format time with leading zeros
@@ -16,11 +19,10 @@ export default function useNextPrayer(prayerTimes) {
     // Compute next prayer based on current time
     // ------------------------------------------------------------
     const computeNextPrayer = () => {
-        if (!prayerTimes) return;
+        if (!prayerTimes) return null;
 
         // Find next prayer today
         const now = new Date();
-        let upcoming = null;
 
         // loop through prayers in order
         const PRAYER_ORDER_SHORT = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
@@ -32,52 +34,68 @@ export default function useNextPrayer(prayerTimes) {
             prayerDate.setHours(hour, minute, 0, 0);
             // If prayer time is still upcoming
             if (prayerDate > now) {
-                upcoming = { name: name, time: prayerDate };
-                break; // stop at first upcoming prayer
+                return { name: name, time: prayerDate };
             }
         }
 
         // If no more today, pick tomorrow's Fajr
-        if (!upcoming && prayerTimes["Fajr"]) {
+        if (prayerTimes["Fajr"]) {
             const [hour, minute] = prayerTimes["Fajr"].split(":").map(Number);
             const tomorrowFajr = new Date();
             tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
             tomorrowFajr.setHours(hour, minute, 0, 0);
-            upcoming = { name: "Fajr", time: tomorrowFajr };
+            return { name: "Fajr", time: tomorrowFajr };
         }
 
-        return upcoming;
+        return null;
     };
 
     // ------------------------------------------------------------
     // Start interval ticking every second
     // ------------------------------------------------------------
     useEffect(() => {
+        // cannot proceed without prayerTimes
         if (!prayerTimes) return;
 
         // initial tick
         const tick = () => {
-            // Determine upcoming prayer
-            let upcoming = nextPrayerTime ? { name: nextPrayerName, time: nextPrayerTime } : computeNextPrayer();
+            const now = new Date();
 
-            // No upcoming prayer found
+            // compute upcoming fresh each tick (robust)
+            let upcoming = computeNextPrayer();
+
+            // cannot compute next prayer
             if (!upcoming) return;
 
-            // Calculate difference in seconds
-            const now = new Date();
-            let diffSec = Math.floor((upcoming.time - now) / 1000);
+            // If we detect a different upcoming prayer than previously stored, snapshot totalSeconds
+            const upcomingTs = upcoming.time.getTime();
+            if (prevNextTimestampRef.current !== upcomingTs) {
+                // new prayer interval started — store it
+                prevNextTimestampRef.current = upcomingTs;
 
-            // If countdown reached zero, compute next prayer
-            if (diffSec <= 0) {
-                upcoming = computeNextPrayer();
-                if (!upcoming) return;
-                diffSec = Math.floor((upcoming.time - now) / 1000);
+                // Update next prayer info
                 setNextPrayerName(upcoming.name);
                 setNextPrayerTime(upcoming.time);
-                setTotalSeconds(diffSec); // reset full duration
+
+                // Initialize countdown
+                const initialDiff = Math.max(Math.floor((upcoming.time - now) / 1000), 0);
+
+                // Update state
+                setTotalSeconds(initialDiff); // freeze the interval length for progress calculation
+                setRemainingSeconds(initialDiff); // initialize remainingSeconds
+
+                // Set initial countdown display
+                const hours = pad(Math.floor(initialDiff / 3600));
+                const minutes = pad(Math.floor((initialDiff % 3600) / 60));
+                const seconds = pad(initialDiff % 60);
+                setPrayerCountdown({ hours, minutes, seconds });
+                return; // wait for next tick to continue counting down
             }
 
-            // Format countdown
+            // Normal countdown update for the current upcoming prayer
+            const diffSec = Math.max(Math.floor((upcoming.time - now) / 1000), 0);
+
+            // If diffSec reached 0, computeNextPrayer in next tick will pick the next one.
             const hours = pad(Math.floor(diffSec / 3600));
             const minutes = pad(Math.floor((diffSec % 3600) / 60));
             const seconds = pad(diffSec % 60);
@@ -85,17 +103,14 @@ export default function useNextPrayer(prayerTimes) {
             // Update state
             setPrayerCountdown({ hours, minutes, seconds });
             setRemainingSeconds(diffSec);
-
-            // Initialize totalSeconds if null
-            if (totalSeconds === null) setTotalSeconds(diffSec);
         };
-
-        tick(); // initial call
+        // run every second
+        tick();
 
         // Set interval to tick every second
         const interval = setInterval(tick, 1000);
         return () => clearInterval(interval);
-    }, [prayerTimes, nextPrayerName, nextPrayerTime, totalSeconds]);
+    }, [prayerTimes]);
 
     return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds };
 }

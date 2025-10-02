@@ -1,4 +1,6 @@
 import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppScreen from "@/components/AppScreen";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { PrayersProvider } from "@/contexts/PrayersContext";
@@ -10,15 +12,14 @@ export default function RootLayout() {
       <SettingsProvider>
         <PrayersProvider>
           <NotificationsProvider>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                animation: "fade",
-              }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(tabs)" />
-            </Stack>
+            <SafeAreaProvider>
+              <AppScreen>
+                <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(tabs)" />
+                </Stack>
+              </AppScreen>
+            </SafeAreaProvider>
           </NotificationsProvider>
         </PrayersProvider>
       </SettingsProvider>

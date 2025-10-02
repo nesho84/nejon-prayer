@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 
+
 export default function TabLayout() {
     const insets = useSafeAreaInsets();
     const { theme } = useThemeContext();
