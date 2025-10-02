@@ -4,22 +4,22 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
+import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import { testNotification } from "@/utils/testNotification";
-import useNextPrayer from "@/hooks/useNextPrayer";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
+import CountdownCircle from "@/components/CountdownCircle";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
     const { tr, language } = useTranslation();
     const { appSettings, settingsLoading, settingsError } = useSettingsContext();
     const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
-    const { nextPrayerName, prayerCountdown } = useNextPrayer(prayerTimes);
+    const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
 
-    // Show loading if either context is loading
+    // Local state
     const isLoading = settingsLoading || prayersLoading;
-    // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
     // ------------------------------------------------------------
@@ -143,16 +143,18 @@ export default function HomeScreen() {
 
                     {/* Countdown Circle */}
                     {nextPrayerName && (
-                        <View style={[styles.countdownCircle, { borderColor: theme.text2 }]}>
-                            <Text style={[styles.countdownLabel, { color: theme.text2 }]}>
-                                » {tr(`prayers.${nextPrayerName}`)} «
-                            </Text>
-                            <Text style={[styles.countdownTime, { color: theme.accent }]}>
-                                {prayerCountdown.hours}<Text style={styles.countdownHms}>h </Text>
-                                {prayerCountdown.minutes}<Text style={styles.countdownHms}>m </Text>
-                                {prayerCountdown.seconds}<Text style={styles.countdownHms}>s</Text>
-                            </Text>
-                        </View>
+                        <CountdownCircle
+                            nextPrayerName={nextPrayerName}
+                            prayerCountdown={prayerCountdown}
+                            remainingSeconds={remainingSeconds}
+                            totalSeconds={totalSeconds}
+                            theme={theme}
+                            tr={tr}
+                            size={160}
+                            strokeWidth={8}
+                            backgroundColor={theme.border}
+                            color={theme.accent}
+                        />
                     )}
                 </View>
 

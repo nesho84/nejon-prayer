@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { Appearance } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { darkTheme, lightTheme } from "@/constants/colors";
@@ -16,19 +16,19 @@ export function ThemeProvider({ children }) {
     // ------------------------------------------------------------
     // Resolve theme
     // ------------------------------------------------------------
-    const resolveTheme = (mode) => {
+    const resolveTheme = useCallback((mode) => {
         const system = Appearance.getColorScheme() || "light";
         const finalMode = mode === "system" ? system : mode;
-        setResolvedTheme(finalMode); // store resolved name
+        setResolvedTheme(finalMode);
         return finalMode === "dark" ? darkTheme : lightTheme;
-    };
+    }, []);
 
     // ------------------------------------------------------------
     // Whenever themeMode changes, resolve theme
     // ------------------------------------------------------------
     useEffect(() => {
         setTheme(resolveTheme(themeMode));
-    }, [themeMode]);
+    }, [themeMode, resolveTheme]);
 
     // ------------------------------------------------------------
     // Load saved theme from storage
@@ -49,37 +49,9 @@ export function ThemeProvider({ children }) {
     };
 
     // ------------------------------------------------------------
-    // Auto-load on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        loadTheme();
-    }, []);
-
-    // ------------------------------------------------------------
-    // Listen to system changes
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (themeMode !== "system") return;
-
-        const listener = ({ colorScheme }) => {
-            if (themeMode === "system") {
-                const newResolvedName = colorScheme || "light";
-                setResolvedTheme(newResolvedName);
-                setTheme(newResolvedName === "dark" ? darkTheme : lightTheme);
-            }
-        };
-
-        const subscription = Appearance.addChangeListener(listener);
-
-        return () => {
-            if (subscription?.remove) subscription.remove();
-        };
-    }, [themeMode]);
-
-    // ------------------------------------------------------------
     // Change theme manually
     // ------------------------------------------------------------
-    const changeTheme = async (mode) => {
+    const changeTheme = useCallback(async (mode) => {
         setThemeMode(mode);
         setTheme(resolveTheme(mode));
         try {
@@ -89,18 +61,45 @@ export function ThemeProvider({ children }) {
         } finally {
             setThemeLoading(false);
         }
-    };
+    }, [resolveTheme]);
+
+    // ------------------------------------------------------------
+    // Auto-load on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        loadTheme();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // ------------------------------------------------------------
+    // Listen to system changes
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (themeMode !== "system") return;
+
+        const listener = ({ colorScheme }) => {
+            const newResolvedName = colorScheme || "light";
+            setResolvedTheme(newResolvedName);
+            setTheme(newResolvedName === "dark" ? darkTheme : lightTheme);
+        };
+
+        const subscription = Appearance.addChangeListener(listener);
+        return () => subscription?.remove?.();
+    }, [themeMode]);
+
+    // ------------------------------------------------------------
+    // Memoize context value to prevent unnecessary re-renders
+    // ------------------------------------------------------------
+    const contextValue = useMemo(() => ({
+        theme,
+        themeMode,
+        changeTheme,
+        resolvedTheme,
+        themeLoading,
+    }), [theme, themeMode, changeTheme, resolvedTheme, themeLoading]);
 
     return (
-        <ThemeContext.Provider
-            value={{
-                theme,
-                themeMode,
-                changeTheme,
-                resolvedTheme,
-                themeLoading,
-            }}
-        >
+        <ThemeContext.Provider value={contextValue}>
             {children}
         </ThemeContext.Provider>
     );

@@ -75,7 +75,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             }
             break;
         case EventType.PRESS:
-            console.log(`👆 [Background] Notification pressed for ${notification?.data?.prayer || 'N/A'} - app will open...")`);
+            console.log(`👆 [Background] Notification pressed for ${notification?.data?.prayer || 'N/A'} - app will open...`);
             break;
     }
 });

@@ -31,9 +31,9 @@ export default function SettingsScreen() {
         appSettings,
         deviceSettings,
         settingsLoading,
-        reloadAppSettings,
         settingsError,
-        saveAppSettings
+        saveAppSettings,
+        reloadAppSettings
     } = useSettingsContext();
     const {
         prayersLoading,
@@ -46,9 +46,7 @@ export default function SettingsScreen() {
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
-    // Show loading if contexts or local operations are loading
     const isLoading = settingsLoading || localLoading;
-    // Show error if either context has an error
     const hasError = settingsError || prayersError;
 
     // ------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
@@ -39,10 +39,7 @@ export function PrayersProvider({ children }) {
     const readFromStorage = async () => {
         try {
             const stored = await AsyncStorage.getItem(PRAYERS_KEY);
-            if (!stored) return null;
-
-            const data = JSON.parse(stored);
-            return data;
+            return stored ? JSON.parse(stored) : null;
         } catch (err) {
             console.warn("⚠️ Failed to read/parse storage:", err);
             return null;
@@ -54,10 +51,7 @@ export function PrayersProvider({ children }) {
     // ------------------------------------------------------------
     const saveToStorage = async (timings) => {
         try {
-            const dataToSave = {
-                timings,
-                timestamp: Date.now(),
-            };
+            const dataToSave = { timings, timestamp: Date.now() };
             await AsyncStorage.setItem(PRAYERS_KEY, JSON.stringify(dataToSave));
             return true;
         } catch (err) {
@@ -106,7 +100,7 @@ export function PrayersProvider({ children }) {
                         await saveToStorage(timings);
                         console.log("✅ Prayer times saved in Storage");
                     } else {
-                        console.log("🔄 Prayer times same as Storage — skiping save");
+                        console.log("🔄 Prayer times from API same as Storage — skipping save");
                     }
                 }
             }
@@ -142,41 +136,7 @@ export function PrayersProvider({ children }) {
             setPrayersLoading(false);
             isLoadingRef.current = false;
         }
-    }
-
-    // ------------------------------------------------------------
-    // Manual save
-    // ------------------------------------------------------------
-    const savePrayerTimes = async (newTimes) => {
-        if (!newTimes) return;
-
-        const success = await saveToStorage(newTimes);
-        if (success) {
-            setPrayerTimes(newTimes);
-            lastFetchedDate.current = new Date().toLocaleString("en-GB");
-            setPrayersOutdated(false);
-            console.log("✅ Prayer times saved manually");
-        }
     };
-
-    // ------------------------------------------------------------
-    // Reload prayer times
-    // ------------------------------------------------------------
-    const reloadPrayerTimes = async () => {
-        if (!appSettings?.location || !deviceSettings?.locationPermission) {
-            await resolveLocation();
-        }
-        await loadPrayerTimes();
-    };
-
-    // ------------------------------------------------------------
-    // Auto-load on mount / settings changes
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (!settingsLoading && appSettings?.location) {
-            loadPrayerTimes();
-        }
-    }, [settingsLoading, deviceSettings.internetConnection, appSettings?.location]);
 
     // ------------------------------------------------------------
     // Determine location to use
@@ -217,17 +177,64 @@ export function PrayersProvider({ children }) {
         return loc.coords;
     };
 
+    // ------------------------------------------------------------
+    // Manual save
+    // ------------------------------------------------------------
+    const savePrayerTimes = useCallback(async (newTimes) => {
+        if (!newTimes) return;
+
+        const success = await saveToStorage(newTimes);
+        if (success) {
+            setPrayerTimes(newTimes);
+            lastFetchedDate.current = new Date().toLocaleString("en-GB");
+            setPrayersOutdated(false);
+            console.log("✅ Prayer times saved manually");
+        }
+    }, []);
+
+    // ------------------------------------------------------------
+    // Reload prayer times
+    // ------------------------------------------------------------
+    const reloadPrayerTimes = useCallback(async () => {
+        if (!appSettings?.location || !deviceSettings?.locationPermission) {
+            await resolveLocation();
+        }
+        await loadPrayerTimes();
+    }, [appSettings?.location, deviceSettings?.locationPermission]);
+
+    // ------------------------------------------------------------
+    // Computed value for hasPrayerTimes
+    // ------------------------------------------------------------
+    const hasPrayerTimes = useMemo(() => {
+        return prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0;
+    }, [prayerTimes]);
+
+    // ------------------------------------------------------------
+    // Auto-load on mount / settings changes
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!settingsLoading && appSettings?.location) {
+            loadPrayerTimes();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [settingsLoading, appSettings?.location, deviceSettings.internetConnection]);
+
+    // ------------------------------------------------------------
+    // Memoize context value to prevent unnecessary re-renders
+    // ------------------------------------------------------------
+    const contextValue = useMemo(() => ({
+        prayerTimes,
+        hasPrayerTimes,
+        savePrayerTimes,
+        prayersLoading,
+        prayersError,
+        prayersOutdated,
+        lastFetchedDate: lastFetchedDate.current,
+        reloadPrayerTimes,
+    }), [prayerTimes, hasPrayerTimes, savePrayerTimes, prayersLoading, prayersError, prayersOutdated, reloadPrayerTimes]);
+
     return (
-        <PrayersContext.Provider value={{
-            prayerTimes,
-            hasPrayerTimes: prayerTimes && typeof prayerTimes === 'object' && Object.keys(prayerTimes).length > 0,
-            savePrayerTimes,
-            prayersLoading,
-            prayersError,
-            prayersOutdated,
-            lastFetchedDate: lastFetchedDate.current,
-            reloadPrayerTimes,
-        }}>
+        <PrayersContext.Provider value={contextValue}>
             {children}
         </PrayersContext.Provider>
     );

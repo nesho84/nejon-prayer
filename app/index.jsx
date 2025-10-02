@@ -19,8 +19,6 @@ export default function OnboardingScreen() {
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
-  // Show loading if contexts or local operations are loading
-  const isLoading = settingsLoading || localLoading;
 
   // Refs for onboarding data
   const languageRef = useRef("en");
@@ -32,7 +30,7 @@ export default function OnboardingScreen() {
   // Onboarding check: Redirect once settings are loaded
   // ------------------------------------------------------------
   useEffect(() => {
-    if (!isLoading && appSettings?.onboarding) {
+    if (!settingsLoading && appSettings?.onboarding) {
       // Show HomeScreen (if already onboarded)
       router.replace("/(tabs)/HomeScreen");
     }
