@@ -240,27 +240,6 @@ const styles = StyleSheet.create({
         height: 1,
         marginVertical: 18,
     },
-    countdownCircle: {
-        width: 150,
-        height: 150,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 2,
-        borderRadius: 100,
-    },
-    countdownLabel: {
-        fontSize: 18,
-        fontWeight: "400",
-        marginBottom: 3,
-    },
-    countdownTime: {
-        fontSize: 24,
-        fontWeight: "500",
-    },
-    countdownHms: {
-        fontSize: 14,
-        fontWeight: "400",
-    },
     prayersList: {
         width: "100%",
         gap: 12,

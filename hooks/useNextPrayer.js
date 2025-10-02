@@ -10,25 +10,27 @@ export default function useNextPrayer(prayerTimes) {
     // ------------------------------------------------------------
     // Format time with leading zeros
     // ------------------------------------------------------------
-    const pad = n => String(n).padStart(2, "0");
+    const pad = (num) => String(num).padStart(2, "0");
 
     // ------------------------------------------------------------
-    // Find next prayer and setup countdown
+    // Compute next prayer based on current time
     // ------------------------------------------------------------
-    const updateNextPrayer = () => {
+    const computeNextPrayer = () => {
         if (!prayerTimes) return;
 
+        // Find next prayer today
         const now = new Date();
         let upcoming = null;
 
+        // loop through prayers in order
         const PRAYER_ORDER_SHORT = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
         for (const name of PRAYER_ORDER_SHORT) {
             if (!prayerTimes[name]) continue; // skip if missing
-
+            // Parse prayer time
             const [hour, minute] = prayerTimes[name].split(":").map(Number);
             const prayerDate = new Date();
             prayerDate.setHours(hour, minute, 0, 0);
-
+            // If prayer time is still upcoming
             if (prayerDate > now) {
                 upcoming = { name: name, time: prayerDate };
                 break; // stop at first upcoming prayer
@@ -44,22 +46,7 @@ export default function useNextPrayer(prayerTimes) {
             upcoming = { name: "Fajr", time: tomorrowFajr };
         }
 
-        if (!upcoming) return;
-
-        setNextPrayerName(upcoming.name);
-        setNextPrayerTime(upcoming.time);
-
-        const diffMs = upcoming.time - now;
-        const diffSec = Math.floor(diffMs / 1000);
-
-        setRemainingSeconds(diffSec);
-        setTotalSeconds(diffSec); // freeze "full duration" for progress
-
-        const hours = pad(Math.floor(diffSec / 3600));
-        const minutes = pad(Math.floor((diffSec % 3600) / 60));
-        const seconds = pad(diffSec % 60);
-
-        setPrayerCountdown({ hours, minutes, seconds });
+        return upcoming;
     };
 
     // ------------------------------------------------------------
@@ -68,25 +55,47 @@ export default function useNextPrayer(prayerTimes) {
     useEffect(() => {
         if (!prayerTimes) return;
 
-        updateNextPrayer(); // initial tick
+        // initial tick
+        const tick = () => {
+            // Determine upcoming prayer
+            let upcoming = nextPrayerTime ? { name: nextPrayerName, time: nextPrayerTime } : computeNextPrayer();
 
-        const interval = setInterval(() => {
-            setRemainingSeconds((prev) => {
-                if (prev === null) return null;
-                const newVal = prev > 0 ? prev - 1 : 0;
+            // No upcoming prayer found
+            if (!upcoming) return;
 
-                // Update formatted countdown too
-                const hours = pad(Math.floor(newVal / 3600));
-                const minutes = pad(Math.floor((newVal % 3600) / 60));
-                const seconds = pad(newVal % 60);
-                setPrayerCountdown({ hours, minutes, seconds });
+            // Calculate difference in seconds
+            const now = new Date();
+            let diffSec = Math.floor((upcoming.time - now) / 1000);
 
-                return newVal;
-            });
-        }, 1000)
+            // If countdown reached zero, compute next prayer
+            if (diffSec <= 0) {
+                upcoming = computeNextPrayer();
+                if (!upcoming) return;
+                diffSec = Math.floor((upcoming.time - now) / 1000);
+                setNextPrayerName(upcoming.name);
+                setNextPrayerTime(upcoming.time);
+                setTotalSeconds(diffSec); // reset full duration
+            }
 
+            // Format countdown
+            const hours = pad(Math.floor(diffSec / 3600));
+            const minutes = pad(Math.floor((diffSec % 3600) / 60));
+            const seconds = pad(diffSec % 60);
+
+            // Update state
+            setPrayerCountdown({ hours, minutes, seconds });
+            setRemainingSeconds(diffSec);
+
+            // Initialize totalSeconds if null
+            if (totalSeconds === null) setTotalSeconds(diffSec);
+        };
+
+        tick(); // initial call
+
+        // Set interval to tick every second
+        const interval = setInterval(tick, 1000);
         return () => clearInterval(interval);
-    }, [prayerTimes]);
+    }, [prayerTimes, nextPrayerName, nextPrayerTime, totalSeconds]);
 
     return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds };
 }
