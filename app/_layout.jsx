@@ -8,21 +8,21 @@ import { NotificationsProvider } from "@/contexts/NotificationsContext";
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <SettingsProvider>
-        <PrayersProvider>
-          <NotificationsProvider>
-            <SafeAreaProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <SettingsProvider>
+          <PrayersProvider>
+            <NotificationsProvider>
               <AppScreen>
                 <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
                   <Stack.Screen name="index" />
                   <Stack.Screen name="(tabs)" />
                 </Stack>
               </AppScreen>
-            </SafeAreaProvider>
-          </NotificationsProvider>
-        </PrayersProvider>
-      </SettingsProvider>
-    </ThemeProvider>
+            </NotificationsProvider>
+          </PrayersProvider>
+        </SettingsProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

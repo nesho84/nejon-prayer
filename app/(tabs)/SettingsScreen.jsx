@@ -244,8 +244,8 @@ export default function SettingsScreen() {
     // Main Content
     return (
         <ScrollView
-            style={styles.scrollContainer}
-            contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.bg }]}
+            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+            contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
         >
 
@@ -414,13 +414,12 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 12,
+        paddingBottom: 14,
+        gap: 10,
     },
     settingCard: {
         borderRadius: 8,
-        marginBottom: 12,
-        paddingHorizontal: 14,
-        paddingTop: 12,
-        paddingBottom: 14,
+        padding: 14,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,

@@ -8,8 +8,9 @@ import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import { testNotification } from "@/utils/testNotification";
 import AppLoading from "@/components/AppLoading";
-import AppScreen from "@/components/AppScreen";
 import CountdownCircle from "@/components/CountdownCircle";
+import { getDailyQuote } from "@/utils/dailyQuote";
+import { useMemo } from "react";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -21,6 +22,11 @@ export default function HomeScreen() {
     // Local state
     const isLoading = settingsLoading || prayersLoading;
     const hasError = settingsError || prayersError;
+
+    // Dynamic daily quote for the middle section
+    const dailyMessage = useMemo(() => {
+        return getDailyQuote(language, { random: true });
+    }, [language]);
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
@@ -107,8 +113,8 @@ export default function HomeScreen() {
     // Main Content
     return (
         <ScrollView
-            style={styles.scrollContainer}
-            contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.bg }]}
+            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+            contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
             refreshControl={
                 <RefreshControl
@@ -121,10 +127,10 @@ export default function HomeScreen() {
         >
 
             {/* Hero Header */}
-            <View style={[styles.heroHeader, { backgroundColor: theme.card }]}>
+            <View style={[styles.headerCard, { backgroundColor: theme.card }]}>
                 {/* Date + Timezone */}
-                <View style={styles.heroLocale}>
-                    <Text style={[styles.heroLocaleLabel, { color: theme.text2 }]}>
+                <View style={styles.headerLocale}>
+                    <Text style={[styles.headerLocaleLabel, { color: theme.text2 }]}>
                         {new Date().toLocaleDateString(tr("labels.localeDate"), {
                             weekday: "long",
                             day: "2-digit",
@@ -132,13 +138,13 @@ export default function HomeScreen() {
                             year: "numeric",
                         }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                     </Text>
-                    <Text style={[styles.heroTimezone, { color: theme.placeholder }]}>
+                    <Text style={[styles.headerTimezone, { color: theme.placeholder }]}>
                         {appSettings.timeZone?.subTitle || ""}
                     </Text>
                 </View>
 
                 {/* Divider */}
-                <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+                <View style={[styles.headerDivider, { backgroundColor: theme.divider2 }]} />
 
                 {/* Countdown Circle */}
                 {nextPrayerName && (
@@ -157,6 +163,13 @@ export default function HomeScreen() {
                 )}
             </View>
 
+            {/* Dynamic middle section */}
+            <View style={[styles.dynamicCard, { backgroundColor: theme.card }]}>
+                <Text style={[styles.dynamicCardText, { color: theme.text2 }]}>
+                    {dailyMessage}
+                </Text>
+            </View>
+
             {/* Prayer Times */}
             <View style={styles.prayersList}>
                 {Object.entries(prayerTimes || {}).map(([name, time]) => {
@@ -167,7 +180,7 @@ export default function HomeScreen() {
                         <View
                             key={name}
                             style={[
-                                styles.prayerRow,
+                                styles.prayerItem,
                                 { backgroundColor: theme.card },
                                 isNext && { borderWidth: 2, borderColor: theme.accent },
                             ]}
@@ -191,9 +204,9 @@ export default function HomeScreen() {
             </View>
 
             {/* Debug utility */}
-            <View style={{ marginTop: 20 }}>
-                <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
-            </View>
+            {/* <View style={{ marginTop: 20 }}>
+                    <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
+                </View> */}
 
         </ScrollView>
     );
@@ -205,49 +218,69 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
+        justifyContent: "flex-start",
         paddingHorizontal: 12,
+        paddingBottom: 14,
+        gap: 8,
     },
-    heroHeader: {
-        width: "100%",
+
+    // Header Card
+    headerCard: {
         alignItems: "center",
-        marginBottom: 14,
-        paddingVertical: 18,
+        padding: 16,
         borderRadius: 8,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
         elevation: 2,
     },
-    heroLocale: {
+    headerLocale: {
         alignItems: "center",
         justifyContent: "center",
         paddingHorizontal: 16,
-        paddingVertical: 0,
     },
-    heroLocaleLabel: {
+    headerLocaleLabel: {
         fontSize: 24,
         fontWeight: "600",
         marginBottom: 3,
     },
-    heroTimezone: {
+    headerTimezone: {
         fontSize: 13,
         fontWeight: "400",
     },
-    divider: {
+    headerDivider: {
         width: "85%",
         height: 1,
         marginVertical: 18,
     },
+
+    // Dynamic middle Card
+    dynamicCard: {
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 16,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    dynamicCardText: {
+        textAlign: "center",
+        opacity: 0.6,
+    },
+
+    // Prayer List with card items
     prayersList: {
         width: "100%",
-        gap: 10,
+        gap: 8,
     },
-    prayerRow: {
+    prayerItem: {
         flexDirection: "row",
-        justifyContent: "space-between",
         alignItems: "center",
-        paddingVertical: 14,
-        paddingHorizontal: 16,
+        justifyContent: "space-between",
+        padding: 12,
         borderRadius: 8,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -267,6 +300,8 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "500",
     },
+
+    // Error / Empty States
     errorContainer: {
         flex: 1,
         padding: 24,
