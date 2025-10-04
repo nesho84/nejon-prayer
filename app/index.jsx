@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
@@ -8,7 +8,6 @@ import { useSettingsContext } from "@/contexts/SettingsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { formatAddress, getTimeZone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
-import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
 
 export default function OnboardingScreen() {
@@ -174,25 +173,16 @@ export default function OnboardingScreen() {
             Select your preferred language to continue
           </Text>
           <View style={styles.inputArea}>
-            {Platform.OS === "android" ? (
-              <Picker
-                selectedValue={languageRef.current}
-                onValueChange={(value) => (languageRef.current = value)}
-                dropdownIconColor={theme.text}
-                style={{ color: theme.text }}
-              >
-                <Picker.Item label="English" value="en" />
-                <Picker.Item label="Shqip" value="sq" />
-                <Picker.Item label="Deutsch" value="de" />
-              </Picker>
-            ) : (
-              <TouchableOpacity
-                style={[styles.pickerButton, { backgroundColor: theme.card }]}
-                onPress={() => Alert.alert("iOS", "Implement picker for iOS")}
-              >
-                <Text style={{ color: theme.text }}>Language: {languageRef.current}</Text>
-              </TouchableOpacity>
-            )}
+            <Picker
+              selectedValue={languageRef.current}
+              onValueChange={(value) => (languageRef.current = value)}
+              dropdownIconColor={theme.text}
+              style={{ color: theme.text }}
+            >
+              <Picker.Item label="English" value="en" />
+              <Picker.Item label="Shqip" value="sq" />
+              <Picker.Item label="Deutsch" value="de" />
+            </Picker>
           </View>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.primary }]}

@@ -68,8 +68,9 @@ export default function CountdownCircle({
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: "center",
+        alignSelf: "center",
         alignItems: "center",
+        justifyContent: "center",
         position: "relative",
     },
     innerContainer: {
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     prayerName: {
-        fontSize: 22,
+        fontSize: 18,
         marginBottom: 3,
     },
     prayerTime: {

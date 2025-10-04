@@ -1,51 +1,60 @@
 import * as Location from "expo-location";
 
 // ------------------------------------------------------------
-// Reverse-geocodes given coordinates into a human-readable timezone.
+// Get timezone and location information from device coordinates
 // ------------------------------------------------------------
 export async function getTimeZone(location) {
     try {
-        // ✅ Location Permission check
+        // Validate location services
         const locationEnabled = await Location.hasServicesEnabledAsync();
         if (!locationEnabled) {
-            console.warn("Location Access Denied");
+            console.warn("Location services are disabled");
             return null;
         }
 
-        // ✅ Add safety check at the beginning
         if (!location?.latitude || !location?.longitude) {
-            console.warn("getTimeZone: Invalid location provided", location);
+            console.warn("Invalid location coordinates", location);
             return null;
         }
 
-        // Reverse geocode → get human-readable address
+        // Get location details from coordinates
         const [place] = await Location.reverseGeocodeAsync({
             latitude: location.latitude,
             longitude: location.longitude,
         });
 
         const city = place?.city || place?.region || "";
-        const area = place?.district || place?.name || "";
         const country = place?.country || "";
 
-        // Timezone lookup → with Intl.DateTimeFormat
+        // Get system timezone (actual IANA timezone)
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const now = new Date();
-        const userLocale = "en-DE"; // or detect from device
 
-        const fullTimeZoneName = new Intl.DateTimeFormat(userLocale, {
+        // Get human-readable timezone name
+        const zoneName = new Intl.DateTimeFormat("en-GB", {
+            timeZone: timezone,
             timeZoneName: "long",
-        }).formatToParts(now).find((p) => p.type === "timeZoneName")?.value;
+        }).formatToParts(now).find((part) => part.type === "timeZoneName")?.value || "";
 
-        const tzOffset = new Intl.DateTimeFormat("en-DE", {
+        // Get UTC offset (e.g., "GMT+2")
+        const offset = new Intl.DateTimeFormat("en-GB", {
+            timeZone: timezone,
             timeZoneName: "shortOffset",
-        }).format(now).split(" ").pop();
+        }).format(now).split(" ").pop() || "";
+
+        // Build location display string
+        const locationName = [city, country].filter(Boolean).join(", ");
 
         return {
-            title: fullTimeZoneName,
-            subTitle: `Time zone in ${area || city}, ${country} (${tzOffset})`,
-        }
+            timezone,               // "Europe/Berlin" (IANA timezone)
+            zoneName,               // "Central European Summer Time"
+            offset,                 // "GMT+2"
+            city,                   // "Vienna"
+            country,                // "Austria"
+            location: locationName, // "Vienna, Austria"
+        };
     } catch (err) {
-        console.error("❌ Location formatting error:", err);
+        console.error("❌ Failed to get timezone information:", err);
         return null;
     }
 }

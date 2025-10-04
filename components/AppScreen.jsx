@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useThemeContext } from "@/contexts/ThemeContext";
@@ -14,15 +14,25 @@ export default function AppScreen({ children }) {
     // Automatically ignore bottom if inside tabs
     const ignoreBottom = segments.includes("(tabs)");
 
+    // Fix for Android 14+ safe area regression
+    const topInset =
+        Platform.OS === "android" && (!insets.top || insets.top < 24)
+            ? StatusBar.currentHeight || 24
+            : insets.top;
+
     return (
         <>
             <StatusBar style={barStyle} />
             <SafeAreaView
                 style={[
                     styles.container,
-                    { backgroundColor: theme.bg, paddingBottom: ignoreBottom ? 0 : insets.bottom }
+                    {
+                        backgroundColor: theme.bg,
+                        paddingTop: topInset,
+                        paddingBottom: ignoreBottom ? 0 : insets.bottom
+                    }
                 ]}
-                edges={['top', 'left', 'right']} // bottom handled manually
+                edges={['left', 'right']}
             >
                 {children}
             </SafeAreaView>

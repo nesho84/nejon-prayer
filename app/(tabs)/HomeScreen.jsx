@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -6,27 +7,22 @@ import { useSettingsContext } from '@/contexts/SettingsContext';
 import { usePrayersContext } from '@/contexts/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
-import { testNotification } from "@/utils/testNotification";
-import AppLoading from "@/components/AppLoading";
-import CountdownCircle from "@/components/CountdownCircle";
 import { getDailyQuote } from "@/utils/dailyQuote";
-import { useMemo } from "react";
+import AppLoading from "@/components/AppLoading";
+import AppCard from "@/components/AppCard";
+import CountdownCircle from "@/components/CountdownCircle";
+import { testNotification } from "@/utils/testNotification";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
     const { tr, language } = useTranslation();
-    const { appSettings, settingsLoading, settingsError } = useSettingsContext();
+    const { appSettings, deviceSettings, settingsLoading, settingsError } = useSettingsContext();
     const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
     const { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
 
     // Local state
     const isLoading = settingsLoading || prayersLoading;
     const hasError = settingsError || prayersError;
-
-    // Dynamic daily quote for the middle section
-    const dailyMessage = useMemo(() => {
-        return getDailyQuote(language, { random: true });
-    }, [language]);
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
@@ -38,6 +34,13 @@ export default function HomeScreen() {
             console.warn("Prayer times refresh failed:", err);
         }
     };
+
+    // ------------------------------------------------------------
+    // Dynamic daily quote for the middle section
+    // ------------------------------------------------------------
+    const dailyMessage = useMemo(() => {
+        return getDailyQuote(language, { random: true });
+    }, [language]);
 
     // ------------------------------------------------------------
     // Prayer icon resolver
@@ -126,27 +129,18 @@ export default function HomeScreen() {
             }
         >
 
-            {/* Hero Header */}
-            <View style={[styles.headerCard, { backgroundColor: theme.card }]}>
-                {/* Date + Timezone */}
-                <View style={styles.headerLocale}>
-                    <Text style={[styles.headerLocaleLabel, { color: theme.text2 }]}>
-                        {new Date().toLocaleDateString(tr("labels.localeDate"), {
-                            weekday: "long",
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                        }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
-                    </Text>
-                    <Text style={[styles.headerTimezone, { color: theme.placeholder }]}>
-                        {appSettings.timeZone?.subTitle || ""}
+            {/* 1. LOCATION HEADER */}
+            <View style={styles.locationRow}>
+                <View style={styles.locationLeft}>
+                    <Ionicons name="location-outline" size={18} color={theme.accent} />
+                    <Text style={[styles.locationText, { color: theme.text2 }]}>
+                        {appSettings.timeZone?.location || "Location"}
                     </Text>
                 </View>
+            </View>
 
-                {/* Divider */}
-                <View style={[styles.headerDivider, { backgroundColor: theme.divider2 }]} />
-
-                {/* Countdown Circle */}
+            {/* 2. COUNTDOWN CIRCLE CARD */}
+            <AppCard style={styles.countdownCard}>
                 {nextPrayerName && (
                     <CountdownCircle
                         nextPrayerName={nextPrayerName}
@@ -156,52 +150,95 @@ export default function HomeScreen() {
                         theme={theme}
                         tr={tr}
                         size={160}
-                        strokeWidth={8}
+                        strokeWidth={6}
                         backgroundColor={theme.border}
                         color={theme.accent}
                     />
                 )}
-            </View>
+            </AppCard>
 
-            {/* Dynamic middle section */}
-            <View style={[styles.dynamicCard, { backgroundColor: theme.card }]}>
-                <Text style={[styles.dynamicCardText, { color: theme.text2 }]}>
+            {/* 3. QUOTES/MESSAGE CARD */}
+            <AppCard style={styles.quotesCard}>
+                <View style={styles.quotesHeader}>
+                    <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
+                    <Ionicons name="book-outline" size={18} color={theme.accent} />
+                    <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
+                </View>
+                <Text style={[styles.quotesText, { color: theme.text2 }]}>
                     {dailyMessage}
                 </Text>
-            </View>
+            </AppCard>
 
-            {/* Prayer Times */}
-            <View style={styles.prayersList}>
-                {Object.entries(prayerTimes || {}).map(([name, time]) => {
-                    const isNext = nextPrayerName === name;
-                    const iconData = resolvePrayerIcon(name);
-                    const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
-                    return (
-                        <View
-                            key={name}
-                            style={[
-                                styles.prayerItem,
-                                { backgroundColor: theme.card },
-                                isNext && { borderWidth: 2, borderColor: theme.accent },
-                            ]}
-                        >
-                            <View style={styles.prayerLeft}>
-                                <IconComponent
-                                    name={iconData.name}
-                                    size={24}
-                                    color={isNext ? theme.accent : theme.text2}
-                                />
-                                <Text style={[styles.prayerName, { color: isNext ? theme.accent : theme.text }]}>
-                                    {tr(`prayers.${name}`) || name}
-                                </Text>
+            {/* 4. PRAYER TIMES CARD */}
+            <AppCard style={styles.prayerCard}>
+                {/* Date Header */}
+                <View style={styles.dateHeader}>
+                    <Text style={[styles.dateText, { color: theme.text }]}>
+                        {new Date().toLocaleDateString(tr("labels.localeDate"), {
+                            weekday: "long",
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                        }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
+                    </Text>
+                    <Text style={[styles.timezoneInfo, { color: theme.text2 }]}>
+                        {appSettings.timeZone?.zoneName || ""}
+                    </Text>
+                </View>
+
+                {/* Divider */}
+                <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
+
+                {/* Prayer Times */}
+                <View style={styles.prayerTable}>
+                    {Object.entries(prayerTimes || {}).map(([name, time], index) => {
+                        const isNext = nextPrayerName === name;
+                        const iconData = resolvePrayerIcon(name);
+                        const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
+                        const isLast = index === Object.entries(prayerTimes || {}).length - 1;
+
+                        return (
+                            <View key={name}>
+                                <View
+                                    style={[
+                                        styles.prayerRow,
+                                        isNext && [
+                                            styles.prayerRowActive,
+                                            { backgroundColor: theme.accentLight, borderLeftColor: theme.accent }
+                                        ]
+                                    ]}
+                                >
+                                    {/* Prayer Name */}
+                                    <View style={styles.prayerNameSection}>
+                                        <IconComponent name={iconData.name} size={20} color={isNext ? theme.accent : theme.text2} />
+                                        <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
+                                            {tr(`prayers.${name}`) || name}
+                                        </Text>
+                                    </View>
+
+                                    {/* Prayer Time */}
+                                    <View style={styles.prayerTimeSection}>
+                                        <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
+                                            {time}
+                                        </Text>
+                                        <Ionicons
+                                            name={deviceSettings.notificationPermission ? "notifications-outline" : "notifications-off-outline"}
+                                            size={20}
+                                            color={theme.text2}
+                                            style={{ opacity: 0.5 }}
+                                        />
+                                    </View>
+                                </View>
+
+                                {/* Prayer Divider */}
+                                {!isLast && (
+                                    <View style={[styles.prayerDivider, { backgroundColor: theme.divider2 }]} />
+                                )}
                             </View>
-                            <Text style={[styles.prayerTime, { color: isNext ? theme.accent : theme.text2 }]}>
-                                {time}
-                            </Text>
-                        </View>
-                    );
-                })}
-            </View>
+                        );
+                    })}
+                </View>
+            </AppCard>
 
             {/* Debug utility */}
             {/* <View style={{ marginTop: 20 }}>
@@ -218,87 +255,123 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        justifyContent: "flex-start",
-        paddingHorizontal: 12,
-        paddingBottom: 14,
-        gap: 8,
-    },
-
-    // Header Card
-    headerCard: {
-        alignItems: "center",
-        padding: 16,
-        borderRadius: 8,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-    headerLocale: {
-        alignItems: "center",
-        justifyContent: "center",
         paddingHorizontal: 16,
-    },
-    headerLocaleLabel: {
-        fontSize: 24,
-        fontWeight: "600",
-        marginBottom: 3,
-    },
-    headerTimezone: {
-        fontSize: 13,
-        fontWeight: "400",
-    },
-    headerDivider: {
-        width: "85%",
-        height: 1,
-        marginVertical: 18,
+        paddingTop: 12,
+        paddingBottom: 20,
+        gap: 16,
     },
 
-    // Dynamic middle Card
-    dynamicCard: {
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 16,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
+    // Location Row
+    locationRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
-    dynamicCardText: {
-        textAlign: "center",
-        opacity: 0.6,
+    locationLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    locationText: {
+        fontSize: 15,
+        fontWeight: '500',
+    },
+    refreshButton: {
+        padding: 4,
     },
 
-    // Prayer List with card items
-    prayersList: {
-        width: "100%",
+    // Countdown Card
+    countdownCard: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 20,
+    },
+
+    // Quotes Card
+    quotesCard: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+    },
+    quotesHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 8,
+        marginBottom: 8,
     },
-    prayerItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: 12,
-        borderRadius: 8,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 1,
+    decorativeLine: {
+        height: 1,
+        flex: 1,
+        opacity: 0.3,
     },
-    prayerLeft: {
-        flexDirection: "row",
-        alignItems: "center",
+    quotesText: {
+        fontSize: 14,
+        lineHeight: 22,
+        textAlign: 'center',
+        fontStyle: 'italic',
+        opacity: 0.75,
     },
-    prayerName: {
-        fontSize: 18,
-        fontWeight: "600",
-        paddingLeft: 8,
+
+    // Prayer Card
+    prayerCard: {
+        borderRadius: 16,
+        overflow: 'hidden',
     },
-    prayerTime: {
-        fontSize: 17,
-        fontWeight: "500",
+    // Date Header
+    dateHeader: {
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+    },
+    dateText: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    timezoneInfo: {
+        fontSize: 13,
+        opacity: 0.7,
+    },
+    fullDivider: {
+        height: 1,
+        width: '100%',
+    },
+    // Prayer Table
+    prayerTable: {
+        paddingVertical: 8,
+    },
+    prayerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 14,
+        paddingHorizontal: 18,
+    },
+    prayerRowActive: {
+        borderLeftWidth: 3,
+        paddingLeft: 15,
+    },
+    prayerNameSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    prayerNameText: {
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    prayerTimeSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    prayerTimeText: {
+        fontSize: 16,
+        fontWeight: '600',
+        letterSpacing: 0.3,
+    },
+    prayerDivider: {
+        height: 1,
+        marginHorizontal: 18,
     },
 
     // Error / Empty States

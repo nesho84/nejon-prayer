@@ -17,7 +17,7 @@ import useTranslation from "@/hooks/useTranslation";
 export const NotificationsContext = createContext();
 
 export function NotificationsProvider({ children }) {
-    const PRAYER_ORDER_SHORT = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+    const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
     const { appSettings, deviceSettings, settingsLoading } = useSettingsContext();
     const { prayerTimes, prayersLoading, hasPrayerTimes } = usePrayersContext();
@@ -74,7 +74,7 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     const isSchedulingUpToDate = async (times) => {
         const scheduled = await notifee.getTriggerNotifications();
-        return PRAYER_ORDER_SHORT.every(prayerName => {
+        return PRAYER_ORDER.every(prayerName => {
             const timeStringRaw = times[prayerName];
             if (!timeStringRaw) return true; // skip missing
 
@@ -136,7 +136,7 @@ export function NotificationsProvider({ children }) {
             const now = new Date();
             let scheduledCount = 0;
 
-            for (const prayerName of PRAYER_ORDER_SHORT) {
+            for (const prayerName of PRAYER_ORDER) {
                 const timeStringRaw = times[prayerName];
                 if (!timeStringRaw) {
                     console.log(`⚠️ No time for ${prayerName}`);

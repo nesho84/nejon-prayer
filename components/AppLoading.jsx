@@ -1,14 +1,21 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useThemeContext } from "@/contexts/ThemeContext";
 
-export default function AppLoading({ text = "Loading..." }) {
+export default function AppLoading({ text = "Loading...", style, ...otherProps }) {
     const { theme } = useThemeContext();
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.bg }]}>
+        <View
+            style={[
+                styles.container,
+                { backgroundColor: theme.bg },
+                style
+            ]}
+            {...otherProps}
+        >
             <ActivityIndicator size="large" color={theme.accent} />
             <Text style={[styles.loadingText, { color: theme.placeholder }]}>
-                {text || "Loading..."}
+                {text}
             </Text>
         </View>
     );

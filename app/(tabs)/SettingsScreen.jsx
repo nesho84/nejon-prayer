@@ -22,7 +22,7 @@ import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { formatAddress, getTimeZone } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
-import AppScreen from "@/components/AppScreen";
+import AppCard from "@/components/AppCard";
 
 export default function SettingsScreen() {
     const { theme, themeMode, changeTheme } = useThemeContext();
@@ -111,7 +111,7 @@ export default function SettingsScreen() {
             }
 
             const newFullAddress = await formatAddress(loc.coords);
-            const newTimeZone = await getTimeZone(loc.coords); // not used!
+            const newTimeZone = await getTimeZone(loc.coords);
 
             // Save settings
             await saveAppSettings({
@@ -250,7 +250,7 @@ export default function SettingsScreen() {
         >
 
             {/* Theme Setting */}
-            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            <AppCard style={styles.settingCard}>
                 <Text style={[styles.settingTitle, { color: theme.text }]}>
                     {tr("labels.theme")}
                 </Text>
@@ -266,10 +266,10 @@ export default function SettingsScreen() {
                     <Picker.Item label="Light" value="light" />
                     <Picker.Item label="System" value="system" />
                 </Picker>
-            </View>
+            </AppCard>
 
             {/* Language Setting */}
-            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            <AppCard style={styles.settingCard}>
                 <Text style={[styles.settingTitle, { color: theme.text }]}>
                     {tr("labels.language")}
                 </Text>
@@ -285,10 +285,10 @@ export default function SettingsScreen() {
                     <Picker.Item label="Shqip" value="sq" />
                     <Picker.Item label="Deutsch" value="de" />
                 </Picker>
-            </View>
+            </AppCard>
 
             {/* Location Setting */}
-            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            <AppCard style={styles.settingCard}>
                 <View style={styles.statusRow}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.location")}
@@ -319,10 +319,10 @@ export default function SettingsScreen() {
                         {appSettings.fullAddress || (tr("labels.loading"))}
                     </Text>
                 )}
-            </View>
+            </AppCard>
 
             {/* Notifications Settings */}
-            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            <AppCard style={styles.settingCard}>
                 <View style={styles.statusRow}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.notifications")}
@@ -341,7 +341,7 @@ export default function SettingsScreen() {
                 <>
                     <View style={styles.statusRow}>
                         <Text style={[styles.statusText, { color: theme.text }]}>
-                            {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅ Unrestricted"}
+                            {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅"}
                         </Text>
                         <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
                             <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
@@ -370,10 +370,10 @@ export default function SettingsScreen() {
                         </Text>
                     </>
                 }
-            </View>
+            </AppCard>
 
             {/* Prayer Times Status */}
-            <View style={[styles.settingCard, { backgroundColor: theme.card }]}>
+            <AppCard style={styles.settingCard}>
                 <Text style={[styles.settingTitle, { color: theme.text }]}>
                     {tr("labels.prayerTimesStatus")}
                 </Text>
@@ -401,7 +401,7 @@ export default function SettingsScreen() {
                         </Text>
                     </>
                 }
-            </View>
+            </AppCard>
 
         </ScrollView>
     );
@@ -413,17 +413,15 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 12,
-        paddingBottom: 14,
-        gap: 10,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 20,
+        gap: 16,
     },
+
+    // Settings Card
     settingCard: {
-        borderRadius: 8,
         padding: 14,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 1,
     },
     settingTitle: {
         fontSize: 18,
@@ -450,6 +448,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginVertical: 8,
     },
+
+    // Location
     updateLocationButton: {
         alignItems: 'center',
         padding: 10,
@@ -467,6 +467,8 @@ const styles = StyleSheet.create({
     fetchedDateText: {
         fontSize: 12,
     },
+
+    // Error / Empty States
     errorContainer: {
         flex: 1,
         padding: 24,

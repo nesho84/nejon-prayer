@@ -13,6 +13,7 @@ export const lightTheme = {
     primary: "#2563eb",
     secondary: "#0ea5e9",
     accent: "#d97706",
+    accentLight: '#f59e0b26', // 15% opacity
     highlight: "#22c55e",
 
     // Status colors
@@ -59,6 +60,7 @@ export const darkTheme = {
     primary: "#3b82f6",
     secondary: "#38bdf8",
     accent: "#fbbe24e1",
+    accentLight: '#f59e0b26', // 15% opacity
     highlight: "#22c55e",
 
     // Status colors
