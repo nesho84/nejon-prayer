@@ -31,7 +31,7 @@ export default function OnboardingScreen() {
   useEffect(() => {
     if (!settingsLoading && appSettings?.onboarding) {
       // Show HomeScreen (if already onboarded)
-      router.replace("/(tabs)/HomeScreen");
+      router.replace("/(tabs)/home");
     }
   }, [settingsLoading, appSettings?.onboarding]);
 
@@ -137,7 +137,7 @@ export default function OnboardingScreen() {
       });
 
       // Redirect to HomeScreen
-      router.replace("/(tabs)/HomeScreen");
+      router.replace("/(tabs)/home");
     } catch (err) {
       console.error("❌ Onboarding error:", err);
       Alert.alert("Error", "Failed to finish onboarding. Please try again.");

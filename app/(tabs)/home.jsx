@@ -182,7 +182,7 @@ export default function HomeScreen() {
                         }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                     </Text>
                     <Text style={[styles.timezoneInfo, { color: theme.text2 }]}>
-                        {appSettings.timeZone?.zoneName || ""}
+                        {appSettings.timeZone?.zoneName || ""} • {appSettings.timeZone?.offset || ""}
                     </Text>
                 </View>
 
@@ -204,7 +204,7 @@ export default function HomeScreen() {
                                         styles.prayerRow,
                                         isNext && [
                                             styles.prayerRowActive,
-                                            { backgroundColor: theme.accentLight, borderLeftColor: theme.accent }
+                                            { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
                                         ]
                                     ]}
                                 >
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     timezoneInfo: {
-        fontSize: 13,
+        fontSize: 12,
         opacity: 0.7,
     },
     fullDivider: {
@@ -348,7 +348,9 @@ const styles = StyleSheet.create({
     },
     prayerRowActive: {
         borderLeftWidth: 3,
-        paddingLeft: 15,
+        borderRightWidth: 3,
+        marginVertical: 3,
+        paddingHorizontal: 15,
     },
     prayerNameSection: {
         flexDirection: 'row',

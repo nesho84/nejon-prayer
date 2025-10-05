@@ -1,14 +1,17 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Tabs, useSegments } from "expo-router";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-
+import { MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
     const insets = useSafeAreaInsets();
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
+    const segments = useSegments();
+
+    // Hide tab bar if we're deeper than 2 levels in "more"
+    const hideTabBar = segments[0] === "(tabs)" && segments[1] === "more" && segments[2];
 
     return (
         <Tabs
@@ -19,28 +22,50 @@ export default function TabLayout() {
                     backgroundColor: theme.bg,
                     height: insets.bottom + 53,
                     elevation: 0,
+                    display: hideTabBar ? 'none' : 'flex',
                 },
             }}
         >
             <Tabs.Screen
-                name="HomeScreen"
+                name="home"
                 options={{
                     title: tr("labels.home"),
-                    tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <McIcons name={focused ? "home" : "home-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="SettingsScreen"
+                name="qibla"
+                options={{
+                    title: "Qibla",
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <McIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="settings"
                 options={{
                     title: tr("labels.settings"),
-                    tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <McIcons name={focused ? "cog" : "cog-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
-                name="AboutScreen"
+                name="about"
                 options={{
+                    // href: null,
                     title: tr("labels.about"),
-                    tabBarIcon: ({ color, size }) => <Ionicons name="information-circle-outline" size={size} color={color} />,
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <McIcons name={focused ? "information" : "information-outline"} size={size} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="more"
+                options={{
+                    title: "More",
+                    headerShown: false,
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <McIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
                 }}
             />
         </Tabs>

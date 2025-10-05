@@ -14,7 +14,12 @@ export default function RootLayout() {
           <PrayersProvider>
             <NotificationsProvider>
               <AppScreen>
-                <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: "fade",
+                    contentStyle: { backgroundColor: '#000' }
+                  }}>
                   <Stack.Screen name="index" />
                   <Stack.Screen name="(tabs)" />
                 </Stack>

@@ -11,8 +11,11 @@ export default function AppScreen({ children }) {
     const insets = useSafeAreaInsets();
     const segments = useSegments();
 
-    // Automatically ignore bottom if inside tabs
     const ignoreBottom = segments.includes("(tabs)");
+    const insideOtherStack = segments.includes("more");
+
+    // Check if inside "more" stack
+    const hasNativeHeader = insideOtherStack;
 
     // Fix for Android 14+ safe area regression
     const topInset =
@@ -28,7 +31,7 @@ export default function AppScreen({ children }) {
                     styles.container,
                     {
                         backgroundColor: theme.bg,
-                        paddingTop: topInset,
+                        paddingTop: hasNativeHeader ? 0 : topInset,
                         paddingBottom: ignoreBottom ? 0 : insets.bottom
                     }
                 ]}
