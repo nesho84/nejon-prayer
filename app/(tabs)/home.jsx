@@ -8,6 +8,7 @@ import { usePrayersContext } from '@/contexts/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import { getDailyQuote } from "@/utils/dailyQuote";
+import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
@@ -115,137 +116,139 @@ export default function HomeScreen() {
 
     // Main Content
     return (
-        <ScrollView
-            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-                <RefreshControl
-                    refreshing={prayersLoading || settingsLoading}
-                    onRefresh={handleRefresh}
-                    tintColor={theme.accent}
-                    colors={[theme.accent]}
-                />
-            }
-        >
-
-            {/* 1. LOCATION HEADER */}
-            <View style={styles.locationRow}>
-                <View style={styles.locationLeft}>
-                    <Ionicons name="location-outline" size={18} color={theme.accent} />
-                    <Text style={[styles.locationText, { color: theme.text2 }]}>
-                        {appSettings.timeZone?.location || "Location"}
-                    </Text>
-                </View>
-            </View>
-
-            {/* 2. COUNTDOWN CIRCLE CARD */}
-            <AppCard style={styles.countdownCard}>
-                {nextPrayerName && (
-                    <CountdownCircle
-                        nextPrayerName={nextPrayerName}
-                        prayerCountdown={prayerCountdown}
-                        remainingSeconds={remainingSeconds}
-                        totalSeconds={totalSeconds}
-                        theme={theme}
-                        tr={tr}
-                        size={160}
-                        strokeWidth={6}
-                        backgroundColor={theme.border}
-                        color={theme.accent}
+        <AppScreen>
+            <ScrollView
+                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={prayersLoading || settingsLoading}
+                        onRefresh={handleRefresh}
+                        tintColor={theme.accent}
+                        colors={[theme.accent]}
                     />
-                )}
-            </AppCard>
+                }
+            >
 
-            {/* 3. QUOTES/MESSAGE CARD */}
-            <AppCard style={styles.quotesCard}>
-                <View style={styles.quotesHeader}>
-                    <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
-                    <Ionicons name="book-outline" size={18} color={theme.accent} />
-                    <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
-                </View>
-                <Text style={[styles.quotesText, { color: theme.text2 }]}>
-                    {dailyMessage}
-                </Text>
-            </AppCard>
-
-            {/* 4. PRAYER TIMES CARD */}
-            <AppCard style={styles.prayerCard}>
-                {/* Date Header */}
-                <View style={styles.dateHeader}>
-                    <Text style={[styles.dateText, { color: theme.text }]}>
-                        {new Date().toLocaleDateString(tr("labels.localeDate"), {
-                            weekday: "long",
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                        }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
-                    </Text>
-                    <Text style={[styles.timezoneInfo, { color: theme.text2 }]}>
-                        {appSettings.timeZone?.zoneName || ""} • {appSettings.timeZone?.offset || ""}
-                    </Text>
+                {/* 1. LOCATION HEADER */}
+                <View style={styles.locationRow}>
+                    <View style={styles.locationLeft}>
+                        <Ionicons name="location-outline" size={18} color={theme.accent} />
+                        <Text style={[styles.locationText, { color: theme.text2 }]}>
+                            {appSettings.timeZone?.location || "Location"}
+                        </Text>
+                    </View>
                 </View>
 
-                {/* Divider */}
-                <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
+                {/* 2. COUNTDOWN CIRCLE CARD */}
+                <AppCard style={styles.countdownCard}>
+                    {nextPrayerName && (
+                        <CountdownCircle
+                            nextPrayerName={nextPrayerName}
+                            prayerCountdown={prayerCountdown}
+                            remainingSeconds={remainingSeconds}
+                            totalSeconds={totalSeconds}
+                            theme={theme}
+                            tr={tr}
+                            size={160}
+                            strokeWidth={6}
+                            backgroundColor={theme.border}
+                            color={theme.accent}
+                        />
+                    )}
+                </AppCard>
 
-                {/* Prayer Times */}
-                <View style={styles.prayerTable}>
-                    {Object.entries(prayerTimes || {}).map(([name, time], index) => {
-                        const isNext = nextPrayerName === name;
-                        const iconData = resolvePrayerIcon(name);
-                        const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
-                        const isLast = index === Object.entries(prayerTimes || {}).length - 1;
+                {/* 3. QUOTES/MESSAGE CARD */}
+                <AppCard style={styles.quotesCard}>
+                    <View style={styles.quotesHeader}>
+                        <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
+                        <Ionicons name="book-outline" size={18} color={theme.accent} />
+                        <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
+                    </View>
+                    <Text style={[styles.quotesText, { color: theme.text2 }]}>
+                        {dailyMessage}
+                    </Text>
+                </AppCard>
 
-                        return (
-                            <View key={name}>
-                                <View
-                                    style={[
-                                        styles.prayerRow,
-                                        isNext && [
-                                            styles.prayerRowActive,
-                                            { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
-                                        ]
-                                    ]}
-                                >
-                                    {/* Prayer Name */}
-                                    <View style={styles.prayerNameSection}>
-                                        <IconComponent name={iconData.name} size={20} color={isNext ? theme.accent : theme.text2} />
-                                        <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
-                                            {tr(`prayers.${name}`) || name}
-                                        </Text>
+                {/* 4. PRAYER TIMES CARD */}
+                <AppCard style={styles.prayerCard}>
+                    {/* Date Header */}
+                    <View style={styles.dateHeader}>
+                        <Text style={[styles.dateText, { color: theme.text }]}>
+                            {new Date().toLocaleDateString(tr("labels.localeDate"), {
+                                weekday: "long",
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                            }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
+                        </Text>
+                        <Text style={[styles.timezoneInfo, { color: theme.text2 }]}>
+                            {appSettings.timeZone?.zoneName || ""} • {appSettings.timeZone?.offset || ""}
+                        </Text>
+                    </View>
+
+                    {/* Divider */}
+                    <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
+
+                    {/* Prayer Times */}
+                    <View style={styles.prayerTable}>
+                        {Object.entries(prayerTimes || {}).map(([name, time], index) => {
+                            const isNext = nextPrayerName === name;
+                            const iconData = resolvePrayerIcon(name);
+                            const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
+                            const isLast = index === Object.entries(prayerTimes || {}).length - 1;
+
+                            return (
+                                <View key={name}>
+                                    <View
+                                        style={[
+                                            styles.prayerRow,
+                                            isNext && [
+                                                styles.prayerRowActive,
+                                                { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
+                                            ]
+                                        ]}
+                                    >
+                                        {/* Prayer Name */}
+                                        <View style={styles.prayerNameSection}>
+                                            <IconComponent name={iconData.name} size={20} color={isNext ? theme.accent : theme.text2} />
+                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
+                                                {tr(`prayers.${name}`) || name}
+                                            </Text>
+                                        </View>
+
+                                        {/* Prayer Time */}
+                                        <View style={styles.prayerTimeSection}>
+                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
+                                                {time}
+                                            </Text>
+                                            <Ionicons
+                                                name={deviceSettings.notificationPermission ? "notifications-outline" : "notifications-off-outline"}
+                                                size={20}
+                                                color={theme.text2}
+                                                style={{ opacity: 0.5 }}
+                                            />
+                                        </View>
                                     </View>
 
-                                    {/* Prayer Time */}
-                                    <View style={styles.prayerTimeSection}>
-                                        <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
-                                            {time}
-                                        </Text>
-                                        <Ionicons
-                                            name={deviceSettings.notificationPermission ? "notifications-outline" : "notifications-off-outline"}
-                                            size={20}
-                                            color={theme.text2}
-                                            style={{ opacity: 0.5 }}
-                                        />
-                                    </View>
+                                    {/* Prayer Divider */}
+                                    {!isLast && (
+                                        <View style={[styles.prayerDivider, { backgroundColor: theme.divider2 }]} />
+                                    )}
                                 </View>
+                            );
+                        })}
+                    </View>
+                </AppCard>
 
-                                {/* Prayer Divider */}
-                                {!isLast && (
-                                    <View style={[styles.prayerDivider, { backgroundColor: theme.divider2 }]} />
-                                )}
-                            </View>
-                        );
-                    })}
-                </View>
-            </AppCard>
-
-            {/* Debug utility */}
-            {/* <View style={{ marginTop: 20 }}>
+                {/* Debug utility */}
+                {/* <View style={{ marginTop: 20 }}>
                     <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
                 </View> */}
 
-        </ScrollView>
+            </ScrollView>
+        </AppScreen>
     );
 }
 

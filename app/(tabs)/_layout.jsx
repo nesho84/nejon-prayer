@@ -1,5 +1,5 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Tabs, useSegments } from "expo-router";
+import { Tabs } from "expo-router";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 import { MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
@@ -8,21 +8,18 @@ export default function TabLayout() {
     const insets = useSafeAreaInsets();
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
-    const segments = useSegments();
-
-    // Hide tab bar if we're deeper than 2 levels in "more"
-    const hideTabBar = segments[0] === "(tabs)" && segments[1] === "more" && segments[2];
 
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
                 tabBarActiveTintColor: theme.tabActive,
+                tabBarLabelStyle: { fontSize: 11 },
+                tabBarInactiveTintColor: theme.tabInactive,
                 tabBarStyle: {
                     backgroundColor: theme.bg,
                     height: insets.bottom + 53,
                     elevation: 0,
-                    display: hideTabBar ? 'none' : 'flex',
                 },
             }}
         >
@@ -63,7 +60,7 @@ export default function TabLayout() {
                 name="more"
                 options={{
                     title: "More",
-                    headerShown: false,
+                    tabBarLabel: "More",
                     tabBarIcon: ({ focused, color, size }) =>
                         <McIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
                 }}

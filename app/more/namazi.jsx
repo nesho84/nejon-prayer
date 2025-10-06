@@ -4,7 +4,7 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import AppScreen from "@/components/AppScreen";
 import useTranslation from "@/hooks/useTranslation";
 
-export default function QiblaScreen() {
+export default function NamaziScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
@@ -12,7 +12,7 @@ export default function QiblaScreen() {
         <AppScreen>
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
-                <Ionicons name="compass" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
+                <Ionicons name="checkmark-circle-outline" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
 
                 {/* Description */}
                 <Text style={[styles.desc, { color: theme.placeholder }]}>

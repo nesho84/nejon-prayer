@@ -96,7 +96,7 @@
         "projectId": "YOUR-EAS-PROJECT-ID"
       }
     },
-    "backgroundColor": "#ffffff",
+    "backgroundColor": "#000000",
     "primaryColor": "#000000"
   }
 }
