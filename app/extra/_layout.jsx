@@ -1,12 +1,10 @@
 import { Stack } from "expo-router";
 import { useThemeContext } from "@/contexts/ThemeContext";
+import useTranslation from "@/hooks/useTranslation";
 
-export const unstable_settings = {
-    initialRouteName: 'index',
-};
-
-export default function MoreLayout() {
+export default function ExtraLayout() {
     const { theme } = useThemeContext();
+    const { tr } = useTranslation();
 
     return (
         <Stack
@@ -34,6 +32,13 @@ export default function MoreLayout() {
                 options={{
                     title: "Tesbih",
                     headerShown: true
+                }}
+            />
+            <Stack.Screen
+                name="about"
+                options={{
+                    title: tr("labels.about"),
+                    headerShown: true,
                 }}
             />
         </Stack>

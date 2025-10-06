@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
 import { getPrayerTimes } from "@/utils/prayersApi";
 import { formatAddress, getTimeZone } from "@/utils/geoInfo";
+import webPrayers from "@/data/webPrayers.json";
 
 export const PrayersContext = createContext();
 
@@ -67,6 +68,23 @@ export function PrayersProvider({ children }) {
         // Prevent race conditions
         if (isLoadingRef.current) return;
         isLoadingRef.current = true;
+
+        // Web Test: load random data from JSON
+        if (Platform.OS === "web") {
+            console.log("🌐 Web detected — loading random prayer times from JSON");
+
+            // pick a random set
+            const randomIndex = Math.floor(Math.random() * webPrayers.length);
+            const timings = webPrayers[randomIndex];
+
+            setPrayerTimes(timings);
+            setPrayersLoading(false);
+            setPrayersError(null);
+            setPrayersOutdated(false);
+            lastFetchedDate.current = new Date().toLocaleString("en-GB");
+
+            return;
+        }
 
         try {
             setPrayersLoading(true);
@@ -170,7 +188,7 @@ export function PrayersProvider({ children }) {
         await saveAppSettings({
             location: loc.coords,
             fullAddress: await formatAddress(loc.coords),
-            timeZone: await getTimeZone(loc.coords), // not used!
+            timeZone: await getTimeZone(loc.coords),
         });
 
         console.log("📍 Prayer times updated Location to:", loc.coords);

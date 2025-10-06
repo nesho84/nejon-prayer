@@ -64,8 +64,6 @@ module.exports = function withNotifeeRepo(config) {
       }
     };
 
-    addPermission('android.permission.ACCESS_COARSE_LOCATION', '📍', 'ACCESS_COARSE_LOCATION');
-    addPermission('android.permission.ACCESS_FINE_LOCATION', '📍', 'ACCESS_FINE_LOCATION');
     addPermission('android.permission.POST_NOTIFICATIONS', '⏰', 'POST_NOTIFICATIONS');
     addPermission('android.permission.USE_EXACT_ALARM', '⏰', 'USE_EXACT_ALARM');
     addPermission('android.permission.SCHEDULE_EXACT_ALARM', '⏰', 'SCHEDULE_EXACT_ALARM');

@@ -14,6 +14,8 @@ export const translations = {
             home: "Home",
             settings: "Settings",
             about: "About",
+            qibla: "Qibla",
+            more: "More",
 
             // General
             loading: "Loading...",
@@ -100,6 +102,8 @@ export const translations = {
             home: "Kryefaqja",
             settings: "Cilësimet",
             about: "Rreth Nesh",
+            qibla: "Kibla",
+            more: "Më Shumë",
 
             // General
             loading: "Duke u ngarkuar...",
@@ -186,6 +190,8 @@ export const translations = {
             home: "Startseite",
             settings: "Einstellungen",
             about: "Über",
+            qibla: "Qibla",
+            more: "Mehr",
 
             // General
             loading: "Lädt...",

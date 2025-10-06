@@ -48,7 +48,6 @@ export default function SettingsScreen() {
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
     const isLoading = settingsLoading || localLoading;
-    const hasError = settingsError || prayersError;
 
     // ------------------------------------------------------------
     // Change theme
@@ -226,7 +225,7 @@ export default function SettingsScreen() {
     }
 
     // Error state
-    if (hasError) {
+    if (settingsError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>

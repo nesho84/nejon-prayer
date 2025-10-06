@@ -31,7 +31,7 @@ export default function OnboardingScreen() {
   // ------------------------------------------------------------
   useEffect(() => {
     if (!settingsLoading && appSettings?.onboarding) {
-      // Show HomeScreen (if already onboarded)
+      // Show Tabs HomeScreen (if already onboarded)
       router.replace("/(tabs)/home");
     }
   }, [settingsLoading, appSettings?.onboarding]);

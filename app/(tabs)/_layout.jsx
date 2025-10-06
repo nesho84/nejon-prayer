@@ -34,7 +34,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="qibla"
                 options={{
-                    title: "Qibla",
+                    title: tr("labels.qibla"),
                     tabBarIcon: ({ focused, color, size }) =>
                         <McIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
                 }}
@@ -48,19 +48,10 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="about"
-                options={{
-                    // href: null,
-                    title: tr("labels.about"),
-                    tabBarIcon: ({ focused, color, size }) =>
-                        <McIcons name={focused ? "information" : "information-outline"} size={size} color={color} />,
-                }}
-            />
-            <Tabs.Screen
                 name="more"
                 options={{
                     title: "More",
-                    tabBarLabel: "More",
+                    tabBarLabel: tr("labels.more"),
                     tabBarIcon: ({ focused, color, size }) =>
                         <McIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
                 }}

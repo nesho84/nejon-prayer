@@ -90,7 +90,7 @@ export default function HomeScreen() {
                 <Text style={[styles.errorText, { color: theme.warning }]}>{tr("labels.locationSet")}</Text>
                 <TouchableOpacity
                     style={[styles.errorButton, { backgroundColor: theme.danger }]}
-                    onPress={() => router.navigate("/(tabs)/SettingsScreen")}>
+                    onPress={() => router.navigate("/(tabs)/settings")}>
                     <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
             </View>

@@ -10,33 +10,37 @@ export default function MoreScreen() {
     const { tr } = useTranslation();
 
     return (
-        <AppScreen>
-            <View style={[styles.content, { backgroundColor: theme.bg }]}>
+        <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
-                <Ionicons name="apps-sharp" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
+            <Ionicons name="apps-sharp" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
 
-                <Text style={[styles.title, { color: theme.text }]}>Comming Soon...</Text>
+            <Text style={[styles.title, { color: theme.text }]}>Comming Soon...</Text>
 
-                <Link href="more/namazi" asChild>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Namazi</Text>
-                    </Pressable>
-                </Link>
+            <Link href="extra/namazi" asChild>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Namazi</Text>
+                </Pressable>
+            </Link>
 
-                <Link href="more/abdesi" asChild>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Abdesi</Text>
-                    </Pressable>
-                </Link>
+            <Link href="extra/abdesi" asChild>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Abdesi</Text>
+                </Pressable>
+            </Link>
 
-                <Link href="more/tesbih" asChild>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Tesbih</Text>
-                    </Pressable>
-                </Link>
+            <Link href="extra/tesbih" asChild>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Tesbih</Text>
+                </Pressable>
+            </Link>
 
-            </View>
-        </AppScreen>
+            <Link href="extra/about" asChild>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>About</Text>
+                </Pressable>
+            </Link>
+
+        </View>
     );
 }
 
