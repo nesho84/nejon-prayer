@@ -1,10 +1,7 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false,
     "strict": true,
-    "jsx": "react-jsx",
     "paths": {
       "@/*": ["./*"]
     }
@@ -12,10 +9,19 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
-  "exclude": ["node_modules"]
+    "expo-env.d.ts",
+    "app/_layout.jsx",
+    "app/index.jsx",
+    "app/extra/_layout.jsx",
+    "app/extra/abdesi.jsx",
+    "app/extra/about.jsx",
+    "app/extra/namazi.jsx",
+    "app/extra/tesbih.jsx",
+    "app/(tabs)/_layout.jsx",
+    "app/(tabs)/home.jsx",
+    "app/(tabs)/more.jsx",
+    "app/(tabs)/qibla.jsx",
+    "app/(tabs)/settings.jsx"
+  ]
 }

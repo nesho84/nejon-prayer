@@ -123,7 +123,7 @@ export function SettingsProvider({ children }) {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
                 // console.log("⚡ AppState → foreground → syncing settings...");
                 // Slight delay to let device settings apply
-                setTimeout(() => syncDeviceSettings(), 500);
+                setTimeout(() => syncDeviceSettings(), 300);
             }
             appState.current = nextAppState;
             console.log('👁‍🗨 AppState →', appState.current);

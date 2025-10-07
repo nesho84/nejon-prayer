@@ -1,19 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration, Linking } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration, Linking, Platform } from 'react-native';
+import * as IntentLauncher from 'expo-intent-launcher';
 import { Magnetometer, Accelerometer } from 'expo-sensors';
-import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#fff', textColor = '#333' }) {
-    const [compassHeading, setCompassHeading] = useState(0);
-    const [loading, setLoading] = useState(false);
+export default function QiblaCompass({
+    loading,
+    locationPermission,
+    latitude,
+    longitude,
+    color = '#4CAF50',
+    backgroundColor = '#fff',
+    textColor = '#333'
+}) {
     const [error, setError] = useState('');
-    const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
+    const [compassHeading, setCompassHeading] = useState(0);
     const [isFlat, setIsFlat] = useState(true);
     const [magnetometerAccuracy, setMagnetometerAccuracy] = useState('unknown');
     const [showCalibration, setShowCalibration] = useState(false);
     const [distanceToKaaba, setDistanceToKaaba] = useState(0);
     const [isAligned, setIsAligned] = useState(false);
+
+    const isFocused = useIsFocused();
 
     // For smoothing compass readings
     const accelRef = useRef({ x: 0, y: 0, z: 0 });
@@ -24,7 +33,9 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
     const KAABA_LAT = 21.4225;
     const KAABA_LNG = 39.8262;
 
+    // ------------------------------------------------------------
     // Calculate Qibla direction
+    // ------------------------------------------------------------
     const calculateQiblaDirection = (userLat, userLng) => {
         const toRad = (deg) => (deg * Math.PI) / 180;
 
@@ -41,7 +52,11 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
         return (bearing + 360) % 360;
     };
 
+    const qiblaDirection = latitude && longitude ? calculateQiblaDirection(latitude, longitude) : 0;
+
+    // ------------------------------------------------------------
     // Calculate distance to Kaaba (Haversine formula)
+    // ------------------------------------------------------------
     const calculateDistance = (lat1, lng1, lat2, lng2) => {
         const toRad = (deg) => (deg * Math.PI) / 180;
         const R = 6371; // Earth's radius in km
@@ -57,99 +72,74 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
         return R * c;
     };
 
-    const qiblaDirection = userLocation.lat && userLocation.lng ?
-        calculateQiblaDirection(userLocation.lat, userLocation.lng) : 0;
+    // ------------------------------------------------------------
+    // Get compass direction
+    // ------------------------------------------------------------
+    const getCompassDirection = (angle) => {
+        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        return dirs[Math.round(angle / 45) % 8];
+    };
 
+    // ------------------------------------------------------------
     // Smooth heading with low-pass filter
+    // ------------------------------------------------------------
     const smoothHeading = (newHeading) => {
         headingHistory.current.push(newHeading);
         if (headingHistory.current.length > MAX_HISTORY) {
             headingHistory.current.shift();
         }
-
         // Calculate average
         const sum = headingHistory.current.reduce((a, b) => a + b, 0);
         return sum / headingHistory.current.length;
     };
 
-    // Fetch location
+    // ------------------------------------------------------------
+    // Open device location settings
+    // ------------------------------------------------------------
+    const openLocationSettings = () => {
+        if (Platform.OS === "android") {
+            // Opens Android Location Settings screen directly
+            IntentLauncher.startActivityAsync(
+                IntentLauncher.ActivityAction.LOCATION_SOURCE_SETTINGS
+            );
+        } else {
+            // iOS does not allow direct access → open app settings instead
+            Linking.openURL("app-settings:");
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Calculate distance once when location changes
+    // ------------------------------------------------------------
     useEffect(() => {
-        let mounted = true;
-        setLoading(true);
-        setError('');
+        if (latitude && longitude) {
+            const dist = calculateDistance(latitude, longitude, KAABA_LAT, KAABA_LNG);
+            setDistanceToKaaba(Math.round(dist));
+        }
+    }, [latitude, longitude]);
 
-        const fetchLocation = async () => {
-            try {
-                // Check if location services are enabled
-                const servicesEnabled = await Location.hasServicesEnabledAsync();
-                if (!servicesEnabled) {
-                    const { status } = await Location.requestForegroundPermissionsAsync();
-                    if (status !== "granted") {
-                        setError('Location services are disabled. Please enable GPS/location services.');
-                        setLoading(false);
-                        return;
-                    }
-                }
-
-                // Use the last known location if already enabled
-                const lastKnown = await Location.getLastKnownPositionAsync();
-                if (lastKnown && mounted) {
-                    setUserLocation({
-                        lat: lastKnown.coords.latitude,
-                        lng: lastKnown.coords.longitude
-                    });
-                    const dist = calculateDistance(lastKnown.coords.latitude, lastKnown.coords.longitude, KAABA_LAT, KAABA_LNG);
-                    setDistanceToKaaba(Math.round(dist));
-                    setLoading(false);
-                    return;
-                }
-
-                // Make sure we always have a location
-                const locationPromise = Location.getCurrentPositionAsync({
-                    accuracy: Location.Accuracy.Lowest,
-                    maximumAge: 10000,
-                });
-                const timeout = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Timeout')), 5000)
-                );
-                const loc = await Promise.race([locationPromise, timeout]);
-
-                if (mounted) {
-                    setUserLocation({
-                        lat: loc.coords.latitude,
-                        lng: loc.coords.longitude
-                    });
-                    const dist = calculateDistance(loc.coords.latitude, loc.coords.longitude, KAABA_LAT, KAABA_LNG);
-                    setDistanceToKaaba(Math.round(dist));
-                }
-            } catch (err) {
-                setError('Unable to get location. Please check GPS.');
-
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchLocation();
-
-        return () => {
-            mounted = false;
-        };
-    }, []);
-
-    // Monitor device tilt with accelerometer
+    // ------------------------------------------------------------
+    // Monitor device tilt - only when active
+    // ------------------------------------------------------------
     useEffect(() => {
+        if (!isFocused) return;
+
         Accelerometer.setUpdateInterval(200);
         const sub = Accelerometer.addListener(({ x, y, z }) => {
             accelRef.current = { x, y, z };
             const isDeviceFlat = Math.abs(z) > 0.8;
             setIsFlat(isDeviceFlat);
         });
-        return () => sub && sub.remove();
-    }, []);
 
-    // Subscribe to magnetometer
+        return () => sub && sub.remove();
+    }, [isFocused]);
+
+    // ------------------------------------------------------------
+    // Subscribe to magnetometer - only when active
+    // ------------------------------------------------------------
     useEffect(() => {
+        if (!isFocused) return;
+
         let sub;
         const subscribe = async () => {
             const available = await Magnetometer.isAvailableAsync();
@@ -157,8 +147,8 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
                 setError('Compass not available');
                 return;
             }
-            Magnetometer.setUpdateInterval(100);
 
+            Magnetometer.setUpdateInterval(100);
             sub = Magnetometer.addListener((mag) => {
                 const { x: mx, y: my, z: mz } = mag;
                 const { x: ax, y: ay, z: az } = accelRef.current;
@@ -171,14 +161,16 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
                 // Tilt-compensated magnetic components
                 const Xh = mx * Math.cos(pitch) + mz * Math.sin(pitch);
                 const Yh = mx * Math.sin(roll) * Math.sin(pitch) + my * Math.cos(roll) - mz * Math.sin(roll) * Math.cos(pitch);
+
                 // heading (azimuth) in degrees, normalized 0..360
                 let heading = Math.atan2(-Xh, Yh) * (180 / Math.PI);
                 if (heading < 0) heading += 360;
+
                 // smooth & set
                 const sm = smoothHeading(heading);
                 setCompassHeading(sm);
 
-                // (optional) compute magnitude for accuracy gauge
+                //  // Accuracy check: compute magnitude for accuracy gauge
                 const magnitude = Math.sqrt(mx * mx + my * my + mz * mz);
                 if (magnitude < 20 || magnitude > 100) setMagnetometerAccuracy('low');
                 else if (magnitude < 30 || magnitude > 70) setMagnetometerAccuracy('medium');
@@ -187,11 +179,16 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
         };
 
         subscribe();
-        return () => sub && sub.remove();
-    }, [magnetometerAccuracy]);
 
-    // Check if aligned with Qibla
+        return () => sub && sub.remove();
+    }, [isFocused]);
+
+    // ------------------------------------------------------------
+    // Check alignment and vibrate - only when active
+    // ------------------------------------------------------------
     useEffect(() => {
+        if (!isFocused) return;
+
         // Calculate difference between where we're facing (up = 0°) and Qibla direction
         let diff = Math.abs(qiblaDirection - compassHeading);
         // Normalize to 0-180 range
@@ -207,39 +204,64 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
         }
     }, [compassHeading, qiblaDirection]);
 
-    // compute relative rotation: Qibla relative to device heading
-    const needleRotation = ((compassHeading - qiblaDirection) + 360) % 360;
-
-    // Get compass direction
-    const getDirection = (angle) => {
-        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-        return dirs[Math.round(angle / 45) % 8];
-    };
+    // ------------------------------------------------------------
+    // Auto-show calibration hint
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (magnetometerAccuracy === 'low' && isActive) {
+            const timer = setTimeout(() => setShowCalibration(true), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [magnetometerAccuracy]);
 
     if (loading) {
         return (
             <View style={[styles.container, { backgroundColor }]}>
                 <Ionicons name="compass" size={80} color={color} />
-                <Text style={[styles.text, { color: textColor, marginTop: 16 }]}>
+                <Text style={[styles.msgText, { color: textColor, marginTop: 16 }]}>
                     Getting location...
                 </Text>
             </View>
         );
     }
 
+    // Error state
     if (error) {
         return (
             <View style={[styles.container, { backgroundColor }]}>
                 <Ionicons name="alert-circle" size={60} color="#ff6b6b" />
-                <Text style={[styles.text, { color: textColor, marginTop: 16 }]}>
+                <Text style={[styles.msgText, { color: textColor, marginTop: 16 }]}>
                     {error}
                 </Text>
+            </View>
+        );
+    }
+
+    // No location permission
+    if (!locationPermission) {
+        return (
+            <View style={[styles.container, { backgroundColor }]}>
+                <Ionicons name="location-outline" size={60} color="#ff6b6b" />
+                <Text style={[styles.errorSubText, { color: textColor, marginTop: 8 }]}>
+                    Location permission is off. Tap below to open settings and allow access.”
+                </Text>
                 <TouchableOpacity
-                    style={{ marginTop: 16, padding: 10, backgroundColor: color, borderRadius: 8 }}
-                    onPress={() => Linking.openSettings()}
+                    style={[styles.errorButton, { backgroundColor: color }]}
+                    onPress={openLocationSettings}
                 >
-                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>Open Settings</Text>
+                    <Text style={styles.errorButtonText}>Open Location Settings</Text>
                 </TouchableOpacity>
+            </View>
+        );
+    }
+    // No location set
+    if (!latitude || !longitude) {
+        return (
+            <View style={[styles.container, { backgroundColor }]}>
+                <Ionicons name="location-outline" size={60} color="#ff6b6b" />
+                <Text style={[styles.text, { color: textColor, marginTop: 16 }]}>
+                    Unable to detect your location. Please check your device's GPS.
+                </Text>
             </View>
         );
     }
@@ -275,7 +297,7 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
 
             {/* Compass direction */}
             <Text style={[styles.directionText, { color: isAligned ? color : textColor }]}>
-                {getDirection(compassHeading)}
+                {getCompassDirection(compassHeading)}
             </Text>
             <Text style={[styles.degreeText, { color: textColor }]}>
                 {Math.round(compassHeading)}°
@@ -360,9 +382,9 @@ export default function QiblaCompass({ color = '#4CAF50', backgroundColor = '#ff
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        padding: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
     },
     warning: {
         position: 'absolute',
@@ -382,9 +404,25 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         flex: 1,
     },
-    text: {
+    msgText: {
         fontSize: 16,
         fontWeight: '500',
+    },
+    errorButton: {
+        marginTop: 16,
+        padding: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+    },
+    errorButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    errorSubText: {
+        fontSize: 14,
+        opacity: 0.7,
+        textAlign: 'center',
     },
     directionText: {
         fontSize: 36,
