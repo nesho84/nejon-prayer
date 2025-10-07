@@ -2,7 +2,7 @@
   "expo": {
     "name": "nejon-prayer",
     "slug": "nejon-prayer",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
@@ -19,7 +19,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "buildNumber": "24",
+      "buildNumber": "25",
       "bundleIdentifier": "com.nejon.nejonprayer",
       "supportsTablet": true,
       "infoPlist": {
@@ -36,7 +36,7 @@
       }
     },
     "android": {
-      "versionCode": 24,
+      "versionCode": 25,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "monochromeImage": "./assets/icons/adaptive-icon.png",
@@ -72,6 +72,18 @@
           "position": "absolute",
           "visibility": "visible",
           "behavior": "overlay-swipe"
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow $(PRODUCT_NAME) to access device motion for Qibla direction"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to get accurate prayer times and Qibla direction."
         }
       ],
       [
