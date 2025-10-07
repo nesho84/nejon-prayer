@@ -35,9 +35,6 @@ export default function QiblaScreen() {
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
                 <QiblaCompass
                     key={refreshKey} // Force remount on focus
-                    latitude={appSettings.location?.latitude}
-                    longitude={appSettings.location?.longitude}
-                    locationPermission={deviceSettings.locationPermission}
                     color={theme.primary}
                     backgroundColor={theme.bg}
                     textColor={theme.text}
