@@ -14,14 +14,10 @@ export default function AppScreen({ children }) {
     const ignoreBottom = segments.includes("(tabs)");
     const insideOtherStack = segments.some(s => s.includes("extra"));
 
-    // Check if inside "extra" stack
-    const hasNativeHeader = insideOtherStack;
-
     // Fix for Android 14+ safe area regression
-    const topInset =
-        Platform.OS === "android" && (!insets.top || insets.top < 24)
-            ? StatusBar.currentHeight || 24
-            : insets.top;
+    const topInset = Platform.OS === "android" && (!insets.top || insets.top < 24)
+        ? StatusBar.currentHeight || 24
+        : insets.top;
 
     return (
         <>
@@ -31,7 +27,7 @@ export default function AppScreen({ children }) {
                     styles.container,
                     {
                         backgroundColor: theme.bg,
-                        paddingTop: hasNativeHeader ? 0 : topInset,
+                        paddingTop: insideOtherStack ? 0 : topInset,
                         paddingBottom: ignoreBottom ? 0 : insets.bottom
                     }
                 ]}

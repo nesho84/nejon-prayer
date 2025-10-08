@@ -41,7 +41,7 @@ export function NotificationsProvider({ children }) {
                 visibility: AndroidVisibility.PUBLIC,
                 sound: "default",
                 vibration: true,
-                vibrationPattern: [300, 500, 300, 500],
+                vibrationPattern: [500, 300, 500, 300],
                 lights: true,
                 lightColor: AndroidColor.WHITE,
                 badge: true,
@@ -166,8 +166,8 @@ export function NotificationsProvider({ children }) {
                 await notifee.createTriggerNotification(
                     {
                         id: `prayer-${prayerName.toLowerCase()}`,
-                        title: `» ${tr(`prayers.${prayerName}`)} « ${timeString}` || "Prayer time",
-                        body: tr("labels.alertBody") || "It's prayer time",
+                        title: `» ${tr(`prayers.${prayerName}`)} «` || "Prayer time",
+                        body: `${tr("labels.alertBody")} (${timeString})` || "Time for Prayer",
                         data: {
                             type: "prayer",
                             prayer: prayerName,
@@ -178,8 +178,9 @@ export function NotificationsProvider({ children }) {
                         },
                         android: {
                             channelId: "prayer-notifications",
+                            showTimestamp: true,
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                            largeIcon: require('../assets/images/prayer-mat-mixed.png'), // Custom large icon
+                            largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
                             color: AndroidColor.RED,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [
@@ -194,7 +195,7 @@ export function NotificationsProvider({ children }) {
                             ],
                             style: {
                                 type: AndroidStyle.INBOX, // Show all action buttons immediately
-                                lines: [`${tr("labels.alertBody") || "It's prayer time"}`],
+                                lines: [`${tr("labels.alertBody")} (${timeString})` || "Time for Prayer"],
                             },
                             autoCancel: true, // Auto dismiss when tapped
                             ongoing: false, // Can be dismissed
@@ -269,12 +270,16 @@ export function NotificationsProvider({ children }) {
                                 // Create reminder-specific channel
                                 await notifee.createChannel({
                                     id: 'prayer-reminders',
-                                    name: 'Prayer Reminders',
+                                    name: 'Prayer Time Reminders',
                                     description: "Reminder for daily prayer times",
                                     importance: AndroidImportance.HIGH,
                                     visibility: AndroidVisibility.PUBLIC,
                                     sound: 'default',
                                     vibration: true,
+                                    vibrationPattern: [500, 300, 500, 300],
+                                    lights: true,
+                                    lightColor: AndroidColor.WHITE,
+                                    badge: true,
                                     bypassDnd: true,
                                 });
                                 // Schedule timestamp reminder

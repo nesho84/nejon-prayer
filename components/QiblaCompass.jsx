@@ -274,10 +274,10 @@ export default function QiblaCompass({
             )}
 
             {/* Direction & Location Display */}
-            <Text style={[styles.degreeText, { color: textColor }]}>
+            <Text style={[styles.degreeText, { color: isAligned ? color : textColor }]}>
                 {Math.round(compassHeading)}°
             </Text>
-            <Text style={[styles.locationText, { color: isAligned ? color : textColor }]}>
+            <Text style={[styles.locationText, { color: textColor }]}>
                 {timeZone || "Location"}
             </Text>
 
@@ -446,14 +446,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 280,
         width: 280,
-        zIndex: 5,
     },
     centerDot: {
+        position: 'absolute',
         width: 16,
         height: 16,
         borderRadius: 8,
-        position: 'absolute',
-        zIndex: 10,
     },
     needleShaft: {
         width: 4,
@@ -532,7 +530,7 @@ const styles = StyleSheet.create({
     // Error / Text
     warning: {
         position: 'absolute',
-        top: 20,
+        top: 10,
         left: 20,
         right: 20,
         padding: 12,
@@ -540,7 +538,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        zIndex: 100,
     },
     warningText: {
         fontSize: 14,

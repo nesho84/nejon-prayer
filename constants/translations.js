@@ -60,7 +60,7 @@ export const translations = {
             prayerReminder: "Prayer Reminder",
             timeFor: "Time for",
             alertTitle: "⏰ Prayer time:",
-            alertBody: "Time for your daily prayer.",
+            alertBody: "Time for Prayer.",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
 
@@ -159,7 +159,7 @@ export const translations = {
             prayerReminder: "Kujtesë Lutjeje",
             timeFor: "Koha për",
             alertTitle: "⏰ Koha e lutjes:",
-            alertBody: "Koha për lutjen tuaj ditore.",
+            alertBody: "Koha për Namaz.",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
 
@@ -258,7 +258,7 @@ export const translations = {
             prayerReminder: "Gebetserinnerung",
             timeFor: "Zeit für",
             alertTitle: "⏰ Gebetszeit:",
-            alertBody: "Zeit für dein tägliches Gebet.",
+            alertBody: "Zeit zum Gebet.",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
 

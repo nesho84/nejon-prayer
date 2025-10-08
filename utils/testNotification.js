@@ -28,7 +28,7 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
             visibility: AndroidVisibility.PUBLIC,
             sound: "default",
             vibration: true,
-            vibrationPattern: [300, 500, 300, 500],
+            vibrationPattern: [500, 300, 500, 300],
             lights: true,
             lightColor: AndroidColor.WHITE,
             badge: true,
@@ -39,8 +39,8 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
         await notifee.createTriggerNotification(
             {
                 id: "prayer-test",
-                title: "» Fajr « 5:30 (test)",
-                body: "It's prayer time",
+                title: "» Sabahu «",
+                body: "Koha për namaz. (06:15)",
                 data: {
                     type: "prayer",
                     prayer: "Fajr",
@@ -49,8 +49,9 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
                 },
                 android: {
                     channelId: "test-notifications",
+                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
-                    largeIcon: require("../assets/images/prayer-mat-mixed.png"),
+                    largeIcon: require("../assets/images/moon-islam.png"),
                     color: AndroidColor.RED,
                     pressAction: { id: "default", launchActivity: "default" },
                     actions: [
@@ -59,7 +60,7 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
                     ],
                     style: {
                         type: AndroidStyle.INBOX,
-                        lines: ["It's prayer time (test)"],
+                        lines: ["Koha për namaz. (06:15)"],
                     },
                     autoCancel: true,
                     ongoing: false,
