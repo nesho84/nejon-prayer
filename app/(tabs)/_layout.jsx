@@ -18,7 +18,7 @@ export default function TabLayout() {
                 tabBarInactiveTintColor: theme.tabInactive,
                 tabBarStyle: {
                     backgroundColor: theme.bg,
-                    height: insets.bottom + 53,
+                    height: insets.bottom + 54,
                     elevation: 0,
                 },
             }}

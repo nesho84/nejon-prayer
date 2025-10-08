@@ -18,6 +18,8 @@ export default function QiblaScreen() {
                     locationPermission={deviceSettings.locationPermission}
                     latitude={appSettings.location?.latitude}
                     longitude={appSettings.location?.longitude}
+                    timeZone={appSettings.timeZone?.location}
+                    tr={tr}
                     color={theme.primary}
                     backgroundColor={theme.bg}
                     textColor={theme.text}

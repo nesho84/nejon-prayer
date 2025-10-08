@@ -12,9 +12,9 @@ export default function AppScreen({ children }) {
     const segments = useSegments();
 
     const ignoreBottom = segments.includes("(tabs)");
-    const insideOtherStack = segments.includes("more");
+    const insideOtherStack = segments.some(s => s.includes("extra"));
 
-    // Check if inside "more" stack
+    // Check if inside "extra" stack
     const hasNativeHeader = insideOtherStack;
 
     // Fix for Android 14+ safe area regression

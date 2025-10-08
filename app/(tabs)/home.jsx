@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     countdownCard: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 20,
+        paddingVertical: 16,
     },
 
     // Quotes Card
@@ -319,9 +319,9 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         overflow: 'hidden',
     },
-    // Date Header
+    // Prayer Card - Date Header
     dateHeader: {
-        paddingVertical: 16,
+        paddingVertical: 14,
         paddingHorizontal: 20,
         alignItems: 'center',
     },

@@ -20,6 +20,7 @@ export const translations = {
             // General
             loading: "Loading...",
             error: "Error",
+            accuracy: "Accuracy",
 
             // Settings
             theme: "Theme",
@@ -36,6 +37,15 @@ export const translations = {
             locationDenied: "Location Access Denied",
             locationDeniedMessage: "Prayer times will not be location-based without location access.",
             locationError: "Failed to get location. Please try again.",
+            locationOff: "Location permission is off. Tap below to open settings and allow access.",
+            locationOff2: "Unable to detect your location. Please check your device's GPS.",
+
+            // Compass
+            compasAligned: "Aligned with Qibla",
+            compasNotAligned: "Rotate until arrow points upward",
+            compassWarning1: "Hold device flat",
+            compassWarning2: "Move device in figure-8 motion to calibrate",
+            compassWarning3: "Move away from electronics",
 
             // Prayer Times
             loadingPrayers: "Loading prayers...",
@@ -54,7 +64,7 @@ export const translations = {
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
 
-            // Warnings
+            // Notifications Warnings
             batteryOptTitle: "Battery Optimization",
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.",
             alarmAccessTitle: "Alarms & Reminders",
@@ -79,6 +89,7 @@ export const translations = {
             cancel: "Cancel",
             later: "Later",
             openSettings: "Open Settings",
+            openLocationSettings: "Open Location Settings",
             retry: "Retry",
         },
         actions: {
@@ -108,6 +119,7 @@ export const translations = {
             // General
             loading: "Duke u ngarkuar...",
             error: "Gabim",
+            accuracy: "Saktësia",
 
             // Settings
             theme: "Pamja",
@@ -124,6 +136,15 @@ export const translations = {
             locationDenied: "Aksesi i Lokacionit u Refuzua",
             locationDeniedMessage: "Kohët e lutjeve nuk do të bazohen në lokacion pa aksesin e lokacionit.",
             locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
+            locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
+            locationOff2: "Nuk mund të zbulohet Lokacioni juaj. Kontrolloni GPS-in e pajisjes suaj.",
+
+            // Compass
+            compasAligned: "I rreshtuar me Kiblën",
+            compasNotAligned: "Rrotullo derisa shigjeta të tregojë nga lart",
+            compassWarning1: "Mbajeni pajisjen drejt (rrafshët)",
+            compassWarning2: "Zhvendos pajisjen në lëvizjen e figurës 8 për të kalibruar",
+            compassWarning3: "Largohuni nga elektronika",
 
             // Prayer Times
             loadingPrayers: "Duke ngarkuar lutjet...",
@@ -142,7 +163,7 @@ export const translations = {
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
 
-            // Warnings
+            // Notifications Warnings
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
             alarmAccessTitle: "Alarme dhe Kujtesa",
@@ -167,6 +188,7 @@ export const translations = {
             cancel: "Anulo",
             later: "Më vonë",
             openSettings: "Hap Cilësimet",
+            openLocationSettings: "Hap Cilësimet e Lokacionit",
             retry: "Riprovo",
         },
         actions: {
@@ -196,6 +218,7 @@ export const translations = {
             // General
             loading: "Lädt...",
             error: "Fehler",
+            accuracy: "Genauigkeit",
 
             // Settings
             theme: "Darstellung",
@@ -212,6 +235,15 @@ export const translations = {
             locationDenied: "Standortzugriff Verweigert",
             locationDeniedMessage: "Gebetszeiten basieren nicht auf dem Standort ohne Standortzugriff.",
             locationError: "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut.",
+            locationOff: "Die Standortberechtigung ist deaktiviert. Tippen Sie unten, um die Einstellungen zu öffnen und den Zugriff zuzulassen.",
+            locationOff2: "Ihr Standort konnte nicht ermittelt werden. Bitte überprüfen Sie das GPS Ihres Geräts.",
+
+            // Compass
+            compasAligned: "Auf Qibla ausgerichtet",
+            compasNotAligned: "Drehen, bis der Pfeil nach oben zeigt",
+            compassWarning1: "Gerät flach halten",
+            compassWarning2: "Bewegen Sie das Gerät zum Kalibrieren in einer 8-förmigen Bewegung",
+            compassWarning3: "Weg von der Elektronik",
 
             // Prayer Times
             loadingPrayers: "Gebete werden geladen...",
@@ -230,7 +262,7 @@ export const translations = {
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
 
-            // Warnings
+            // Notifications Warnings
             batteryOptTitle: "Akkuoptimierung",
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen. Tippe oben, um die Systemeinstellungen anzupassen.",
             alarmAccessTitle: "Alarme & Erinnerungen",
@@ -255,6 +287,7 @@ export const translations = {
             cancel: "Abbrechen",
             later: "Später",
             openSettings: "Einstellungen Öffnen",
+            openLocationSettings: "Standorteinstellungen öffnen",
             retry: "Wiederholen",
         },
         actions: {
