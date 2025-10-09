@@ -111,7 +111,7 @@ export default function SettingsScreen() {
             }
 
             const newFullAddress = await formatAddress(loc.coords);
-            const newTimeZone = await getTimeZone(loc.coords);
+            const newTimeZone = await getTimeZoneInfo(loc.coords);
 
             // Save settings
             await saveAppSettings({

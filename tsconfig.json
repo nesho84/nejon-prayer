@@ -3,7 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -13,11 +15,11 @@
     "expo-env.d.ts",
     "app/_layout.jsx",
     "app/index.jsx",
-    "app/extra/_layout.jsx",
-    "app/extra/abdesi.jsx",
-    "app/extra/about.jsx",
-    "app/extra/namazi.jsx",
-    "app/extra/tesbih.jsx",
+    "app/extras/_layout.jsx",
+    "app/extras/abdesi.jsx",
+    "app/extras/about.jsx",
+    "app/extras/namazi.jsx",
+    "app/extras/tesbih.jsx",
     "app/(tabs)/_layout.jsx",
     "app/(tabs)/home.jsx",
     "app/(tabs)/more.jsx",

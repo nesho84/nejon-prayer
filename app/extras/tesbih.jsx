@@ -2,13 +2,14 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
+import { Ionicons } from "@expo/vector-icons";
 import AppScreen from "@/components/AppScreen";
 import QiblaCompass from "@/components/QiblaCompass";
 
 export default function QiblaScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
-    const { appSettings, settingsLoading } = useSettingsContext();
+    const { appSettings, deviceSettings, settingsLoading } = useSettingsContext();
 
     return (
         <AppScreen>
@@ -18,9 +19,10 @@ export default function QiblaScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                <View style={[styles.content, { backgroundColor: theme.bg }]}>
+                {/* <View style={[styles.content, { backgroundColor: theme.bg }]}>
                     <QiblaCompass
                         loading={settingsLoading}
+                        locationPermission={deviceSettings.locationPermission}
                         latitude={appSettings.location?.latitude}
                         longitude={appSettings.location?.longitude}
                         timeZone={appSettings.timeZone?.location}
@@ -29,7 +31,12 @@ export default function QiblaScreen() {
                         backgroundColor={theme.bg}
                         textColor={theme.text}
                     />
-                </View>
+                </View> */}
+
+                <Ionicons name="add-circle-outline" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
+                <Text style={[styles.desc, { color: theme.placeholder }]}>
+                    Comming Soon...
+                </Text>
 
             </ScrollView>
         </AppScreen>

@@ -85,7 +85,7 @@ export default function OnboardingScreen() {
       // Update Refs
       locationRef.current = loc.coords;
       fullAddressRef.current = await formatAddress(loc.coords);
-      timeZoneRef.current = await getTimeZone(loc.coords); // not used!
+      timeZoneRef.current = await getTimeZoneInfo(loc.coords); // not used!
 
       setStep(3);
     } catch (err) {

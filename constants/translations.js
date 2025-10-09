@@ -33,12 +33,11 @@ export const translations = {
             locationButtonText1: "Update Location",
             locationButtonText2: "Set Location",
             loadingAddress: "Loading address...",
+            locationOff: "Location permission is off. Tap below to open settings and allow access.",
             locationSet: "Please set your location to view prayer times.",
             locationDenied: "Location Access Denied",
             locationDeniedMessage: "Prayer times will not be location-based without location access.",
             locationError: "Failed to get location. Please try again.",
-            locationOff: "Location permission is off. Tap below to open settings and allow access.",
-            locationOff2: "Unable to detect your location. Please check your device's GPS.",
 
             // Compass
             compasAligned: "Aligned with Qibla",
@@ -74,6 +73,13 @@ export const translations = {
             loadingSettings: "Loading settings...",
             updatingSettings: "Updating settings...",
             goToSettings: "Go to Settings",
+
+            // Extras
+            extrasTitle: "Extras",
+            extrasSubtitle: "Explore additional features",
+            namaz: "Prayer",
+            abdes: "Wudu (Ablution)",
+            tesbih: "Tasbeeh Counter",
 
             // Errors
             languageError: "Failed to update language setting.",
@@ -112,9 +118,9 @@ export const translations = {
             // Navigation
             home: "Kryefaqja",
             settings: "Cilësimet",
-            about: "Rreth Nesh",
+            about: "Info",
             qibla: "Kibla",
-            more: "Më Shumë",
+            more: "Më Tepër",
 
             // General
             loading: "Duke u ngarkuar...",
@@ -132,12 +138,11 @@ export const translations = {
             locationButtonText1: "Përditëso Lokacionin",
             locationButtonText2: "Vendos Lokacionin",
             loadingAddress: "Duke ngarkuar adresën...",
+            locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
             locationSet: "Ju lutemi caktoni lokacionin tuaj për të parë kohët e lutjeve.",
             locationDenied: "Aksesi i Lokacionit u Refuzua",
             locationDeniedMessage: "Kohët e lutjeve nuk do të bazohen në lokacion pa aksesin e lokacionit.",
             locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
-            locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
-            locationOff2: "Nuk mund të zbulohet Lokacioni juaj. Kontrolloni GPS-in e pajisjes suaj.",
 
             // Compass
             compasAligned: "I rreshtuar me Kiblën",
@@ -173,6 +178,13 @@ export const translations = {
             loadingSettings: "Duke ngarkuar cilësimet...",
             updatingSettings: "Duke përditësuar cilësimet...",
             goToSettings: "Shko te Cilësimet",
+
+            // Extras
+            extrasTitle: "Të Tjera",
+            extrasSubtitle: "Eksploro veçori shtesë",
+            namaz: "Namazi",
+            abdes: "Abdesi",
+            tesbih: "Tesbihu",
 
             // Errors
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
@@ -211,7 +223,7 @@ export const translations = {
             // Navigation
             home: "Startseite",
             settings: "Einstellungen",
-            about: "Über",
+            about: "Info",
             qibla: "Qibla",
             more: "Mehr",
 
@@ -231,12 +243,11 @@ export const translations = {
             locationButtonText1: "Standort aktualisieren",
             locationButtonText2: "Standort festlegen",
             loadingAddress: "Adresse wird geladen...",
+            locationOff: "Die Standortberechtigung ist deaktiviert. Tippen Sie unten, um die Einstellungen zu öffnen und den Zugriff zuzulassen.",
             locationSet: "Bitte geben Sie Ihren Standort ein, um die Gebetszeiten anzuzeigen.",
             locationDenied: "Standortzugriff Verweigert",
             locationDeniedMessage: "Gebetszeiten basieren nicht auf dem Standort ohne Standortzugriff.",
             locationError: "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut.",
-            locationOff: "Die Standortberechtigung ist deaktiviert. Tippen Sie unten, um die Einstellungen zu öffnen und den Zugriff zuzulassen.",
-            locationOff2: "Ihr Standort konnte nicht ermittelt werden. Bitte überprüfen Sie das GPS Ihres Geräts.",
 
             // Compass
             compasAligned: "Auf Qibla ausgerichtet",
@@ -272,6 +283,13 @@ export const translations = {
             loadingSettings: "Einstellungen werden geladen...",
             updatingSettings: "Einstellungen werden aktualisiert...",
             goToSettings: "Zu Einstellungen",
+
+            // Extras
+            extrasTitle: "Weitere",
+            extrasSubtitle: "Weitere Funktionen",
+            namaz: "Gebet",
+            abdes: "Wudu (Waschung)",
+            tesbih: "Tasbih-Zähler",
 
             // Errors
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",

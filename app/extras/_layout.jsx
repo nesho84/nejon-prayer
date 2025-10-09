@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 
-export default function ExtraLayout() {
+export default function ExtrasLayout() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 

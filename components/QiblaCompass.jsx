@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration, Linking, Platform } from 'react-native';
+import { router } from "expo-router";
 import * as IntentLauncher from 'expo-intent-launcher';
 import { Magnetometer, Accelerometer } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,7 +13,6 @@ const MAX_HISTORY = 5;
 
 export default function QiblaCompass({
     loading,
-    locationPermission,
     latitude,
     longitude,
     timeZone,
@@ -35,6 +35,22 @@ export default function QiblaCompass({
     const headingHistory = useRef([]);
 
     // ------------------------------------------------------------
+    // Calculate distance using Haversine formula
+    // ------------------------------------------------------------
+    const calculateDistance = (lat1, lng1, lat2, lng2) => {
+        const toRad = (deg) => (deg * Math.PI) / 180;
+        const R = 6371; // Earth's radius in km
+
+        const dLat = toRad(lat2 - lat1);
+        const dLng = toRad(lng2 - lng1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
+    // ------------------------------------------------------------
     // Calculate Qibla direction (bearing from user to Kaaba)
     // ------------------------------------------------------------
     const calculateQiblaDirection = (userLat, userLng) => {
@@ -51,22 +67,6 @@ export default function QiblaCompass({
 
         let bearing = Math.atan2(y, x) * (180 / Math.PI);
         return (bearing + 360) % 360;
-    };
-
-    // ------------------------------------------------------------
-    // Calculate distance using Haversine formula
-    // ------------------------------------------------------------
-    const calculateDistance = (lat1, lng1, lat2, lng2) => {
-        const toRad = (deg) => (deg * Math.PI) / 180;
-        const R = 6371; // Earth's radius in km
-
-        const dLat = toRad(lat2 - lat1);
-        const dLng = toRad(lng2 - lng1);
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLng / 2) * Math.sin(dLng / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
     };
 
     // ------------------------------------------------------------
@@ -206,6 +206,7 @@ export default function QiblaCompass({
         }
     }, [magnetometerAccuracy, isFocused]);
 
+    // Loading state
     if (loading) {
         return (
             <View style={[styles.container, { backgroundColor }]}>
@@ -217,31 +218,19 @@ export default function QiblaCompass({
         );
     }
 
-    // No location permission
-    if (!locationPermission) {
+    // No location set
+    if (!latitude || !longitude) {
         return (
-            <View style={[styles.container, { backgroundColor }]}>
-                <Ionicons name="location-outline" size={60} color="#ff6b6b" />
+            <View style={[styles.container, { backgroundColor: backgroundColor }]}>
+                <Ionicons name="location-outline" size={80} color="#ff6b6b" />
                 <Text style={[styles.errorSubText, { color: textColor, marginTop: 8 }]}>
                     {tr("labels.locationOff")}
                 </Text>
                 <TouchableOpacity
                     style={[styles.errorButton, { backgroundColor: color }]}
-                    onPress={openLocationSettings}
-                >
-                    <Text style={styles.errorButtonText}>{tr("buttons.openLocationSettings")}</Text>
+                    onPress={() => router.navigate("/(tabs)/settings")}>
+                    <Text style={styles.errorButtonText}>{tr("labels.goToSettings")}</Text>
                 </TouchableOpacity>
-            </View>
-        );
-    }
-    // No location data set
-    if (!latitude || !longitude) {
-        return (
-            <View style={[styles.container, { backgroundColor }]}>
-                <Ionicons name="location-outline" size={60} color="#ff6b6b" />
-                <Text style={[styles.msgText, { color: textColor, marginTop: 16 }]}>
-                    {tr("labels.locationOff2")}
-                </Text>
             </View>
         );
     }
@@ -305,12 +294,13 @@ export default function QiblaCompass({
                     {/* Needle INSIDE the rotating ring */}
                     <View style={[styles.needleContainer, { transform: [{ rotate: `${qiblaDirection}deg` }] }]}>
                         <View style={[styles.needleShaft, { backgroundColor: color }]} />
-                        <View style={[styles.arrowTip, { borderBottomColor: color }]} />
+                        <View style={[styles.needleArrow, { borderBottomColor: color }]} />
+                        <View style={[styles.needleBackLine, { backgroundColor: color }]} />
                     </View>
                 </Animated.View>
 
                 {/* Fixed center dot */}
-                <View style={[styles.centerDot, { backgroundColor: "#333" }]} />
+                <View style={[styles.needleDot, { backgroundColor: "#333" }]} />
             </View>
 
             {/* Info Row */}
@@ -402,6 +392,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.05)',
         position: 'absolute',
     },
+    innerCircle: {
+        position: 'absolute',
+        width: 200,
+        height: 200,
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: '#666', // light gray
+        opacity: 0.6,
+    },
     alignedRing: {
         position: 'absolute',
         width: 290,
@@ -411,15 +410,6 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         top: -8,
         left: -8,
-    },
-    innerCircle: {
-        position: 'absolute',
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        borderWidth: 2,
-        borderColor: '#666', // light gray
-        opacity: 0.6,
     },
     cardinals: {
         position: 'absolute',
@@ -447,7 +437,7 @@ const styles = StyleSheet.create({
         height: 280,
         width: 280,
     },
-    centerDot: {
+    needleDot: {
         position: 'absolute',
         width: 16,
         height: 16,
@@ -455,12 +445,12 @@ const styles = StyleSheet.create({
     },
     needleShaft: {
         width: 4,
-        height: 105,
+        height: 95,
         borderRadius: 2,
         position: 'absolute',
-        top: 75,
+        top: 77,
     },
-    arrowTip: {
+    needleArrow: {
         width: 0,
         height: 0,
         borderLeftWidth: 12,
@@ -470,6 +460,14 @@ const styles = StyleSheet.create({
         borderRightColor: 'transparent',
         position: 'absolute',
         top: 55,
+    },
+    needleBackLine: {
+        width: 4,
+        height: 25,
+        borderRadius: 2,
+        position: 'absolute',
+        bottom: 55,
+        opacity: 0.5,
     },
 
     // Info row

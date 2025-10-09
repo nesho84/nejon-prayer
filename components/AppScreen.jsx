@@ -12,7 +12,7 @@ export default function AppScreen({ children }) {
     const segments = useSegments();
 
     const ignoreBottom = segments.includes("(tabs)");
-    const insideOtherStack = segments.some(s => s.includes("extra"));
+    const insideOtherStack = segments.some(s => s.includes("extras"));
 
     // Fix for Android 14+ safe area regression
     const topInset = Platform.OS === "android" && (!insets.top || insets.top < 24)

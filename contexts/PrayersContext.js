@@ -188,7 +188,7 @@ export function PrayersProvider({ children }) {
         await saveAppSettings({
             location: loc.coords,
             fullAddress: await formatAddress(loc.coords),
-            timeZone: await getTimeZone(loc.coords),
+            timeZone: await getTimeZoneInfo(loc.coords),
         });
 
         console.log("📍 Prayer times updated Location to:", loc.coords);
