@@ -1,25 +1,40 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Vibration } from "react-native";
+import { useEffect, useRef } from "react";
 import Svg, { Circle } from "react-native-svg";
 
-export default function CountdownCircle({
-    nextPrayerName,
-    prayerCountdown,
-    remainingSeconds,
-    totalSeconds,
+export default function CounterCircle({
+    currentCount = 0,
+    totalCount = 33,
+    onCountReached,
     theme,
     tr,
     size = 140,
     strokeWidth = 10,
     backgroundColor = "#eee",
     color = "#2563eb",
+    vibrationDuration = 500,
 }) {
-    if (!totalSeconds || remainingSeconds === null) return null;
+    const previousCount = useRef(currentCount);
 
-    const radius = (size - strokeWidth) / 2; // Radius of the circle
-    const circumference = 2 * Math.PI * radius; // Circle perimeter
+    useEffect(() => {
+        // Check if count just reached totalCount
+        if (currentCount === totalCount && previousCount.current !== totalCount && totalCount > 0) {
+            Vibration.vibrate(vibrationDuration);
+            // Notify parent to reset count
+            if (onCountReached) {
+                onCountReached();
+            }
+        }
+        previousCount.current = currentCount;
+    }, [currentCount, totalCount, vibrationDuration, onCountReached]);
 
-    // progress goes from 0 → 1 as time passes
-    const progress = 1 - (remainingSeconds / totalSeconds);
+    if (!totalCount) return null;
+
+    const radius = (size - strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
+
+    // Progress goes from 0 → 1 as count increases
+    const progress = currentCount / totalCount;
     const strokeDashoffset = circumference * (1 - progress);
 
     return (
@@ -49,41 +64,35 @@ export default function CountdownCircle({
                 />
             </Svg>
 
-            {/* Countdown Text */}
+            {/* Counter Text */}
             <View style={styles.innerContainer}>
-                <Text style={[styles.prayerName, { color: theme.text }]}>
-                    » {tr(`prayers.${nextPrayerName}`)} «
-                </Text>
-                <Text style={[styles.prayerTime, { color: theme.accent }]}>
-                    {prayerCountdown.hours}<Text style={styles.hms}>h </Text>
-                    {prayerCountdown.minutes}<Text style={styles.hms}>m </Text>
-                    {prayerCountdown.seconds}<Text style={styles.hms}>s</Text>
+                <Text style={[styles.counterText, { color: theme.text2 }]}>
+                    <Text style={[styles.currentCount, { color: theme.accent }]}>
+                        {currentCount}
+                    </Text>
+                    /{totalCount}
                 </Text>
             </View>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
-        alignSelf: "center",
+        position: "relative",
         alignItems: "center",
         justifyContent: "center",
-        position: "relative",
     },
     innerContainer: {
         position: "absolute",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
     },
-    prayerName: {
-        fontSize: 18,
-        marginBottom: 3,
+    counterText: {
+        fontSize: 48,
+        fontWeight: "300",
     },
-    prayerTime: {
-        fontSize: 24,
-    },
-    hms: {
-        fontSize: 14,
+    currentCount: {
+        fontWeight: "400",
     },
 });

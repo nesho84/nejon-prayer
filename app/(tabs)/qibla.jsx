@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -18,18 +18,16 @@ export default function QiblaScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                <View style={[styles.content, { backgroundColor: theme.bg }]}>
-                    <QiblaCompass
-                        loading={settingsLoading}
-                        latitude={appSettings.location?.latitude}
-                        longitude={appSettings.location?.longitude}
-                        timeZone={appSettings.timeZone?.location}
-                        tr={tr}
-                        color={theme.primary}
-                        backgroundColor={theme.bg}
-                        textColor={theme.text}
-                    />
-                </View>
+                <QiblaCompass
+                    loading={settingsLoading}
+                    latitude={appSettings.location?.latitude}
+                    longitude={appSettings.location?.longitude}
+                    timeZone={appSettings.timeZone?.location}
+                    tr={tr}
+                    color={theme.primary}
+                    backgroundColor={theme.bg}
+                    textColor={theme.text}
+                />
 
             </ScrollView>
         </AppScreen>
@@ -45,7 +43,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 16,
-        paddingTop: 32,
+        paddingTop: 12,
         paddingBottom: 20,
         gap: 16,
     },

@@ -184,7 +184,7 @@ export const translations = {
             extrasSubtitle: "Eksploro veçori shtesë",
             namaz: "Namazi",
             abdes: "Abdesi",
-            tesbih: "Tesbihu",
+            tesbih: "Tesbih",
 
             // Errors
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
