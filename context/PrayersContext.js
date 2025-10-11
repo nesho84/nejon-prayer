@@ -2,11 +2,11 @@ import { createContext, useContext, useState, useEffect, useMemo, useRef, useCal
 import { Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
-import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
-import { getPrayerTimes } from "@/utils/prayersApi";
-import { formatAddress, getTimeZone } from "@/utils/geoInfo";
-import webPrayers from "@/data/webPrayers.json";
+import { getPrayerTimes } from "@/services/prayersApi";
+import { formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
+import webPrayers from "@/services/webPrayers.json";
 
 export const PrayersContext = createContext();
 
@@ -187,7 +187,7 @@ export function PrayersProvider({ children }) {
         // Save new settings
         await saveAppSettings({
             location: loc.coords,
-            fullAddress: await formatAddress(loc.coords),
+            fullAddress: await formatUserAddress(loc.coords),
             timeZone: await getTimeZoneInfo(loc.coords),
         });
 

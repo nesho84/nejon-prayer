@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 
 export default function AppCard({ children, style, ...otherProps }) {
     const { theme } = useThemeContext();

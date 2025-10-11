@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 
 export default function ExtrasLayout() {

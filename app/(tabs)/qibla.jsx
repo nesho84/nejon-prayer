@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet } from "react-native";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useThemeContext } from "@/context/ThemeContext";
+import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
 import AppScreen from "@/components/AppScreen";
 import QiblaCompass from "@/components/QiblaCompass";

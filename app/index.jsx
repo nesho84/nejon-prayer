@@ -3,10 +3,10 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useThemeContext } from "@/context/ThemeContext";
+import { useSettingsContext } from "@/context/SettingsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatAddress, getTimeZone } from "@/utils/geoInfo";
+import { formatUserAddress as formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
@@ -84,8 +84,8 @@ export default function OnboardingScreen() {
 
       // Update Refs
       locationRef.current = loc.coords;
-      fullAddressRef.current = await formatAddress(loc.coords);
-      timeZoneRef.current = await getTimeZoneInfo(loc.coords); // not used!
+      fullAddressRef.current = await formatUserAddress(loc.coords);
+      timeZoneRef.current = await getTimeZoneInfo(loc.coords);
 
       setStep(3);
     } catch (err) {

@@ -10,8 +10,8 @@ import notifee, {
     AndroidColor,
     AndroidStyle
 } from "@notifee/react-native";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { usePrayersContext } from "@/contexts/PrayersContext";
+import { useSettingsContext } from "@/context/SettingsContext";
+import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 import AppScreen from "@/components/AppScreen";
 import useTranslation from "@/hooks/useTranslation";
 

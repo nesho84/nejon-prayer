@@ -2,9 +2,9 @@ import React from "react";
 import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen";
+import AppScreen from "@/components/AppScreen"; // Note: we dont use it here, because of screen jump!
 
 export default function ExtrasScreen() {
     const { theme } = useThemeContext();
@@ -18,52 +18,50 @@ export default function ExtrasScreen() {
     ];
 
     return (
-        <AppScreen>
-            <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Header */}
-                <View style={styles.header}>
-                    <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
-                        {tr("labels.extrasTitle")}
-                    </Text>
-                    <Text style={[styles.subtitle, { color: theme.text2 }]}>
-                        {tr("labels.extrasSubtitle")}
-                    </Text>
-                </View>
+        <ScrollView
+            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+        >
+            {/* Header */}
+            <View style={styles.header}>
+                <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
+                    {tr("labels.extrasTitle")}
+                </Text>
+                <Text style={[styles.subtitle, { color: theme.text2 }]}>
+                    {tr("labels.extrasSubtitle")}
+                </Text>
+            </View>
 
-                {/* Optional Divider */}
-                <View style={[styles.divider, { backgroundColor: theme.text }]} />
+            {/* Optional Divider */}
+            <View style={[styles.divider, { backgroundColor: theme.text }]} />
 
-                {/* Feature Cards */}
-                <View style={styles.grid}>
-                    {features.map((item) => (
-                        <Link key={item.href} href={item.href} asChild>
-                            <Pressable style={styles.cardWrapper}>
-                                {({ pressed }) => (
-                                    <View
-                                        style={[
-                                            styles.moreCard,
-                                            { backgroundColor: theme.card },
-                                            pressed && styles.cardPressed,
-                                        ]}
-                                    >
-                                        <View style={[styles.iconContainer, { backgroundColor: item.color + "15" }]}>
-                                            {item.icon}
-                                        </View>
-                                        <Text style={[styles.label, { color: theme.text }]} numberOfLines={1}>
-                                            {item.label}
-                                        </Text>
+            {/* Feature Cards */}
+            <View style={styles.grid}>
+                {features.map((item) => (
+                    <Link key={item.href} href={item.href} asChild>
+                        <Pressable style={styles.cardWrapper}>
+                            {({ pressed }) => (
+                                <View
+                                    style={[
+                                        styles.moreCard,
+                                        { backgroundColor: theme.card },
+                                        pressed && styles.cardPressed,
+                                    ]}
+                                >
+                                    <View style={[styles.iconContainer, { backgroundColor: item.color + "15" }]}>
+                                        {item.icon}
                                     </View>
-                                )}
-                            </Pressable>
-                        </Link>
-                    ))}
-                </View>
-            </ScrollView>
-        </AppScreen>
+                                    <Text style={[styles.label, { color: theme.text }]} numberOfLines={1}>
+                                        {item.label}
+                                    </Text>
+                                </View>
+                            )}
+                        </Pressable>
+                    </Link>
+                ))}
+            </View>
+        </ScrollView>
     );
 }
 
@@ -73,7 +71,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 16,
-        paddingTop: 32,
+        paddingTop: 80,
         paddingBottom: 24,
         gap: 16,
     },

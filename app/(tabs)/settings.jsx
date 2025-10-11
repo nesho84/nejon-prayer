@@ -14,12 +14,12 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { useSettingsContext } from "@/contexts/SettingsContext";
-import { usePrayersContext } from "@/contexts/PrayersContext";
+import { useThemeContext } from "@/context/ThemeContext";
+import { useSettingsContext } from "@/context/SettingsContext";
+import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatAddress, getTimeZone } from "@/utils/geoInfo";
+import { formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
 import { Ionicons } from "@expo/vector-icons";
 import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
@@ -110,7 +110,7 @@ export default function SettingsScreen() {
                 return;
             }
 
-            const newFullAddress = await formatAddress(loc.coords);
+            const newFullAddress = await formatUserAddress(loc.coords);
             const newTimeZone = await getTimeZoneInfo(loc.coords);
 
             // Save settings

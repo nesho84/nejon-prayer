@@ -70,7 +70,7 @@ export async function getTimeZoneInfo(location) {
 // ------------------------------------------------------------
 // Reverse-geocodes given coordinates into a human-readable Address
 // ------------------------------------------------------------
-export async function formatAddress(location) {
+export async function formatUserAddress(location) {
     try {
         const loc = await getReverseGeocode(location);
         if (!loc) return null;

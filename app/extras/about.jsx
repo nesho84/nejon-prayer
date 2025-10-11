@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 import AppScreen from "@/components/AppScreen";
 import useTranslation from "@/hooks/useTranslation";
 
@@ -21,7 +21,7 @@ export default function AboutScreen() {
                 </Text>
 
                 {/* About Description */}
-                <Text style={[styles.desc, { color: theme.placeholder }]}>
+                <Text style={[styles.desc, { color: theme.placeholder }]} adjustsFontSizeToFit>
                     {tr("labels.aboutText2")}
                 </Text>
 
@@ -45,30 +45,32 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 24,
+        gap: 16,
     },
     logo: {
         width: 150,
         height: 150,
-        marginBottom: 24,
+        marginBottom: 5,
     },
     title: {
         fontSize: 24,
         fontWeight: "700",
         textAlign: "center",
-        marginBottom: 12,
     },
     desc: {
         fontSize: 16,
         fontWeight: "400",
         textAlign: "center",
-        marginBottom: 28,
         lineHeight: 22,
+        marginBottom: 8,
     },
     yearText: {
         fontSize: 15,
         fontWeight: "600",
-        marginBottom: 6,
+        marginBottom: -8,
     },
     versionText: {
         fontSize: 14,

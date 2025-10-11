@@ -1,9 +1,9 @@
 import { Stack } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { SettingsProvider } from "@/contexts/SettingsContext";
-import { PrayersProvider } from "@/contexts/PrayersContext";
-import { NotificationsProvider } from "@/contexts/NotificationsContext";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { SettingsProvider } from "@/context/SettingsContext";
+import { PrayersProvider } from "@/context/PrayersContext";
+import { NotificationsProvider } from "@/context/NotificationsContext";
 
 export default function RootLayout() {
   return (
@@ -11,7 +11,7 @@ export default function RootLayout() {
       <ThemeProvider>
         <SettingsProvider>
           <PrayersProvider>
-            <NotificationsProvider>
+            <NotificationsProvider initialMetrics={initialWindowMetrics}>
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" options={{ animation: "fade" }} />
                 <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />

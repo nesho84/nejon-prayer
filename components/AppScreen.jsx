@@ -1,7 +1,7 @@
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useThemeContext } from "@/context/ThemeContext";
 import { useSegments } from "expo-router";
 
 export default function AppScreen({ children }) {
