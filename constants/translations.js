@@ -81,6 +81,12 @@ export const translations = {
             abdes: "Wudu (Ablution)",
             tesbih: "Tasbeeh Counter",
 
+
+            // Tesbih
+            tInstruction: "Tap the circle to count your Tasbeeh.",
+            tLap: "LAP",
+            tLimit: "LIMIT",
+
             // Errors
             languageError: "Failed to update language setting.",
             themeError: "Failed to update theme setting.",
@@ -186,6 +192,11 @@ export const translations = {
             abdes: "Abdesi",
             tesbih: "Tesbih",
 
+            // Tesbih
+            tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
+            tLap: "RAUNDI",
+            tLimit: "LIMIT",
+
             // Errors
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
             themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
@@ -290,6 +301,11 @@ export const translations = {
             namaz: "Gebet",
             abdes: "Wudu (Waschung)",
             tesbih: "Tasbih-Zähler",
+
+            // Tesbih
+            tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen.",
+            tLap: "RUNDE",
+            tLimit: "LIMIT",
 
             // Errors
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",

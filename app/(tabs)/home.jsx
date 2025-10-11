@@ -153,7 +153,7 @@ export default function HomeScreen() {
                             tr={tr}
                             size={160}
                             strokeWidth={6}
-                            backgroundColor={theme.border}
+                            strokeColor={theme.border}
                             color={theme.accent}
                         />
                     )}
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: 16,
         paddingTop: 12,
-        paddingBottom: 20,
+        paddingBottom: 24,
         gap: 16,
     },
 

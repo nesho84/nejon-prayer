@@ -17,7 +17,7 @@ export default function QiblaCompass({
     longitude,
     timeZone,
     tr,
-    backgroundColor = '#eee',
+    bgColor = '#eee',
     color = '#2563eb',
     textColor = '#333'
 }) {
@@ -209,7 +209,7 @@ export default function QiblaCompass({
     // Loading state
     if (loading) {
         return (
-            <View style={[styles.container, { backgroundColor }]}>
+            <View style={[styles.container, { backgroundColor: bgColor }]}>
                 <Ionicons name="compass" size={80} color={color} />
                 <Text style={[styles.msgText, { color: textColor, marginTop: 16 }]}>
                     {tr("labels.loadingSettings")}
@@ -221,7 +221,7 @@ export default function QiblaCompass({
     // No location set
     if (!latitude || !longitude) {
         return (
-            <View style={[styles.container, { backgroundColor: backgroundColor }]}>
+            <View style={[styles.container, { backgroundColor: bgColor }]}>
                 <Ionicons name="location-outline" size={80} color="#ff6b6b" />
                 <Text style={[styles.errorSubText, { color: textColor, marginTop: 8 }]}>
                     {tr("labels.locationOff")}
@@ -236,7 +236,7 @@ export default function QiblaCompass({
     }
 
     return (
-        <View style={[styles.container, { backgroundColor }]}>
+        <View style={[styles.container, { backgroundColor: bgColor }]}>
             {/* Warning Banners */}
             {!isFlat && (
                 <View style={[styles.warning, { backgroundColor: '#ff9800' }]}>

@@ -6,12 +6,11 @@ export default function CounterCircle({
     currentCount = 0,
     totalCount = 33,
     onCountReached,
-    theme,
-    tr,
     size = 140,
     strokeWidth = 10,
-    backgroundColor = "#eee",
+    strokeColor = "#eee",
     color = "#2563eb",
+    textColor = '#333',
     vibrationDuration = 500,
 }) {
     const previousCount = useRef(currentCount);
@@ -38,11 +37,11 @@ export default function CounterCircle({
     const strokeDashoffset = circumference * (1 - progress);
 
     return (
-        <View style={[styles.container, { width: size, height: size }]}>
+        <View style={[styles.innerContainer, { width: size, height: size }]}>
             <Svg width={size} height={size}>
                 {/* Background Circle */}
                 <Circle
-                    stroke={backgroundColor}
+                    stroke={strokeColor}
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
@@ -65,9 +64,9 @@ export default function CounterCircle({
             </Svg>
 
             {/* Counter Text */}
-            <View style={styles.innerContainer}>
-                <Text style={[styles.counterText, { color: theme.text2 }]}>
-                    <Text style={[styles.currentCount, { color: theme.accent }]}>
+            <View style={styles.innerSection}>
+                <Text style={[styles.counterText, { color: textColor }]}>
+                    <Text style={[styles.currentCount, { color: color }]}>
                         {currentCount}
                     </Text>
                     /{totalCount}
@@ -78,12 +77,15 @@ export default function CounterCircle({
 }
 
 const styles = StyleSheet.create({
-    container: {
+    innerContainer: {
         position: "relative",
         alignItems: "center",
         justifyContent: "center",
+        width: 270,
+        borderRadius: 135,
+        backgroundColor: 'rgba(0,0,0,0.05)',
     },
-    innerContainer: {
+    innerSection: {
         position: "absolute",
         alignItems: "center",
         justifyContent: "center",

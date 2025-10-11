@@ -1,34 +1,98 @@
-import { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, AppState, Vibration } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 import AppScreen from "@/components/AppScreen";
 import CounterCircle from "@/components/CounterCircle";
 
 export default function QiblaScreen() {
+    const TESBIH_KEY = '@app_tesbih_v1';
+
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
-
-    // Preset options
-    const presets = [33, 66, 99, 100];
 
     // Local state
     const [count, setCount] = useState(0);
     const [totalCount, setTotalCount] = useState(33);
+    const [laps, setLaps] = useState(0);
 
     // ------------------------------------------------------------
-    //  Handle press
+    // Load state on mount
     // ------------------------------------------------------------
-    const handlePress = () => {
-        if (count < totalCount) {
-            setCount(count + 1);
+    useEffect(() => {
+        loadState();
+    }, []);
+
+    // ------------------------------------------------------------
+    // Save state when screen loses focus
+    // ------------------------------------------------------------
+    useFocusEffect(
+        useCallback(() => {
+            return () => saveState();
+        }, [count, totalCount, laps])
+    );
+
+    // ------------------------------------------------------------
+    // Save state when app goes to background
+    // ------------------------------------------------------------
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', (nextAppState) => {
+            if (nextAppState === 'background' || nextAppState === 'inactive') {
+                saveState();
+            }
+        });
+
+        return () => subscription.remove();
+    }, [count, totalCount, laps]);
+
+    // ------------------------------------------------------------
+    // Load persisted state
+    // ------------------------------------------------------------
+    const loadState = async () => {
+        try {
+            const saved = await AsyncStorage.getItem(TESBIH_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                setCount(data.count || 0);
+                setTotalCount(data.totalCount || 33);
+                setLaps(data.laps || 0);
+            }
+        } catch (error) {
+            console.error('Error loading tesbih state:', error);
         }
+    };
+
+    // ------------------------------------------------------------
+    // Save state to storage
+    // ------------------------------------------------------------
+    const saveState = async () => {
+        try {
+            const data = {
+                count: count,
+                totalCount: totalCount,
+                laps: laps
+            };
+            await AsyncStorage.setItem(TESBIH_KEY, JSON.stringify(data));
+        } catch (error) {
+            console.error('Error saving tesbih state:', error);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Handle press
+    // ------------------------------------------------------------
+    const handleCount = () => {
+        setCount(count + 1);
     };
 
     // ------------------------------------------------------------
     // Auto-restart when reaching total
     // ------------------------------------------------------------
-    const handleCountReached = () => {
+    const setCountReached = () => {
+        setLaps(prev => prev + 1)
         setCount(0);
     };
 
@@ -37,6 +101,8 @@ export default function QiblaScreen() {
     // ------------------------------------------------------------
     const handleReset = () => {
         setCount(0);
+        setLaps(0);
+        Vibration.vibrate(100);
     };
 
     // ------------------------------------------------------------
@@ -45,6 +111,7 @@ export default function QiblaScreen() {
     const incrementTotal = () => {
         setTotalCount(prev => prev + 1);
         setCount(0);
+        setLaps(0);
     };
 
     // ------------------------------------------------------------
@@ -54,6 +121,7 @@ export default function QiblaScreen() {
         if (totalCount > 1) {
             setTotalCount(prev => prev - 1);
             setCount(0);
+            setLaps(0);
         }
     };
 
@@ -63,6 +131,7 @@ export default function QiblaScreen() {
     const setPreset = (value) => {
         setTotalCount(value);
         setCount(0);
+        setLaps(0);
     };
 
     return (
@@ -73,76 +142,97 @@ export default function QiblaScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                {/* Preset Buttons */}
-                <View style={styles.presetsContainer}>
-                    {presets.map((preset) => (
+                {/* Instruction at top */}
+                <View style={[styles.instruction, { borderColor: theme.border }]}>
+                    <Ionicons name="information-circle" size={18} color={theme.divider} />
+                    <Text style={[styles.instructionText, { color: theme.text }]}>
+                        {tr('labels.tInstruction')}
+                    </Text>
+                </View>
+
+                {/* Preset chips - subtle and compact */}
+                <View style={styles.presets}>
+                    {[33, 66, 99, 100].map((preset) => (
                         <TouchableOpacity
                             key={preset}
                             style={[
-                                styles.presetButton,
+                                styles.presetBtn,
                                 {
-                                    backgroundColor: totalCount === preset ? theme.card : 'transparent',
-                                    borderColor: totalCount === preset ? theme.divider : theme.border,
+                                    backgroundColor: totalCount === preset ? theme.primary + '20' : theme.card,
+                                    borderColor: totalCount === preset ? theme.primary : 'transparent',
                                 }
                             ]}
                             onPress={() => setPreset(preset)}
                         >
-                            <Text style={[styles.presetButtonText, { color: totalCount === preset ? theme.text2 : theme.placeholder }]}>
+                            <Text style={[
+                                styles.presetText,
+                                { color: totalCount === preset ? theme.primary : theme.text2 }
+                            ]}>
                                 {preset}
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
 
-                {/* Custom Counter with +/- */}
-                <View style={styles.customCounter}>
-                    {/* Button (-) */}
-                    <TouchableOpacity style={[styles.counterButton, { borderColor: theme.border }]} onPress={decrementTotal}>
-                        <Text style={[styles.counterButtonText, { color: theme.text }]}>−</Text>
-                    </TouchableOpacity>
-
-                    {/* Counter number */}
-                    <View style={[styles.countDisplay, { borderColor: theme.border }]}>
-                        <Text style={[styles.countDisplayText, { color: theme.text2, opacity: 0.8 }]}>
-                            {totalCount}
-                        </Text>
-                    </View>
-
-                    {/* Button (+) */}
-                    <TouchableOpacity style={[styles.counterButton, { borderColor: theme.border }]} onPress={incrementTotal}>
-                        <Text style={[styles.counterButtonText, { color: theme.text }]}>+</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Reset Button */}
-                <TouchableOpacity style={[styles.resetButton, { borderColor: theme.border }]} onPress={handleReset}>
-                    <Text style={[styles.resetButtonText, { color: theme.text2, opacity: 0.8 }]}>RESET</Text>
-                </TouchableOpacity>
-
-                {/* Instructions text */}
-                <Text style={[styles.instructions, { color: theme.text2, opacity: 0.7 }]}>
-                    {tr('tesbih.instructions')}
-                </Text>
-
-                {/* COUNTER CIRCLE */}
+                {/* Counter Circle - Tappable */}
                 <TouchableOpacity
-                    style={styles.counterArea}
-                    activeOpacity={0.9}
-                    onPress={handlePress}
+                    style={[styles.circleContainer]}
+                    activeOpacity={0.6}
+                    onPress={handleCount}
                 >
                     <CounterCircle
                         currentCount={count}
                         totalCount={totalCount}
-                        onCountReached={handleCountReached}
-                        theme={theme}
-                        tr={tr}
+                        onCountReached={setCountReached}
                         size={280}
-                        strokeWidth={12}
-                        backgroundColor={theme.border}
+                        strokeWidth={10}
+                        strokeColor={theme.divider}
                         color={theme.primary}
+                        textColor={theme.text}
                         vibrationDuration={500}
                     />
                 </TouchableOpacity>
+
+                {/* Bottom Info Cards - Current and Limit */}
+                <View style={styles.infoCard}>
+                    <View style={[styles.infoCardItem, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.infoCardLabel, { color: theme.text2 }]}>
+                            {tr('labels.tLap')}
+                        </Text>
+                        <Text style={[styles.infoCardValue, { color: theme.text }]}>
+                            {laps}
+                        </Text>
+                    </View>
+
+                    <View style={[styles.infoCardItem, { backgroundColor: theme.card }]}>
+                        <Text style={[styles.infoCardLabel, { color: theme.text2 }]}>
+                            {tr('labels.tLimit')}
+                        </Text>
+                        <Text style={[styles.infoCardValue, { color: theme.text }]}>
+                            {totalCount}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Bottom Controls - Inside pill container */}
+                <View style={[styles.controls, { backgroundColor: theme.card }]}>
+                    <TouchableOpacity style={styles.controlBtn} onPress={decrementTotal}>
+                        <McIcons name="minus" size={24} color={theme.text2} />
+                    </TouchableOpacity>
+
+                    <Text style={[styles.controlValue, { color: theme.text2 }]}>
+                        {totalCount}
+                    </Text>
+
+                    <TouchableOpacity style={styles.controlBtn} onPress={incrementTotal}>
+                        <McIcons name="plus" size={24} color={theme.text2} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.controlBtn} onPress={handleReset}>
+                        <McIcons name="reload" size={26} color={theme.primary} />
+                    </TouchableOpacity>
+                </View>
+
 
             </ScrollView>
         </AppScreen>
@@ -155,94 +245,105 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 16,
-        paddingBottom: 40,
-        gap: 16,
+        paddingTop: 20,
+        paddingBottom: 24,
+        gap: 24,
+    },
+
+    // Instruction
+    instruction: {
+        alignSelf: "center",
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderRadius: 20,
+        gap: 6,
+    },
+    instructionText: {
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 20,
+        opacity: 0.6,
     },
 
     // Presets
-    presetsContainer: {
+    presets: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
         justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    presetBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    presetText: {
+        fontSize: 18,
+        fontWeight: '500',
+        opacity: 0.6,
+    },
+
+    // Counter Circle
+    circleContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    // Bottom Info Bar (LAP + LIMIT)
+    infoCard: {
+        width: '100%',
+        flexDirection: "row",
+        justifyContent: 'center',
+        marginBottom: -3,
         gap: 16,
     },
-    presetButton: {
-        minWidth: 70,
-        paddingVertical: 12,
-        paddingHorizontal: 18,
+    infoCardItem: {
+        minWidth: 110,
+        alignItems: "center",
+        paddingVertical: 6,
+        paddingHorizontal: 20,
         borderRadius: 8,
-        alignItems: 'center',
-        borderWidth: 2,
     },
-    presetButtonText: {
+    infoCardLabel: {
+        fontSize: 12,
+        letterSpacing: 0.5,
+        opacity: 0.6,
+        marginBottom: 2,
+    },
+    infoCardValue: {
         fontSize: 18,
         fontWeight: '600',
+        opacity: 0.6,
     },
 
-    // Custom Counter
-    customCounter: {
+    // Bottom Controls (Pill)
+    controls: {
+        width: '95%',
+        alignSelf: 'center',
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 8,
-        gap: 20,
+        justifyContent: 'space-evenly',
+        borderRadius: 40,
+        paddingVertical: 14,
     },
-    counterButton: {
-        width: 50,
-        height: 50,
+    controlBtn: {
+        width: 52,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1.5,
-        borderRadius: 25,
     },
-    counterButtonText: {
-        fontSize: 28,
-        fontWeight: '300',
-    },
-    countDisplay: {
-        minWidth: 70,
-        paddingVertical: 12,
-        paddingHorizontal: 18,
-        alignItems: 'center',
-        borderRadius: 8,
-        borderWidth: 1.5,
-    },
-    countDisplayText: {
-        fontSize: 18,
-        fontWeight: '600',
-    },
-
-    // Reset Button
-    resetButton: {
-        height: 50,
-        paddingVertical: 10,
-        paddingHorizontal: 45,
-        borderRadius: 8,
-        borderWidth: 1.5,
-    },
-    resetButtonText: {
+    controlValue: {
         fontSize: 20,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-    },
-
-    // Instructions
-    instructions: {
-        fontSize: 15,
-        textAlign: 'center',
-        lineHeight: 22,
-        paddingHorizontal: 20,
-        marginTop: 8,
-    },
-
-    // Counter Area
-    counterArea: {
-        flex: 1,
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 320,
+        fontWeight: '600',
+        marginHorizontal: 6,
+        opacity: 0.6,
     },
 });

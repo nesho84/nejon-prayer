@@ -10,7 +10,7 @@ export default function CountdownCircle({
     tr,
     size = 140,
     strokeWidth = 10,
-    backgroundColor = "#eee",
+    strokeColor = "#eee",
     color = "#2563eb",
 }) {
     if (!totalSeconds || remainingSeconds === null) return null;
@@ -27,7 +27,7 @@ export default function CountdownCircle({
             <Svg width={size} height={size}>
                 {/* Background Circle */}
                 <Circle
-                    stroke={backgroundColor}
+                    stroke={strokeColor}
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     },
     innerContainer: {
         position: "absolute",
-        justifyContent: "center",
         alignItems: "center",
+        justifyContent: "center",
     },
     prayerName: {
         fontSize: 18,

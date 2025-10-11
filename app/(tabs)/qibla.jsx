@@ -24,8 +24,8 @@ export default function QiblaScreen() {
                     longitude={appSettings.location?.longitude}
                     timeZone={appSettings.timeZone?.location}
                     tr={tr}
+                    bgColor={theme.bg}
                     color={theme.primary}
-                    backgroundColor={theme.bg}
                     textColor={theme.text}
                 />
 
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 16,
         paddingTop: 12,
-        paddingBottom: 20,
+        paddingBottom: 24,
         gap: 16,
     },
 });

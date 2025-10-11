@@ -121,7 +121,6 @@ export function SettingsProvider({ children }) {
 
         const subscription = AppState.addEventListener('change', (nextAppState) => {
             if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-                // console.log("⚡ AppState → foreground → syncing settings...");
                 // Slight delay to let device settings apply
                 setTimeout(() => syncDeviceSettings(), 300);
             }
