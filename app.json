@@ -18,13 +18,34 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "android": {
+      "versionCode": 27,
+      "package": "com.nejon.nejonprayer",
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "monochromeImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
+    },
     "ios": {
       "buildNumber": "27",
       "bundleIdentifier": "com.nejon.nejonprayer",
       "supportsTablet": true,
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": [
+          "audio"
+        ]
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -35,23 +56,13 @@
         "tinted": "./assets/icons/ios-tinted.png"
       }
     },
-    "android": {
-      "versionCode": 27,
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "monochromeImage": "./assets/icons/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.nejon.nejonprayer"
-    },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/icons/favicon.png"
     },
     "plugins": [
-      "./plugins/notifee-mod.js",
+      "./plugins/withNotifeeRepo.js",
       "expo-router",
       [
         "expo-splash-screen",

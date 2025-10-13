@@ -1,4 +1,3 @@
-import React from "react";
 import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -15,6 +14,8 @@ export default function ExtrasScreen() {
         { href: "extras/abdesi", label: tr("labels.abdes"), color: "#06b6d4", icon: <Ionicons name="water-outline" size={30} color="#06b6d4" /> },
         { href: "extras/tesbih", label: tr("labels.tesbih"), color: "#8b5cf6", icon: <McIcons name="counter" size={34} color="#8b5cf6" /> },
         { href: "extras/about", label: tr("labels.about"), color: "#f59e0b", icon: <McIcons name="information-outline" size={32} color="#f59e0b" /> },
+        { href: "extras/about", label: 'empty1', color: "#8b5cf6", icon: <McIcons name="timer-sand" size={32} color="#8b5cf6" /> },
+        { href: "extras/about", label: 'empty2', color: "#8b5cf6", icon: <McIcons name="timer-sand" size={32} color="#8b5cf6" /> },
     ];
 
     return (
@@ -39,7 +40,7 @@ export default function ExtrasScreen() {
             {/* Feature Cards */}
             <View style={styles.grid}>
                 {features.map((item) => (
-                    <Link key={item.href} href={item.href} asChild>
+                    <Link key={item.label} href={item.href} asChild>
                         <Pressable style={styles.cardWrapper}>
                             {({ pressed }) => (
                                 <View

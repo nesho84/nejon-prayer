@@ -141,6 +141,9 @@ export default function HomeScreen() {
                     </View>
                 </View>
 
+                {/* Notifications Debug utility */}
+                <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
+
                 {/* 2. COUNTDOWN CIRCLE CARD */}
                 <AppCard style={styles.countdownCard}>
                     {nextPrayerName && (
@@ -241,11 +244,6 @@ export default function HomeScreen() {
                         })}
                     </View>
                 </AppCard>
-
-                {/* Debug utility */}
-                {/* <View style={{ marginTop: 20 }}>
-                    <Button title="Test Notifications" onPress={() => testNotification({ language, seconds: 5 })} />
-                </View> */}
 
             </ScrollView>
         </AppScreen>

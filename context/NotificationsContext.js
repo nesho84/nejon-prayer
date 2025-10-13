@@ -6,12 +6,12 @@ import notifee, {
     AndroidNotificationSetting,
     TriggerType,
     RepeatFrequency,
-    EventType,
     AndroidColor,
     AndroidStyle
 } from "@notifee/react-native";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { usePrayersContext } from "@/context/PrayersContext";
+import { handleNotificationEvent } from '@/utils/alertManager';
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();
@@ -26,20 +26,44 @@ export function NotificationsProvider({ children }) {
     const isSchedulingRef = useRef(false);
     const isLoading = settingsLoading || prayersLoading;
 
-    // ------------------------------------------------------------
-    // Create notification channel (Android only)
-    // ------------------------------------------------------------
-    const createNotificationChannel = async () => {
-        if (Platform.OS !== "android") return;
+    const anSettings = useMemo(() => ({
+        snoozeTime: appSettings?.notifications?.snoozeTime ?? 10, // minutes (5, 10, 15, 20, 30)
+        soundEnabled: appSettings?.notifications?.soundEnabled ?? true, // true or false
+        soundVolume: 1.0, // 0.0 to 1.0
+        vibrationPattern: appSettings?.notifications?.vibrationPattern ?? "medium", // "off", "short", "medium", "long"
+    }), [appSettings?.notifications]);
 
+    // ------------------------------------------------------------
+    // Create notification channels (Android only)
+    // ------------------------------------------------------------
+    const createNotificationChannels = async () => {
+        if (Platform.OS !== "android") return;
         try {
+            // prayer-notifications channel
             await notifee.createChannel({
                 id: "prayer-notifications",
                 name: "Prayer Time Notifications",
                 description: "Notifications for daily prayer times",
-                importance: AndroidImportance.HIGH,
+                importance: AndroidImportance.MAX,
                 visibility: AndroidVisibility.PUBLIC,
-                sound: "default",
+                sound: undefined,
+                autoCancel: false,
+                ongoing: true,
+                vibration: true,
+                vibrationPattern: [500, 300, 500, 300],
+                lights: true,
+                lightColor: AndroidColor.WHITE,
+                badge: true,
+                bypassDnd: true,
+            });
+            // prayer-reminders channel
+            await notifee.createChannel({
+                id: 'prayer-reminders',
+                name: 'Prayer Time Reminders',
+                description: "Reminder for daily prayer times",
+                importance: AndroidImportance.MAX,
+                visibility: AndroidVisibility.PUBLIC,
+                sound: undefined,
                 vibration: true,
                 vibrationPattern: [500, 300, 500, 300],
                 lights: true,
@@ -127,14 +151,14 @@ export function NotificationsProvider({ children }) {
             // Cancel existing notifications
             await cancelPrayerNotifications();
             // Create Channel (Android only)
-            await createNotificationChannel();
+            await createNotificationChannels();
 
             // Check Alarm & Reminders permission
             const settings = await notifee.getNotificationSettings();
             const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
-            const now = new Date();
             let scheduledCount = 0;
+            const now = new Date();
 
             for (const prayerName of PRAYER_ORDER) {
                 const timeStringRaw = times[prayerName];
@@ -181,28 +205,22 @@ export function NotificationsProvider({ children }) {
                             showTimestamp: true,
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
                             largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
-                            color: AndroidColor.RED,
+                            sound: undefined,
+                            color: AndroidColor.OLIVE,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [
-                                {
-                                    title: tr("actions.prayed") || "Prayed",
-                                    pressAction: { id: 'mark-prayed' },
-                                },
-                                {
-                                    title: tr("actions.remindLater") || "Remind Later",
-                                    pressAction: { id: 'snooze-prayer' },
-                                },
+                                { title: tr("actions.prayed") || "Prayed", pressAction: { id: 'mark-prayed' } },
+                                { title: tr("actions.remindLater") || "Remind Later", pressAction: { id: 'snooze-prayer' } },
                             ],
                             style: {
                                 type: AndroidStyle.INBOX, // Show all action buttons immediately
                                 lines: [`${tr("labels.alertBody")} (${timeString})` || "Time for Prayer"],
                             },
-                            autoCancel: true, // Auto dismiss when tapped
-                            ongoing: false, // Can be dismissed
+                            autoCancel: false,
+                            ongoing: true,
                         },
                         ios: {
                             categoryId: 'prayer-category',
-                            sound: 'default',
                             critical: false,
                             interruptionLevel: 'active',
                         }
@@ -253,67 +271,7 @@ export function NotificationsProvider({ children }) {
             // Ignore if no notification
             if (!notification) return;
 
-            // Check Alarm & Reminders permission
-            const settings = await notifee.getNotificationSettings();
-            const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
-
-            // Handle event types
-            switch (type) {
-                case EventType.ACTION_PRESS:
-                    switch (pressAction?.id) {
-                        case 'mark-prayed':
-                            console.log(`✅ [Foreground] Marked "${notification?.data?.prayer}" as prayed`);
-                            break;
-                        case 'snooze-prayer':
-                            console.log(`⏰ [Foreground] Snoozed "${notification?.data?.prayer}"`);
-                            try {
-                                // Create reminder-specific channel
-                                await notifee.createChannel({
-                                    id: 'prayer-reminders',
-                                    name: 'Prayer Time Reminders',
-                                    description: "Reminder for daily prayer times",
-                                    importance: AndroidImportance.HIGH,
-                                    visibility: AndroidVisibility.PUBLIC,
-                                    sound: 'default',
-                                    vibration: true,
-                                    vibrationPattern: [500, 300, 500, 300],
-                                    lights: true,
-                                    lightColor: AndroidColor.WHITE,
-                                    badge: true,
-                                    bypassDnd: true,
-                                });
-                                // Schedule timestamp reminder
-                                await notifee.createTriggerNotification(
-                                    {
-                                        id: `prayer-snooze-${notification?.data?.prayer}`,
-                                        title: notification?.data?.reminderTitle,
-                                        body: notification?.data?.reminderBody,
-                                        data: { type: "prayer-reminder" },
-                                        android: {
-                                            channelId: 'prayer-reminders',
-                                            smallIcon: 'ic_stat_prayer',
-                                            largeIcon: require('../assets/images/past.png'),
-                                            color: AndroidColor.RED,
-                                            pressAction: { id: 'default', launchActivity: 'default' },
-                                        }
-                                    },
-                                    {
-                                        type: TriggerType.TIMESTAMP,
-                                        timestamp: Date.now() + (10 * 60 * 1000), // 10 minutes
-                                        alarmManager: hasAlarm,
-                                    }
-                                );
-                                console.log(`🔔 [Foreground] Prayer reminder scheduled for "${notification?.data?.prayer}"`);
-                            } catch (err) {
-                                console.error("❌ [Foreground] Failed to schedule snooze reminder:", err);
-                            }
-                            break;
-                    }
-                    break;
-                case EventType.PRESS:
-                    console.log(`👆 [Foreground] Notification pressed for ${notification?.data?.prayer || 'N/A'} - app will open...`);
-                    break;
-            }
+            await handleNotificationEvent(type, notification, pressAction, 'foreground');
         });
     }, []);
 

@@ -143,9 +143,7 @@ export function PrayersProvider({ children }) {
 
             // Update state
             setPrayerTimes(timings);
-            if (timings && fromAPI) {
-                lastFetchedDate.current = new Date().toLocaleString("en-GB");
-            }
+            lastFetchedDate.current = new Date().toLocaleString("en-GB");
         } catch (err) {
             console.warn("⚠️ Failed to load prayer times:", err);
             setPrayersError(err.message);
