@@ -11,7 +11,7 @@ import notifee, {
 } from "@notifee/react-native";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { usePrayersContext } from "@/context/PrayersContext";
-import { handleNotificationEvent } from '@/utils/alertManager';
+import { handleNotificationEvent } from '@/utils/notificationManager';
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();
@@ -26,49 +26,54 @@ export function NotificationsProvider({ children }) {
     const isSchedulingRef = useRef(false);
     const isLoading = settingsLoading || prayersLoading;
 
-    const anSettings = useMemo(() => ({
-        snoozeTime: appSettings?.notifications?.snoozeTime ?? 10, // minutes (5, 10, 15, 20, 30)
-        soundEnabled: appSettings?.notifications?.soundEnabled ?? true, // true or false
-        soundVolume: 1.0, // 0.0 to 1.0
-        vibrationPattern: appSettings?.notifications?.vibrationPattern ?? "medium", // "off", "short", "medium", "long"
-    }), [appSettings?.notifications]);
+    // Vibration Patterns for Notifee Notifications
+    const VIBRATION_PATTERNS = {
+        off: [],
+        short: [500, 300, 500, 300], // quick alert
+        medium: Array(30).fill([1000, 300]).flat(), // ~30s total: 1s vibrate, 0.3s pause
+        long: Array(60).fill([1000, 300]).flat(),   // ~60s total: 1s vibrate, 0.3s pause
+    };
 
     // ------------------------------------------------------------
-    // Create notification channels (Android only)
+    // Create notification channels once (Android only)
     // ------------------------------------------------------------
     const createNotificationChannels = async () => {
         if (Platform.OS !== "android") return;
         try {
-            // prayer-notifications channel
+            const pattern = VIBRATION_PATTERNS[appSettings?.notifications?.vibrationPattern] || VIBRATION_PATTERNS.long;
+
+            // Create prayer-notifications Channel
             await notifee.createChannel({
-                id: "prayer-notifications",
+                id: "prayer-notifications-channel",
                 name: "Prayer Time Notifications",
                 description: "Notifications for daily prayer times",
-                importance: AndroidImportance.MAX,
+                importance: AndroidImportance.HIGH,
                 visibility: AndroidVisibility.PUBLIC,
                 sound: undefined,
+                vibration: pattern.length > 0,
+                vibrationPattern: pattern,
+                lights: true,
+                lightColor: AndroidColor.WHITE,
+                badge: true,
                 autoCancel: false,
                 ongoing: true,
-                vibration: true,
-                vibrationPattern: [500, 300, 500, 300],
-                lights: true,
-                lightColor: AndroidColor.WHITE,
-                badge: true,
                 bypassDnd: true,
             });
-            // prayer-reminders channel
+            // Create prayer-reminders Channel
             await notifee.createChannel({
-                id: 'prayer-reminders',
+                id: 'prayer-reminders-channel',
                 name: 'Prayer Time Reminders',
                 description: "Reminder for daily prayer times",
-                importance: AndroidImportance.MAX,
+                importance: AndroidImportance.HIGH,
                 visibility: AndroidVisibility.PUBLIC,
                 sound: undefined,
-                vibration: true,
-                vibrationPattern: [500, 300, 500, 300],
+                vibration: pattern.length > 0,
+                vibrationPattern: pattern,
                 lights: true,
                 lightColor: AndroidColor.WHITE,
                 badge: true,
+                autoCancel: false,
+                ongoing: true,
                 bypassDnd: true,
             });
         } catch (err) {
@@ -81,12 +86,17 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     const cancelPrayerNotifications = useCallback(async () => {
         try {
+            // Cancel notifications
             const notifications = await notifee.getTriggerNotifications();
             for (const n of notifications) {
                 if (n.notification.data?.type === "prayer") {
                     await notifee.cancelNotification(n.notification.id);
                 }
             }
+            // Delete channels
+            await notifee.deleteChannel('prayer-notifications-channel');
+            await notifee.deleteChannel('prayer-reminders-channel');
+
             console.log("🔴 All existing prayer notifications cancelled");
         } catch (err) {
             console.error("❌ Failed to cancel prayer notifications", err);
@@ -193,15 +203,14 @@ export function NotificationsProvider({ children }) {
                         title: `» ${tr(`prayers.${prayerName}`)} «` || "Prayer time",
                         body: `${tr("labels.alertBody")} (${timeString})` || "Time for Prayer",
                         data: {
-                            type: "prayer",
+                            type: "prayer-notification",
                             prayer: prayerName,
                             language: language,
-                            scheduledAt: new Date().toISOString(),
-                            reminderTitle: tr("labels.prayerReminder"),
-                            reminderBody: `» ${tr(`prayers.${prayerName}`)} «`,
+                            reminderTitle: `» ${tr(`prayers.${prayerName}`)} «`,
+                            reminderBody: tr("labels.prayerReminder"),
                         },
                         android: {
-                            channelId: "prayer-notifications",
+                            channelId: "prayer-notifications-channel",
                             showTimestamp: true,
                             smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
                             largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
@@ -253,13 +262,13 @@ export function NotificationsProvider({ children }) {
     // Schedule notifications when enabled & prayer times available
     // ------------------------------------------------------------
     useEffect(() => {
-        if (isLoading || !deviceSettings) return;
+        if (isLoading || !appSettings || !deviceSettings) return;
 
         if (deviceSettings.notificationPermission && hasPrayerTimes) {
             schedulePrayerNotifications(prayerTimes);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoading, deviceSettings, prayerTimes, hasPrayerTimes]);
+    }, [isLoading, appSettings, deviceSettings, prayerTimes, hasPrayerTimes]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee

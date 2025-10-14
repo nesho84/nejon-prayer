@@ -19,6 +19,11 @@ export function SettingsProvider({ children }) {
         location: null,
         fullAddress: null,
         timeZone: null,
+        notifications: {
+            soundVolume: 1.0,
+            vibrationPattern: 'long',
+            snoozeTimeout: 1,
+        }
     });
     // Live device/system settings (not stored)
     const [deviceSettings, setDeviceSettings] = useState({

@@ -1,6 +1,4 @@
 import notifee, {
-    AndroidImportance,
-    AndroidVisibility,
     AndroidColor,
     AndroidStyle,
     AndroidNotificationSetting,
@@ -19,24 +17,6 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
         const settings = await notifee.getNotificationSettings();
         const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
-        // Create channel for test notifications
-        await notifee.createChannel({
-            id: "test-notifications",
-            name: "Test Notifications",
-            description: "Notifications for testing only",
-            importance: AndroidImportance.HIGH,
-            visibility: AndroidVisibility.PUBLIC,
-            sound: undefined,
-            autoCancel: false,
-            ongoing: true,
-            vibration: true,
-            vibrationPattern: [500, 300, 500, 300],
-            lights: true,
-            lightColor: AndroidColor.WHITE,
-            badge: true,
-            bypassDnd: true,
-        });
-
         // Schedule the notification
         await notifee.createTriggerNotification(
             {
@@ -44,15 +24,14 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
                 title: "» Sabahu «",
                 body: "Koha për namaz (06:15)",
                 data: {
-                    type: "prayer",
+                    type: "prayer-notification",
                     prayer: "Sabahu",
                     language: language,
-                    scheduledAt: new Date().toISOString(),
-                    reminderTitle: "Kujtesë Lutjeje",
-                    reminderBody: `» Sabahu «`,
+                    reminderTitle: "» Sabahu «",
+                    reminderBody: "Kujtesë Lutjeje",
                 },
                 android: {
-                    channelId: "test-notifications",
+                    channelId: "prayer-notifications-channel", // (is created in NotificationsContext.js)
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../assets/images/moon-islam.png"),

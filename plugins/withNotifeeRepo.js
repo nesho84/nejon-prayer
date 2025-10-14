@@ -37,7 +37,7 @@ module.exports = function withNotifeeRepo(config) {
     const targetIcon = path.join(drawableFolder, 'ic_stat_prayer.png');
     if (fs.existsSync(sourceIcon)) {
       fs.copyFileSync(sourceIcon, targetIcon);
-      console.log('🖼️  Copied Notifee icon → drawable/ic_stat_prayer.png');
+      console.log('🖼️  Copied Notifee icon → android/app/src/main/res/drawable/ic_stat_prayer.png');
     } else {
       console.warn('⚠️  Notification icon not found in assets/icons/notification-icon.png');
     }
@@ -54,7 +54,7 @@ module.exports = function withNotifeeRepo(config) {
         const sourceSound = path.join(soundsSourceDir, file);
         const targetSound = path.join(rawFolder, file);
         fs.copyFileSync(sourceSound, targetSound);
-        console.log(`🔊 Copied sound → res/raw/${file}`);
+        console.log(`🔊 Copied sound → android/app/src/main/res/raw/${file}`);
       });
     } else {
       console.warn('⚠️  Sounds folder not found in assets/sounds');
