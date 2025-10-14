@@ -8,9 +8,9 @@ import notifee, {
 } from '@notifee/react-native';
 
 // ------------------------------------------------------------
-// Configuration
+// Default Configuration
 // ------------------------------------------------------------
-const CONFIG = {
+const DEFAULTS = {
     soundFile: 'sound1',
     soundVolume: 1.0, // 0.0 to 1.0
     // vibrationPattern: 'long', // (is handled in NotificationsContext.js)
@@ -35,8 +35,8 @@ async function loadSettings() {
     try {
         const jsonValue = await AsyncStorage.getItem('@app_settings_v1');
         if (!jsonValue) return {};
-        const settings = JSON.parse(jsonValue);
-        return settings?.notifications || {};
+        const saved = JSON.parse(jsonValue);
+        return saved?.notificationsConfig || {};
     } catch (e) {
         console.error('❌ Failed to load settings:', e);
         return {};
@@ -52,9 +52,9 @@ async function playSound(file, volume) {
     try {
         await stopSound();
 
-        const fileName = CONFIG.SOUNDS[file];
+        const fileName = DEFAULTS.SOUNDS[file];
         if (!fileName) {
-            console.error(`❌ Sound not found: ${file}`);
+            console.error(`❌ Sound file not found: ${file}`);
             return;
         }
 
@@ -97,15 +97,15 @@ async function stopSound() {
 // ------------------------------------------------------------
 export async function startAlert(options = {}) {
     const settings = await loadSettings();
-    const sound = options.sound ?? CONFIG.soundFile;
-    const volume = options.volume ?? settings.soundVolume ?? CONFIG.soundVolume;
+    const sound = options.sound ?? DEFAULTS.soundFile;
+    const volume = settings.soundVolume ?? DEFAULTS.soundVolume;
 
     if (volume > 0) {
         await playSound(sound, volume);
     }
 
     if (stopTimeout) clearTimeout(stopTimeout);
-    stopTimeout = setTimeout(() => stopAlert(), CONFIG.autoStopDuration);
+    stopTimeout = setTimeout(() => stopAlert(), DEFAULTS.autoStopDuration);
 }
 
 // ------------------------------------------------------------
@@ -126,8 +126,8 @@ export async function handleNotificationEvent(type, notification, pressAction, s
     const prefix = source === 'background' ? '[Background]' : '[Foreground]';
 
     // Load stored notification settings
-    const settings = await loadSettings();
-    const snoozeTimeout = settings.snoozeTimeout ?? CONFIG.snoozeTimeout; // in minutes
+    const stSettings = await loadSettings();
+    const snoozeTimeout = stSettings.snoozeTimeout ?? DEFAULTS.snoozeTimeout; // in minutes
 
     // Check Alarm & Reminders permission
     const notifSettings = await notifee.getNotificationSettings();
@@ -135,6 +135,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
 
     switch (type) {
         case EventType.DELIVERED:
+            console.log("Notification data:", JSON.stringify(notification?.data, null, 2)); // @TODO: debugging....
             console.log(`✅ ${prefix} Notification delivered`);
             // For default notification
             if (notification?.data?.type === "prayer-notification") {

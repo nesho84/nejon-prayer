@@ -19,7 +19,7 @@ export function SettingsProvider({ children }) {
         location: null,
         fullAddress: null,
         timeZone: null,
-        notifications: {
+        notificationsConfig: {
             soundVolume: 1.0,
             vibrationPattern: 'long',
             snoozeTimeout: 1,

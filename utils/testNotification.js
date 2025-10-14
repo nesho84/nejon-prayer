@@ -8,7 +8,7 @@ import notifee, {
 // ------------------------------------------------------------
 // Debug utility: schedule a test notification
 // ------------------------------------------------------------
-export async function testNotification({ language = "en", seconds = 10 } = {}) {
+export async function testNotification({ appSettings = null, seconds = 10 } = {}) {
     try {
         // Default to 10 seconds later if no timestamp passed
         const fireTime = Date.now() + seconds * 1000;
@@ -26,7 +26,10 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
                 data: {
                     type: "prayer-notification",
                     prayer: "Sabahu",
-                    language: language,
+                    language: appSettings?.language,
+                    soundVolume: String(appSettings?.notificationsConfig?.soundVolume ?? 1),
+                    vibrationPattern: appSettings?.notificationsConfig?.vibrationPattern ?? "long",
+                    snoozeTimeout: String(appSettings?.notificationsConfig?.snoozeTimeout ?? 1),
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
                 },
@@ -64,9 +67,7 @@ export async function testNotification({ language = "en", seconds = 10 } = {}) {
 
         const remainingSeconds = Math.max(0, Math.floor((fireTime - Date.now()) / 1000) + 1);
 
-        console.log(
-            `🔔 Test notification scheduled in ${remainingSeconds}s | language="${language}"`
-        );
+        console.log(`🔔 Test notification scheduled in ${remainingSeconds}s | language="${appSettings?.language}"`);
     } catch (err) {
         console.error("❌ Failed to schedule test notification:", err);
     }

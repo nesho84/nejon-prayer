@@ -233,7 +233,7 @@ export function PrayersProvider({ children }) {
             loadPrayerTimes();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settingsLoading, appSettings?.location, deviceSettings.internetConnection]);
+    }, [settingsLoading, appSettings?.location]);
 
     // ------------------------------------------------------------
     // Memoize context value to prevent unnecessary re-renders

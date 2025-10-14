@@ -26,21 +26,22 @@ export function NotificationsProvider({ children }) {
     const isSchedulingRef = useRef(false);
     const isLoading = settingsLoading || prayersLoading;
 
-    // Vibration Patterns for Notifee Notifications
-    const VIBRATION_PATTERNS = {
-        off: [],
-        short: [500, 300, 500, 300], // quick alert
-        medium: Array(30).fill([1000, 300]).flat(), // ~30s total: 1s vibrate, 0.3s pause
-        long: Array(60).fill([1000, 300]).flat(),   // ~60s total: 1s vibrate, 0.3s pause
-    };
-
     // ------------------------------------------------------------
     // Create notification channels once (Android only)
     // ------------------------------------------------------------
     const createNotificationChannels = async () => {
         if (Platform.OS !== "android") return;
+
+        // Vibration Patterns for Notifee Notifications
+        const V_PATTERNS = {
+            off: [],
+            short: [500, 300, 500, 300], // quick alert
+            medium: Array(30).fill([1000, 300]).flat(), // ~30s total: 1s vibrate, 0.3s pause
+            long: Array(60).fill([1000, 300]).flat(),   // ~60s total: 1s vibrate, 0.3s pause
+        };
+
         try {
-            const pattern = VIBRATION_PATTERNS[appSettings?.notifications?.vibrationPattern] || VIBRATION_PATTERNS.long;
+            const pattern = V_PATTERNS[appSettings?.notificationsConfig?.vibrationPattern] || V_PATTERNS.long;
 
             // Create prayer-notifications Channel
             await notifee.createChannel({
@@ -104,24 +105,37 @@ export function NotificationsProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
-    // Check if the currently scheduled notifications match the desired times & language
+    // Check if scheduled notifications match:
+    // current Payer times, language, and notificationsConfig
+    // Returns true if all notifications are up-to-date
     // ------------------------------------------------------------
     const isSchedulingUpToDate = async (times) => {
+        // Get all currently scheduled notifications
         const scheduled = await notifee.getTriggerNotifications();
+
+        // Check each prayer against its scheduled notification
         return PRAYER_ORDER.every(prayerName => {
+            // Skip if no time is set for this prayer
             const timeStringRaw = times[prayerName];
             if (!timeStringRaw) return true; // skip missing
 
+            // Find the scheduled notification for this prayer
             const scheduledNotification = scheduled.find(
                 n => n.notification.id === `prayer-${prayerName.toLowerCase()}`
             );
-            // not scheduled yet
-            if (!scheduledNotification) return false;
+            if (!scheduledNotification) return false; // not scheduled yet
 
-            // Check language
-            if (scheduledNotification.notification.data.language !== language) return false;
+            const data = scheduledNotification.notification.data;
 
-            // Compare trigger timestamp
+            // Check if language has changed
+            if (data.language !== language) return false;
+
+            // Check notificationsConfig
+            if (Number(data.soundVolume) !== appSettings?.notificationsConfig?.soundVolume) return false;
+            if (data.vibrationPattern !== appSettings?.notificationsConfig?.vibrationPattern) return false;
+            if (Number(data.snoozeTimeout) !== appSettings?.notificationsConfig?.snoozeTimeout) return false;
+
+            // Parse and normalize target time
             const [hourStr, minuteStr] = timeStringRaw.split(":");
             const hour = Number(hourStr);
             const minute = Number(minuteStr);
@@ -129,11 +143,15 @@ export function NotificationsProvider({ children }) {
             const now = new Date();
             const targetTime = new Date();
             targetTime.setHours(hour, minute, 0, 0);
+
+            // If time already passed today, schedule for tomorrow
             if (targetTime <= now) targetTime.setDate(targetTime.getDate() + 1);
 
-            const triggerTimestamp = scheduledNotification.trigger.timestamp;
+            // Check if trigger timestamp matches the target time
+            if (scheduledNotification.trigger.timestamp !== targetTime.getTime()) return false;
 
-            return triggerTimestamp === targetTime.getTime();
+            // Notification matches / up-to-date
+            return true;
         });
     };
 
@@ -206,6 +224,9 @@ export function NotificationsProvider({ children }) {
                             type: "prayer-notification",
                             prayer: prayerName,
                             language: language,
+                            soundVolume: String(appSettings?.notificationsConfig?.soundVolume ?? 1),
+                            vibrationPattern: appSettings?.notificationsConfig?.vibrationPattern ?? "long",
+                            snoozeTimeout: String(appSettings?.notificationsConfig?.snoozeTimeout ?? 1),
                             reminderTitle: `» ${tr(`prayers.${prayerName}`)} «`,
                             reminderBody: tr("labels.prayerReminder"),
                         },
@@ -262,7 +283,7 @@ export function NotificationsProvider({ children }) {
     // Schedule notifications when enabled & prayer times available
     // ------------------------------------------------------------
     useEffect(() => {
-        if (isLoading || !appSettings || !deviceSettings) return;
+        if (isLoading || !deviceSettings) return;
 
         if (deviceSettings.notificationPermission && hasPrayerTimes) {
             schedulePrayerNotifications(prayerTimes);
