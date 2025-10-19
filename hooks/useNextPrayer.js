@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import { useIsFocused } from '@react-navigation/native';
 
 export default function useNextPrayer(prayerTimes) {
+    const isFocused = useIsFocused();
     const [nextPrayerName, setNextPrayerName] = useState(null);
     const [nextPrayerTime, setNextPrayerTime] = useState(null);
     const [prayerCountdown, setPrayerCountdown] = useState({});
@@ -28,9 +30,11 @@ export default function useNextPrayer(prayerTimes) {
 
         // Find next prayer in today's schedule
         for (const name of PRAYER_ORDER) {
-            if (!prayerTimes[name]) continue; // skip if missing
+            const timeStr = prayerTimes[name];
 
-            const [hour, minute] = prayerTimes[name].split(":").map(Number);
+            if (!timeStr) continue; // skip if missing
+
+            const [hour, minute] = timeStr.split(":").map(Number);
             const prayerDate = new Date();
             prayerDate.setHours(hour, minute, 0, 0);
 
@@ -66,7 +70,7 @@ export default function useNextPrayer(prayerTimes) {
     // Update countdown every second
     // ------------------------------------------------------------
     useEffect(() => {
-        if (!prayerTimes) return;
+        if (!prayerTimes || !isFocused) return;
 
         const tick = () => {
             const now = new Date();
@@ -116,7 +120,7 @@ export default function useNextPrayer(prayerTimes) {
         tick();
         const interval = setInterval(tick, 1000);
         return () => clearInterval(interval);
-    }, [prayerTimes]);
+    }, [prayerTimes, isFocused]);
 
     return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds };
 }

@@ -14,27 +14,33 @@ import AppScreen from "@/components/AppScreen";
 export default function OnboardingScreen() {
   const router = useRouter();
   const { theme } = useThemeContext();
-  const { appSettings, settingsLoading, saveAppSettings } = useSettingsContext();
+  const {
+    appSettings,
+    isReady: settingsReady,
+    isLoading: settingsLoading,
+    settingsError,
+    saveAppSettings
+  } = useSettingsContext();
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
-  const languageRef = useRef("en");
-  const locationRef = useRef(null);
-  const fullAddressRef = useRef(null);
-  const timeZoneRef = useRef(null);
+  const languageRef = useRef(appSettings?.language ?? "en");
+  const locationRef = useRef(appSettings?.location);
+  const fullAddressRef = useRef(appSettings?.fullAddress);
+  const timeZoneRef = useRef(appSettings?.timeZone);
 
   // ------------------------------------------------------------
-  // Onboarding check: Redirect once settings are loaded
+  // Redirect if already onboarded (once settings are ready)
   // ------------------------------------------------------------
   useEffect(() => {
-    if (!settingsLoading && appSettings?.onboarding) {
+    if (appSettings?.onboarding) {
       // Show Tabs HomeScreen (if already onboarded)
       router.replace("/(tabs)/home");
     }
-  }, [settingsLoading, appSettings?.onboarding]);
+  }, [appSettings?.onboarding]);
 
   // ----------------------------
   // 1️⃣ (Step 1) Handle language
@@ -67,7 +73,7 @@ export default function OnboardingScreen() {
         setStep(3);
         return;
       }
-      // Try high accuracy first, fallback to balanced
+      // Get current position: first try high accuracy, fallback to balanced
       let loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
         timeout: 5000,
@@ -148,17 +154,13 @@ export default function OnboardingScreen() {
   }
 
   // If still loading settings
-  if (settingsLoading) {
-    return <AppLoading text="Loading settings..." />;
-  }
+  if (!settingsReady || settingsLoading) return <AppLoading text="Loading settings..." />;
+
   // Redirecting...
-  if (appSettings?.onboarding) {
-    return <AppLoading text="Loading..." />;
-  }
+  if (appSettings?.onboarding) return <AppLoading text="Loading..." />;
+
   // Show local loading
-  if (localLoading) {
-    return <AppLoading text="Please Wait..." />;
-  }
+  if (localLoading) return <AppLoading text="Please Wait..." />;
 
   return (
     <AppScreen>

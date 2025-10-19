@@ -12,18 +12,32 @@ import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
-import { testNotification } from "@/utils/testNotification";
+import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
     const { tr, language } = useTranslation();
-    const { appSettings, deviceSettings, settingsLoading, settingsError } = useSettingsContext();
-    const { prayerTimes, prayersLoading, prayersError, reloadPrayerTimes, hasPrayerTimes } = usePrayersContext();
-    const { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
-
-    // Local state
-    const isLoading = settingsLoading || prayersLoading;
-    const hasError = settingsError || prayersError;
+    const {
+        appSettings,
+        deviceSettings,
+        isReady: settingsReady,
+        isLoading: settingsLoading,
+        settingsError
+    } = useSettingsContext();
+    const {
+        prayerTimes,
+        hasPrayerTimes,
+        isReady: prayersReady,
+        isLoading: prayersLoading,
+        prayersError,
+        reloadPrayerTimes,
+    } = usePrayersContext();
+    const {
+        nextPrayerName,
+        prayerCountdown,
+        remainingSeconds,
+        totalSeconds
+    } = useNextPrayer(prayerTimes);
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
@@ -58,13 +72,14 @@ export default function HomeScreen() {
         return "time-outline";
     };
 
-    // Loading state
-    if (isLoading) {
-        return <AppLoading text={tr("labels.loading")} />
-    }
+    // Loading state: settings
+    if (!settingsReady || settingsLoading) return <AppLoading text={tr("labels.loadingSettings")} />;
+
+    // Loading state: prayer times
+    if (!prayersReady || prayersLoading) return <AppLoading text={tr("labels.loadingPrayers")} />;
 
     // Error state
-    if (hasError) {
+    if (settingsError || prayersError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
@@ -143,6 +158,7 @@ export default function HomeScreen() {
 
                 {/* Notifications Debug utility */}
                 <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} />
+                <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} />
 
                 {/* 2. COUNTDOWN CIRCLE CARD */}
                 <AppCard style={styles.countdownCard}>

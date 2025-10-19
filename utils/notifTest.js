@@ -13,6 +13,9 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
         // Default to 10 seconds later if no timestamp passed
         const fireTime = Date.now() + seconds * 1000;
 
+        // Extract config for cleaner dependency tracking
+        const notificationsConfig = appSettings?.notificationsConfig;
+
         // Check alarm permission
         const settings = await notifee.getNotificationSettings();
         const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
@@ -26,15 +29,16 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                 data: {
                     type: "prayer-notification",
                     prayer: "Sabahu",
-                    language: appSettings?.language,
-                    soundVolume: String(appSettings?.notificationsConfig?.soundVolume ?? 1),
-                    vibrationPattern: appSettings?.notificationsConfig?.vibrationPattern ?? "long",
-                    snoozeTimeout: String(appSettings?.notificationsConfig?.snoozeTimeout ?? 1),
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
+                    language: appSettings?.language,
+                    soundVolume: String(notificationsConfig?.soundVolume ?? 1.0),
+                    vibration: notificationsConfig?.vibration ?? "medium",
+                    snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
                 },
                 android: {
-                    channelId: "prayer-notifications-channel", // (is created in NotificationsContext.js)
+                    // (is created in NotificationsContext.js)
+                    channelId: `prayer-notifications-channel-${notificationsConfig?.vibration ?? 'medium'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../assets/images/moon-islam.png"),
@@ -67,8 +71,43 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
 
         const remainingSeconds = Math.max(0, Math.floor((fireTime - Date.now()) / 1000) + 1);
 
-        console.log(`🔔 Test notification scheduled in ${remainingSeconds}s | language="${appSettings?.language}"`);
+        console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds
+            channelId: ${`prayer-notifications-channel-${notificationsConfig?.vibration}`}
+            language: ${appSettings?.language},
+            alarm: ${hasAlarm},
+            soundVolume: ${notificationsConfig?.soundVolume},
+            vibration: ${notificationsConfig?.vibration},
+            snoozeTimeout: ${notificationsConfig?.snoozeTimeout}
+            `);
+
     } catch (err) {
         console.error("❌ Failed to schedule test notification:", err);
     }
 }
+
+export async function debugChannelsAndScheduled() {
+    try {
+        const channels = await notifee.getChannels();
+        console.log('📡 All channels:', channels.map(c => ({
+            id: c.id,
+            name: c.name,
+            vibration: c.vibration,
+            vibrationPattern: c.vibrationPattern,
+            importance: c.importance
+        })));
+
+        const scheduled = await notifee.getTriggerNotifications();
+        console.log('⏰ Scheduled trigger notifications:', scheduled.map(n => ({
+            id: n.notification.id,
+            channelId: n.notification.android?.channelId,
+            data: n.notification.data,
+            timestamp: n.trigger?.timestamp
+        })));
+
+        const settings = await notifee.getNotificationSettings();
+        console.log('🔧 Notification settings:', settings);
+    } catch (err) {
+        console.error('❌ debugChannelsAndScheduled failed:', err);
+    }
+}
+

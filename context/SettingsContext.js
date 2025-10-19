@@ -7,24 +7,25 @@ import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notif
 
 export const SettingsContext = createContext();
 
+const SETTINGS_KEY = "@app_settings_v1";
+
+const DEFAULT_SETTINGS = {
+    onboarding: false,
+    language: "en",
+    location: null,
+    fullAddress: null,
+    timeZone: null,
+    notificationsConfig: {
+        soundVolume: 1, // off or 0.0 to 1.0
+        vibration: 'medium', // off, short, medium, long
+        snoozeTimeout: 5, // minutes (1, 5, 10, 15, 20, 30)
+    }
+};
+
 export function SettingsProvider({ children }) {
-    const SETTINGS_KEY = "@app_settings_v1";
-
-    const appState = useRef(AppState.currentState);
-
     // Persistent storage app-level settings
-    const [appSettings, setAppSettings] = useState({
-        onboarding: false,
-        language: null,
-        location: null,
-        fullAddress: null,
-        timeZone: null,
-        notificationsConfig: {
-            soundVolume: 1.0,
-            vibrationPattern: 'long',
-            snoozeTimeout: 1,
-        }
-    });
+    const [appSettings, setAppSettings] = useState(DEFAULT_SETTINGS);
+
     // Live device/system settings (not stored)
     const [deviceSettings, setDeviceSettings] = useState({
         internetConnection: false,
@@ -33,57 +34,60 @@ export function SettingsProvider({ children }) {
         batteryOptimization: true,
         alarmPermission: false,
     });
-    const [settingsLoading, setSettingsLoading] = useState(true);
+
+    const [isReady, setIsReady] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [settingsError, setSettingsError] = useState(null);
 
+    const appStateRef = useRef(AppState.currentState);
+
     // ------------------------------------------------------------
-    // Load settings from storage
+    // Load settings from AsyncStorage
     // ------------------------------------------------------------
-    const loadAppSettings = async () => {
-        // Loading already started...
+    const loadAppSettings = useCallback(async () => {
+        setIsLoading(true);
+        setSettingsError(null);
         try {
-            setSettingsError(null);
             const saved = await AsyncStorage.getItem(SETTINGS_KEY);
-            if (saved !== null) {
-                setAppSettings(JSON.parse(saved));
-            }
+            if (saved !== null) setAppSettings(JSON.parse(saved));
         } catch (err) {
             console.warn("❌ Failed to load settings", err);
             setSettingsError(err.message);
         } finally {
-            setSettingsLoading(false);
+            setIsLoading(false);
+            setIsReady(true);
         }
-    };
+    }, []);
 
     // ------------------------------------------------------------
-    // Save settings to storage (merge with current)
+    // Save settings to AsyncStorage
     // ------------------------------------------------------------
     const saveAppSettings = useCallback(async (newSettings) => {
-        setSettingsLoading(true);
+        setIsLoading(true);
+        setSettingsError(null);
         try {
-            const updated = { ...appSettings, ...newSettings };
-            await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated));
-            setAppSettings(updated);
+            // Use functional update to get current state
+            setAppSettings((prev) => {
+                const updated = { ...prev, ...newSettings };
+                // Save to storage after state update
+                AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated)).catch(err => {
+                    console.warn("❌ Failed to save settings in AsyncStorage", err);
+                    setSettingsError(err.message);
+                });
+                return updated;
+            });
         } catch (err) {
-            console.warn("❌ Failed to save settings", err);
+            console.warn("❌ Failed to save appSettings", err);
             setSettingsError(err.message);
         } finally {
-            setSettingsLoading(false);
+            setIsLoading(false);
         }
-    }, [appSettings]);
-
-    // ------------------------------------------------------------
-    // Auto-load on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        loadAppSettings();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ------------------------------------------------------------
     // Sync Device settings (Android only)
     // ------------------------------------------------------------
-    const syncDeviceSettings = async () => {
+    const syncDeviceSettings = useCallback(async () => {
         if (Platform.OS !== 'android') return;
 
         try {
@@ -94,7 +98,6 @@ export function SettingsProvider({ children }) {
             const notificationsEnabled = ns.authorizationStatus === AuthorizationStatus.AUTHORIZED;
             const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
             const alarmEnabled = ns.android?.alarm === AndroidNotificationSetting.ENABLED;
-
             // Internet connection
             const netInfo = await NetInfo.fetch();
             const internetEnabled = !!(netInfo.isConnected && netInfo.isInternetReachable);
@@ -115,39 +118,49 @@ export function SettingsProvider({ children }) {
         } catch (err) {
             console.warn('❌ Failed to sync Device settings:', err);
         }
-    };
-
-    // ------------------------------------------------------------
-    // AppState listener - re-check on return to foreground
-    // ------------------------------------------------------------
-    useEffect(() => {
-        // Initial sync
-        syncDeviceSettings();
-
-        const subscription = AppState.addEventListener('change', (nextAppState) => {
-            if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-                // Slight delay to let device settings apply
-                setTimeout(() => syncDeviceSettings(), 300);
-            }
-            appState.current = nextAppState;
-            console.log('👁‍🗨 AppState →', appState.current);
-        });
-
-        return () => subscription.remove();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ------------------------------------------------------------
-    // Memoize context value to prevent unnecessary re-renders
+    // Auto-load on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        let mounted = true;
+
+        (async () => {
+            await loadAppSettings();
+            if (mounted) await syncDeviceSettings();
+        })();
+
+        return () => { mounted = false; };
+    }, [loadAppSettings, syncDeviceSettings]);
+
+    // ------------------------------------------------------------
+    // AppState listener - sync device settings!
+    // ------------------------------------------------------------
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", (nextAppState) => {
+            if (appStateRef.current.match(/inactive|background/) && nextAppState === "active") {
+                syncDeviceSettings();
+            }
+            appStateRef.current = nextAppState;
+            console.log('👁‍🗨 AppState →', appStateRef.current);
+        });
+
+        return () => subscription.remove(); //
+    }, [syncDeviceSettings]);
+
+    // ------------------------------------------------------------
+    // Memoize context value
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         appSettings,
         deviceSettings,
         saveAppSettings,
-        settingsLoading,
-        settingsError,
         reloadAppSettings: loadAppSettings,
-    }), [appSettings, deviceSettings, saveAppSettings, settingsLoading, settingsError]);
+        isReady,
+        isLoading,
+        settingsError,
+    }), [appSettings, deviceSettings, saveAppSettings, loadAppSettings, isReady, isLoading, settingsError]);
 
     return (
         <SettingsContext.Provider value={contextValue}>
@@ -158,8 +171,6 @@ export function SettingsProvider({ children }) {
 
 export function useSettingsContext() {
     const context = useContext(SettingsContext);
-    if (context === undefined) {
-        throw new Error('useSettingsContext must be used within a SettingsProvider');
-    }
+    if (!context) throw new Error('useSettingsContext must be used within a SettingsProvider');
     return context;
 }

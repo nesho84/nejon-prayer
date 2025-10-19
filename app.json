@@ -32,8 +32,11 @@
         "android.permission.USE_EXACT_ALARM",
         "android.permission.SCHEDULE_EXACT_ALARM",
         "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.VIBRATE",
         "android.permission.WAKE_LOCK",
-        "android.permission.FOREGROUND_SERVICE"
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
       ]
     },
     "ios": {
@@ -62,7 +65,7 @@
       "favicon": "./assets/icons/favicon.png"
     },
     "plugins": [
-      "./plugins/withNotifeeRepo.js",
+      "./plugins/resBuild.js",
       "expo-router",
       [
         "expo-splash-screen",

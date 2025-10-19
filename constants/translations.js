@@ -63,7 +63,10 @@ export const translations = {
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
 
-            // Notifications Warnings
+            // Notifications config
+            soundVolume: "Volume",
+            vibration: "Vibration",
+            snoozeTimeout: "Reminder timeout",
             batteryOptTitle: "Battery Optimization",
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.",
             alarmAccessTitle: "Alarms & Reminders",
@@ -91,6 +94,9 @@ export const translations = {
             languageError: "Failed to update language setting.",
             themeError: "Failed to update theme setting.",
             notificationError: "Failed to update notifications setting.",
+            soundVolumeError: "Failed to update notifications sound volume.",
+            vibrationError: "Failed to update notifications vibration.",
+            snoozeTimeoutError: "Failed to update notifications snooze timeout.",
             settingsError: "Failed to load settings.",
 
             // About
@@ -174,7 +180,10 @@ export const translations = {
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
 
-            // Notifications Warnings
+            // Notifications config
+            soundVolume: "Volumi i zërit",
+            vibration: "Dridhje",
+            snoozeTimeout: "Kohëzgjatja e kujtesës",
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
             alarmAccessTitle: "Alarme dhe Kujtesa",
@@ -201,6 +210,9 @@ export const translations = {
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
             themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
             notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
+            soundVolumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
+            vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
+            snoozeTimeoutError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
             settingsError: "Cilësimet nuk mund të ngarkohen.",
 
             // About
@@ -284,7 +296,10 @@ export const translations = {
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
 
-            // Notifications Warnings
+            // Notifications config
+            soundVolume: "Lautstärke",
+            vibration: "Vibration",
+            snoozeTimeout: "Erinnerungs-Timeout",
             batteryOptTitle: "Akkuoptimierung",
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen. Tippe oben, um die Systemeinstellungen anzupassen.",
             alarmAccessTitle: "Alarme & Erinnerungen",
@@ -311,6 +326,9 @@ export const translations = {
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",
             themeError: "Darstellungseinstellung konnte nicht aktualisiert werden.",
             notificationError: "Benachrichtigungseinstellung konnte nicht aktualisiert werden.",
+            soundVolumeError: "Die Lautstärke der Benachrichtigungen konnte nicht aktualisiert werden.",
+            vibrationError: "Die Aktualisierung der Benachrichtigungsvibration ist fehlgeschlagen.",
+            snoozeTimeoutError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             settingsError: "Einstellungen konnten nicht geladen werden.",
 
             // About

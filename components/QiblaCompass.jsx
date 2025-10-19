@@ -21,14 +21,13 @@ export default function QiblaCompass({
     color = '#2563eb',
     textColor = '#333'
 }) {
+    const isFocused = useIsFocused();
     const [compassHeading, setCompassHeading] = useState(0);
     const [magnetometerAccuracy, setMagnetometerAccuracy] = useState('unknown');
     const [showCalibration, setShowCalibration] = useState(false);
     const [distanceToKaaba, setDistanceToKaaba] = useState(0);
     const [isFlat, setIsFlat] = useState(true);
     const [isAligned, setIsAligned] = useState(false);
-
-    const isFocused = useIsFocused();
 
     // Refs
     const accelRef = useRef({ x: 0, y: 0, z: 0 });
@@ -194,7 +193,7 @@ export default function QiblaCompass({
         } else if (!aligned && isAligned) {
             setIsAligned(false);
         }
-    }, [compassHeading, qiblaDirection, isFocused, isAligned]);
+    }, [compassHeading, qiblaDirection, isAligned, isFocused]);
 
     // ------------------------------------------------------------
     // Show calibration hint after 3 seconds of low accuracy

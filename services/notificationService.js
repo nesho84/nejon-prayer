@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Sound from 'react-native-sound';
 import notifee, {
     EventType,
@@ -8,40 +7,21 @@ import notifee, {
 } from '@notifee/react-native';
 
 // ------------------------------------------------------------
-// Default Configuration
-// ------------------------------------------------------------
-const DEFAULTS = {
-    soundFile: 'sound1',
-    soundVolume: 1.0, // 0.0 to 1.0
-    // vibrationPattern: 'long', // (is handled in NotificationsContext.js)
-    snoozeTimeout: 1, // minutes (5, 10, 15, 20, 30)
-    autoStopDuration: 60000,
-    SOUNDS: {
-        sound1: 'azan1.mp3',
-        sound2: 'alarm1.mp3',
-    },
-};
-
-// ------------------------------------------------------------
 // Internal state
 // ------------------------------------------------------------
 let currentSound = null;
 let stopTimeout = null;
 
 // ------------------------------------------------------------
-// Load stored app settings
+// Default Configuration
 // ------------------------------------------------------------
-async function loadSettings() {
-    try {
-        const jsonValue = await AsyncStorage.getItem('@app_settings_v1');
-        if (!jsonValue) return {};
-        const saved = JSON.parse(jsonValue);
-        return saved?.notificationsConfig || {};
-    } catch (e) {
-        console.error('❌ Failed to load settings:', e);
-        return {};
-    }
-}
+const DEFAULTS = {
+    soundFile: 'azan1.mp3', // android/app/src/main/res/raw/azan1.mp3
+    soundVolume: 1.0, // off or 0.0 to 1.0
+    vibration: 'medium', // short, medium, long (is handled in NotificationsContext.js)
+    snoozeTimeout: 5, // minutes (1, 5, 10, 15, 20, 30)
+    autoStopDuration: 60000, // 60 seconds/1 minute
+};
 
 // ------------------------------------------------------------
 // Start Sound
@@ -52,13 +32,7 @@ async function playSound(file, volume) {
     try {
         await stopSound();
 
-        const fileName = DEFAULTS.SOUNDS[file];
-        if (!fileName) {
-            console.error(`❌ Sound file not found: ${file}`);
-            return;
-        }
-
-        currentSound = new Sound(fileName, Sound.MAIN_BUNDLE, (error) => {
+        currentSound = new Sound(file, Sound.MAIN_BUNDLE, (error) => {
             if (error) {
                 console.error('❌ Error loading sound:', error);
                 return;
@@ -96,13 +70,10 @@ async function stopSound() {
 // Start Alert (Public API)
 // ------------------------------------------------------------
 export async function startAlert(options = {}) {
-    const settings = await loadSettings();
-    const sound = options.sound ?? DEFAULTS.soundFile;
-    const volume = settings.soundVolume ?? DEFAULTS.soundVolume;
+    const sound = options.soundFile ?? DEFAULTS.soundFile;
+    const volume = options.soundVolume ?? DEFAULTS.soundVolume;
 
-    if (volume > 0) {
-        await playSound(sound, volume);
-    }
+    await playSound(sound, volume);
 
     if (stopTimeout) clearTimeout(stopTimeout);
     stopTimeout = setTimeout(() => stopAlert(), DEFAULTS.autoStopDuration);
@@ -123,27 +94,29 @@ export async function stopAlert() {
 // Handle Notifee Notification event (Public API)
 // ------------------------------------------------------------
 export async function handleNotificationEvent(type, notification, pressAction, source = 'unknown') {
-    const prefix = source === 'background' ? '[Background]' : '[Foreground]';
-
-    // Load stored notification settings
-    const stSettings = await loadSettings();
-    const snoozeTimeout = stSettings.snoozeTimeout ?? DEFAULTS.snoozeTimeout; // in minutes
+    // Get notification data passed from SettingsContext
+    const language = notification?.data?.language ?? 'en';
+    const soundVolume = Number(notification?.data?.soundVolume ?? DEFAULTS.soundVolume);
+    const vibration = notification?.data?.vibration ?? DEFAULTS.vibration;
+    const snoozeTimeout = Number(notification?.data?.snoozeTimeout ?? DEFAULTS.snoozeTimeout);
 
     // Check Alarm & Reminders permission
     const notifSettings = await notifee.getNotificationSettings();
     const hasAlarm = notifSettings.android.alarm === AndroidNotificationSetting.ENABLED;
 
+    const prefix = source === 'background' ? '[Background]' : '[Foreground]';
+
     switch (type) {
         case EventType.DELIVERED:
-            console.log("Notification data:", JSON.stringify(notification?.data, null, 2)); // @TODO: debugging....
             console.log(`✅ ${prefix} Notification delivered`);
+
             // For default notification
             if (notification?.data?.type === "prayer-notification") {
-                await startAlert({ sound: 'sound1' });
+                await startAlert({ soundFile: 'azan1.mp3', soundVolume });
             }
             // For reminder notification
             if (notification?.data?.type === "prayer-reminder") {
-                await startAlert({ sound: 'sound2' });
+                await startAlert({ soundFile: 'alarm1.mp3', soundVolume });
             }
             break;
 
@@ -156,7 +129,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                     break;
 
                 case 'snooze-prayer':
-                    console.log(`⏰ ${prefix} Notification "Remind Later" pressed`);
+                    console.log(`⏰ ${prefix} Notification "Remind Later" pressed (${snoozeTimeout}min)`);
                     await notifee.cancelNotification(notification.id);
 
                     try {
@@ -166,14 +139,25 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                 id: `prayer-snooze-${notification?.data?.prayer}`,
                                 title: notification?.data?.reminderTitle,
                                 body: notification?.data?.reminderBody,
-                                data: { type: "prayer-reminder" },
+                                data: {
+                                    type: "prayer-reminder",
+                                    soundVolume: soundVolume,
+                                },
                                 android: {
-                                    channelId: 'prayer-reminders-channel', // (is created in NotificationsContext.js)
+                                    // (is created in NotificationsContext.js)
+                                    channelId: `prayer-reminders-channel-${vibration ?? DEFAULTS.vibration}`,
                                     showTimestamp: true,
                                     smallIcon: 'ic_stat_prayer',
                                     largeIcon: require('../assets/images/past.png'),
                                     color: AndroidColor.RED,
                                     pressAction: { id: 'default', launchActivity: 'default' },
+                                    autoCancel: false,
+                                    ongoing: true,
+                                },
+                                ios: {
+                                    categoryId: 'prayer-reminder-category',
+                                    critical: false,
+                                    interruptionLevel: 'active',
                                 }
                             },
                             {

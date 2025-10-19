@@ -5,13 +5,14 @@ import { darkTheme, lightTheme } from "@/constants/colors";
 
 export const ThemeContext = createContext();
 
-export function ThemeProvider({ children }) {
-    const THEME_KEY = "@app_theme_v1";
+const THEME_KEY = "@app_theme_v1";
 
+export function ThemeProvider({ children }) {
     const [themeMode, setThemeMode] = useState("system"); // "light" | "dark" | "system"
-    const [theme, setTheme] = useState(lightTheme);       // actual theme object for UI
+    const [theme, setTheme] = useState(lightTheme); // actual theme object for UI
     const [resolvedTheme, setResolvedTheme] = useState("light"); // "light" or "dark"
-    const [themeLoading, setThemeLoading] = useState(true);
+    const [isReady, setIsReady] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     // ------------------------------------------------------------
     // Resolve theme
@@ -33,33 +34,35 @@ export function ThemeProvider({ children }) {
     // ------------------------------------------------------------
     // Load saved theme from storage
     // ------------------------------------------------------------
-    const loadTheme = async () => {
+    const loadTheme = useCallback(async () => {
         try {
             const saved = await AsyncStorage.getItem(THEME_KEY);
             const mode = saved || "system";
             setThemeMode(mode);
             setTheme(resolveTheme(mode));
         } catch (err) {
-            console.warn("❌ Failed to load theme, defaulting to light", err);
+            console.warn("❌ Failed to load theme, defaulting to system", err);
             setThemeMode("system");
             setTheme(lightTheme);
         } finally {
-            setThemeLoading(false);
+            setLoading(false);
+            setIsReady(true);
         }
-    };
+    }, [resolveTheme]);
 
     // ------------------------------------------------------------
     // Change theme manually
     // ------------------------------------------------------------
     const changeTheme = useCallback(async (mode) => {
-        setThemeMode(mode);
-        setTheme(resolveTheme(mode));
+        setLoading(true);
         try {
+            setThemeMode(mode);
+            setTheme(resolveTheme(mode));
             await AsyncStorage.setItem(THEME_KEY, mode);
         } catch (err) {
             console.warn("❌ Failed to save theme", err);
         } finally {
-            setThemeLoading(false);
+            setLoading(false);
         }
     }, [resolveTheme]);
 
@@ -67,9 +70,14 @@ export function ThemeProvider({ children }) {
     // Auto-load on mount
     // ------------------------------------------------------------
     useEffect(() => {
-        loadTheme();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        let mounted = true;
+
+        (async () => {
+            await loadTheme();
+        })();
+
+        return () => { mounted = false; };
+    }, [loadTheme]);
 
     // ------------------------------------------------------------
     // Listen to system changes
@@ -88,15 +96,16 @@ export function ThemeProvider({ children }) {
     }, [themeMode]);
 
     // ------------------------------------------------------------
-    // Memoize context value to prevent unnecessary re-renders
+    // Memoize context value
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         theme,
         themeMode,
         changeTheme,
         resolvedTheme,
-        themeLoading,
-    }), [theme, themeMode, changeTheme, resolvedTheme, themeLoading]);
+        isReady,
+        isLoading,
+    }), [theme, themeMode, changeTheme, resolvedTheme, isReady, isLoading]);
 
     return (
         <ThemeContext.Provider value={contextValue}>
@@ -107,8 +116,6 @@ export function ThemeProvider({ children }) {
 
 export function useThemeContext() {
     const context = useContext(ThemeContext);
-    if (context === undefined) {
-        throw new Error('useThemeContext must be used within a ThemeProvider');
-    }
+    if (!context) throw new Error('useThemeContext must be used within a ThemeProvider');
     return context;
 }

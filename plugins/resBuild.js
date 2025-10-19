@@ -23,46 +23,46 @@ module.exports = function withNotifeeRepo(config) {
   });
 
   // ------------------------------------------------------------
-  // Copy icon + sounds into Android resources
+  // Copy notification icon (Notifee)
   // ------------------------------------------------------------
   config = withDangerousMod(config, ['android', async config => {
-    const resRoot = path.join(config.modRequest.platformProjectRoot, 'app/src/main/res');
+    const drawableFolder = path.join(config.modRequest.platformProjectRoot, 'app/src/main/res/drawable');
+    if (!fs.existsSync(drawableFolder)) fs.mkdirSync(drawableFolder, { recursive: true });
 
-    // --- Copy notification icon (Notifee) ---
-    const drawableFolder = path.join(resRoot, 'drawable');
-    if (!fs.existsSync(drawableFolder)) {
-      fs.mkdirSync(drawableFolder, { recursive: true });
-    }
     const sourceIcon = path.join(config.modRequest.projectRoot, 'assets/icons/notification-icon.png');
     const targetIcon = path.join(drawableFolder, 'ic_stat_prayer.png');
+
     if (fs.existsSync(sourceIcon)) {
       fs.copyFileSync(sourceIcon, targetIcon);
-      console.log('🖼️  Copied Notifee icon → android/app/src/main/res/drawable/ic_stat_prayer.png');
+      console.log('🖼️  Copied notification icon → drawable/ic_stat_prayer.png');
     } else {
       console.warn('⚠️  Notification icon not found in assets/icons/notification-icon.png');
     }
 
-    // --- Copy all sounds from assets/sounds to raw folder (react-native-sound) ---
-    const rawFolder = path.join(resRoot, 'raw');
-    if (!fs.existsSync(rawFolder)) {
-      fs.mkdirSync(rawFolder, { recursive: true });
-    }
+    return config;
+  }]);
+
+  // ------------------------------------------------------------
+  // Copy all sounds files (react-native-sound)
+  // ------------------------------------------------------------
+  config = withDangerousMod(config, ['android', async config => {
+    const rawFolder = path.join(config.modRequest.platformProjectRoot, 'app/src/main/res/raw');
+    if (!fs.existsSync(rawFolder)) fs.mkdirSync(rawFolder, { recursive: true });
+
     const soundsSourceDir = path.join(config.modRequest.projectRoot, 'assets/sounds');
     if (fs.existsSync(soundsSourceDir)) {
-      const soundFiles = fs.readdirSync(soundsSourceDir);
-      soundFiles.forEach(file => {
+      fs.readdirSync(soundsSourceDir).forEach(file => {
         const sourceSound = path.join(soundsSourceDir, file);
         const targetSound = path.join(rawFolder, file);
         fs.copyFileSync(sourceSound, targetSound);
-        console.log(`🔊 Copied sound → android/app/src/main/res/raw/${file}`);
+        console.log(`🔊 Copied sound → raw/${file}`);
       });
     } else {
       console.warn('⚠️  Sounds folder not found in assets/sounds');
     }
 
     return config;
-  },
-  ]);
+  }]);
 
   return config;
 };

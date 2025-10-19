@@ -1,7 +1,7 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
 import notifee from '@notifee/react-native';
-import { handleNotificationEvent } from '@/utils/notificationManager';
+import { handleNotificationEvent } from '@/services/notificationService';
 
 // ------------------------------------------------------------
 // Background handler for Notifee

@@ -4,160 +4,153 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
-import { getPrayerTimes } from "@/services/prayersApi";
+import { getPrayerTimes } from "@/services/prayerService";
 import { formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
 import webPrayers from "@/services/webPrayers.json";
 
 export const PrayersContext = createContext();
 
-export function PrayersProvider({ children }) {
-    const PRAYERS_KEY = "@app_prayers_v1";
-    const STALE_DAYS = 7; // Consider data stale after 7 days
+const PRAYERS_KEY = "@app_prayers_v1";
+const STALE_DAYS = 7; // consider data outdated after 7 days
 
-    const { appSettings, deviceSettings, settingsLoading, saveAppSettings } = useSettingsContext();
+export function PrayersProvider({ children }) {
+    const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useSettingsContext();
     const { tr } = useTranslation();
 
-    const lastFetchedDate = useRef(null);
-    const isLoadingRef = useRef(false);
-
-    const [prayerTimes, setPrayerTimes] = useState([]);
-    const [prayersLoading, setPrayersLoading] = useState(false);
+    const [prayerTimes, setPrayerTimes] = useState(null);
     const [prayersError, setPrayersError] = useState(null);
     const [prayersOutdated, setPrayersOutdated] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isReady, setIsReady] = useState(false);
+
+    const lastFetchedDateRef = useRef(null);
 
     // ------------------------------------------------------------
-    // Check if data is stale (older than STALE_DAYS)
+    // Check if data is outdated (older than STALE_DAYS)
     // ------------------------------------------------------------
-    const checkIfOutdated = (timestamp) => {
+    const checkIfOutdated = useCallback((timestamp) => {
         if (!timestamp) return false;
         const daysDiff = (Date.now() - timestamp) / (1000 * 60 * 60 * 24);
         return daysDiff > STALE_DAYS;
-    };
+    }, []);
 
     // ------------------------------------------------------------
-    // Read from storage
+    // Read from AsyncStorage
     // ------------------------------------------------------------
-    const readFromStorage = async () => {
+    const readFromStorage = useCallback(async () => {
+        setIsLoading(true);
+        setPrayersError(null);
         try {
             const stored = await AsyncStorage.getItem(PRAYERS_KEY);
             return stored ? JSON.parse(stored) : null;
         } catch (err) {
             console.warn("⚠️ Failed to read/parse storage:", err);
+            setPrayersError(err.message);
             return null;
+        } finally {
+            setIsLoading(false);
         }
-    };
+    }, []);
 
     // ------------------------------------------------------------
-    // Save to storage with timestamp
+    // Save to AsyncStorage
     // ------------------------------------------------------------
-    const saveToStorage = async (timings) => {
+    const saveToStorage = useCallback(async (timings) => {
+        setIsLoading(true);
+        setPrayersError(null);
         try {
             const dataToSave = { timings, timestamp: Date.now() };
             await AsyncStorage.setItem(PRAYERS_KEY, JSON.stringify(dataToSave));
             return true;
         } catch (err) {
             console.warn("⚠️ Failed to save to storage:", err);
+            setPrayersError(err.message);
             return false;
+        } finally {
+            setIsLoading(false);
         }
-    };
+    }, []);
 
     // ------------------------------------------------------------
-    // Fetch prayers times from aladhan API or load from Storage
+    // Load prayer times
     // ------------------------------------------------------------
-    const loadPrayerTimes = async () => {
-        // Prevent race conditions
-        if (isLoadingRef.current) return;
-        isLoadingRef.current = true;
-
-        // Web Test: load random data from JSON
-        if (Platform.OS === "web") {
-            console.log("🌐 Web detected — loading random prayer times from JSON");
-
-            // pick a random set
-            const randomIndex = Math.floor(Math.random() * webPrayers.length);
-            const timings = webPrayers[randomIndex];
-
-            setPrayerTimes(timings);
-            setPrayersLoading(false);
-            setPrayersError(null);
-            setPrayersOutdated(false);
-            lastFetchedDate.current = new Date().toLocaleString("en-GB");
-
-            return;
-        }
+    const loadPrayerTimes = useCallback(async () => {
+        setIsLoading(true);
+        setPrayersError(null);
+        setPrayersOutdated(false);
 
         try {
-            setPrayersLoading(true);
-            setPrayersError(null);
-            setPrayersOutdated(false);
-
-            const loc = appSettings?.location;
-            if (!loc) {
-                setPrayerTimes([]);
-                setPrayersLoading(false);
+            // Web platform: use mock data
+            if (Platform.OS === "web") {
+                const randomIndex = Math.floor(Math.random() * webPrayers.length);
+                setPrayerTimes(webPrayers[randomIndex]);
+                lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
                 return;
             }
 
-            // Read storage once upfront for comparison and fallback
             const saved = await readFromStorage();
             const savedTimings = saved?.timings || null;
             const savedTimestamp = saved?.timestamp || null;
 
+            const loc = appSettings?.location;
             let timings = null;
-            let fromAPI = false;
 
             // ONLINE: fetch from API
-            if (deviceSettings.internetConnection) {
-                timings = await getPrayerTimes(loc).catch(() => null);
-                if (timings) {
-                    fromAPI = true;
-                    console.log("✔ Prayer times loaded from API");
-                    // Compare and save only if different
-                    const isSame = savedTimings && JSON.stringify(savedTimings) === JSON.stringify(timings);
-                    if (!isSame) {
-                        await saveToStorage(timings);
-                        console.log("✅ Prayer times saved in Storage");
-                    } else {
-                        console.log("🔄 Prayer times from API same as Storage — skipping save");
+            if (loc && deviceSettings?.internetConnection) {
+                try {
+                    timings = await getPrayerTimes(loc);
+                    if (timings) {
+                        const isSame = savedTimings && JSON.stringify(savedTimings) === JSON.stringify(timings);
+                        if (!isSame) await saveToStorage(timings);
+                        console.log("✔ Prayer times loaded from API");
                     }
+                } catch (err) {
+                    console.warn("⚠️ Failed to fetch prayer times:", err);
                 }
             }
 
-            // OFFLINE or API failed: use saved data
+            // OFFLINE: Fallback to saved data if fetch failed
             if (!timings && savedTimings) {
                 timings = savedTimings;
-                console.log("🔧 Prayer times loaded from storage");
-                // Check if saved data is stale
-                if (checkIfOutdated(savedTimestamp)) {
-                    setPrayersOutdated(true);
-                    console.warn(`⚠️ Data is ${Math.floor((Date.now() - savedTimestamp) / (1000 * 60 * 60 * 24))} days old`);
-                }
+                if (checkIfOutdated(savedTimestamp)) setPrayersOutdated(true);
+                console.log("✔ Prayer times loaded from AsyncStorage");
             }
 
-            // No data available at all
+            // No data available
             if (!timings) {
-                const errorMsg = tr("labels.noPrayerTimes")
-                setPrayersError(errorMsg);
-                console.warn("⚠️", errorMsg);
+                setPrayerTimes(null);
+                setPrayersError(loc ? tr("labels.noLocation") : tr("labels.noPrayerTimes"));
+                return;
             }
 
             // Update state
             setPrayerTimes(timings);
-            lastFetchedDate.current = new Date().toLocaleString("en-GB");
+            lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
         } catch (err) {
             console.warn("⚠️ Failed to load prayer times:", err);
             setPrayersError(err.message);
             setPrayerTimes(null);
         } finally {
-            setPrayersLoading(false);
-            isLoadingRef.current = false;
+            setIsLoading(false);
+            setIsReady(true);
         }
-    };
+    }, [appSettings?.location, deviceSettings?.internetConnection, readFromStorage, saveToStorage, checkIfOutdated, tr]);
+
+    // -----------------------------
+    // Reload prayer times
+    // -----------------------------
+    const reloadPrayerTimes = useCallback(async () => {
+        if (!appSettings?.location || !deviceSettings?.locationPermission) {
+            await resolveLocation();
+        }
+        await loadPrayerTimes();
+    }, [appSettings?.location, deviceSettings?.locationPermission]);
 
     // ------------------------------------------------------------
-    // Determine location to use
+    // Resolve location
     // ------------------------------------------------------------
-    const resolveLocation = async () => {
+    const resolveLocation = useCallback(async () => {
+        // Use existing location if permitted
         if (appSettings?.location && deviceSettings?.locationPermission) {
             return appSettings.location;
         }
@@ -167,16 +160,20 @@ export function PrayersProvider({ children }) {
             Alert.alert(tr("labels.locationDenied"), tr("labels.locationDeniedMessage"));
             return null;
         }
-        // Try high accuracy first, fallback to balanced
-        const loc = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Highest,
-            timeout: 5000,
-        }).catch(() =>
-            Location.getCurrentPositionAsync({
+
+        let loc;
+        try {
+            loc = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Highest,
+                timeout: 5000,
+            });
+        } catch {
+            loc = await Location.getCurrentPositionAsync({
                 accuracy: Location.Accuracy.Balanced,
                 timeout: 10000,
-            })
-        );
+            });
+        }
+
         if (!loc?.coords) {
             Alert.alert(tr("labels.error"), tr("labels.locationError"));
             return null;
@@ -189,34 +186,9 @@ export function PrayersProvider({ children }) {
             timeZone: await getTimeZoneInfo(loc.coords),
         });
 
-        console.log("📍 Prayer times updated Location to:", loc.coords);
+        console.log("📍 (Prayer times) Location updated to:", loc.coords);
         return loc.coords;
-    };
-
-    // ------------------------------------------------------------
-    // Manual save
-    // ------------------------------------------------------------
-    const savePrayerTimes = useCallback(async (newTimes) => {
-        if (!newTimes) return;
-
-        const success = await saveToStorage(newTimes);
-        if (success) {
-            setPrayerTimes(newTimes);
-            lastFetchedDate.current = new Date().toLocaleString("en-GB");
-            setPrayersOutdated(false);
-            console.log("✅ Prayer times saved manually");
-        }
-    }, []);
-
-    // ------------------------------------------------------------
-    // Reload prayer times
-    // ------------------------------------------------------------
-    const reloadPrayerTimes = useCallback(async () => {
-        if (!appSettings?.location || !deviceSettings?.locationPermission) {
-            await resolveLocation();
-        }
-        await loadPrayerTimes();
-    }, [appSettings?.location, deviceSettings?.locationPermission]);
+    }, [appSettings?.location, deviceSettings?.locationPermission, saveAppSettings, tr]);
 
     // ------------------------------------------------------------
     // Computed value for hasPrayerTimes
@@ -226,28 +198,40 @@ export function PrayersProvider({ children }) {
     }, [prayerTimes]);
 
     // ------------------------------------------------------------
-    // Auto-load on mount / settings changes
+    // Auto-load on mount (only if settingsReady)
     // ------------------------------------------------------------
     useEffect(() => {
-        if (!settingsLoading && appSettings?.location) {
-            loadPrayerTimes();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settingsLoading, appSettings?.location]);
+        if (!settingsReady) return;
+
+        let mounted = true;
+
+        (async () => {
+            if (appSettings?.location) {
+                await loadPrayerTimes();
+            } else {
+                if (mounted) {
+                    setPrayerTimes(null);
+                    setIsReady(true);
+                }
+            }
+        })();
+
+        return () => { mounted = false; };
+    }, [settingsReady, appSettings?.location]);
 
     // ------------------------------------------------------------
-    // Memoize context value to prevent unnecessary re-renders
+    // Memoize context value
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         prayerTimes,
-        hasPrayerTimes,
-        savePrayerTimes,
-        prayersLoading,
-        prayersError,
         prayersOutdated,
-        lastFetchedDate: lastFetchedDate.current,
+        lastFetchedDate: lastFetchedDateRef.current,
+        isReady,
+        isLoading,
+        hasPrayerTimes,
         reloadPrayerTimes,
-    }), [prayerTimes, hasPrayerTimes, savePrayerTimes, prayersLoading, prayersError, prayersOutdated, reloadPrayerTimes]);
+        prayersError,
+    }), [prayerTimes, prayersOutdated, lastFetchedDateRef.current, isReady, isLoading, hasPrayerTimes, reloadPrayerTimes, prayersError]);
 
     return (
         <PrayersContext.Provider value={contextValue}>
@@ -258,8 +242,6 @@ export function PrayersProvider({ children }) {
 
 export function usePrayersContext() {
     const context = useContext(PrayersContext);
-    if (context === undefined) {
-        throw new Error('usePrayersContext must be used within a PrayersProvider');
-    }
+    if (!context) throw new Error('usePrayersContext must be used within a PrayersProvider');
     return context;
 }
