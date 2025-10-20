@@ -37,7 +37,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
                 },
                 android: {
-                    // (is created in NotificationsContext.js)
+                    // (is created in notificationService.js)
                     channelId: `prayer-notifications-channel-${notificationsConfig?.vibration ?? 'medium'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
@@ -46,8 +46,8 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     color: AndroidColor.OLIVE,
                     pressAction: { id: "default", launchActivity: "default" },
                     actions: [
-                        { title: "Prayed", pressAction: { id: "mark-prayed" } },
-                        { title: "Remind Later", pressAction: { id: "snooze-prayer" } },
+                        { title: "Dismiss", pressAction: { id: "stop" } },
+                        { title: "Remind me later", pressAction: { id: "snooze" } },
                     ],
                     style: {
                         type: AndroidStyle.INBOX,
@@ -71,7 +71,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
 
         const remainingSeconds = Math.max(0, Math.floor((fireTime - Date.now()) / 1000) + 1);
 
-        console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds
+        console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
             channelId: ${`prayer-notifications-channel-${notificationsConfig?.vibration}`}
             language: ${appSettings?.language},
             alarm: ${hasAlarm},
@@ -88,21 +88,23 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
 export async function debugChannelsAndScheduled() {
     try {
         const channels = await notifee.getChannels();
-        console.log('📡 All channels:', channels.map(c => ({
+        const channelsObj = channels.map(c => ({
             id: c.id,
             name: c.name,
             vibration: c.vibration,
             vibrationPattern: c.vibrationPattern,
             importance: c.importance
-        })));
+        }));
+        console.log('📡 All channels:', channelsObj);
 
         const scheduled = await notifee.getTriggerNotifications();
-        console.log('⏰ Scheduled trigger notifications:', scheduled.map(n => ({
+        const scheduledObj = scheduled.map(n => ({
             id: n.notification.id,
             channelId: n.notification.android?.channelId,
             data: n.notification.data,
             timestamp: n.trigger?.timestamp
-        })));
+        }));
+        console.log('⏰ Scheduled trigger notifications:', JSON.stringify(scheduledObj, null, 2));
 
         const settings = await notifee.getNotificationSettings();
         console.log('🔧 Notification settings:', settings);

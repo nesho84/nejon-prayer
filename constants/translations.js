@@ -111,8 +111,8 @@ export const translations = {
             retry: "Retry",
         },
         actions: {
-            prayed: "Prayed",
-            remindLater: "Remind Later",
+            dismiss: "Dismiss",
+            snooze: "Remind me later",
         },
     },
 
@@ -227,8 +227,8 @@ export const translations = {
             retry: "Riprovo",
         },
         actions: {
-            prayed: "U luta",
-            remindLater: "Më kujto më vonë",
+            dismiss: "Në rregull",
+            snooze: "Më kujto më vonë",
         },
     },
 
@@ -343,8 +343,8 @@ export const translations = {
             retry: "Wiederholen",
         },
         actions: {
-            prayed: "Gebetet",
-            remindLater: "Später erinnern",
+            dismiss: "Verstanden",
+            snooze: "Später erinnern",
         },
     },
 };

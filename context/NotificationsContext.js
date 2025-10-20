@@ -1,17 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
-import { Platform } from "react-native";
-import notifee, {
-    AndroidImportance,
-    AndroidVisibility,
-    AndroidNotificationSetting,
-    TriggerType,
-    RepeatFrequency,
-    AndroidColor,
-    AndroidStyle
-} from "@notifee/react-native";
+import notifee, { AndroidNotificationSetting, TriggerType, RepeatFrequency, AndroidColor, AndroidStyle } from "@notifee/react-native";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { usePrayersContext } from "@/context/PrayersContext";
-import { handleNotificationEvent } from '@/services/notificationService';
+import { cancelPrayerNotifications, createNotificationChannels, handleNotificationEvent } from '@/services/notificationService';
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();
@@ -32,108 +23,7 @@ export function NotificationsProvider({ children }) {
     const notificationsConfig = appSettings?.notificationsConfig;
 
     // ------------------------------------------------------------
-    // Get vibration pattern
-    // ------------------------------------------------------------
-    const getVibrationMode = useCallback((patternName) => {
-        const patterns = {
-            off: [],
-            short: [500, 300, 500, 300],
-            medium: Array(30).fill([1000, 300]).flat(),
-            long: Array(60).fill([1000, 300]).flat(),
-        };
-        return patterns[patternName] || patterns.medium;
-    }, []);
-
-    // ------------------------------------------------------------
-    // Create notification channels once (Android only)
-    // ------------------------------------------------------------
-    const createNotificationChannels = useCallback(async () => {
-        if (Platform.OS !== "android") return;
-
-        try {
-            const vibration = notificationsConfig?.vibration ?? 'medium';
-            const pattern = getVibrationMode(vibration);
-            const hasVibration = pattern.length > 0;
-
-            const channelConfig = {
-                importance: AndroidImportance.HIGH,
-                visibility: AndroidVisibility.PUBLIC,
-                sound: undefined,
-                vibration: hasVibration,
-                vibrationPattern: hasVibration ? pattern : undefined,
-                lights: true,
-                lightColor: AndroidColor.WHITE,
-                badge: true,
-                autoCancel: false,
-                ongoing: true,
-                bypassDnd: true,
-            };
-
-            // Use vibrationMode in channel IDs
-            const notificationsChannelId = `prayer-notifications-channel-${vibration}`;
-            const remindersChannelId = `prayer-reminders-channel-${vibration}`;
-
-            // Create prayer-notifications Channel
-            await notifee.createChannel({
-                id: notificationsChannelId,
-                name: "Prayer Time Notifications",
-                description: "Notifications for daily prayer times",
-                ...channelConfig,
-            });
-            // Create prayer-reminders Channel
-            await notifee.createChannel({
-                id: remindersChannelId,
-                name: 'Prayer Time Reminders',
-                description: "Reminder for daily prayer times",
-                ...channelConfig,
-            });
-
-            console.log(`✅ Created channels with vibration: ${vibration}`);
-        } catch (err) {
-            console.error("❌ Failed to create notification channels:", err);
-        }
-    }, [notificationsConfig, getVibrationMode]);
-
-    // ------------------------------------------------------------
-    // Cancel all existing prayer notifications && remove channels
-    // ------------------------------------------------------------
-    const cancelPrayerNotifications = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            // 1) Cancel scheduled trigger notifications that belong to our app and match types
-            const scheduled = await notifee.getTriggerNotifications();
-            for (const n of scheduled) {
-                const type = n.notification.data?.type;
-                if (type === 'prayer-notification' || type === 'prayer-reminder') {
-                    await notifee.cancelNotification(n.notification.id);
-                }
-            }
-
-            // 2) Remove any existing channels that match our prefixes
-            const allChannels = await notifee.getChannels();
-            const toDelete = allChannels.map(c => c.id).filter(
-                id => id && (id.startsWith('prayer-notifications-channel') || id.startsWith('prayer-reminders-channel'))
-            );
-            for (const id of toDelete) {
-                try {
-                    await notifee.deleteChannel(id);
-                    console.log(`🗑️ Deleted channel: ${id}`);
-                } catch (err) {
-                    console.warn(`⚠️ Failed to delete channel ${id}:`, err);
-                }
-            }
-
-            console.log('🔴 All existing prayer notifications cancelled & prayer channels removed (if any)');
-        } catch (err) {
-            console.error("❌ Failed to cancel prayer notifications && to remove prayer channels", err);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    // ------------------------------------------------------------
     // Check if notifications need rescheduling
-    // Returns true if rescheduling is needed
     // ------------------------------------------------------------
     const shouldReschedule = useCallback(async (times) => {
         try {
@@ -214,7 +104,7 @@ export function NotificationsProvider({ children }) {
             // Cancel all existing notifications
             await cancelPrayerNotifications();
             // Create Channels (Android only)
-            await createNotificationChannels();
+            await createNotificationChannels(notificationsConfig);
 
             // Check Alarm & Reminders permission
             const settings = await notifee.getNotificationSettings();
@@ -268,13 +158,13 @@ export function NotificationsProvider({ children }) {
                         android: {
                             channelId: `prayer-notifications-channel-${notificationsConfig?.vibration ?? 'medium'}`,
                             showTimestamp: true,
-                            smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
+                            smallIcon: 'ic_stat_prayer', // Must exist in android/app/src/main/res/drawable
                             largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
                             color: AndroidColor.OLIVE,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [
-                                { title: tr("actions.prayed"), pressAction: { id: 'mark-prayed' } },
-                                { title: tr("actions.remindLater"), pressAction: { id: 'snooze-prayer' } },
+                                { title: tr("actions.dismiss"), pressAction: { id: 'dismiss' } },
+                                { title: tr("actions.snooze"), pressAction: { id: 'snooze' } },
                             ],
                             style: {
                                 type: AndroidStyle.INBOX, // Show all action buttons immediately
