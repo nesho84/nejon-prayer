@@ -47,18 +47,16 @@ export default function SettingsScreen() {
         reloadPrayerTimes
     } = usePrayersContext();
 
-    const vibrationPatterns = ["off", "short", "medium", "long"];
-    const snoozePatterns = [1, 5, 10, 15, 20, 30, 60];
+    // Extract config for cleaner dependency tracking
+    const notificationsConfig = appSettings?.notificationsConfig;
 
     // Local state
-    const isLoading = settingsLoading || localLoading;
     const [localLoading, setLocalLoading] = useState(false);
-    const [tempVolume, setTempVolume] = useState(Number(appSettings?.notificationsConfig?.soundVolume ?? 1.0));
-    const [tempVibration, setTempVibration] = useState(vibrationPatterns.indexOf(appSettings?.notificationsConfig?.vibration ?? "long"));
-    const [tempSnooze, setTempSnooze] = useState(snoozePatterns.indexOf(appSettings?.notificationsConfig?.snoozeTimeout ?? 5));
+    const [tempVolume, setTempVolume] = useState(Number(notificationsConfig?.volume ?? 1.0));
 
-    // Refs
     const saveTimeout = useRef(null);
+
+    const isLoading = settingsLoading || localLoading;
 
     // ------------------------------------------------------------
     // Change theme
@@ -208,8 +206,8 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     // Change Notification Sound Volume
     // ------------------------------------------------------------
-    const handleSoundVolume = async (value) => {
-        if (appSettings.notificationsConfig?.soundVolume === Number(value.toFixed(2))) {
+    const handleVolume = async (value) => {
+        if (notificationsConfig?.volume === Number(value.toFixed(2))) {
             return; // no change
         }
 
@@ -221,17 +219,17 @@ export default function SettingsScreen() {
                 await saveAppSettings({
                     notificationsConfig: {
                         ...appSettings.notificationsConfig,
-                        soundVolume: Number(value.toFixed(1)),
+                        volume: Number(value.toFixed(1)),
                     }
                 });
 
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 console.log("🌐 Sound Volume changed to:", Number(value.toFixed(1)));
             }, 500);
             // Reschedule notifications with new volume (handled in NotificationsContext)
         } catch (err) {
             console.error("Sound volume change error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.soundVolumeError"));
+            Alert.alert(tr("labels.error"), tr("labels.volumeError"));
         }
     };
 
@@ -239,59 +237,62 @@ export default function SettingsScreen() {
     // Change Notification Vibration
     // ------------------------------------------------------------
     const handleVibration = async (value) => {
-        const pattern = vibrationPatterns[value];
-        if (appSettings.notificationsConfig?.vibration === pattern) {
-            return; // no change
-        }
-
-        if (saveTimeout.current) clearTimeout(saveTimeout.current);
-
+        setLocalLoading(true);
         try {
-            saveTimeout.current = setTimeout(async () => {
-                // Save appSettings
-                await saveAppSettings({
-                    notificationsConfig: {
-                        ...appSettings.notificationsConfig,
-                        vibration: pattern,
-                    },
-                });
+            // Save appSettings
+            await saveAppSettings({
+                notificationsConfig: {
+                    ...appSettings.notificationsConfig,
+                    vibration: value ? 'on' : 'off',
+                },
+            });
 
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                console.log("📳 Vibration changed to:", pattern);
-            }, 300);
+            console.log("📳 Vibration changed to:", value ? 'on' : 'off');
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (err) {
-            console.error("Vibration pattern change error:", err);
+            console.error("Vibration change error:", err);
             Alert.alert(tr("labels.error"), tr("labels.vibrationError"));
+        } finally {
+            setLocalLoading(false);
         }
     };
 
     // ------------------------------------------------------------
-    // Change Notification Vibration
+    // Change Notification snozee timeout
     // ------------------------------------------------------------
     const handleSnoozeTimeout = async (value) => {
-        const pattern = snoozePatterns[value];
-        if (appSettings.notificationsConfig?.snoozeTimeout === pattern) {
+        if (notificationsConfig?.snoozeTimeout === value) {
             return; // no change
         }
 
-        if (saveTimeout.current) clearTimeout(saveTimeout.current);
-
+        setLocalLoading(true);
         try {
-            saveTimeout.current = setTimeout(async () => {
-                // Save appSettings
-                await saveAppSettings({
-                    notificationsConfig: {
-                        ...appSettings.notificationsConfig,
-                        snoozeTimeout: pattern,
-                    },
-                });
+            // Save appSettings
+            await saveAppSettings({
+                notificationsConfig: {
+                    ...appSettings.notificationsConfig,
+                    snoozeTimeout: value,
+                },
+            });
 
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                console.log("⏳ Snooze timeout changed to:", pattern);
-            }, 300);
+            console.log(`⏳ Snooze timeout changed to: ${value}min`);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (err) {
             console.error("Snooze timeout change error:", err);
             Alert.alert(tr("labels.error"), tr("labels.snoozeTimeoutError"));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Open Notifications settings
+    // ------------------------------------------------------------
+    const openNotificationSettings = async () => {
+        if (Platform.OS === "android") {
+            await notifee.openNotificationSettings();
+        } else {
+            Linking.openSettings();
         }
     };
 
@@ -340,7 +341,9 @@ export default function SettingsScreen() {
     }
 
     // Loading state
-    if (isLoading) return <AppLoading text={tr("labels.loadingSettings")} />
+    if (isLoading) {
+        return <AppLoading text={tr("labels.loadingSettings")} />
+    }
 
     // Error state
     if (settingsError) {
@@ -368,7 +371,7 @@ export default function SettingsScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                {/* Theme Setting */}
+                {/* ------ Theme Setting ------ */}
                 <AppCard style={styles.settingCard}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.theme")}
@@ -387,7 +390,7 @@ export default function SettingsScreen() {
                     </Picker>
                 </AppCard>
 
-                {/* Language Setting */}
+                {/* ------ Language Setting ------ */}
                 <AppCard style={styles.settingCard}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.language")}
@@ -406,7 +409,7 @@ export default function SettingsScreen() {
                     </Picker>
                 </AppCard>
 
-                {/* Location Setting */}
+                {/* ------ Location Setting ------ */}
                 <AppCard style={styles.settingCard}>
                     <View style={styles.statusRow}>
                         <Text style={[styles.settingTitle, { color: theme.text }]}>
@@ -420,6 +423,7 @@ export default function SettingsScreen() {
                             thumbColor={deviceSettings.locationPermission ? theme.border : theme.border}
                         />
                     </View>
+
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
 
@@ -444,13 +448,15 @@ export default function SettingsScreen() {
                     )}
                 </AppCard>
 
-                {/* Prayer Times Status */}
+                {/* ------ Prayer Times Status ------ */}
                 <AppCard style={styles.settingCard}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.prayerTimesStatus")}
                     </Text>
+
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+
                     <View style={styles.statusRow}>
                         <Text style={[styles.statusText, { color: theme.text2 }]}>
                             {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
@@ -470,6 +476,7 @@ export default function SettingsScreen() {
                         <>
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+
                             <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
                                 {tr("labels.prayerTimesOutdated")}
                             </Text>
@@ -477,7 +484,7 @@ export default function SettingsScreen() {
                     }
                 </AppCard>
 
-                {/* Notifications Settings */}
+                {/* ------ Notifications Settings ------ */}
                 <AppCard style={styles.settingCard}>
                     <View style={styles.statusRow}>
                         <Text style={[styles.settingTitle, { color: theme.text }]}>
@@ -491,113 +498,133 @@ export default function SettingsScreen() {
                             thumbColor={deviceSettings.notificationPermission ? theme.border : theme.border}
                         />
                     </View>
-                    {/* Divider */}
-                    <View style={[styles.divider, { borderColor: theme.divider }]}></View>
 
-                    {/* Sound Volume */}
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.text }]}>
-                            {tr("labels.soundVolume")}
-                        </Text>
-                        <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                            {tempVolume === 0 ? "off" : `${Math.round((tempVolume) * 100)}%`}
-                        </Text>
-                    </View>
-                    <Slider
-                        style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
-                        minimumValue={0}
-                        maximumValue={1}
-                        step={0.1}
-                        value={tempVolume}
-                        onValueChange={setTempVolume}
-                        onSlidingComplete={handleSoundVolume}
-                        minimumTrackTintColor={theme.primary}
-                        maximumTrackTintColor={theme.overlay}
-                        thumbTintColor={theme.accent}
-                    />
-                    {/* Divider */}
-                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                    {/* Vibration */}
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.text }]}>
-                            {tr("labels.vibration")}
-                        </Text>
-                        <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                            {vibrationPatterns[tempVibration]}
-                        </Text>
-                    </View>
-                    <Slider
-                        style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
-                        minimumValue={0}
-                        maximumValue={vibrationPatterns.length - 1}
-                        step={1}
-                        value={tempVibration}
-                        onValueChange={setTempVibration}
-                        onSlidingComplete={handleVibration}
-                        minimumTrackTintColor={theme.primary}
-                        maximumTrackTintColor={theme.overlay}
-                        thumbTintColor={theme.accent}
-                    />
-                    {/* Divider */}
-                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                    {/* Snooze Timeout */}
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.text }]}>
-                            {tr("labels.snoozeTimeout")}
-                        </Text>
-                        <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                            {snoozePatterns[tempSnooze]}min
-                        </Text>
-                    </View>
-                    <Slider
-                        style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
-                        minimumValue={0}
-                        maximumValue={vibrationPatterns.length - 1}
-                        step={1}
-                        value={tempSnooze}
-                        onValueChange={setTempSnooze}
-                        onSlidingComplete={handleSnoozeTimeout}
-                        minimumTrackTintColor={theme.primary}
-                        maximumTrackTintColor={theme.overlay}
-                        thumbTintColor={theme.accent}
-                    />
-                    {/* Divider */}
-                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                    {/* Battery Optimization */}
-                    <View style={styles.statusRow}>
-                        <Text style={[styles.statusText, { color: theme.text }]}>
-                            {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅"}
-                        </Text>
-                        <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
-                            <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
-                        </Pressable>
-                    </View>
-                    {deviceSettings.batteryOptimization &&
-                        <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                            {tr("labels.batteryOptBody")}
-                        </Text>}
-
-                    {/* Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) */}
-                    {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
+                    {/* ------ notificationsConfig (show only if notificationPermission=true) ------ */}
+                    {deviceSettings.notificationPermission && (
                         <>
                             {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+
+                            {/* ------ Sound Volume ------ */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr("labels.alarmAccessTitle")}
+                                    {tr("labels.volume")}
                                 </Text>
-                                <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                    {tempVolume === 0 ? "off" : `${Math.round((tempVolume) * 100)}%`}
+                                </Text>
+                            </View>
+                            <Slider
+                                style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
+                                minimumValue={0}
+                                maximumValue={1}
+                                step={0.1}
+                                value={tempVolume}
+                                onValueChange={setTempVolume}
+                                onSlidingComplete={handleVolume}
+                                minimumTrackTintColor={theme.primary}
+                                maximumTrackTintColor={theme.overlay}
+                                thumbTintColor={theme.accent}
+                            />
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* ------ Vibration ------ */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr("labels.vibration")}
+                                </Text>
+                                <Switch
+                                    value={notificationsConfig?.vibration === 'on'}
+                                    onValueChange={handleVibration}
+                                    disabled={localLoading}
+                                    trackColor={{ false: theme.overlay, true: theme.primary }}
+                                    thumbColor={notificationsConfig?.vibration === 'on' ? theme.border : theme.border}
+                                />
+                            </View>
+                            {/* Vibration Note */}
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                                {tr("labels.vibrationNote")}
+                                <Text onPress={openNotificationSettings} disabled={localLoading}>
+                                    <Text style={{ color: theme.primary }}> {tr("buttons.openSettings")}</Text>
+                                </Text>
+                            </Text>
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* ------ Snooze/Reminder Timeout ------ */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr("labels.snoozeTimeout")}
+                                </Text>
+                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                    {notificationsConfig?.snoozeTimeout ?? 5}min
+                                </Text>
+                            </View>
+                            <View style={styles.presets}>
+                                {[1, 5, 10, 15, 20, 30, 60].map((st) => (
+                                    <TouchableOpacity
+                                        key={st}
+                                        style={[
+                                            styles.presetBtn,
+                                            {
+                                                backgroundColor: notificationsConfig?.snoozeTimeout === st ? theme.primary + '20' : theme.card,
+                                                borderColor: notificationsConfig?.snoozeTimeout === st ? theme.primary : 'transparent',
+                                                marginTop: 8,
+                                                marginBottom: 3
+                                            }
+                                        ]}
+                                        onPress={() => handleSnoozeTimeout(st)}
+                                    >
+                                        <Text style={[
+                                            styles.presetText,
+                                            { color: notificationsConfig?.snoozeTimeout === st ? theme.primary : theme.text2 }
+                                        ]}>
+                                            {st}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* ------ Battery Optimization ------ */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr("labels.batteryOptTitle")} {deviceSettings.batteryOptimization ? "" : "✅"}
+                                </Text>
+                                <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
                                     <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
                                 </Pressable>
                             </View>
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                {tr("labels.alarmAccessBody")}
-                            </Text>
+                            {deviceSettings.batteryOptimization &&
+                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                                    {tr("labels.batteryOptBody")}
+                                </Text>}
+
+                            {/* ------ Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) ------ */}
+                            {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
+                                <>
+                                    {/* Divider */}
+                                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                                    <View style={styles.statusRow}>
+                                        <Text style={[styles.statusText, { color: theme.text }]}>
+                                            {tr("labels.alarmAccessTitle")}
+                                        </Text>
+                                        <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                            <Text style={{ color: theme.primary }}>{tr("buttons.openSettings")}</Text>
+                                        </Pressable>
+                                    </View>
+                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
+                                        {tr("labels.alarmAccessBody")}
+                                    </Text>
+                                </>
+                            }
                         </>
-                    }
+                    )}
                 </AppCard>
 
             </ScrollView>
@@ -664,6 +691,30 @@ const styles = StyleSheet.create({
     },
     fetchedDateText: {
         fontSize: 12,
+    },
+
+    // Presets
+    presets: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-evenly',
+        gap: 6,
+    },
+
+    presetBtn: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    presetText: {
+        fontSize: 16,
+        fontWeight: '600',
+        opacity: 0.8,
     },
 
     // Error / Empty States

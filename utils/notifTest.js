@@ -32,21 +32,20 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
                     language: appSettings?.language,
-                    soundVolume: String(notificationsConfig?.soundVolume ?? 1.0),
-                    vibration: notificationsConfig?.vibration ?? "medium",
+                    volume: String(notificationsConfig?.volume ?? 1.0),
+                    vibration: notificationsConfig?.vibration ?? 'on',
                     snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
                 },
                 android: {
                     // (is created in notificationService.js)
-                    channelId: `prayer-notifications-channel-${notificationsConfig?.vibration ?? 'medium'}`,
+                    channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../assets/images/moon-islam.png"),
-                    sound: undefined,
                     color: AndroidColor.OLIVE,
                     pressAction: { id: "default", launchActivity: "default" },
                     actions: [
-                        { title: "Dismiss", pressAction: { id: "stop" } },
+                        { title: "Dismiss", pressAction: { id: "dismiss" } },
                         { title: "Remind me later", pressAction: { id: "snooze" } },
                     ],
                     style: {
@@ -75,7 +74,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
             channelId: ${`prayer-notifications-channel-${notificationsConfig?.vibration}`}
             language: ${appSettings?.language},
             alarm: ${hasAlarm},
-            soundVolume: ${notificationsConfig?.soundVolume},
+            volume: ${notificationsConfig?.volume},
             vibration: ${notificationsConfig?.vibration},
             snoozeTimeout: ${notificationsConfig?.snoozeTimeout}
             `);

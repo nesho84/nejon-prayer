@@ -157,8 +157,8 @@ export default function HomeScreen() {
                 </View>
 
                 {/* Notifications Debug utility */}
-                <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} />
-                <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} />
+                {/* <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} /> */}
+                {/* <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} /> */}
 
                 {/* 2. COUNTDOWN CIRCLE CARD */}
                 <AppCard style={styles.countdownCard}>

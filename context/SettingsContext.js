@@ -16,9 +16,9 @@ const DEFAULT_SETTINGS = {
     fullAddress: null,
     timeZone: null,
     notificationsConfig: {
-        soundVolume: 1, // off or 0.0 to 1.0
-        vibration: 'medium', // off, short, medium, long
-        snoozeTimeout: 5, // minutes (1, 5, 10, 15, 20, 30)
+        volume: 1, // off or 0.0 to 1.0
+        vibration: 'on', // on or off
+        snoozeTimeout: 5, // minutes (1, 5, 10, 15, 20, 30, 60)
     }
 };
 

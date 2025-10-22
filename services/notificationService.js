@@ -12,35 +12,53 @@ import { Platform } from 'react-native';
 // ------------------------------------------------------------
 // Internal state
 // ------------------------------------------------------------
+const AZAN_SOUNDS = {
+    short: 'azan-15sec.mp3', // 15sec (not used)
+    medium: 'azan1.mp3', // 30sec
+    long: 'azan-60sec.mp3', // 60sec (not used)
+};
+
+const ALARM_SOUNDS = {
+    short: 'alarm-15sec.mp3', // 15sec (not used)
+    medium: 'alarm1.mp3', // 30sec
+    long: 'alarm-60sec.mp3', // 60sec (not used)
+};
+
 let currentSound = null;
-let stopTimeout = null;
 
 // ------------------------------------------------------------
 // Start Sound
 // ------------------------------------------------------------
-async function startSound(file, volume, autoStopMs = 30000) {
+async function startSound(file, volume) {
     if (!file || volume <= 0) return;
 
     try {
         await stopSound();
 
-        currentSound = new Sound(file, Sound.MAIN_BUNDLE, (error) => {
-            if (error) {
-                console.error('❌ Error loading sound:', error);
+        currentSound = new Sound(file, Sound.MAIN_BUNDLE, (err) => {
+            if (err) {
+                console.error('❌ [Sound] Failed to load:', err);
                 return;
             }
 
             currentSound.setVolume(volume);
-            currentSound.setNumberOfLoops(-1);
-            currentSound.play();
-            console.log('🔊 Sound started');
-        });
+            currentSound.setNumberOfLoops(0); // play once
 
-        // Stop automatically after given duration
-        if (stopTimeout) clearTimeout(stopTimeout);
-        stopTimeout = setTimeout(() => stopSound(), autoStopMs);
+            const duration = currentSound.getDuration();
+
+            console.log(`🔊 [Sound] Playing "${file} ${duration.toFixed(2)}sec" at volume ${volume}`);
+
+            currentSound.play((success) => {
+                if (success) {
+                    // console.log('✅ [Sound] Finished playback');
+                } else {
+                    console.error('❌ [Sound] Playback failed');
+                }
+                stopSound();
+            });
+        });
     } catch (err) {
-        console.error('❌ Error starting sound:', err);
+        console.error('❌ [Sound] Error starting:', err);
     }
 }
 
@@ -49,15 +67,11 @@ async function startSound(file, volume, autoStopMs = 30000) {
 // ------------------------------------------------------------
 async function stopSound() {
     return new Promise((resolve) => {
-        if (stopTimeout) {
-            clearTimeout(stopTimeout);
-            stopTimeout = null;
-        }
         if (currentSound) {
             currentSound.stop(() => {
                 currentSound.release();
                 currentSound = null;
-                console.log('🔇 Sound stopped');
+                console.log('🔇 [Sound] Stopped & released');
                 resolve();
             });
         } else {
@@ -67,65 +81,22 @@ async function stopSound() {
 }
 
 // ------------------------------------------------------------
-// Cancel all existing prayer notifications && remove channels
-// ------------------------------------------------------------
-export const cancelPrayerNotifications = async () => {
-    try {
-        // 1) Cancel scheduled notifications
-        const scheduled = await notifee.getTriggerNotifications();
-        for (const n of scheduled) {
-            const type = n.notification.data?.type;
-            if (type === 'prayer-notification' || type === 'prayer-reminder') {
-                await notifee.cancelNotification(n.notification.id);
-            }
-        }
-
-        // 2) Remove existing channels
-        const allChannels = await notifee.getChannels();
-        const toDelete = allChannels.map(c => c.id).filter(
-            id => id && (id.startsWith('prayer-notifications-channel') || id.startsWith('prayer-reminders-channel'))
-        );
-        for (const id of toDelete) {
-            try {
-                await notifee.deleteChannel(id);
-            } catch (err) {
-                console.warn(`⚠️ Failed to delete channel ${id}:`, err);
-            }
-        }
-        console.log('🔴 All existing notifications cancelled and channels removed');
-    } catch (err) {
-        console.error("❌ Failed to cancel notifications && remove prayer channels", err);
-    }
-};
-
-// ------------------------------------------------------------
 // Create notification channels once (Android only)
 // ------------------------------------------------------------
 export const createNotificationChannels = async (notificationsConfig) => {
-    if (Platform.OS !== "android") return;
-
-    // Get vibration pattern based on mode
-    const getVibrationPattern = (patternName) => {
-        const patterns = {
-            off: [],
-            short: Array(15).fill([500, 300]).flat(),   // 15s total, 10 cycles of 500ms on / 300ms off
-            medium: Array(30).fill([1000, 300]).flat(), // 30s total, 15 cycles of 1s on / 300ms off
-            long: Array(60).fill([1000, 300]).flat(),   // 60s total, 30 cycles of 1s on / 300ms off
-        };
-        return patterns[patternName] || patterns.medium;
-    };
+    if (Platform.OS !== 'android') return;
 
     try {
-        const vibrationMode = notificationsConfig?.vibration ?? 'medium';
-        const pattern = getVibrationPattern(vibrationMode);
-        const hasVibration = pattern.length > 0;
+        const vibration = notificationsConfig?.vibration ?? 'on';
+        const isEnabled = vibration === 'on';
+        const pattern = Array(30).fill([1000, 300]).flat(); // 30s total, 15 cycles of 1s on / 300ms off
 
         const channelConfig = {
             importance: AndroidImportance.HIGH,
             visibility: AndroidVisibility.PUBLIC,
             sound: undefined, // handled manually
-            vibration: hasVibration,
-            vibrationPattern: hasVibration ? pattern : undefined,
+            vibration: isEnabled,
+            vibrationPattern: isEnabled ? pattern : undefined,
             lights: true,
             lightColor: AndroidColor.WHITE,
             badge: true,
@@ -135,20 +106,20 @@ export const createNotificationChannels = async (notificationsConfig) => {
         };
 
         // Use vibrationMode in channel IDs
-        const notificationsChannelId = `prayer-notifications-channel-${vibrationMode}`;
-        const remindersChannelId = `prayer-reminders-channel-${vibrationMode}`;
+        const notificationsChannelId = `prayer-notif-channel-vib-${vibration}`;
+        const remindersChannelId = `prayer-remind-channel-vib-${vibration}`;
 
         // Create prayer-notifications Channel
         await notifee.createChannel({
             id: notificationsChannelId,
-            name: "Prayer Time Notifications",
+            name: "Prayer Notifications",
             description: "Notifications for daily prayer times",
             ...channelConfig,
         });
         // Create prayer-reminders Channel
         await notifee.createChannel({
             id: remindersChannelId,
-            name: 'Prayer Time Reminders',
+            name: 'Prayer Reminders',
             description: "Reminder for daily prayer times",
             ...channelConfig,
         });
@@ -158,13 +129,48 @@ export const createNotificationChannels = async (notificationsConfig) => {
 };
 
 // ------------------------------------------------------------
+// Cancel All Scheduled Prayer Notifications
+// ------------------------------------------------------------
+export const cancelPrayerNotifications = async () => {
+    try {
+        // Cancel scheduled notifications
+        const scheduled = await notifee.getTriggerNotifications();
+        for (const n of scheduled) {
+            const type = n.notification.data?.type;
+            if (type === 'prayer-notification' || type === 'prayer-reminder') {
+                await notifee.cancelNotification(n.notification.id);
+            }
+        }
+        console.log('🔴 All existing notifications cancelled');
+    } catch (err) {
+        console.error("❌ Failed to cancel notifications", err);
+    }
+};
+
+// ------------------------------------------------
+// Clear everything: stop sound + remove notification
+// ------------------------------------------------
+async function clearAll(notificationId) {
+    try {
+        if (notificationId) {
+            await notifee.cancelNotification(notificationId);
+        }
+        // Optional: clear all displayed notifications
+        // await notifee.cancelDisplayedNotifications();
+        await stopSound();
+    } catch (err) {
+        console.error('❌ [Cleanup] Failed to clear:', err);
+    }
+}
+
+// ------------------------------------------------------------
 // Handle Notifee Notification event (Public API)
 // ------------------------------------------------------------
 export async function handleNotificationEvent(type, notification, pressAction, source = 'unknown') {
     // Get notification data passed from SettingsContext
-    const language = notification?.data?.language ?? 'en';
-    const soundVolume = Number(notification?.data?.soundVolume ?? 1.0);
-    const vibration = notification?.data?.vibration ?? 'medium';
+    const language = notification?.data?.language ?? 'en'; // not used currently
+    const volume = Number(notification?.data?.volume ?? 1.0);
+    const vibration = notification?.data?.vibration ?? 'on';
     const snoozeTimeout = Number(notification?.data?.snoozeTimeout ?? 5);
 
     // Check Alarm & Reminders permission
@@ -179,25 +185,26 @@ export async function handleNotificationEvent(type, notification, pressAction, s
 
             // For prayer notification
             if (notification?.data?.type === "prayer-notification") {
-                await startSound('azan1.mp3', soundVolume);
+                const sound = AZAN_SOUNDS['medium'] ?? AZAN_SOUNDS.medium;
+                await startSound(sound, volume);
             }
             // For prayer reminder notification
             if (notification?.data?.type === "prayer-reminder") {
-                await startSound('alarm1.mp3', soundVolume);
+                const sound = ALARM_SOUNDS['medium'] ?? ALARM_SOUNDS.medium;
+                await startSound(sound, volume);
             }
             break;
 
         case EventType.ACTION_PRESS:
-            await stopSound();
             switch (pressAction?.id) {
                 case 'dismiss':
-                    console.log(`✅ ${prefix} Notification "Dismiss" pressed`);
-                    await notifee.cancelNotification(notification.id);
+                    console.log(`🛑 ${prefix} Notification "Dismiss" pressed`);
+                    await clearAll(notification.id);
                     break;
 
                 case 'snooze':
                     console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snoozeTimeout}min)...`);
-                    await notifee.cancelNotification(notification.id);
+                    await clearAll(notification.id);
                     try {
                         // Schedule timestamp reminder
                         await notifee.createTriggerNotification(
@@ -207,10 +214,10 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                 body: notification?.data?.reminderBody,
                                 data: {
                                     type: "prayer-reminder",
-                                    soundVolume: soundVolume,
+                                    volume: volume,
                                 },
                                 android: {
-                                    channelId: `prayer-reminders-channel-${vibration}`,
+                                    channelId: `prayer-remind-channel-vib-${vibration}`,
                                     showTimestamp: true,
                                     smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
                                     largeIcon: require('../assets/images/past.png'), // Custom large icon
@@ -240,22 +247,20 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                     break;
 
                 case 'OK':
-                    console.log(`✅ ${prefix} Reminder "OK" pressed`);
-                    await notifee.cancelNotification(notification.id);
+                    console.log(`✅ ${prefix} Notification Reminder "OK" pressed`);
+                    await clearAll(notification.id);
                     break;
             }
             break;
 
         case EventType.PRESS:
             console.log(`👆 ${prefix} Notification pressed`);
-            await stopSound();
-            await notifee.cancelNotification(notification.id);
+            await clearAll(notification.id);
             break;
 
         case EventType.DISMISSED:
             console.log(`👆 ${prefix} Notification dismissed`);
-            await stopSound();
-            await notifee.cancelNotification(notification.id);
+            await clearAll(notification.id);
             break;
     }
 }

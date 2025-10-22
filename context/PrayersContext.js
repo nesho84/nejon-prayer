@@ -102,7 +102,7 @@ export function PrayersProvider({ children }) {
                     if (timings) {
                         const isSame = savedTimings && JSON.stringify(savedTimings) === JSON.stringify(timings);
                         if (!isSame) await saveToStorage(timings);
-                        console.log("✔ Prayer times loaded from API");
+                        console.log("🌐 Prayer times loaded from API");
                     }
                 } catch (err) {
                     console.warn("⚠️ Failed to fetch prayer times:", err);
@@ -113,7 +113,7 @@ export function PrayersProvider({ children }) {
             if (!timings && savedTimings) {
                 timings = savedTimings;
                 if (checkIfOutdated(savedTimestamp)) setPrayersOutdated(true);
-                console.log("✔ Prayer times loaded from AsyncStorage");
+                console.log("💾 Prayer times loaded from AsyncStorage");
             }
 
             // No data available

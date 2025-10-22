@@ -11,7 +11,7 @@ const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 export function NotificationsProvider({ children }) {
     const { appSettings, deviceSettings, isReady: settingsReady } = useSettingsContext();
-    const { prayerTimes, isReady: prayersReady, hasPrayerTimes } = usePrayersContext();
+    const { prayerTimes, isReady: prayersReady } = usePrayersContext();
     const { tr, language } = useTranslation();
 
     const [isReady, setIsReady] = useState(false);
@@ -48,11 +48,11 @@ export function NotificationsProvider({ children }) {
                 if (notifData.language !== language) return false;
 
                 // Convert to strings for comparison (saved data is always string)
-                const currentVolume = String(notificationsConfig?.soundVolume ?? 1);
-                const currentVibration = String(notificationsConfig?.vibration ?? "long");
+                const currentVolume = String(notificationsConfig?.volume ?? 1);
+                const currentVibration = String(notificationsConfig?.vibration ?? 'on');
                 const currentSnooze = String(notificationsConfig?.snoozeTimeout ?? 5);
                 // Check if notification config hasn't changed
-                if (notifData.soundVolume !== currentVolume) return false;
+                if (notifData.volume !== currentVolume) return false;
                 if (notifData.vibration !== currentVibration) return false;
                 if (notifData.snoozeTimeout !== currentSnooze) return false;
 
@@ -86,14 +86,14 @@ export function NotificationsProvider({ children }) {
     const schedulePrayerNotifications = useCallback(async (times) => {
         // Prevent concurrent scheduling operations
         if (isSchedulingRef.current) {
-            console.log("⭕ Scheduling already in progress - skipping duplicate call");
+            console.log("🔴 Scheduling already in progress - skipping duplicate call");
             return;
         }
 
         // Prevent duplicate scheduling - only reschedule if times or language changed
         const isUpToDate = await shouldReschedule(times)
         if (isUpToDate) {
-            console.log("✔ Prayer notifications already up to date");
+            console.log("🟤 Prayer notifications already up to date");
             return;
         }
 
@@ -151,12 +151,12 @@ export function NotificationsProvider({ children }) {
                             reminderTitle: `» ${tr(`prayers.${prayerName}`)} «`,
                             reminderBody: tr("labels.prayerReminder"),
                             language: language,
-                            soundVolume: String(notificationsConfig?.soundVolume ?? 1.0),
-                            vibration: notificationsConfig?.vibration ?? "medium",
+                            volume: String(notificationsConfig?.volume ?? 1.0),
+                            vibration: notificationsConfig?.vibration ?? 'on',
                             snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
                         },
                         android: {
-                            channelId: `prayer-notifications-channel-${notificationsConfig?.vibration ?? 'medium'}`,
+                            channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
                             showTimestamp: true,
                             smallIcon: 'ic_stat_prayer', // Must exist in android/app/src/main/res/drawable
                             largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
@@ -213,7 +213,7 @@ export function NotificationsProvider({ children }) {
         let mounted = true;
 
         (async () => {
-            if (deviceSettings?.notificationPermission && hasPrayerTimes) {
+            if (deviceSettings?.notificationPermission && prayerTimes) {
                 await schedulePrayerNotifications(prayerTimes);
             }
         })();
@@ -221,7 +221,7 @@ export function NotificationsProvider({ children }) {
         if (mounted) setIsReady(true);
 
         return () => { mounted = false; };
-    }, [settingsReady, appSettings, deviceSettings?.notificationPermission, prayersReady, prayerTimes, hasPrayerTimes]);
+    }, [settingsReady, appSettings, deviceSettings?.notificationPermission, prayersReady, prayerTimes]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee

@@ -64,8 +64,9 @@ export const translations = {
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
 
             // Notifications config
-            soundVolume: "Volume",
+            volume: "Volume",
             vibration: "Vibration",
+            vibrationNote: "ℹ️ If vibration is not working, check your device notification settings.",
             snoozeTimeout: "Reminder timeout",
             batteryOptTitle: "Battery Optimization",
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.",
@@ -84,7 +85,6 @@ export const translations = {
             abdes: "Wudu (Ablution)",
             tesbih: "Tasbeeh Counter",
 
-
             // Tesbih
             tInstruction: "Tap the circle to count your Tasbeeh.",
             tLap: "LAP",
@@ -94,7 +94,7 @@ export const translations = {
             languageError: "Failed to update language setting.",
             themeError: "Failed to update theme setting.",
             notificationError: "Failed to update notifications setting.",
-            soundVolumeError: "Failed to update notifications sound volume.",
+            volumeError: "Failed to update notifications sound volume.",
             vibrationError: "Failed to update notifications vibration.",
             snoozeTimeoutError: "Failed to update notifications snooze timeout.",
             settingsError: "Failed to load settings.",
@@ -181,8 +181,9 @@ export const translations = {
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
 
             // Notifications config
-            soundVolume: "Volumi i zërit",
+            volume: "Volumi i zërit",
             vibration: "Dridhje",
+            vibrationNote: "ℹ️ Nëse dridhja nuk funksionon, kontrolloni cilësimet e njoftimeve të pajisjes suaj.",
             snoozeTimeout: "Kohëzgjatja e kujtesës",
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
@@ -210,7 +211,7 @@ export const translations = {
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
             themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
             notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
-            soundVolumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
+            volumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
             vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
             snoozeTimeoutError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
             settingsError: "Cilësimet nuk mund të ngarkohen.",
@@ -297,8 +298,9 @@ export const translations = {
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
 
             // Notifications config
-            soundVolume: "Lautstärke",
+            volume: "Lautstärke",
             vibration: "Vibration",
+            vibrationNote: "ℹ️ Wenn die Vibration nicht funktioniert, überprüfen Sie die Benachrichtigungseinstellungen Ihres Geräts.",
             snoozeTimeout: "Erinnerungs-Timeout",
             batteryOptTitle: "Akkuoptimierung",
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen. Tippe oben, um die Systemeinstellungen anzupassen.",
@@ -326,7 +328,7 @@ export const translations = {
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",
             themeError: "Darstellungseinstellung konnte nicht aktualisiert werden.",
             notificationError: "Benachrichtigungseinstellung konnte nicht aktualisiert werden.",
-            soundVolumeError: "Die Lautstärke der Benachrichtigungen konnte nicht aktualisiert werden.",
+            volumeError: "Die Lautstärke der Benachrichtigungen konnte nicht aktualisiert werden.",
             vibrationError: "Die Aktualisierung der Benachrichtigungsvibration ist fehlgeschlagen.",
             snoozeTimeoutError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             settingsError: "Einstellungen konnten nicht geladen werden.",
