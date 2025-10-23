@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,14 +14,13 @@ import {
 } from "react-native";
 import Slider from '@react-native-community/slider';
 import { Picker } from "@react-native-picker/picker";
-import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useSettingsContext } from "@/context/SettingsContext";
 import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
+import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
@@ -39,7 +38,7 @@ export default function SettingsScreen() {
         reloadAppSettings
     } = useSettingsContext();
     const {
-        hasPrayerTimes,
+        prayerTimes,
         isLoading: prayersLoading,
         prayersOutdated,
         lastFetchedDate,
@@ -56,7 +55,16 @@ export default function SettingsScreen() {
 
     const saveTimeout = useRef(null);
 
-    const isLoading = settingsLoading || localLoading;
+    // ------------------------------------------------------------
+    // Handle settings refresh
+    // ------------------------------------------------------------
+    const handleSettingsRefresh = async () => {
+        try {
+            await reloadAppSettings();
+        } catch (err) {
+            console.warn("Settings refresh failed:", err);
+        }
+    }
 
     // ------------------------------------------------------------
     // Change theme
@@ -105,50 +113,28 @@ export default function SettingsScreen() {
     const updateLocation = async () => {
         setLocalLoading(true);
         try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(tr("labels.locationDenied"), tr("labels.locationDeniedMessage"));
-                return;
-            }
-            // Get current position: first try high accuracy, fallback to balanced
-            const loc = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.Highest,
-                timeout: 5000,
-            }).catch(() =>
-                Location.getCurrentPositionAsync({
-                    accuracy: Location.Accuracy.Balanced,
-                    timeout: 10000,
-                })
-            );
-            if (!loc?.coords) {
-                Alert.alert(tr("labels.error"), tr("labels.locationError"));
+            // Get fresh location
+            const data = await getUserLocation(tr);
+
+            if (!data) {
+                console.log("❌ Could not get location");
                 return;
             }
 
-            const newFullAddress = await formatUserAddress(loc.coords);
-            const newTimeZone = await getTimeZoneInfo(loc.coords);
-
-            // --- Change detection ---
-            const oldCoords = appSettings.location;
-            // Compare coordinates individually to detect changes
-            const LAT_LON_THRESHOLD = 0.00005; // roughly 5 meters
-            const coordsChanged = !oldCoords
-                || Math.abs(oldCoords.latitude - loc.coords.latitude) > LAT_LON_THRESHOLD
-                || Math.abs(oldCoords.longitude - loc.coords.longitude) > LAT_LON_THRESHOLD;
-            // If nothing changed, skip saving and re-rendering
-            if (!coordsChanged && appSettings.fullAddress === newFullAddress && JSON.stringify(appSettings.timeZone) === JSON.stringify(newTimeZone)) {
+            // Check for location changes
+            if (!hasLocationChanged(appSettings, data)) {
                 console.log("📍 Location unchanged — skipping save");
                 return;
             }
 
             // Save appSettings
             await saveAppSettings({
-                location: loc.coords,
-                fullAddress: newFullAddress,
-                timeZone: newTimeZone
+                location: data.location,
+                fullAddress: data.fullAddress,
+                timeZone: data.timeZone
             });
 
-            console.log("📍 Location updated to:", loc.coords);
+            console.log("📍 Location updated to:", data.location);
             // Reschedule notifications with new location (handled in NotificationsContext)
         } catch (err) {
             console.error("Location access error:", err);
@@ -157,6 +143,20 @@ export default function SettingsScreen() {
             setLocalLoading(false);
         }
     };
+
+    // ------------------------------------------------------------
+    // Handle prayers refresh
+    // ------------------------------------------------------------
+    const handlePrayersRefresh = async () => {
+        setLocalLoading(true);
+        try {
+            await reloadPrayerTimes();
+        } catch (err) {
+            console.warn("Prayers refresh failed:", err);
+        } finally {
+            setLocalLoading(false);
+        }
+    }
 
     // ------------------------------------------------------------
     // Handle Notifications
@@ -211,10 +211,14 @@ export default function SettingsScreen() {
             return; // no change
         }
 
+        setLocalLoading(true);
+
+        // Clear any pending save
         if (saveTimeout.current) clearTimeout(saveTimeout.current);
 
-        try {
-            saveTimeout.current = setTimeout(async () => {
+        // Schedule save after debounce
+        saveTimeout.current = setTimeout(async () => {
+            try {
                 // Save appSettings
                 await saveAppSettings({
                     notificationsConfig: {
@@ -225,12 +229,14 @@ export default function SettingsScreen() {
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 console.log("🌐 Sound Volume changed to:", Number(value.toFixed(1)));
-            }, 500);
-            // Reschedule notifications with new volume (handled in NotificationsContext)
-        } catch (err) {
-            console.error("Sound volume change error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.volumeError"));
-        }
+                // Reschedule notifications with new volume (handled in NotificationsContext)
+            } catch (err) {
+                console.error("Sound volume change error:", err);
+                Alert.alert(tr("labels.error"), tr("labels.volumeError"));
+            } finally {
+                setLocalLoading(false);
+            }
+        }, 500);
     };
 
     // ------------------------------------------------------------
@@ -238,6 +244,7 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     const handleVibration = async (value) => {
         setLocalLoading(true);
+
         try {
             // Save appSettings
             await saveAppSettings({
@@ -318,30 +325,8 @@ export default function SettingsScreen() {
         }
     };
 
-    // ------------------------------------------------------------
-    // Handle settings refresh
-    // ------------------------------------------------------------
-    const handleSettingsRefresh = async () => {
-        try {
-            await reloadAppSettings();
-        } catch (err) {
-            console.warn("Settings refresh failed:", err);
-        }
-    }
-
-    // ------------------------------------------------------------
-    // Handle prayers refresh
-    // ------------------------------------------------------------
-    const handlePrayersRefresh = async () => {
-        try {
-            await reloadPrayerTimes();
-        } catch (err) {
-            console.warn("Prayers refresh failed:", err);
-        }
-    }
-
     // Loading state
-    if (isLoading) {
+    if (settingsLoading) {
         return <AppLoading text={tr("labels.loadingSettings")} />
     }
 
@@ -365,6 +350,9 @@ export default function SettingsScreen() {
     // Main Content
     return (
         <AppScreen>
+            {/* Inline Loading */}
+            {localLoading && <AppLoading inline={true} text={tr("labels.updatingSettings")} />}
+
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -381,8 +369,9 @@ export default function SettingsScreen() {
                         onValueChange={handleTheme}
                         dropdownIconColor={theme.text}
                         dropdownIconRippleColor={theme.text}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                         enabled={!localLoading}
+                        mode="dropdown"
+                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                     >
                         <Picker.Item label="Dark" value="dark" />
                         <Picker.Item label="Light" value="light" />
@@ -400,8 +389,9 @@ export default function SettingsScreen() {
                         onValueChange={handleLanguage}
                         dropdownIconColor={theme.text}
                         dropdownIconRippleColor={theme.text}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                         enabled={!localLoading}
+                        mode="dropdown"
+                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                     >
                         <Picker.Item label="English" value="en" />
                         <Picker.Item label="Shqip" value="sq" />
@@ -459,7 +449,7 @@ export default function SettingsScreen() {
 
                     <View style={styles.statusRow}>
                         <Text style={[styles.statusText, { color: theme.text2 }]}>
-                            {hasPrayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
+                            {prayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                         </Text>
                         {/* lastFetchedDate */}
                         {lastFetchedDate && (
@@ -468,7 +458,7 @@ export default function SettingsScreen() {
                             </Text>
                         )}
                         {/* Prayers loading icon */}
-                        {prayersLoading ? (<ActivityIndicator size="small" color={theme.accent} />)
+                        {(prayersLoading || localLoading) ? (<ActivityIndicator size="small" color={theme.accent} />)
                             : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
                     </View>
                     {/* prayersOutdated */}

@@ -6,7 +6,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useSettingsContext } from "@/context/SettingsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { formatUserAddress as formatUserAddress, getTimeZoneInfo } from "@/utils/geoInfo";
+import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
@@ -64,34 +64,17 @@ export default function OnboardingScreen() {
   async function requestLocation() {
     setLocalLoading(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Location needed",
-          "You can skip for now, but prayer times won't load until you allow location access. You can update it later in Settings."
-        );
-        setStep(3);
-        return;
-      }
-      // Get current position: first try high accuracy, fallback to balanced
-      let loc = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-        timeout: 5000,
-      }).catch(() =>
-        Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-          timeout: 10000,
-        })
-      );
-      if (!loc?.coords) {
-        Alert.alert("Error", "Failed to request location. Please try again.");
+      const data = await getUserLocation();
+
+      if (!data) {
+        console.log("❌ Could not get location");
         return;
       }
 
       // Update Refs
-      locationRef.current = loc.coords;
-      fullAddressRef.current = await formatUserAddress(loc.coords);
-      timeZoneRef.current = await getTimeZoneInfo(loc.coords);
+      locationRef.current = data.location;
+      fullAddressRef.current = data.fullAddress;
+      timeZoneRef.current = data.timeZone;
 
       setStep(3);
     } catch (err) {
@@ -181,6 +164,7 @@ export default function OnboardingScreen() {
                 selectedValue={languageRef.current}
                 onValueChange={(value) => (languageRef.current = value)}
                 dropdownIconColor={theme.text}
+                mode="dropdown"
                 style={{ color: theme.text }}
               >
                 <Picker.Item label="English" value="en" />

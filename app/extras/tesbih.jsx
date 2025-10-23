@@ -16,7 +16,7 @@ export default function QiblaScreen() {
 
     // Local state
     const [count, setCount] = useState(0);
-    const [totalCount, setTotalCount] = useState(33);
+    const [totalCount, setTotalCount] = useState(10);
     const [laps, setLaps] = useState(0);
 
     // ------------------------------------------------------------
@@ -57,7 +57,7 @@ export default function QiblaScreen() {
             if (saved) {
                 const data = JSON.parse(saved);
                 setCount(data.count || 0);
-                setTotalCount(data.totalCount || 33);
+                setTotalCount(data.totalCount || 10);
                 setLaps(data.laps || 0);
             }
         } catch (error) {
@@ -152,7 +152,7 @@ export default function QiblaScreen() {
 
                 {/* Preset chips - subtle and compact */}
                 <View style={styles.presets}>
-                    {[33, 66, 99, 100].map((preset) => (
+                    {[10, 25, 33, 66, 99, 100].map((preset) => (
                         <TouchableOpacity
                             key={preset}
                             style={[
@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 20,
-        paddingTop: 20,
+        paddingHorizontal: 16,
+        paddingTop: 24,
         paddingBottom: 24,
         gap: 24,
     },
@@ -279,13 +279,13 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     presetBtn: {
-        paddingVertical: 6,
-        paddingHorizontal: 14,
+        paddingVertical: 4,
+        paddingHorizontal: 12,
         borderRadius: 20,
         borderWidth: 1,
     },
     presetText: {
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: '500',
         opacity: 0.6,
     },

@@ -86,7 +86,7 @@ export function NotificationsProvider({ children }) {
     const schedulePrayerNotifications = useCallback(async (times) => {
         // Prevent concurrent scheduling operations
         if (isSchedulingRef.current) {
-            console.log("🔴 Scheduling already in progress - skipping duplicate call");
+            console.log("🔴 Scheduling already in progress - skipping");
             return;
         }
 
@@ -97,10 +97,9 @@ export function NotificationsProvider({ children }) {
             return;
         }
 
+        isSchedulingRef.current = true;
+        setIsLoading(true);
         try {
-            isSchedulingRef.current = true;
-            setIsLoading(true);
-
             // Cancel all existing notifications
             await cancelPrayerNotifications();
             // Create Channels (Android only)

@@ -26,7 +26,6 @@ export default function HomeScreen() {
     } = useSettingsContext();
     const {
         prayerTimes,
-        hasPrayerTimes,
         isReady: prayersReady,
         isLoading: prayersLoading,
         prayersError,
@@ -113,7 +112,7 @@ export default function HomeScreen() {
     }
 
     // No prayer times available
-    if (!prayerTimes || !hasPrayerTimes) {
+    if (prayersReady && !prayerTimes) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>

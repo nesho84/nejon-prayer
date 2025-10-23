@@ -18,7 +18,7 @@ export default function TabLayout() {
                 tabBarInactiveTintColor: theme.tabInactive,
                 tabBarStyle: {
                     backgroundColor: theme.bg,
-                    height: insets.bottom + 54,
+                    height: insets.bottom + 55,
                     elevation: 0,
                 },
             }}
@@ -50,6 +50,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="more"
                 options={{
+                    headerShow: true,
                     title: "More",
                     tabBarLabel: tr("labels.more"),
                     tabBarIcon: ({ focused, color, size }) =>
