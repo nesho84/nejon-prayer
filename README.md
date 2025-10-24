@@ -238,3 +238,135 @@ a   # launch on emulator
 
 **Tip:** For faster emulator startup, enable **Quick Boot** in AVD Manager and store AVDs on an **SSD**.
 
+
+
+
+
+# Expo Project Dependency Update Workflow
+
+A safe, repeatable workflow for keeping your Expo project dependencies up-to-date while minimizing `expo-doctor` warnings and avoiding runtime/native issues.
+
+---
+
+## Step 0 — Backup
+Always commit your code or make a backup before updates:
+```bash
+git add .
+git commit -m "Backup before monthly dependency update"
+```
+
+---
+
+## Step 1 — Check outdated packages
+- DevDependencies only:
+```bash
+npx ncu --dep dev
+```
+- All dependencies:
+```bash
+npx ncu
+```
+- Review which ones are **minor/patch vs major**.
+
+---
+
+## Step 2 — Update devDependencies (safe)
+```bash
+npx ncu --dep dev -u
+npm install
+```
+✅ Safe, won’t affect runtime.
+
+---
+
+## Step 3 — Update JS-only runtime packages (safe)
+- For packages with no native code:
+```bash
+npm install axios@latest dayjs@latest redux@latest
+```
+- These **won’t trigger Expo native warnings**.
+
+---
+
+## Step 4 — Update native/Expo-managed packages selectively
+- Only patch/minor updates (same major version) for packages like:
+  - `@react-native-picker/picker`
+  - `react-native-sound`
+  - `react-native-gesture-handler`
+- Example:
+```bash
+npm install @react-native-picker/picker@2.11.4 react-native-sound@0.11.3
+```
+- ⚠️ **Do not upgrade major versions** until Expo SDK supports them.
+
+---
+
+## Step 5 — Clear caches
+After updates:
+```bash
+rm -rf node_modules android package-lock.json
+npm install
+npx expo-doctor
+npx expo start -c
+```
+- Refreshes dependency map.
+- Removes stale warnings.
+- Ensures Metro and Expo caches are clean.
+
+---
+
+## Step 6 — Test thoroughly
+- Development build:
+```bash
+npx expo start
+```
+- Android/iOS previews:
+```bash
+expo run:android
+expo run:ios
+```
+- If using EAS for release builds, do a test build:
+```bash
+eas build --platform android --profile preview
+eas build --platform ios --profile preview
+```
+- Verify the app doesn’t crash and native modules behave correctly.
+
+---
+
+## Step 7 — Ignore harmless Expo warnings
+- If `expo-doctor` warns about **minor patch differences** for native modules you just tested, it’s safe to ignore.
+- Warnings are **informational** — they indicate Expo hasn’t officially verified the version, but if it works, you’re fine.
+
+---
+
+## Step 8 — Optional: Upgrade Expo SDK
+- Every few months, consider upgrading Expo SDK to reduce warnings permanently:
+```bash
+npx expo upgrade
+```
+- This bumps all supported packages in sync with the SDK.
+- After upgrading, repeat steps 1–7 for any other packages.
+
+---
+
+## Rules of Thumb
+| Package Type | Update Rule | Expo Warning? |
+|-------------|-------------|---------------|
+| DevDependencies | Update freely | Usually none |
+| Pure JS | Update freely | Usually none |
+| Community/native packages | Update minor/patch only, test builds | Can ignore warnings if tested |
+| Expo SDK & core packages | Upgrade only via `expo upgrade` | Never update manually |
+
+---
+
+## Monthly Checklist
+1. Backup
+2. Update devDependencies
+3. Update JS-only runtime libs
+4. Update native packages carefully (minor/patch)
+5. Clear caches & run `expo-doctor`
+6. Test all builds
+7. Ignore harmless warnings
+8. Upgrade Expo SDK when possible
+

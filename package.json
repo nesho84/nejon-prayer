@@ -1,6 +1,6 @@
 {
   "name": "nejon-prayer",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "scripts": {
     "start": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
@@ -19,7 +19,7 @@
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.7.0",
     "@react-navigation/native": "^7.1.8",
-    "expo": "54.0.19",
+    "expo": "54.0.20",
     "expo-blur": "~15.0.7",
     "expo-build-properties": "~1.0.9",
     "expo-constants": "^18.0.10",
@@ -57,5 +57,12 @@
     "react-devtools": "^7.0.1",
     "typescript": "^5.9.3"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "install": {
+      "exclude": [
+        "@react-native-picker/picker"
+      ]
+    }
+  }
 }
