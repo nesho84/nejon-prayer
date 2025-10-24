@@ -30,16 +30,6 @@ export default function OnboardingScreen() {
   const fullAddressRef = useRef(appSettings?.fullAddress);
   const timeZoneRef = useRef(appSettings?.timeZone);
 
-  // // ------------------------------------------------------------
-  // // Redirect if already onboarded (once settings are ready)
-  // // ------------------------------------------------------------
-  // useEffect(() => {
-  //   if (appSettings?.onboarding) {
-  //     // Show Tabs HomeScreen (if already onboarded)
-  //     router.replace("/(tabs)/home");
-  //   }
-  // }, [appSettings?.onboarding]);
-
   // ----------------------------
   // 1️⃣ (Step 1) Handle language
   // ----------------------------
@@ -126,7 +116,7 @@ export default function OnboardingScreen() {
       });
 
       // Redirect to HomeScreen
-      router.replace("/(tabs)/home");
+      router.replace("/(tabs)/index");
     } catch (err) {
       console.error("❌ Onboarding error:", err);
       Alert.alert("Error", "Failed to finish onboarding. Please try again.");
@@ -137,9 +127,6 @@ export default function OnboardingScreen() {
 
   // If still loading settings
   if (!settingsReady || settingsLoading) return <AppLoading text="Loading settings..." />;
-
-  // Redirecting...
-  if (appSettings?.onboarding) return <AppLoading text="Loading..." />;
 
   // Show local loading
   if (localLoading) return <AppLoading text="Please Wait..." />;

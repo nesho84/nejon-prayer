@@ -128,7 +128,7 @@ export function SettingsProvider({ children }) {
 
         (async () => {
             await loadAppSettings();
-            if (mounted) await syncDeviceSettings();
+            if (mounted) syncDeviceSettings();
         })();
 
         return () => { mounted = false; };

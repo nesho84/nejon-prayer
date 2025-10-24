@@ -19,6 +19,8 @@ export const translations = {
 
             // General
             loading: "Loading...",
+            loadingSettings: "Loading settings...",
+            loadingPrayers: "Loading prayers...",
             error: "Error",
             accuracy: "Accuracy",
 
@@ -49,7 +51,6 @@ export const translations = {
             compassWarning3: "Move away from electronics",
 
             // Prayer Times
-            loadingPrayers: "Loading prayers...",
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
             noPrayerTimes: "Prayer times could not be loaded. Please check your internet connection.",
@@ -76,7 +77,6 @@ export const translations = {
             alarmAccessBody: "⚠️ Alarms & reminders may be disabled. Tap above to verify.",
 
             // Settings States
-            loadingSettings: "Loading settings...",
             updatingSettings: "Updating settings...",
             goToSettings: "Go to Settings",
 
@@ -137,6 +137,8 @@ export const translations = {
 
             // General
             loading: "Duke u ngarkuar...",
+            loadingSettings: "Duke ngarkuar cilësimet...",
+            loadingPrayers: "Duke ngarkuar lutjet...",
             error: "Gabim",
             accuracy: "Saktësia",
 
@@ -167,7 +169,6 @@ export const translations = {
             compassWarning3: "Largohuni nga elektronika",
 
             // Prayer Times
-            loadingPrayers: "Duke ngarkuar lutjet...",
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
             prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
             noPrayerTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
@@ -194,7 +195,6 @@ export const translations = {
             alarmAccessBody: "⚠️ Alarmet dhe përkujtuesit mund të jenë të çaktivizuar. Shtyp më sipër për të verifikuar.",
 
             // Settings States
-            loadingSettings: "Duke ngarkuar cilësimet...",
             updatingSettings: "Duke përditësuar cilësimet...",
             goToSettings: "Shko te Cilësimet",
 
@@ -255,6 +255,8 @@ export const translations = {
 
             // General
             loading: "Lädt...",
+            loadingSettings: "Einstellungen werden geladen...",
+            loadingPrayers: "Gebete werden geladen...",
             error: "Fehler",
             accuracy: "Genauigkeit",
 
@@ -285,7 +287,6 @@ export const translations = {
             compassWarning3: "Weg von der Elektronik",
 
             // Prayer Times
-            loadingPrayers: "Gebete werden geladen...",
             prayerTimesStatus: "Status der Gebetszeiten",
             prayerTimesOutdated: "⚠️ Die Gebetszeiten sind veraltet. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
             noPrayerTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
@@ -312,7 +313,6 @@ export const translations = {
             alarmAccessBody: "⚠️ Alarme und Erinnerungen sind möglicherweise deaktiviert. Tippen Sie oben, um dies zu bestätigen.",
 
             // Settings States
-            loadingSettings: "Einstellungen werden geladen...",
             updatingSettings: "Einstellungen werden aktualisiert...",
             goToSettings: "Zu Einstellungen",
 

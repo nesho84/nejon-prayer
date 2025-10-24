@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { useSettingsContext } from "@/context/SettingsContext";
