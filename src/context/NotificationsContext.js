@@ -158,7 +158,7 @@ export function NotificationsProvider({ children }) {
                             channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
                             showTimestamp: true,
                             smallIcon: 'ic_stat_prayer', // Must exist in android/app/src/main/res/drawable
-                            largeIcon: require('../assets/images/moon-islam.png'), // Custom large icon
+                            largeIcon: require('../../assets/images/moon-islam.png'), // Custom large icon
                             color: AndroidColor.OLIVE,
                             pressAction: { id: 'default', launchActivity: 'default' },
                             actions: [

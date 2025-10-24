@@ -41,7 +41,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
-                    largeIcon: require("../assets/images/moon-islam.png"),
+                    largeIcon: require("../../assets/images/moon-islam.png"),
                     color: AndroidColor.OLIVE,
                     pressAction: { id: "default", launchActivity: "default" },
                     actions: [

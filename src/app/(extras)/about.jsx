@@ -13,7 +13,7 @@ export default function AboutScreen() {
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
                 {/* App Logo */}
-                <Image style={styles.logo} source={require("../../assets/icons/icon-bg.png")} />
+                <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
 
                 {/* About Title */}
                 <Text style={[styles.title, { color: theme.text }]}>

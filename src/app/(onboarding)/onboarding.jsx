@@ -30,15 +30,15 @@ export default function OnboardingScreen() {
   const fullAddressRef = useRef(appSettings?.fullAddress);
   const timeZoneRef = useRef(appSettings?.timeZone);
 
-  // ------------------------------------------------------------
-  // Redirect if already onboarded (once settings are ready)
-  // ------------------------------------------------------------
-  useEffect(() => {
-    if (appSettings?.onboarding) {
-      // Show Tabs HomeScreen (if already onboarded)
-      router.replace("/(tabs)/home");
-    }
-  }, [appSettings?.onboarding]);
+  // // ------------------------------------------------------------
+  // // Redirect if already onboarded (once settings are ready)
+  // // ------------------------------------------------------------
+  // useEffect(() => {
+  //   if (appSettings?.onboarding) {
+  //     // Show Tabs HomeScreen (if already onboarded)
+  //     router.replace("/(tabs)/home");
+  //   }
+  // }, [appSettings?.onboarding]);
 
   // ----------------------------
   // 1️⃣ (Step 1) Handle language

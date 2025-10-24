@@ -63,7 +63,7 @@
       "favicon": "./assets/icons/favicon.png"
     },
     "plugins": [
-      "./plugins/resBuild.js",
+      "./src/plugins/resBuild.js",
       "expo-router",
       [
         "expo-splash-screen",

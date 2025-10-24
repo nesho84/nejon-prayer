@@ -220,7 +220,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                     channelId: `prayer-remind-channel-vib-${vibration}`,
                                     showTimestamp: true,
                                     smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                                    largeIcon: require('../assets/images/past.png'), // Custom large icon
+                                    largeIcon: require('../../assets/images/past.png'), // Custom large icon
                                     color: AndroidColor.RED,
                                     pressAction: { id: 'default', launchActivity: 'default' },
                                     actions: [

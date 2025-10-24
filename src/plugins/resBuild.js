@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = function withNotifeeRepo(config) {
   // ------------------------------------------------------------
-  // Copy notification icon (Notifee)
+  // Copy notification icon (@notifee/react-native)
   // ------------------------------------------------------------
   config = withDangerousMod(config, ['android', async config => {
     const drawableFolder = path.join(config.modRequest.platformProjectRoot, 'app/src/main/res/drawable');

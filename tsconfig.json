@@ -4,7 +4,7 @@
     "strict": true,
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     }
   },
@@ -13,17 +13,19 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "app/_layout.jsx",
-    "app/index.jsx",
-    "app/extras/_layout.jsx",
-    "app/extras/abdesi.jsx",
-    "app/extras/about.jsx",
-    "app/extras/namazi.jsx",
-    "app/extras/tesbih.jsx",
-    "app/(tabs)/_layout.jsx",
-    "app/(tabs)/home.jsx",
-    "app/(tabs)/more.jsx",
-    "app/(tabs)/qibla.jsx",
-    "app/(tabs)/settings.jsx"
+    "src/app/_layout.jsx",
+    "src/app/index.jsx",
+    "src/app/(onboarding)/_layout.jsx",
+    "src/app/(onboarding)/onboarding.jsx",
+    "src/app/(tabs)/_layout.jsx",
+    "src/app/(tabs)/index.jsx",
+    "src/app/(tabs)/more.jsx",
+    "src/app/(tabs)/qibla.jsx",
+    "src/app/(tabs)/settings.jsx",
+    "src/app/(extras)/_layout.jsx",
+    "src/app/(extras)/abdesi.jsx",
+    "src/app/(extras)/about.jsx",
+    "src/app/(extras)/namazi.jsx",
+    "src/app/(extras)/tesbih.jsx",
   ]
 }
