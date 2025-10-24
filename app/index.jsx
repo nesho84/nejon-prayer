@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useSettingsContext } from "@/context/SettingsContext";
@@ -18,7 +17,6 @@ export default function OnboardingScreen() {
     appSettings,
     isReady: settingsReady,
     isLoading: settingsLoading,
-    settingsError,
     saveAppSettings
   } = useSettingsContext();
 
@@ -67,7 +65,8 @@ export default function OnboardingScreen() {
       const data = await getUserLocation();
 
       if (!data) {
-        console.log("❌ Could not get location");
+        console.log("📍 Location denied or unavailable, continuing anyway");
+        setStep(3);
         return;
       }
 
@@ -164,7 +163,6 @@ export default function OnboardingScreen() {
                 selectedValue={languageRef.current}
                 onValueChange={(value) => (languageRef.current = value)}
                 dropdownIconColor={theme.text}
-                mode="dropdown"
                 style={{ color: theme.text }}
               >
                 <Picker.Item label="English" value="en" />

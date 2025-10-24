@@ -370,7 +370,6 @@ export default function SettingsScreen() {
                         dropdownIconColor={theme.text}
                         dropdownIconRippleColor={theme.text}
                         enabled={!localLoading}
-                        mode="dropdown"
                         style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                     >
                         <Picker.Item label="Dark" value="dark" />
@@ -390,7 +389,6 @@ export default function SettingsScreen() {
                         dropdownIconColor={theme.text}
                         dropdownIconRippleColor={theme.text}
                         enabled={!localLoading}
-                        mode="dropdown"
                         style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
                     >
                         <Picker.Item label="English" value="en" />

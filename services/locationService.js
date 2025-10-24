@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 import * as Location from 'expo-location';
 import NetInfo from "@react-native-community/netinfo";
 
@@ -7,16 +7,35 @@ import NetInfo from "@react-native-community/netinfo";
 // ------------------------------------------------------------
 export async function getUserLocation(tr = null) {
     try {
-        // Request location permission
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        // 1️⃣ Request location permission first
+        const { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();
+
         if (status !== 'granted') {
-            const title = tr ? tr("labels.locationDenied") : "Location needed";
-            const message = tr ? tr("labels.locationDeniedMessage") : "Location access is required.";
-            Alert.alert(title, message);
+            // 2️⃣ If denied permanently, show alert to open settings
+            if (!canAskAgain) {
+                Alert.alert(
+                    tr ? tr("labels.locationAccessTitle") : "Enable Location Access",
+                    tr ? tr("labels.locationAccessMessage") : "Location access is required to show accurate prayer times. Please enable it in your device settings.",
+                    [
+                        { text: tr ? tr("buttons.cancel") : "Cancel", style: "cancel" },
+                        {
+                            text: tr ? tr("buttons.openSettings") : "Open Settings",
+                            onPress: () => Linking.openSettings(),
+                        },
+                    ],
+                    { cancelable: true }
+                );
+            } else {
+                // Temporarily denied but can ask again
+                Alert.alert(
+                    tr ? tr("labels.locationDeniedTitle") : "Location Access Needed",
+                    tr ? tr("labels.locationDeniedMessage") : "Please allow location access to detect your city and display the correct prayer times."
+                );
+            }
             return null;
         }
 
-        // Get current position with fallback from high to balanced accuracy
+        // 3️⃣ Get current position with fallback from high to balanced accuracy
         const loc = await Location.getCurrentPositionAsync({
             accuracy: Location.Accuracy.Highest,
             timeout: 5000,
@@ -34,7 +53,7 @@ export async function getUserLocation(tr = null) {
             return null;
         }
 
-        // Get address and timezone information
+        // 4️⃣ Get address and timezone info
         const fullAddress = await formatUserAddress(loc.coords);
         const timeZone = await getTimeZoneInfo(loc.coords);
 

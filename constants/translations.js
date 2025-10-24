@@ -32,12 +32,14 @@ export const translations = {
             // Location
             locationButtonText1: "Update Location",
             locationButtonText2: "Set Location",
-            loadingAddress: "Loading address...",
             locationOff: "Location permission is off. Tap below to open settings and allow access.",
             locationSet: "Please set your location to view prayer times.",
-            locationDenied: "Location Access Denied",
-            locationDeniedMessage: "Prayer times will not be location-based without location access.",
             locationError: "Failed to get location. Please try again.",
+            // Location access messages
+            locationAccessTitle: "Enable Location Access",
+            locationAccessMessage: "Location access is required to show accurate prayer times. Please enable it in your device settings.",
+            locationDeniedTitle: "Location Access Needed",
+            locationDeniedMessage: "Please allow location access to detect your city and display the correct prayer times.",
 
             // Compass
             compasAligned: "Aligned with Qibla",
@@ -107,7 +109,6 @@ export const translations = {
             cancel: "Cancel",
             later: "Later",
             openSettings: "Open Settings",
-            openLocationSettings: "Open Location Settings",
             retry: "Retry",
         },
         actions: {
@@ -149,12 +150,14 @@ export const translations = {
             // Location
             locationButtonText1: "Përditëso Lokacionin",
             locationButtonText2: "Vendos Lokacionin",
-            loadingAddress: "Duke ngarkuar adresën...",
             locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
             locationSet: "Ju lutemi caktoni lokacionin tuaj për të parë kohët e lutjeve.",
-            locationDenied: "Aksesi i Lokacionit u Refuzua",
-            locationDeniedMessage: "Kohët e lutjeve nuk do të bazohen në lokacion pa aksesin e lokacionit.",
             locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
+            // Location access messages
+            locationAccessTitle: "Aktivizo qasjen e lokacionit",
+            locationAccessMessage: "Për të shfaqur oraret e sakta të lutjeve, duhet të lejoni qasjen e lokacionit. Ju lutemi hapni cilësimet e pajisjes dhe aktivizoni lokacionin.",
+            locationDeniedTitle: "Lejo qasjen e lokacionit",
+            locationDeniedMessage: "Ju lutemi lejoni qasjen e lokacionit për të përcaktuar qytetin tuaj dhe për të shfaqur oraret e sakta të lutjeve.",
 
             // Compass
             compasAligned: "I rreshtuar me Kiblën",
@@ -224,7 +227,6 @@ export const translations = {
             cancel: "Anulo",
             later: "Më vonë",
             openSettings: "Hap Cilësimet",
-            openLocationSettings: "Hap Cilësimet e Lokacionit",
             retry: "Riprovo",
         },
         actions: {
@@ -266,12 +268,14 @@ export const translations = {
             // Location
             locationButtonText1: "Standort aktualisieren",
             locationButtonText2: "Standort festlegen",
-            loadingAddress: "Adresse wird geladen...",
             locationOff: "Die Standortberechtigung ist deaktiviert. Tippen Sie unten, um die Einstellungen zu öffnen und den Zugriff zuzulassen.",
             locationSet: "Bitte geben Sie Ihren Standort ein, um die Gebetszeiten anzuzeigen.",
-            locationDenied: "Standortzugriff Verweigert",
-            locationDeniedMessage: "Gebetszeiten basieren nicht auf dem Standort ohne Standortzugriff.",
             locationError: "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut.",
+            // Location access messages
+            locationAccessTitle: "Standortzugriff Aktivieren",
+            locationAccessMessage: "Der Standortzugriff ist erforderlich, um genaue Gebetszeiten anzuzeigen. Bitte aktivieren Sie ihn in den Geräteeinstellungen.",
+            locationDeniedTitle: "Standortzugriff Erforderlich",
+            locationDeniedMessage: "Bitte erlauben Sie den Standortzugriff, um Ihre Stadt zu erkennen und genaue Gebetszeiten anzuzeigen.",
 
             // Compass
             compasAligned: "Auf Qibla ausgerichtet",
@@ -341,7 +345,6 @@ export const translations = {
             cancel: "Abbrechen",
             later: "Später",
             openSettings: "Einstellungen Öffnen",
-            openLocationSettings: "Standorteinstellungen öffnen",
             retry: "Wiederholen",
         },
         actions: {

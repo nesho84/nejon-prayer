@@ -10,12 +10,14 @@ export default function ExtrasScreen() {
     const { tr } = useTranslation();
 
     const features = [
-        { href: "extras/namazi", label: tr("labels.namaz"), color: "#3b82f6", icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" /> },
-        { href: "extras/abdesi", label: tr("labels.abdes"), color: "#06b6d4", icon: <Ionicons name="water-outline" size={30} color="#06b6d4" /> },
-        { href: "extras/tesbih", label: tr("labels.tesbih"), color: "#8b5cf6", icon: <McIcons name="counter" size={34} color="#8b5cf6" /> },
-        { href: "extras/about", label: tr("labels.about"), color: "#f59e0b", icon: <McIcons name="information-outline" size={32} color="#f59e0b" /> },
-        { href: "extras/about", label: 'empty1', color: "#8b5cf6", icon: <McIcons name="timer-sand" size={32} color="#8b5cf6" /> },
-        { href: "extras/about", label: 'empty2', color: "#8b5cf6", icon: <McIcons name="timer-sand" size={32} color="#8b5cf6" /> },
+        { id: 1, href: "extras/namazi", label: tr("labels.namaz"), color: "#3b82f6", icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" /> },
+        { id: 2, href: "extras/abdesi", label: tr("labels.abdes"), color: "#06b6d4", icon: <Ionicons name="water-outline" size={30} color="#06b6d4" /> },
+        { id: 3, href: "extras/tesbih", label: tr("labels.tesbih"), color: "#8b5cf6", icon: <McIcons name="counter" size={34} color="#8b5cf6" /> },
+        { id: 4, href: "extras/about", label: tr("labels.about"), color: "#f59e0b", icon: <McIcons name="information-outline" size={32} color="#f59e0b" /> },
+        { id: 5, href: "extras/about", label: '', color: '', icon: '' },
+        { id: 6, href: "extras/about", label: '', color: '', icon: '' },
+        { id: 7, href: "extras/about", label: '', color: '', icon: '' },
+        { id: 8, href: "extras/about", label: '', color: '', icon: '' },
     ];
 
     return (
@@ -40,7 +42,7 @@ export default function ExtrasScreen() {
             {/* Feature Cards */}
             <View style={styles.grid}>
                 {features.map((item) => (
-                    <Link key={item.label} href={item.href} asChild>
+                    <Link key={item.id} href={item.href} asChild>
                         <Pressable style={styles.cardWrapper}>
                             {({ pressed }) => (
                                 <View

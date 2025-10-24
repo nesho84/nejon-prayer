@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useIsFocused } from '@react-navigation/native';
-import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration, Linking, Platform } from 'react-native';
+import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration } from 'react-native';
 import { router } from "expo-router";
-import * as IntentLauncher from 'expo-intent-launcher';
 import { Magnetometer, Accelerometer } from 'expo-sensors';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -94,17 +93,6 @@ export default function QiblaCompass({
         }
         const sum = headingHistory.current.reduce((a, b) => a + b, 0);
         return sum / headingHistory.current.length;
-    };
-
-    // ------------------------------------------------------------
-    // Open device location settings
-    // ------------------------------------------------------------
-    const openLocationSettings = () => {
-        if (Platform.OS === "android") {
-            IntentLauncher.startActivityAsync(IntentLauncher.ActivityAction.LOCATION_SOURCE_SETTINGS);
-        } else {
-            Linking.openURL("app-settings:");
-        }
     };
 
     // ------------------------------------------------------------
