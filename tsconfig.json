@@ -2,29 +2,20 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@root/*": ["./*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
+    "**/*.js",
+    "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "src/app/_layout.jsx",
-    "src/app/(onboarding)/_layout.jsx",
-    "src/app/(onboarding)/onboarding.jsx",
-    "src/app/(tabs)/_layout.jsx",
-    "src/app/(tabs)/index.jsx",
-    "src/app/(tabs)/more.jsx",
-    "src/app/(tabs)/qibla.jsx",
-    "src/app/(tabs)/settings.jsx",
-    "src/app/(extras)/_layout.jsx",
-    "src/app/(extras)/abdesi.jsx",
-    "src/app/(extras)/about.jsx",
-    "src/app/(extras)/namazi.jsx",
-    "src/app/(extras)/tesbih.jsx",
+    "expo-env.d.ts"
   ]
 }

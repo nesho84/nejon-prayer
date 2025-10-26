@@ -35,16 +35,32 @@ export async function getUserLocation(tr = null) {
             return null;
         }
 
-        // 3️⃣ Get current position with fallback from high to balanced accuracy
-        const loc = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Highest,
-            timeout: 5000,
-        }).catch(() =>
-            Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.Balanced,
-                timeout: 10000,
-            })
-        );
+        // 3️⃣ Check internet connectivity first
+        const { isConnected } = await NetInfo.fetch();
+
+        // 4️⃣ Adjust accuracy and timeout based on connectivity
+        const locationOptions = isConnected
+            ? {
+                accuracy: Location.Accuracy.Highest,
+                timeout: 8000,
+            }
+            : {
+                accuracy: Location.Accuracy.Balanced, // Use Balanced offline
+                timeout: 15000, // Give more time for pure GPS fix
+                maximumAge: 10000, // Allow cached location up to 10s old
+            };
+
+        // 5️⃣ Get current position with single attempt
+        let loc;
+        try {
+            loc = await Location.getCurrentPositionAsync(locationOptions);
+        } catch (error) {
+            // Final fallback: try with last known location
+            loc = await Location.getLastKnownPositionAsync({
+                maxAge: 60000, // Accept location up to 1 minute old
+                requiredAccuracy: 100, // Within 100 meters
+            });
+        }
 
         if (!loc?.coords) {
             const title = tr ? tr("labels.error") : "Error";
@@ -53,7 +69,7 @@ export async function getUserLocation(tr = null) {
             return null;
         }
 
-        // 4️⃣ Get address and timezone info
+        // 6️⃣ Get address and timezone info (already handles offline gracefully)
         const fullAddress = await formatUserAddress(loc.coords);
         const timeZone = await getTimeZoneInfo(loc.coords);
 

@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, Alert } from "react-native";
 import Constants from "expo-constants";
 import { useThemeContext } from "@/context/ThemeContext";
 import AppScreen from "@/components/AppScreen";
@@ -32,7 +32,7 @@ export default function AboutScreen() {
 
                 {/* App Version */}
                 <Text style={[styles.versionText, { color: theme.placeholder }]}>
-                    Version {Constants.expoConfig.version}
+                    Version {Constants?.expoConfig?.version}
                 </Text>
 
             </View>

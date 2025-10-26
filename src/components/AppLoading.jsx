@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
 
-export default function AppLoading({ text = "Loading...", inline = false, style }) {
+export default function AppLoading({ text = "Loading...", inline = false, style = null }) {
     const { theme } = useThemeContext();
 
     const containerStyle = inline

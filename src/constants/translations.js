@@ -96,6 +96,7 @@ export const translations = {
             tLimit: "LIMIT",
 
             // Errors
+            noInternet: "No internet connection. Please connect to download prayer times.",
             languageError: "Failed to update language setting.",
             themeError: "Failed to update theme setting.",
             notificationError: "Failed to update notifications setting.",
@@ -217,6 +218,7 @@ export const translations = {
             tLimit: "LIMIT",
 
             // Errors
+            noInternet: "Nuk ka lidhje interneti. Ju lutemi kyçuni për të shkarkuar kohët e lutjeve.",
             languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
             themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
             notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
@@ -338,6 +340,7 @@ export const translations = {
             tLimit: "LIMIT",
 
             // Errors
+            noInternet: "Keine Internetverbindung. Bitte verbinden Sie sich, um die Gebetszeiten herunterzuladen.",
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",
             themeError: "Darstellungseinstellung konnte nicht aktualisiert werden.",
             notificationError: "Benachrichtigungseinstellung konnte nicht aktualisiert werden.",

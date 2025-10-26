@@ -125,16 +125,16 @@ export default function SettingsScreen() {
             if (!hasLocationChanged(appSettings, data)) {
                 console.log("📍 Location unchanged — skipping save");
                 return;
+            } else {
+                // Save appSettings
+                await saveAppSettings({
+                    location: data.location,
+                    fullAddress: data.fullAddress,
+                    timeZone: data.timeZone
+                });
+
+                console.log("📍 Location updated to:", data.location);
             }
-
-            // Save appSettings
-            await saveAppSettings({
-                location: data.location,
-                fullAddress: data.fullAddress,
-                timeZone: data.timeZone
-            });
-
-            console.log("📍 Location updated to:", data.location);
             // Reschedule notifications with new location (handled in NotificationsContext)
         } catch (err) {
             console.error("Location access error:", err);

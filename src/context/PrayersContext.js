@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Platform } from "react-native";
+import { Alert, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -113,6 +113,11 @@ export function PrayersProvider({ children }) {
                     }
                 } catch (err) {
                     console.warn("⚠️ Failed to fetch prayer times:", err);
+                    // Show alert for API errors when online
+                    Alert.alert(
+                        tr("labels.error") || "Error",
+                        tr("labels.noPrayerTimes") || "Prayer times could not be loaded. Please check your internet connection."
+                    );
                 }
             }
 
@@ -126,7 +131,17 @@ export function PrayersProvider({ children }) {
             // No data available
             if (!timings) {
                 setPrayerTimes(null);
-                setPrayersError(tr("labels.noPrayerTimes"));
+                if (!hasInternet) {
+                    // First time user with no internet
+                    const errorMsg = tr("labels.noInternet") || "No internet connection. Please connect to download prayer times.";
+                    setPrayersError(errorMsg);
+                    Alert.alert(tr("labels.error") || "Error", errorMsg);
+                } else {
+                    // Online but no data
+                    const errorMsg = tr("labels.noPrayerTimes") || "Prayer times could not be loaded.";
+                    setPrayersError(errorMsg);
+                    Alert.alert(tr("labels.error") || "Error", errorMsg);
+                }
                 return;
             }
 
@@ -160,20 +175,18 @@ export function PrayersProvider({ children }) {
             // Check for location changes
             if (!hasLocationChanged(appSettings, data)) {
                 console.log("📍 Location unchanged — skipping save");
-                return;
+            } else {
+                // Save location to appSettings
+                await saveAppSettings({
+                    location: data.location,
+                    fullAddress: data.fullAddress,
+                    timeZone: data.timeZone
+                });
+                console.log("📍  (Prayer times) Location updated to:", data.location);
             }
-
-            // Save location to appSettings
-            await saveAppSettings({
-                location: data.location,
-                fullAddress: data.fullAddress,
-                timeZone: data.timeZone
-            });
 
             // Load prayer times with new location
             await loadPrayerTimes();
-
-            console.log("📍  (Prayer times) Location updated to:", data.location);
         } catch (err) {
             console.error("Location access error:", err);
             Alert.alert(tr("labels.error"), tr("labels.locationError"));

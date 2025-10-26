@@ -9,11 +9,7 @@ export async function getPrayerTimes(location, tr = null) {
     // 1. Validate coordinates
     if (typeof latitude !== "number" || typeof longitude !== "number") {
         console.error("❌ Invalid location:", location);
-        Alert.alert(
-            tr("labels.error") || "Error",
-            tr("labels.locationError") || "Failed to get location. Please try again."
-        );
-        return null;
+        throw new Error("Invalid location coordinates");
     }
 
     try {
@@ -35,6 +31,7 @@ export async function getPrayerTimes(location, tr = null) {
         if (latitude >= 41 && latitude <= 50) {
             method = 13; // Turkey Diyanet default
             tune = "1,55,0,0,0,0,0,0,0"; // example: +1 min Imsak, +55 min Fajr
+
             // Southern Balkans: Albania, Kosovo, Bosnia, Macedonia (~41-44°)
             if (latitude < 44) {
                 method = 99;
@@ -55,8 +52,19 @@ export async function getPrayerTimes(location, tr = null) {
         const response = await fetch(url, { signal: controller.signal });
         clearTimeout(timeout);
 
-        // 6.2 Get the results
+        // 6.2 Check if response is ok
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 6.3 Get the results
         const result = await response.json();
+
+        // 6.4 Validate response structure
+        if (!result?.data?.timings) {
+            throw new Error("Invalid API response structure");
+        }
+
         let timings = result.data.timings;
         // console.log("aladhan api response:", JSON.stringify(result, null, 2));
 
@@ -70,10 +78,6 @@ export async function getPrayerTimes(location, tr = null) {
         return filtered; // { Fajr: "06:00", Dhuhr: "12:50", ... }
     } catch (err) {
         console.error("❌ API fetch error:", err);
-        Alert.alert(
-            tr("labels.error") || "Error",
-            tr("labels.noPrayerTimes") || "Prayer times could not be loaded. Please check your internet connection."
-        );
         return null;
     }
 }
