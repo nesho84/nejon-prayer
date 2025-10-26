@@ -342,9 +342,10 @@ export default function QiblaCompass({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 24,
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 24,
+        marginTop: 24,
     },
 
     // Info top

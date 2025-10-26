@@ -116,7 +116,7 @@ export default function OnboardingScreen() {
       });
 
       // Redirect to HomeScreen
-      router.replace("/(tabs)/index");
+      // Stack.Protected will auto-redirect to (tabs) when onboarding becomes true
     } catch (err) {
       console.error("❌ Onboarding error:", err);
       Alert.alert("Error", "Failed to finish onboarding. Please try again.");
@@ -125,11 +125,10 @@ export default function OnboardingScreen() {
     }
   }
 
-  // If still loading settings
-  if (!settingsReady || settingsLoading) return <AppLoading text="Loading settings..." />;
-
-  // Show local loading
-  if (localLoading) return <AppLoading text="Please Wait..." />;
+  // Loadng state
+  if (!settingsReady || settingsLoading || localLoading) {
+    return <AppLoading />;
+  }
 
   return (
     <AppScreen>

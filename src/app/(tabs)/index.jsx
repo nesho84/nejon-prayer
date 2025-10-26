@@ -72,10 +72,9 @@ export default function HomeScreen() {
     };
 
     // Loading state: settings
-    if (!settingsReady || settingsLoading) return <AppLoading text={tr("labels.loadingSettings")} />;
-
-    // Loading state: prayer times
-    if (!prayersReady || prayersLoading) return <AppLoading text={tr("labels.loadingPrayers")} />;
+    if (!settingsReady || settingsLoading || !prayersReady || prayersLoading) {
+        return <AppLoading text={tr("labels.loading")} />;
+    }
 
     // Error state
     if (settingsError || prayersError) {
@@ -329,7 +328,6 @@ const styles = StyleSheet.create({
 
     // Prayer Card
     prayerCard: {
-        borderRadius: 16,
         overflow: 'hidden',
     },
     // Prayer Card - Date Header

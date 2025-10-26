@@ -241,6 +241,66 @@ a   # launch on emulator
 
 
 
+# ---
+
+
+
+
+# To Get Device Logs:
+
+## Clear the logs first:
+## Android:
+## bash# Clear all logs
+```bash
+adb logcat -c
+```
+
+## Then start fresh logging
+```bash
+adb logcat | grep -i "error\|exception\|fatal"
+Or use filtered logging with timestamp:
+bash# Clear first
+adb logcat -c
+```
+
+## Start logging with timestamp, filter for errors
+```bash
+adb logcat -v time *:E *:F
+```
+
+- *:E = Error level
+- *:F = Fatal level
+- Better: Log to a file
+- bash# Clear logs
+```bash
+adb logcat -c
+```
+
+## Now reproduce the crash, logs go to file
+```bash
+adb logcat > crash_log.txt
+```
+
+## When it crashes, stop with Ctrl+C
+## Then search the file for errors
+
+## Or for React Native specific
+```bash
+adb logcat *:S ReactNative:V ReactNativeJS:V
+```
+
+## iOS:
+- In Xcode: Window → Devices and Simulators → View Device Logs
+
+
+
+
+
+# ---
+
+
+
+
 
 # Expo Project Dependency Update Workflow
 

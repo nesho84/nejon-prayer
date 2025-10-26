@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 16,
-        paddingTop: 24,
+        paddingTop: 0,
         paddingBottom: 24,
-        gap: 24,
+        gap: 16,
     },
 
     // Instruction
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 6,
         paddingHorizontal: 12,
-        marginBottom: 8,
+        marginBottom: 16,
         borderWidth: 1,
         borderRadius: 20,
         gap: 6,
@@ -302,7 +302,6 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: "row",
         justifyContent: 'center',
-        marginBottom: -3,
         gap: 16,
     },
     infoCardItem: {

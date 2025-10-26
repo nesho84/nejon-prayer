@@ -264,3 +264,23 @@ export async function handleNotificationEvent(type, notification, pressAction, s
             break;
     }
 }
+
+// ------------------------------------------------------------
+// Background handler for Notifee
+// This will fire when:
+// The device is locked.
+// The application is running & is in not in view (minimized).
+// The application is killed/quit.
+// Notification action is pressed
+// ------------------------------------------------------------
+// To register your handler, the onBackgroundEvent method should be registered in your project(root)
+// (e.g. the index.js file):
+// ------------------------------------------------------------
+notifee.onBackgroundEvent(async ({ type, detail }) => {
+    const { notification, pressAction } = detail;
+
+    // Ignore if no notification
+    if (!notification) return;
+
+    await handleNotificationEvent(type, notification, pressAction, 'background');
+});

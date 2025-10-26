@@ -90,7 +90,7 @@ export function NotificationsProvider({ children }) {
             return;
         }
 
-        // Prevent duplicate scheduling - only reschedule if times or language changed
+        // Prevent duplicate scheduling
         const isUpToDate = await shouldReschedule(times)
         if (isUpToDate) {
             console.log("🟤 Prayer notifications already up to date");

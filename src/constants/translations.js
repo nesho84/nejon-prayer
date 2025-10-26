@@ -1,4 +1,7 @@
 export const translations = {
+    // ------------------------------------------------------------
+    // English
+    // ------------------------------------------------------------
     en: {
         prayers: {
             Imsak: "Imsak",
@@ -13,14 +16,12 @@ export const translations = {
             // Navigation
             home: "Home",
             settings: "Settings",
-            about: "About",
             qibla: "Qibla",
             more: "More",
 
             // General
             loading: "Loading...",
             loadingSettings: "Loading settings...",
-            loadingPrayers: "Loading prayers...",
             error: "Error",
             accuracy: "Accuracy",
 
@@ -54,14 +55,11 @@ export const translations = {
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
             noPrayerTimes: "Prayer times could not be loaded. Please check your internet connection.",
-            retryFetch: "Retry",
             loaded: "🟢 Loaded",
             notLoaded: "🔴 Not Loaded",
 
             // Notifications
             prayerReminder: "Prayer Reminder",
-            timeFor: "Time for",
-            alertTitle: "⏰ Prayer time:",
             alertBody: "Time for Prayer",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
@@ -81,11 +79,16 @@ export const translations = {
             goToSettings: "Go to Settings",
 
             // Extras
-            extrasTitle: "Extras",
-            extrasSubtitle: "Explore additional features",
+            extrasTitle: "Additional Tools and Resources",
+            extrasSubtitle: "Useful tools and guides to learn more",
             namaz: "Prayer",
+            namazDesc: "Learn how to perform Salah",
             abdes: "Wudu (Ablution)",
+            abdesDesc: "Step by step ablution guide",
             tesbih: "Tasbeeh Counter",
+            tesbihDesc: "Digital prayer beads counter",
+            about: "About",
+            aboutDesc: "About this App",
 
             // Tesbih
             tInstruction: "Tap the circle to count your Tasbeeh.",
@@ -102,7 +105,7 @@ export const translations = {
             settingsError: "Failed to load settings.",
 
             // About
-            aboutText1: "About This App",
+            aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times based on your location. You can enable daily notifications to remind you of prayer times.",
         },
         buttons: {
@@ -117,6 +120,9 @@ export const translations = {
         },
     },
 
+    // ------------------------------------------------------------
+    // Shqip
+    // ------------------------------------------------------------
     sq: {
         prayers: {
             Imsak: "Imsaku",
@@ -131,14 +137,12 @@ export const translations = {
             // Navigation
             home: "Kryefaqja",
             settings: "Cilësimet",
-            about: "Info",
             qibla: "Kibla",
             more: "Më Tepër",
 
             // General
             loading: "Duke u ngarkuar...",
             loadingSettings: "Duke ngarkuar cilësimet...",
-            loadingPrayers: "Duke ngarkuar lutjet...",
             error: "Gabim",
             accuracy: "Saktësia",
 
@@ -172,14 +176,11 @@ export const translations = {
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
             prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
             noPrayerTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
-            retryFetch: "Rifresko",
             loaded: "🟢 Ngarkuar",
             notLoaded: "🔴 Jo i Ngarkuar",
 
             // Notifications
             prayerReminder: "Kujtesë Lutjeje",
-            timeFor: "Koha për",
-            alertTitle: "⏰ Koha e lutjes:",
             alertBody: "Koha për Namaz",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
@@ -199,11 +200,16 @@ export const translations = {
             goToSettings: "Shko te Cilësimet",
 
             // Extras
-            extrasTitle: "Të Tjera",
-            extrasSubtitle: "Eksploro veçori shtesë",
+            extrasTitle: "Mjete dhe burime shtesë",
+            extrasSubtitle: "Mjete dhe udhëzues të dobishëm për të mësuar më shumë",
             namaz: "Namazi",
+            namazDesc: "Mëso si të falësh Namazin",
             abdes: "Abdesi",
+            abdesDesc: "Udhëzues hap pas hapi për abdesin",
             tesbih: "Tesbih",
+            tesbihDesc: "Numërues digjital për tesbih",
+            about: "Info",
+            aboutDesc: "Rreth këtij Aplikacioni",
 
             // Tesbih
             tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
@@ -235,6 +241,9 @@ export const translations = {
         },
     },
 
+    // ------------------------------------------------------------
+    // Deutsch
+    // ------------------------------------------------------------
     de: {
         prayers: {
             Imsak: "Imsak",
@@ -249,14 +258,12 @@ export const translations = {
             // Navigation
             home: "Startseite",
             settings: "Einstellungen",
-            about: "Info",
             qibla: "Qibla",
             more: "Mehr",
 
             // General
             loading: "Lädt...",
             loadingSettings: "Einstellungen werden geladen...",
-            loadingPrayers: "Gebete werden geladen...",
             error: "Fehler",
             accuracy: "Genauigkeit",
 
@@ -290,14 +297,11 @@ export const translations = {
             prayerTimesStatus: "Status der Gebetszeiten",
             prayerTimesOutdated: "⚠️ Die Gebetszeiten sind veraltet. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
             noPrayerTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
-            retryFetch: "Erneut versuchen",
             loaded: "🟢 Geladen",
             notLoaded: "🔴 Nicht Geladen",
 
             // Notifications
             prayerReminder: "Gebetserinnerung",
-            timeFor: "Zeit für",
-            alertTitle: "⏰ Gebetszeit:",
             alertBody: "Zeit zum Gebet",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
@@ -317,11 +321,16 @@ export const translations = {
             goToSettings: "Zu Einstellungen",
 
             // Extras
-            extrasTitle: "Weitere",
-            extrasSubtitle: "Weitere Funktionen",
+            extrasTitle: "Zusätzliche Werkzeuge und Ressourcen",
+            extrasSubtitle: "Nützliche Tools und Anleitungen, um mehr zu lernen",
             namaz: "Gebet",
+            namazDesc: "Lerne, wie man das Salah verrichtet",
             abdes: "Wudu (Waschung)",
+            abdesDesc: "Schritt-für-Schritt-Waschungsanleitung",
             tesbih: "Tasbih-Zähler",
+            tesbihDesc: "Digitaler Gebetsperlen-Zähler",
+            about: "Info",
+            aboutDesc: "Über diese App",
 
             // Tesbih
             tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen.",

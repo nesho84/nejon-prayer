@@ -1,70 +1,135 @@
 import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen"; // Note: we dont use it here, because of screen jump!
+import AppScreen from "@/components/AppScreen";
+import AppCard from "@/components/AppCard";
 
 export default function ExtrasScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     const features = [
-        { id: 1, href: "(extras)/namazi", label: tr("labels.namaz"), color: "#3b82f6", icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" /> },
-        { id: 2, href: "(extras)/abdesi", label: tr("labels.abdes"), color: "#06b6d4", icon: <Ionicons name="water-outline" size={30} color="#06b6d4" /> },
-        { id: 3, href: "(extras)/tesbih", label: tr("labels.tesbih"), color: "#8b5cf6", icon: <McIcons name="counter" size={34} color="#8b5cf6" /> },
-        { id: 4, href: "(extras)/about", label: tr("labels.about"), color: "#f59e0b", icon: <McIcons name="information-outline" size={32} color="#f59e0b" /> },
-        { id: 5, href: "(extras)/about", label: '', color: '', icon: '' },
-        { id: 6, href: "(extras)/about", label: '', color: '', icon: '' },
-        { id: 7, href: "(extras)/about", label: '', color: '', icon: '' },
-        { id: 8, href: "(extras)/about", label: '', color: '', icon: '' },
+        {
+            id: 1,
+            href: "(extras)/namazi",
+            label: tr("labels.namaz"),
+            description: tr("labels.namazDesc") || "Learn how to perform Salah",
+            color: "#3b82f6",
+            icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" />
+        },
+        {
+            id: 2,
+            href: "(extras)/abdesi",
+            label: tr("labels.abdes"),
+            description: tr("labels.abdesDesc") || "Step by step ablution guide",
+            color: "#06b6d4",
+            icon: <Ionicons name="water-outline" size={30} color="#06b6d4" />
+        },
+        {
+            id: 3,
+            href: "(extras)/tesbih",
+            label: tr("labels.tesbih"),
+            description: tr("labels.tesbihDesc") || "Digital prayer beads counter",
+            color: "#8b5cf6",
+            icon: <McIcons name="counter" size={32} color="#8b5cf6" />
+        },
+        {
+            id: 4,
+            href: "(extras)/about",
+            label: tr("labels.about"),
+            description: tr("labels.aboutDesc") || "App information & credits",
+            color: "#f59e0b",
+            icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
+        },
+        {
+            id: 5,
+            href: "/",
+            label: "Feature 1",
+            description: tr("labels.feature") || "New and Upcoming Feature",
+            color: theme.success,
+            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
+        },
+        {
+            id: 6,
+            href: "/",
+            label: "Feature 2",
+            description: tr("labels.feature") || "New and Upcoming Feature",
+            color: theme.success,
+            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
+        },
+        {
+            id: 7,
+            href: "/",
+            label: "Feature 3",
+            description: tr("labels.feature") || "New and Upcoming Feature",
+            color: theme.success,
+            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
+        },
     ];
 
     return (
-        <ScrollView
-            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-        >
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
-                    {tr("labels.extrasTitle")}
-                </Text>
-                <Text style={[styles.subtitle, { color: theme.text2 }]}>
-                    {tr("labels.extrasSubtitle")}
-                </Text>
-            </View>
+        <AppScreen>
+            <ScrollView
+                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
 
-            {/* Optional Divider */}
-            <View style={[styles.divider, { backgroundColor: theme.text }]} />
+                {/* Hero Header Section */}
+                <AppCard style={styles.headerCard}>
+                    <View style={[styles.headerIconContainer, { backgroundColor: theme.warning + '15' }]}>
+                        <Ionicons name="apps" size={52} color={theme.accent} />
+                    </View>
+                    <Text style={[styles.headerTitle, { color: theme.text }]}>
+                        {tr("labels.extrasTitle") || "Explore Features"}
+                    </Text>
+                    <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>
+                        {tr("labels.extrasSubtitle") || "Enhance your spiritual journey with these tools"}
+                    </Text>
+                </AppCard>
 
-            {/* Feature Cards */}
-            <View style={styles.grid}>
-                {features.map((item) => (
-                    <Link key={item.id} href={item.href} asChild>
-                        <Pressable style={styles.cardWrapper}>
-                            {({ pressed }) => (
-                                <View
-                                    style={[
-                                        styles.moreCard,
-                                        { backgroundColor: theme.card },
-                                        pressed && styles.cardPressed,
-                                    ]}
-                                >
-                                    <View style={[styles.iconContainer, { backgroundColor: item.color + "15" }]}>
-                                        {item.icon}
-                                    </View>
-                                    <Text style={[styles.label, { color: theme.text }]} numberOfLines={1}>
-                                        {item.label}
-                                    </Text>
-                                </View>
+                {/* Feature List Card */}
+                <AppCard style={styles.listCard}>
+                    {features.map((item, index) => (
+                        <View key={item.id}>
+                            <Link href={item.href} asChild>
+                                <Pressable>
+                                    {({ pressed }) => (
+                                        <View style={[
+                                            styles.listItem,
+                                            pressed && { backgroundColor: theme.accent + '08' }
+                                        ]}>
+                                            <View style={[styles.itemIconContainer, { backgroundColor: item.color + "15" }]}>
+                                                {item.icon}
+                                            </View>
+
+                                            <View style={styles.textContent}>
+                                                <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
+                                                    {item.label}
+                                                </Text>
+                                                <Text style={[styles.itemDescription, { color: theme.text2 }]} numberOfLines={2}>
+                                                    {item.description}
+                                                </Text>
+                                            </View>
+
+                                            <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+                                        </View>
+                                    )}
+                                </Pressable>
+                            </Link>
+
+                            {/* Divider */}
+                            {index < features.length - 1 && (
+                                <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
                             )}
-                        </Pressable>
-                    </Link>
-                ))}
-            </View>
-        </ScrollView>
+                        </View>
+                    ))}
+                </AppCard>
+
+            </ScrollView>
+        </AppScreen>
     );
 }
 
@@ -75,70 +140,76 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 16,
-        paddingTop: 48,
+        paddingTop: 24,
         paddingBottom: 24,
         gap: 16,
     },
 
-    // Header
-    header: {
-        paddingLeft: 3,
+    // Header Hero Section
+    headerCard: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 32,
     },
-    title: {
-        fontSize: 30,
-        fontWeight: "700",
-        marginBottom: 3,
-        letterSpacing: 1,
+    headerIconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
     },
-    subtitle: {
+    headerTitle: {
+        fontSize: 21,
+        textAlign: 'center',
+        fontWeight: '700',
+        marginBottom: 8,
+        letterSpacing: -0.3,
+    },
+    headerSubtitle: {
+        fontSize: 15,
+        textAlign: 'center',
+        lineHeight: 22,
+        opacity: 0.7,
+    },
+
+    // List Card
+    listCard: {
+        flex: 1,
+        paddingVertical: 8,
+        overflow: 'hidden',
+    },
+    listItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+        gap: 14,
+    },
+    itemIconContainer: {
+        width: 56,
+        height: 56,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textContent: {
+        flex: 1,
+        gap: 4,
+    },
+    itemTitle: {
+        fontSize: 17,
+        fontWeight: '600',
+    },
+    itemDescription: {
         fontSize: 14,
-        paddingLeft: 1,
-        opacity: 0.65,
+        lineHeight: 20,
+        opacity: 0.7,
     },
     divider: {
         height: 1,
-        marginHorizontal: 3,
-        marginTop: -2,
-        marginBottom: 8,
-        opacity: 0.08,
-    },
-
-    // Grid
-    grid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        rowGap: 16,
-    },
-    cardWrapper: {
-        width: "48%",
-    },
-    moreCard: {
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 16,
-        aspectRatio: 1,
-        borderRadius: 16,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    cardPressed: {
-        opacity: 0.9,
-        transform: [{ scale: 0.98 }],
-    },
-    iconContainer: {
-        width: 72,
-        height: 72,
-        borderRadius: 18,
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: 16,
-    },
-    label: {
-        fontSize: 17,
-        fontWeight: "600",
-        textAlign: "center",
+        marginHorizontal: 18,
+        // marginLeft: 86, // Aligns with text (icon width + gap + padding)
     },
 });

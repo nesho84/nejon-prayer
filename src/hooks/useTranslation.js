@@ -15,7 +15,7 @@ export default function useTranslation() {
         for (const key of keys) {
             result = result?.[key];
         }
-        return result ?? path;
+        return result ?? null;
     };
 
     return { tr, language };

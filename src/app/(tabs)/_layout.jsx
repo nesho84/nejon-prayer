@@ -13,6 +13,7 @@ export default function TabLayout() {
         <Tabs
             screenOptions={{
                 headerShown: false,
+                headerStyle: { backgroundColor: theme.bg },
                 tabBarActiveTintColor: theme.tabActive,
                 tabBarLabelStyle: { fontSize: 11 },
                 tabBarInactiveTintColor: theme.tabInactive,
@@ -50,7 +51,6 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="more"
                 options={{
-                    headerShow: true,
                     title: "More",
                     tabBarLabel: tr("labels.more"),
                     tabBarIcon: ({ focused, color, size }) =>

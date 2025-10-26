@@ -1,12 +1,18 @@
+import { Alert } from "react-native";
+
 // ------------------------------------------------------------
 // Fetch prayer times from aladhan.com API
 // ------------------------------------------------------------
-export async function getPrayerTimes(location) {
+export async function getPrayerTimes(location, tr = null) {
     const { latitude, longitude } = location;
 
     // 1. Validate coordinates
     if (typeof latitude !== "number" || typeof longitude !== "number") {
         console.error("❌ Invalid location:", location);
+        Alert.alert(
+            tr("labels.error") || "Error",
+            tr("labels.locationError") || "Failed to get location. Please try again."
+        );
         return null;
     }
 
@@ -64,6 +70,10 @@ export async function getPrayerTimes(location) {
         return filtered; // { Fajr: "06:00", Dhuhr: "12:50", ... }
     } catch (err) {
         console.error("❌ API fetch error:", err);
+        Alert.alert(
+            tr("labels.error") || "Error",
+            tr("labels.noPrayerTimes") || "Prayer times could not be loaded. Please check your internet connection."
+        );
         return null;
     }
 }
