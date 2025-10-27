@@ -21,7 +21,7 @@ import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
@@ -421,7 +421,8 @@ export default function SettingsScreen() {
                         onPress={updateLocation}
                         disabled={localLoading}
                     >
-                        <Text style={[styles.updateLocationButtonText, { color: theme.text }]}>
+                        <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} onPress={handlePrayersRefresh} />
+                        <Text style={[styles.updateLocationButtonText, { color: theme.text2 }]}>
                             {appSettings.location
                                 ? (tr("labels.locationButtonText1"))
                                 : (tr("labels.locationButtonText2"))}
@@ -459,11 +460,24 @@ export default function SettingsScreen() {
                         {(prayersLoading || localLoading) ? (<ActivityIndicator size="small" color={theme.accent} />)
                             : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
                     </View>
+
+                    {/* prayersError */}
+                    {prayersError &&
+                        <>
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
+                                ⚠️ {tr("labels.prayersError")}
+                            </Text>
+                        </>
+                    }
+
                     {/* prayersOutdated */}
                     {prayersOutdated &&
                         <>
                             {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
                             <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
                                 {tr("labels.prayerTimesOutdated")}
@@ -664,10 +678,13 @@ const styles = StyleSheet.create({
 
     // Location
     updateLocationButton: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         padding: 10,
         marginTop: 5,
         borderRadius: 8,
+        gap: 6,
     },
     updateLocationButtonText: {
         fontSize: 16,

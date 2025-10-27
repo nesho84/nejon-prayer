@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
@@ -10,6 +10,7 @@ import useTranslation from "@/hooks/useTranslation";
 import { getDailyQuote } from "@/utils/dailyQuote";
 import AppScreen from "@/components/AppScreen";
 import AppLoading from "@/components/AppLoading";
+import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
@@ -22,7 +23,7 @@ export default function HomeScreen() {
         deviceSettings,
         isReady: settingsReady,
         isLoading: settingsLoading,
-        settingsError
+        settingsError,
     } = useSettingsContext();
     const {
         prayerTimes,
@@ -41,7 +42,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Handle prayer times refresh
     // ------------------------------------------------------------
-    const handleRefresh = async () => {
+    const handlePrayersRefresh = async () => {
         try {
             await reloadPrayerTimes();
         } catch (err) {
@@ -76,54 +77,46 @@ export default function HomeScreen() {
         return <AppLoading text={tr("labels.loading")} />;
     }
 
-    // Error state
-    if (settingsError || prayersError) {
+    // Settings error
+    // ------------------------------------------------------------
+    if (settingsError) {
         return (
-            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
-                <View style={styles.errorBanner}>
-                    <Ionicons name="alert-circle-outline" size={80} color={theme.primary} />
-                </View>
-                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
-                <TouchableOpacity
-                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
-                    onPress={handleRefresh}>
-                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
-                </TouchableOpacity>
-            </View>
+            <AppError
+                icon="alert-circle-outline"
+                iconColor={theme.danger}
+                message={settingsError || tr("labels.settingsError")}
+                buttonText={tr("labels.goToSettings")}
+                buttonColor={theme.primary}
+                onPress={() => router.navigate("/(tabs)/settings")}
+            />
         );
     }
 
     // No location set
     if (!appSettings.locationPermission && !appSettings.location) {
         return (
-            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
-                <View style={styles.errorBanner}>
-                    <Ionicons name="location-outline" size={80} color={theme.danger} />
-                </View>
-                <Text style={[styles.errorText, { color: theme.warning }]}>{tr("labels.locationSet")}</Text>
-                <TouchableOpacity
-                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
-                    onPress={() => router.navigate("/(tabs)/settings")}>
-                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("labels.goToSettings")}</Text>
-                </TouchableOpacity>
-            </View>
+            <AppError
+                icon="location-outline"
+                iconColor={theme.danger}
+                message={tr("labels.locationSet")}
+                buttonText={tr("labels.goToSettings")}
+                buttonColor={theme.danger}
+                onPress={() => router.navigate("/(tabs)/settings")}
+            />
         );
     }
 
-    // No prayer times available
-    if (prayersReady && !prayerTimes) {
+    // Prayer times error
+    if (prayersError || !prayerTimes) {
         return (
-            <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
-                <View style={styles.errorBanner}>
-                    <Ionicons name="time-outline" size={80} color={theme.primary} />
-                </View>
-                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr("labels.noPrayerTimes")}</Text>
-                <TouchableOpacity
-                    style={[styles.errorButton, { backgroundColor: theme.primary }]}
-                    onPress={handleRefresh}>
-                    <Text style={[styles.errorButtonText, { color: theme.white }]}>{tr("buttons.retry")}</Text>
-                </TouchableOpacity>
-            </View>
+            <AppError
+                icon="time-outline"
+                iconColor={theme.danger}
+                message={prayersError || tr("labels.prayersError")}
+                buttonText={tr("buttons.retry")}
+                buttonColor={theme.danger}
+                onPress={handlePrayersRefresh}
+            />
         );
     }
 
@@ -137,7 +130,7 @@ export default function HomeScreen() {
                 refreshControl={
                     <RefreshControl
                         refreshing={prayersLoading || settingsLoading}
-                        onRefresh={handleRefresh}
+                        onRefresh={handlePrayersRefresh}
                         tintColor={theme.accent}
                         colors={[theme.accent]}
                     />
@@ -291,9 +284,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '500',
     },
-    refreshButton: {
-        padding: 4,
-    },
 
     // Countdown Card
     countdownCard: {
@@ -310,8 +300,7 @@ const styles = StyleSheet.create({
     quotesHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginBottom: 8,
+        marginBottom: 6,
     },
     decorativeLine: {
         height: 1,
@@ -388,34 +377,5 @@ const styles = StyleSheet.create({
     prayerDivider: {
         height: 1,
         marginHorizontal: 18,
-    },
-
-    // Error / Empty States
-    errorContainer: {
-        flex: 1,
-        padding: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    errorBanner: {
-        marginBottom: 32,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    errorText: {
-        fontSize: 16,
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    errorButton: {
-        paddingVertical: 14,
-        borderRadius: 12,
-        width: "100%",
-        alignItems: "center",
-        marginBottom: 12,
-    },
-    errorButtonText: {
-        fontSize: 16,
-        fontWeight: '600',
     },
 });

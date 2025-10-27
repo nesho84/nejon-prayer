@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Alert, Platform } from "react-native";
+import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -113,11 +113,6 @@ export function PrayersProvider({ children }) {
                     }
                 } catch (err) {
                     console.warn("⚠️ Failed to fetch prayer times:", err);
-                    // Show alert for API errors when online
-                    Alert.alert(
-                        tr("labels.error") || "Error",
-                        tr("labels.noPrayerTimes") || "Prayer times could not be loaded. Please check your internet connection."
-                    );
                 }
             }
 
@@ -133,14 +128,10 @@ export function PrayersProvider({ children }) {
                 setPrayerTimes(null);
                 if (!hasInternet) {
                     // First time user with no internet
-                    const errorMsg = tr("labels.noInternet") || "No internet connection. Please connect to download prayer times.";
-                    setPrayersError(errorMsg);
-                    Alert.alert(tr("labels.error") || "Error", errorMsg);
+                    setPrayersError(tr("labels.noInternet"));
                 } else {
                     // Online but no data
-                    const errorMsg = tr("labels.noPrayerTimes") || "Prayer times could not be loaded.";
-                    setPrayersError(errorMsg);
-                    Alert.alert(tr("labels.error") || "Error", errorMsg);
+                    setPrayersError(tr("labels.prayersError"));
                 }
                 return;
             }
@@ -150,7 +141,7 @@ export function PrayersProvider({ children }) {
             lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
         } catch (err) {
             console.warn("⚠️ Failed to load prayer times:", err);
-            setPrayersError(err.message);
+            setPrayersError(err.message || "An unexpected error occurred.");
             setPrayerTimes(null);
         } finally {
             isFetchingRef.current = false;
@@ -189,7 +180,7 @@ export function PrayersProvider({ children }) {
             await loadPrayerTimes();
         } catch (err) {
             console.error("Location access error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.locationError"));
+            setPrayersError(tr("labels.locationError"));
         } finally {
             setIsLoading(false);
             setIsReady(true);

@@ -13,19 +13,19 @@ export default function ExtrasScreen() {
     const features = [
         {
             id: 1,
-            href: "(extras)/namazi",
-            label: tr("labels.namaz"),
-            description: tr("labels.namazDesc") || "Learn how to perform Salah",
-            color: "#3b82f6",
-            icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" />
-        },
-        {
-            id: 2,
             href: "(extras)/abdesi",
             label: tr("labels.abdes"),
             description: tr("labels.abdesDesc") || "Step by step ablution guide",
             color: "#06b6d4",
             icon: <Ionicons name="water-outline" size={30} color="#06b6d4" />
+        },
+        {
+            id: 2,
+            href: "(extras)/namazi",
+            label: tr("labels.namaz"),
+            description: tr("labels.namazDesc") || "Learn how to perform Salah",
+            color: "#3b82f6",
+            icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" />
         },
         {
             id: 3,
@@ -37,36 +37,28 @@ export default function ExtrasScreen() {
         },
         {
             id: 4,
+            href: "(extras)/ramadan",
+            label: tr("labels.ramadan") || "Ramazani",
+            description: tr("labels.ramadan") || "Ramazani...",
+            color: "#f59e0b",
+            icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
+        },
+        {
+            id: 5,
             href: "(extras)/about",
             label: tr("labels.about"),
             description: tr("labels.aboutDesc") || "App information & credits",
             color: "#f59e0b",
             icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
         },
-        {
-            id: 5,
-            href: "/",
-            label: "Feature 1",
-            description: tr("labels.feature") || "New and Upcoming Feature",
-            color: theme.success,
-            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
-        },
-        {
-            id: 6,
-            href: "/",
-            label: "Feature 2",
-            description: tr("labels.feature") || "New and Upcoming Feature",
-            color: theme.success,
-            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
-        },
-        {
-            id: 7,
-            href: "/",
-            label: "Feature 3",
-            description: tr("labels.feature") || "New and Upcoming Feature",
-            color: theme.success,
-            icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
-        },
+        // {
+        //     id: 6,
+        //     href: "/",
+        //     label: "Feature 1",
+        //     description: tr("labels.feature") || "New and Upcoming Feature",
+        //     color: theme.success,
+        //     icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
+        // },
     ];
 
     return (

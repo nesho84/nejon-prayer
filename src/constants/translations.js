@@ -38,11 +38,13 @@ export const translations = {
             locationOff: "Location permission is off. Tap below to open settings and allow access.",
             locationSet: "Please set your location to view prayer times.",
             locationError: "Failed to get location. Please try again.",
-            // Location access messages
+            // Location error messages
             locationAccessTitle: "Enable Location Access",
             locationAccessMessage: "Location access is required to show accurate prayer times. Please enable it in your device settings.",
             locationDeniedTitle: "Location Access Needed",
             locationDeniedMessage: "Please allow location access to detect your city and display the correct prayer times.",
+            gpsOfflineWarningTitle: "No Internet Connection",
+            gpsOfflineWarningMessage: "Without internet, GPS may take several minutes and only works outdoors.\n\nFor faster results, connect to internet first.",
 
             // Compass
             compasAligned: "Aligned with Qibla",
@@ -54,7 +56,6 @@ export const translations = {
             // Prayer Times
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
-            noPrayerTimes: "Prayer times could not be loaded. Please check your internet connection.",
             loaded: "🟢 Loaded",
             notLoaded: "🔴 Not Loaded",
 
@@ -104,6 +105,7 @@ export const translations = {
             vibrationError: "Failed to update notifications vibration.",
             snoozeTimeoutError: "Failed to update notifications snooze timeout.",
             settingsError: "Failed to load settings.",
+            prayersError: "Prayer times could not be loaded. Please check your internet connection.",
 
             // About
             aboutText1: "About this App",
@@ -114,6 +116,7 @@ export const translations = {
             later: "Later",
             openSettings: "Open Settings",
             retry: "Retry",
+            continue: "Continue",
         },
         actions: {
             dismiss: "Dismiss",
@@ -160,11 +163,13 @@ export const translations = {
             locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
             locationSet: "Ju lutemi caktoni lokacionin tuaj për të parë kohët e lutjeve.",
             locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
-            // Location access messages
+            // Location error messages
             locationAccessTitle: "Aktivizo qasjen e lokacionit",
             locationAccessMessage: "Për të shfaqur oraret e sakta të lutjeve, duhet të lejoni qasjen e lokacionit. Ju lutemi hapni cilësimet e pajisjes dhe aktivizoni lokacionin.",
             locationDeniedTitle: "Lejo qasjen e lokacionit",
             locationDeniedMessage: "Ju lutemi lejoni qasjen e lokacionit për të përcaktuar qytetin tuaj dhe për të shfaqur oraret e sakta të lutjeve.",
+            gpsOfflineWarningTitle: "Nuk ka lidhje interneti",
+            gpsOfflineWarningMessage: "Pa internet, GPS-i mund të zgjasë disa minuta dhe funksionon vetëm jashtë.\n\nPër rezultate më të shpejta, lidheni së pari me internet.",
 
             // Compass
             compasAligned: "I rreshtuar me Kiblën",
@@ -176,7 +181,6 @@ export const translations = {
             // Prayer Times
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
             prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
-            noPrayerTimes: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             loaded: "🟢 Ngarkuar",
             notLoaded: "🔴 Jo i Ngarkuar",
 
@@ -226,6 +230,7 @@ export const translations = {
             vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
             snoozeTimeoutError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
             settingsError: "Cilësimet nuk mund të ngarkohen.",
+            prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
 
             // About
             aboutText1: "Rreth këtij Aplikacioni",
@@ -236,6 +241,7 @@ export const translations = {
             later: "Më vonë",
             openSettings: "Hap Cilësimet",
             retry: "Riprovo",
+            continue: "Vazhdo",
         },
         actions: {
             dismiss: "Në rregull",
@@ -282,11 +288,13 @@ export const translations = {
             locationOff: "Die Standortberechtigung ist deaktiviert. Tippen Sie unten, um die Einstellungen zu öffnen und den Zugriff zuzulassen.",
             locationSet: "Bitte geben Sie Ihren Standort ein, um die Gebetszeiten anzuzeigen.",
             locationError: "Standort konnte nicht ermittelt werden. Bitte versuchen Sie es erneut.",
-            // Location access messages
+            // Location error messages
             locationAccessTitle: "Standortzugriff Aktivieren",
             locationAccessMessage: "Der Standortzugriff ist erforderlich, um genaue Gebetszeiten anzuzeigen. Bitte aktivieren Sie ihn in den Geräteeinstellungen.",
             locationDeniedTitle: "Standortzugriff Erforderlich",
             locationDeniedMessage: "Bitte erlauben Sie den Standortzugriff, um Ihre Stadt zu erkennen und genaue Gebetszeiten anzuzeigen.",
+            gpsOfflineWarningTitle: "Keine Internetverbindung",
+            gpsOfflineWarningMessage: "Ohne Internet kann GPS mehrere Minuten dauern und funktioniert nur im Freien.\n\nUm schnellere Ergebnisse zu erzielen, stellen Sie zuerst eine Verbindung zum Internet her.",
 
             // Compass
             compasAligned: "Auf Qibla ausgerichtet",
@@ -298,7 +306,6 @@ export const translations = {
             // Prayer Times
             prayerTimesStatus: "Status der Gebetszeiten",
             prayerTimesOutdated: "⚠️ Die Gebetszeiten sind veraltet. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
-            noPrayerTimes: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             loaded: "🟢 Geladen",
             notLoaded: "🔴 Nicht Geladen",
 
@@ -348,6 +355,7 @@ export const translations = {
             vibrationError: "Die Aktualisierung der Benachrichtigungsvibration ist fehlgeschlagen.",
             snoozeTimeoutError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             settingsError: "Einstellungen konnten nicht geladen werden.",
+            prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
 
             // About
             aboutText1: "Über diese App",
@@ -358,6 +366,7 @@ export const translations = {
             later: "Später",
             openSettings: "Einstellungen Öffnen",
             retry: "Wiederholen",
+            continue: "Weiter",
         },
         actions: {
             dismiss: "Verstanden",

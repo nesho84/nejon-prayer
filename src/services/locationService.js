@@ -7,11 +7,11 @@ import NetInfo from "@react-native-community/netinfo";
 // ------------------------------------------------------------
 export async function getUserLocation(tr = null) {
     try {
-        // 1️⃣ Request location permission first
+        // Request location permission first
         const { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();
 
         if (status !== 'granted') {
-            // 2️⃣ If denied permanently, show alert to open settings
+            // If denied permanently, show alert to open settings
             if (!canAskAgain) {
                 Alert.alert(
                     tr ? tr("labels.locationAccessTitle") : "Enable Location Access",
@@ -35,10 +35,18 @@ export async function getUserLocation(tr = null) {
             return null;
         }
 
-        // 3️⃣ Check internet connectivity first
+        // Check internet connectivity first
         const { isConnected } = await NetInfo.fetch();
 
-        // 4️⃣ Adjust accuracy and timeout based on connectivity
+        // GPS without Internet access
+        if (!isConnected) {
+            Alert.alert(
+                tr ? tr("labels.gpsOfflineWarningTitle") : "No Internet Connection",
+                tr ? tr("labels.gpsOfflineWarningMessage") : "Without internet, GPS may take several minutes and only works outdoors.\n\nFor faster results, connect to internet first.",
+            );
+        }
+
+        // Adjust accuracy and timeout based on connectivity
         const locationOptions = isConnected
             ? {
                 accuracy: Location.Accuracy.Highest,
@@ -50,7 +58,7 @@ export async function getUserLocation(tr = null) {
                 maximumAge: 10000, // Allow cached location up to 10s old
             };
 
-        // 5️⃣ Get current position with single attempt
+        // Get current position with single attempt
         let loc;
         try {
             loc = await Location.getCurrentPositionAsync(locationOptions);
@@ -69,7 +77,7 @@ export async function getUserLocation(tr = null) {
             return null;
         }
 
-        // 6️⃣ Get address and timezone info (already handles offline gracefully)
+        // Get address and timezone info (already handles offline gracefully)
         const fullAddress = await formatUserAddress(loc.coords);
         const timeZone = await getTimeZoneInfo(loc.coords);
 

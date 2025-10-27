@@ -1,9 +1,8 @@
-import { Alert } from "react-native";
 
 // ------------------------------------------------------------
 // Fetch prayer times from aladhan.com API
 // ------------------------------------------------------------
-export async function getPrayerTimes(location, tr = null) {
+export async function getPrayerTimes(location) {
     const { latitude, longitude } = location;
 
     // 1. Validate coordinates
@@ -78,6 +77,6 @@ export async function getPrayerTimes(location, tr = null) {
         return filtered; // { Fajr: "06:00", Dhuhr: "12:50", ... }
     } catch (err) {
         console.error("❌ API fetch error:", err);
-        return null;
+        throw err;
     }
 }
