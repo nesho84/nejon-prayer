@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useSettingsContext } from "@/context/SettingsContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen";
+import AppTabScreen from "@root/src/components/AppTabScreen";
 import QiblaCompass from "@/components/QiblaCompass";
 
 export default function QiblaScreen() {
@@ -11,7 +11,7 @@ export default function QiblaScreen() {
     const { appSettings, settingsLoading } = useSettingsContext();
 
     return (
-        <AppScreen>
+        <AppTabScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -30,7 +30,7 @@ export default function QiblaScreen() {
                 />
 
             </ScrollView>
-        </AppScreen>
+        </AppTabScreen>
     );
 }
 

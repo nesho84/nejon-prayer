@@ -8,7 +8,7 @@ import { usePrayersContext } from '@/context/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import { getDailyQuote } from "@/utils/dailyQuote";
-import AppScreen from "@/components/AppScreen";
+import AppTabScreen from "@root/src/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
@@ -122,7 +122,7 @@ export default function HomeScreen() {
 
     // Main Content
     return (
-        <AppScreen>
+        <AppTabScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -253,7 +253,7 @@ export default function HomeScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppScreen>
+        </AppTabScreen>
     );
 }
 

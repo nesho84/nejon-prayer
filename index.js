@@ -1,10 +1,21 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
-// Background handler for Notifee
-// This will fire when:
+// ------------------------------------------------------------
+// "@notifee/react-native" Background handler. This works when:
 // The device is locked.
 // The application is running & is in not in view (minimized).
 // The application is killed/quit.
 // Notification action is pressed
-import './src/services/notificationService';
+// ------------------------------------------------------------
+import notifee from '@notifee/react-native';
+import { handleNotificationEvent } from './src/services/notificationService';
 
+notifee.onBackgroundEvent(async ({ type, detail }) => {
+    const { notification, pressAction } = detail;
+
+    // Ignore if no notification
+    if (!notification) return;
+
+    // Call the Notification event handler
+    await handleNotificationEvent(type, notification, pressAction, 'background');
+});

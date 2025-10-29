@@ -2,16 +2,11 @@ import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useSegments } from "expo-router";
 
-export default function AppScreen({ children }) {
+export default function AppTabScreen({ children }) {
     const { theme, resolvedTheme } = useThemeContext();
-    const barStyle = resolvedTheme === "dark" ? "light" : "dark";
-
     const insets = useSafeAreaInsets();
-    const segments = useSegments();
-
-    const ignoreBottom = segments.includes("(tabs)");
+    const barStyle = resolvedTheme === "dark" ? "light" : "dark";
 
     // Fix for Android 14+ safe area regression
     const topInset = Platform.OS === "android" && (!insets.top || insets.top < 24)
@@ -22,14 +17,7 @@ export default function AppScreen({ children }) {
         <>
             <StatusBar style={barStyle} />
             <SafeAreaView
-                style={[
-                    styles.container,
-                    {
-                        backgroundColor: theme.bg,
-                        paddingTop: topInset,
-                        paddingBottom: ignoreBottom ? 0 : insets.bottom
-                    }
-                ]}
+                style={[styles.container, { backgroundColor: theme.bg, paddingTop: topInset, }]}
                 edges={['left', 'right']}
             >
                 {children}

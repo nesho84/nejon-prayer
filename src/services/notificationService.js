@@ -12,18 +12,6 @@ import { Platform } from 'react-native';
 // ------------------------------------------------------------
 // Internal state
 // ------------------------------------------------------------
-const AZAN_SOUNDS = {
-    short: 'azan-15sec.mp3', // 15sec (not used)
-    medium: 'azan1.mp3', // 30sec
-    long: 'azan-60sec.mp3', // 60sec (not used)
-};
-
-const ALARM_SOUNDS = {
-    short: 'alarm-15sec.mp3', // 15sec (not used)
-    medium: 'alarm1.mp3', // 30sec
-    long: 'alarm-60sec.mp3', // 60sec (not used)
-};
-
 let currentSound = null;
 
 // ------------------------------------------------------------
@@ -171,7 +159,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
     const language = notification?.data?.language ?? 'en'; // not used currently
     const volume = Number(notification?.data?.volume ?? 1.0);
     const vibration = notification?.data?.vibration ?? 'on';
-    const snoozeTimeout = Number(notification?.data?.snoozeTimeout ?? 5);
+    const snooze = Number(notification?.data?.snooze ?? 5);
 
     // Check Alarm & Reminders permission
     const notifSettings = await notifee.getNotificationSettings();
@@ -185,13 +173,11 @@ export async function handleNotificationEvent(type, notification, pressAction, s
 
             // For prayer notification
             if (notification?.data?.type === "prayer-notification") {
-                const sound = AZAN_SOUNDS['medium'] ?? AZAN_SOUNDS.medium;
-                await startSound(sound, volume);
+                await startSound('azan1.mp3', volume); // 29sec
             }
             // For prayer reminder notification
             if (notification?.data?.type === "prayer-reminder") {
-                const sound = ALARM_SOUNDS['medium'] ?? ALARM_SOUNDS.medium;
-                await startSound(sound, volume);
+                await startSound('beep1.mp3', volume); // 25sec
             }
             break;
 
@@ -203,7 +189,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                     break;
 
                 case 'snooze':
-                    console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snoozeTimeout}min)...`);
+                    console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
                     await clearAll(notification.id);
                     try {
                         // Schedule timestamp reminder
@@ -237,7 +223,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                             },
                             {
                                 type: TriggerType.TIMESTAMP,
-                                timestamp: Date.now() + snoozeTimeout * 60 * 1000,
+                                timestamp: Date.now() + snooze * 60 * 1000,
                                 alarmManager: hasAlarm,
                             }
                         );
@@ -264,23 +250,3 @@ export async function handleNotificationEvent(type, notification, pressAction, s
             break;
     }
 }
-
-// ------------------------------------------------------------
-// Background handler for Notifee
-// This will fire when:
-// The device is locked.
-// The application is running & is in not in view (minimized).
-// The application is killed/quit.
-// Notification action is pressed
-// ------------------------------------------------------------
-// To register your handler, the onBackgroundEvent method should be registered in your project(root)
-// (e.g. the index.js file):
-// ------------------------------------------------------------
-notifee.onBackgroundEvent(async ({ type, detail }) => {
-    const { notification, pressAction } = detail;
-
-    // Ignore if no notification
-    if (!notification) return;
-
-    await handleNotificationEvent(type, notification, pressAction, 'background');
-});

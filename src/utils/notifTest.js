@@ -34,7 +34,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     language: appSettings?.language,
                     volume: String(notificationsConfig?.volume ?? 1.0),
                     vibration: notificationsConfig?.vibration ?? 'on',
-                    snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
+                    snooze: String(notificationsConfig?.snooze ?? 5),
                 },
                 android: {
                     // (is created in notificationService.js)
@@ -71,12 +71,12 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
         const remainingSeconds = Math.max(0, Math.floor((fireTime - Date.now()) / 1000) + 1);
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
-            channelId: ${`prayer-notifications-channel-${notificationsConfig?.vibration}`}
+            channelId: ${`prayer-notif-channel-vib-${notificationsConfig?.vibration}`}
             language: ${appSettings?.language},
             alarm: ${hasAlarm},
             volume: ${notificationsConfig?.volume},
             vibration: ${notificationsConfig?.vibration},
-            snoozeTimeout: ${notificationsConfig?.snoozeTimeout}
+            snooze: ${notificationsConfig?.snooze}
             `);
 
     } catch (err) {

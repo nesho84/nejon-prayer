@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen";
+import AppFullScreen from "@root/src/components/AppFullScreen";
 import CounterCircle from "@/components/CounterCircle";
 
 export default function QiblaScreen() {
@@ -135,10 +135,10 @@ export default function QiblaScreen() {
     };
 
     return (
-        <AppScreen>
+        <AppFullScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[styles.scrollContent]}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -233,9 +233,8 @@ export default function QiblaScreen() {
                     </TouchableOpacity>
                 </View>
 
-
             </ScrollView>
-        </AppScreen>
+        </AppFullScreen>
     );
 }
 
@@ -245,8 +244,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
         paddingHorizontal: 16,
-        paddingTop: 0,
+        paddingTop: 12,
         paddingBottom: 24,
         gap: 16,
     },
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 6,
         paddingHorizontal: 12,
-        marginBottom: 16,
+        marginVertical: 16,
         borderWidth: 1,
         borderRadius: 20,
         gap: 6,

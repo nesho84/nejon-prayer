@@ -8,7 +8,7 @@ import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
-import AppScreen from "@/components/AppScreen";
+import AppTabScreen from "@root/src/components/AppTabScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -131,7 +131,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <AppScreen>
+    <AppTabScreen>
       <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
         {/* Step 1: Language */}
@@ -223,7 +223,7 @@ export default function OnboardingScreen() {
         </View>
 
       </View>
-    </AppScreen>
+    </AppTabScreen>
   );
 }
 

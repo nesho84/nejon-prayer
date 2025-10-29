@@ -22,7 +22,7 @@ import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AppScreen from "@/components/AppScreen";
+import AppTabScreen from "@root/src/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
 
@@ -267,8 +267,8 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     // Change Notification snozee timeout
     // ------------------------------------------------------------
-    const handleSnoozeTimeout = async (value) => {
-        if (notificationsConfig?.snoozeTimeout === value) {
+    const handleSnooze = async (value) => {
+        if (notificationsConfig?.snooze === value) {
             return; // no change
         }
 
@@ -278,7 +278,7 @@ export default function SettingsScreen() {
             await saveAppSettings({
                 notificationsConfig: {
                     ...appSettings.notificationsConfig,
-                    snoozeTimeout: value,
+                    snooze: value,
                 },
             });
 
@@ -286,7 +286,7 @@ export default function SettingsScreen() {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (err) {
             console.error("Snooze timeout change error:", err);
-            Alert.alert(tr("labels.error"), tr("labels.snoozeTimeoutError"));
+            Alert.alert(tr("labels.error"), tr("labels.snoozeError"));
         } finally {
             setLocalLoading(false);
         }
@@ -349,7 +349,7 @@ export default function SettingsScreen() {
 
     // Main Content
     return (
-        <AppScreen>
+        <AppTabScreen>
             {/* Inline Loading */}
             {localLoading && <AppLoading inline={true} text={tr("labels.updatingSettings")} />}
 
@@ -559,10 +559,10 @@ export default function SettingsScreen() {
                             {/* ------ Snooze/Reminder Timeout ------ */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr("labels.snoozeTimeout")}
+                                    {tr("labels.snooze")}
                                 </Text>
                                 <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                                    {notificationsConfig?.snoozeTimeout ?? 5}min
+                                    {notificationsConfig?.snooze ?? 5}min
                                 </Text>
                             </View>
                             <View style={styles.presets}>
@@ -572,17 +572,17 @@ export default function SettingsScreen() {
                                         style={[
                                             styles.presetBtn,
                                             {
-                                                backgroundColor: notificationsConfig?.snoozeTimeout === st ? theme.primary + '20' : theme.card,
-                                                borderColor: notificationsConfig?.snoozeTimeout === st ? theme.primary : 'transparent',
+                                                backgroundColor: notificationsConfig?.snooze === st ? theme.primary + '20' : theme.card,
+                                                borderColor: notificationsConfig?.snooze === st ? theme.primary : 'transparent',
                                                 marginTop: 8,
                                                 marginBottom: 3
                                             }
                                         ]}
-                                        onPress={() => handleSnoozeTimeout(st)}
+                                        onPress={() => handleSnooze(st)}
                                     >
                                         <Text style={[
                                             styles.presetText,
-                                            { color: notificationsConfig?.snoozeTimeout === st ? theme.primary : theme.text2 }
+                                            { color: notificationsConfig?.snooze === st ? theme.primary : theme.text2 }
                                         ]}>
                                             {st}
                                         </Text>
@@ -630,7 +630,7 @@ export default function SettingsScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppScreen>
+        </AppTabScreen>
     );
 }
 

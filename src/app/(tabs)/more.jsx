@@ -1,9 +1,9 @@
 import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppScreen from "@/components/AppScreen";
+import AppTabScreen from "@root/src/components/AppTabScreen";
 import AppCard from "@/components/AppCard";
 
 export default function ExtrasScreen() {
@@ -17,6 +17,7 @@ export default function ExtrasScreen() {
             label: tr("labels.abdes"),
             description: tr("labels.abdesDesc") || "Step by step ablution guide",
             color: "#06b6d4",
+            bg: "#06b6d426", // ✅ 15% opacity background
             icon: <Ionicons name="water-outline" size={30} color="#06b6d4" />
         },
         {
@@ -25,6 +26,7 @@ export default function ExtrasScreen() {
             label: tr("labels.namaz"),
             description: tr("labels.namazDesc") || "Learn how to perform Salah",
             color: "#3b82f6",
+            bg: "#3b82f626",
             icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" />
         },
         {
@@ -33,15 +35,17 @@ export default function ExtrasScreen() {
             label: tr("labels.tesbih"),
             description: tr("labels.tesbihDesc") || "Digital prayer beads counter",
             color: "#8b5cf6",
+            bg: "#8b5cf626",
             icon: <McIcons name="counter" size={32} color="#8b5cf6" />
         },
         {
             id: 4,
-            href: "(extras)/ramadan",
-            label: tr("labels.ramadan") || "Ramazani",
-            description: tr("labels.ramadan") || "Ramazani...",
-            color: "#f59e0b",
-            icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
+            href: "(extras)/ramazani",
+            label: tr("labels.ramadan"),
+            description: tr("labels.ramadanDesc"),
+            color: "#06b6d4",
+            bg: "#06b6d426",
+            icon: <McIcons name="information-outline" size={32} color="#06b6d4" />
         },
         {
             id: 5,
@@ -49,20 +53,13 @@ export default function ExtrasScreen() {
             label: tr("labels.about"),
             description: tr("labels.aboutDesc") || "App information & credits",
             color: "#f59e0b",
+            bg: "#f59e0b26",
             icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
         },
-        // {
-        //     id: 6,
-        //     href: "/",
-        //     label: "Feature 1",
-        //     description: tr("labels.feature") || "New and Upcoming Feature",
-        //     color: theme.success,
-        //     icon: <McIcons name="head-question-outline" size={32} color={theme.success} />
-        // },
     ];
 
     return (
-        <AppScreen>
+        <AppTabScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -71,7 +68,7 @@ export default function ExtrasScreen() {
 
                 {/* Hero Header Section */}
                 <AppCard style={styles.headerCard}>
-                    <View style={[styles.headerIconContainer, { backgroundColor: theme.warning + '15' }]}>
+                    <View style={[styles.headerIconContainer, { backgroundColor: "#f59e0b26" }]}>
                         <Ionicons name="apps" size={52} color={theme.accent} />
                     </View>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
@@ -91,9 +88,9 @@ export default function ExtrasScreen() {
                                     {({ pressed }) => (
                                         <View style={[
                                             styles.listItem,
-                                            pressed && { backgroundColor: theme.accent + '08' }
+                                            pressed && { backgroundColor: theme.accent + '08', opacity: pressed ? 0.3 : 1 }
                                         ]}>
-                                            <View style={[styles.itemIconContainer, { backgroundColor: item.color + "15" }]}>
+                                            <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
                                                 {item.icon}
                                             </View>
 
@@ -121,7 +118,7 @@ export default function ExtrasScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppScreen>
+        </AppTabScreen>
     );
 }
 
@@ -132,7 +129,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 16,
-        paddingTop: 24,
+        paddingTop: 12,
         paddingBottom: 24,
         gap: 16,
     },

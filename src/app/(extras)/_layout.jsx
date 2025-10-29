@@ -14,23 +14,30 @@ export default function ExtrasLayout() {
             }}
         >
             <Stack.Screen
-                name="namazi"
+                name="abdesi"
                 options={{
-                    title: "Namazi",
-                    headerShown: true,
+                    title: tr("labels.abdes"),
+                    headerShown: true
                 }}
             />
             <Stack.Screen
-                name="abdesi"
+                name="namazi"
                 options={{
-                    title: "Abdesi",
-                    headerShown: true
+                    title: tr("labels.namaz"),
+                    headerShown: true,
                 }}
             />
             <Stack.Screen
                 name="tesbih"
                 options={{
-                    title: "Tesbih",
+                    title: tr("labels.tesbih"),
+                    headerShown: true
+                }}
+            />
+            <Stack.Screen
+                name="ramazani"
+                options={{
+                    title: tr("labels.ramadan"),
                     headerShown: true
                 }}
             />

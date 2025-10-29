@@ -1,15 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
-import AppScreen from "@/components/AppScreen";
 import useTranslation from "@/hooks/useTranslation";
+import AppFullScreen from "@root/src/components/AppFullScreen";
 
 export default function NamaziScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     return (
-        <AppScreen>
+        <AppFullScreen>
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
                 <Ionicons name="checkmark-circle-outline" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
@@ -20,7 +20,7 @@ export default function NamaziScreen() {
                 </Text>
 
             </View>
-        </AppScreen>
+        </AppFullScreen>
     );
 }
 
@@ -29,7 +29,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
+        paddingHorizontal: 16,
+        paddingTop: 24,
+        paddingBottom: 24,
+        gap: 16,
     },
     desc: {
         fontSize: 16,

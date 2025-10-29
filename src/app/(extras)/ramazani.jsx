@@ -4,7 +4,7 @@ import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 import AppFullScreen from "@root/src/components/AppFullScreen";
 
-export default function AbdesiScreen() {
+export default function RamazaniScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
@@ -12,7 +12,7 @@ export default function AbdesiScreen() {
         <AppFullScreen>
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
-                <Ionicons name="shield-checkmark-outline" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
+                <Ionicons name="checkmark-circle-outline" size={100} color={theme.placeholder} style={{ marginBottom: 24 }} />
 
                 {/* Description */}
                 <Text style={[styles.desc, { color: theme.placeholder }]}>

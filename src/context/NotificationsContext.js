@@ -50,11 +50,11 @@ export function NotificationsProvider({ children }) {
                 // Convert to strings for comparison (saved data is always string)
                 const currentVolume = String(notificationsConfig?.volume ?? 1);
                 const currentVibration = String(notificationsConfig?.vibration ?? 'on');
-                const currentSnooze = String(notificationsConfig?.snoozeTimeout ?? 5);
+                const currentSnooze = String(notificationsConfig?.snooze ?? 5);
                 // Check if notification config hasn't changed
                 if (notifData.volume !== currentVolume) return false;
                 if (notifData.vibration !== currentVibration) return false;
-                if (notifData.snoozeTimeout !== currentSnooze) return false;
+                if (notifData.snooze !== currentSnooze) return false;
 
                 // Check if prayer time hasn't changed
                 const [hourStr, minuteStr] = timeString.split(":");
@@ -152,7 +152,7 @@ export function NotificationsProvider({ children }) {
                             language: language,
                             volume: String(notificationsConfig?.volume ?? 1.0),
                             vibration: notificationsConfig?.vibration ?? 'on',
-                            snoozeTimeout: String(notificationsConfig?.snoozeTimeout ?? 5),
+                            snooze: String(notificationsConfig?.snooze ?? 5),
                         },
                         android: {
                             channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,

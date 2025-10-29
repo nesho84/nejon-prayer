@@ -1,15 +1,15 @@
 import { Image, StyleSheet, Text, View, Alert } from "react-native";
 import Constants from "expo-constants";
 import { useThemeContext } from "@/context/ThemeContext";
-import AppScreen from "@/components/AppScreen";
 import useTranslation from "@/hooks/useTranslation";
+import AppFullScreen from "@root/src/components/AppFullScreen";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
     return (
-        <AppScreen>
+        <AppFullScreen>
             <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
                 {/* App Logo */}
@@ -36,7 +36,7 @@ export default function AboutScreen() {
                 </Text>
 
             </View>
-        </AppScreen>
+        </AppFullScreen>
     );
 }
 
@@ -46,14 +46,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 16,
-        paddingTop: 12,
+        paddingTop: 24,
         paddingBottom: 24,
         gap: 16,
     },
     logo: {
         width: 150,
         height: 150,
-        marginBottom: 5,
+        marginTop: -40,
+        marginBottom: 16,
     },
     title: {
         fontSize: 24,
