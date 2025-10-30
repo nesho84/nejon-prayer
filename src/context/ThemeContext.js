@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { Appearance } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "@/utils/storage";
 import { darkTheme, lightTheme } from "@/constants/colors";
 
 export const ThemeContext = createContext();
 
-const THEME_KEY = "@app_theme_v1";
+// MMKV storage key
+const THEME_KEY = "@theme_key";
 
 export function ThemeProvider({ children }) {
     const [themeMode, setThemeMode] = useState("system"); // "light" | "dark" | "system"
@@ -32,16 +33,16 @@ export function ThemeProvider({ children }) {
     }, [themeMode, resolveTheme]);
 
     // ------------------------------------------------------------
-    // Load saved theme from storage
+    // Load saved theme from MMKV storage
     // ------------------------------------------------------------
-    const loadTheme = useCallback(async () => {
+    const loadTheme = useCallback(() => {
         try {
-            const saved = await AsyncStorage.getItem(THEME_KEY);
+            const saved = storage.getString(THEME_KEY);
             const mode = saved || "system";
             setThemeMode(mode);
             setTheme(resolveTheme(mode));
         } catch (err) {
-            console.warn("❌ Failed to load theme, defaulting to system", err);
+            console.warn("⚠️ Failed to load theme, defaulting to system", err);
             setThemeMode("system");
             setTheme(lightTheme);
         } finally {
@@ -51,16 +52,16 @@ export function ThemeProvider({ children }) {
     }, [resolveTheme]);
 
     // ------------------------------------------------------------
-    // Change theme manually
+    // Save theme to MMKV storage - change theme manually
     // ------------------------------------------------------------
-    const changeTheme = useCallback(async (mode) => {
+    const changeTheme = useCallback((mode) => {
         setLoading(true);
         try {
             setThemeMode(mode);
             setTheme(resolveTheme(mode));
-            await AsyncStorage.setItem(THEME_KEY, mode);
+            storage.set(THEME_KEY, mode);
         } catch (err) {
-            console.warn("❌ Failed to save theme", err);
+            console.warn("⚠️ Failed to save theme", err);
         } finally {
             setLoading(false);
         }
@@ -72,9 +73,7 @@ export function ThemeProvider({ children }) {
     useEffect(() => {
         let mounted = true;
 
-        (async () => {
-            await loadTheme();
-        })();
+        loadTheme();
 
         return () => { mounted = false; };
     }, [loadTheme]);

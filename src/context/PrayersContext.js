@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "@/utils/storage";
 import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
 import { getPrayerTimes } from "@/services/prayersService";
@@ -9,7 +9,9 @@ import webPrayers from "@/services/webPrayers.json";
 
 export const PrayersContext = createContext();
 
-const PRAYERS_KEY = "@app_prayers_v1";
+// MMKV storage key
+const PRAYERS_KEY = "@prayers_key";
+
 const STALE_DAYS = 7;
 
 export function PrayersProvider({ children }) {
@@ -39,28 +41,28 @@ export function PrayersProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
-    // Read from AsyncStorage
+    // Read prayers from MMKV storage
     // ------------------------------------------------------------
-    const readFromStorage = useCallback(async () => {
+    const readFromStorage = useCallback(() => {
         try {
-            const stored = await AsyncStorage.getItem(PRAYERS_KEY);
+            const stored = storage.getString(PRAYERS_KEY);
             return stored ? JSON.parse(stored) : null;
         } catch (err) {
-            console.warn("⚠️ Failed to read/parse storage:", err);
+            console.warn("⚠️ Failed to read/parse prayers:", err);
             return null;
         }
     }, []);
 
     // ------------------------------------------------------------
-    // Save to AsyncStorage
+    // Save prayers to MMKV storage
     // ------------------------------------------------------------
-    const saveToStorage = useCallback(async (timings) => {
+    const saveToStorage = useCallback((timings) => {
         try {
             const dataToSave = { timings, timestamp: Date.now() };
-            await AsyncStorage.setItem(PRAYERS_KEY, JSON.stringify(dataToSave));
+            storage.set(PRAYERS_KEY, JSON.stringify(dataToSave));
             return true;
         } catch (err) {
-            console.warn("⚠️ Failed to save to storage:", err);
+            console.warn("⚠️ Failed to save prayers:", err);
             return false;
         }
     }, []);
@@ -120,7 +122,7 @@ export function PrayersProvider({ children }) {
             if (!timings && savedTimings) {
                 timings = savedTimings;
                 if (checkIfOutdated(savedTimestamp)) setPrayersOutdated(true);
-                console.log("💾 Prayer times loaded from AsyncStorage");
+                console.log("💾 Prayer times loaded from MMKV storage");
             }
 
             // No data available

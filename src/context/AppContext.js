@@ -1,37 +1,36 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { AppState, Platform } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "@/utils/storage";
 import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
 import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
 
 export const AppContext = createContext();
 
-const SETTINGS_KEY = "@app_settings_v1";
-
-const DEFAULT_SETTINGS = {
-    onboarding: false,
-    language: "en",
-    location: null,
-    fullAddress: null,
-    timeZone: null,
-    notificationsConfig: {
-        volume: 1, // off or 0.0 to 1.0
-        vibration: 'on', // on or off
-        snooze: 5, // minutes (1, 5, 10, 15, 20, 30, 60)
-        prayers: {
-            Fajr: true,
-            Dhuhr: true,
-            Asr: true,
-            Maghrib: true,
-            Isha: true,
-        },
-    }
-};
+// MMKV storage key
+const SETTINGS_KEY = "@settings_key";
 
 export function AppProvider({ children }) {
     // Persistent storage app-level settings
-    const [appSettings, setAppSettings] = useState(DEFAULT_SETTINGS);
+    const [appSettings, setAppSettings] = useState({
+        onboarding: false,
+        language: "en",
+        location: null,
+        fullAddress: null,
+        timeZone: null,
+        notificationsConfig: {
+            volume: 1, // off or 0.0 to 1.0
+            vibration: 'on', // on or off
+            snooze: 5, // minutes (1, 5, 10, 15, 20, 30, 60)
+            prayers: {
+                Fajr: true,
+                Dhuhr: true,
+                Asr: true,
+                Maghrib: true,
+                Isha: true,
+            },
+        }
+    });
 
     // Live device/system settings (not stored)
     const [deviceSettings, setDeviceSettings] = useState({
@@ -49,16 +48,16 @@ export function AppProvider({ children }) {
     const appStateRef = useRef(AppState.currentState);
 
     // ------------------------------------------------------------
-    // Load settings from AsyncStorage
+    // Load settings from MMKV storage
     // ------------------------------------------------------------
-    const loadAppSettings = useCallback(async () => {
+    const loadAppSettings = useCallback(() => {
         setIsLoading(true);
         setSettingsError(null);
         try {
-            const saved = await AsyncStorage.getItem(SETTINGS_KEY);
-            if (saved !== null) setAppSettings(JSON.parse(saved));
+            const saved = storage.getString(SETTINGS_KEY);
+            if (saved) setAppSettings(JSON.parse(saved));
         } catch (err) {
-            console.warn("❌ Failed to load settings", err);
+            console.warn("⚠️ Failed to load settings", err);
             setSettingsError(err.message);
         } finally {
             setIsLoading(false);
@@ -67,24 +66,19 @@ export function AppProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
-    // Save settings to AsyncStorage
+    // Save settings to MMKV storage
     // ------------------------------------------------------------
     const saveAppSettings = useCallback(async (newSettings) => {
         setIsLoading(true);
         setSettingsError(null);
         try {
-            // Use functional update to get current state
             setAppSettings((prev) => {
                 const updated = { ...prev, ...newSettings };
-                // Save to storage after state update
-                AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(updated)).catch(err => {
-                    console.warn("❌ Failed to save settings in AsyncStorage", err);
-                    setSettingsError(err.message);
-                });
+                storage.set(SETTINGS_KEY, JSON.stringify(updated));
                 return updated;
             });
         } catch (err) {
-            console.warn("❌ Failed to save appSettings", err);
+            console.warn("⚠️ Failed to save settings", err);
             setSettingsError(err.message);
         } finally {
             setIsLoading(false);
@@ -123,7 +117,7 @@ export function AppProvider({ children }) {
                 return hasChanged ? newDeviceSettings : prevSettings;
             });
         } catch (err) {
-            console.warn('❌ Failed to sync Device settings:', err);
+            console.warn('❌ Failed to sync device settings:', err);
         }
     }, []);
 
@@ -133,8 +127,9 @@ export function AppProvider({ children }) {
     useEffect(() => {
         let mounted = true;
 
+        loadAppSettings();
+
         (async () => {
-            await loadAppSettings();
             if (mounted) syncDeviceSettings();
         })();
 

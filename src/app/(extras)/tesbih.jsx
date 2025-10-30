@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, AppState, Vibration } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "@/utils/storage";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -9,7 +9,8 @@ import AppFullScreen from "@/components/AppFullScreen";
 import CounterCircle from "@/components/CounterCircle";
 
 export default function QiblaScreen() {
-    const TESBIH_KEY = '@app_tesbih_v1';
+    // MMKV storage key
+    const TESBIH_KEY = '@tesbih_key';
 
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
@@ -49,35 +50,35 @@ export default function QiblaScreen() {
     }, [count, totalCount, laps]);
 
     // ------------------------------------------------------------
-    // Load persisted state
+    // Load state from MMKV storage
     // ------------------------------------------------------------
-    const loadState = async () => {
+    const loadState = () => {
         try {
-            const saved = await AsyncStorage.getItem(TESBIH_KEY);
+            const saved = storage.getString(TESBIH_KEY);
             if (saved) {
                 const data = JSON.parse(saved);
                 setCount(data.count || 0);
                 setTotalCount(data.totalCount || 10);
                 setLaps(data.laps || 0);
             }
-        } catch (error) {
-            console.error('Error loading tesbih state:', error);
+        } catch (err) {
+            console.warn("⚠️ Failed to load tesbih state", err);
         }
     };
 
     // ------------------------------------------------------------
-    // Save state to storage
+    //  Save state to MMKV storage
     // ------------------------------------------------------------
-    const saveState = async () => {
+    const saveState = () => {
         try {
             const data = {
                 count: count,
                 totalCount: totalCount,
                 laps: laps
             };
-            await AsyncStorage.setItem(TESBIH_KEY, JSON.stringify(data));
-        } catch (error) {
-            console.error('Error saving tesbih state:', error);
+            storage.set(TESBIH_KEY, JSON.stringify(data));
+        } catch (err) {
+            console.warn("⚠️ Failed to save tesbih state", err);
         }
     };
 
