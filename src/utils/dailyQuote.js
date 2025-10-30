@@ -1,4 +1,7 @@
-const content = {
+// ------------------------------------------------------------
+// AI generatede Islamic Daily Quotes
+// ------------------------------------------------------------
+const quotes = {
     en: [
         "Verily, in the remembrance of Allah do hearts find rest 💚 (Ar-Ra'd 13:28)",
         "Indeed, prayer prohibits immorality and wrongdoing 🌙 (Al-Ankabut 29:45)",
@@ -27,7 +30,7 @@ const content = {
         "Dhe faleni namazin, jepni zeqatin dhe përkuluni me ata që përkulen 🕌 (El-Bekare 2:43)",
         "Ruajini me kujdes namazet, sidomos namazin e mesëm ⏰ (El-Bekare 2:238)",
         "Pra më përmendni Mua, do t'ju përmend edhe Unë ✨ (El-Bekare 2:152)",
-        "Kërkoni ndihmë me durim dhe namaz 🤲 (El-Bekare 2:153)",
+        "Kërkoni ndihmë me durim dhe namaz \n🤲 (El-Bekare 2:153)",
         "Vërtet, Unë jam afër. Ua plotësoj lutjen kur më thërrasin 🌟 (El-Bekare 2:186)",
         "Më thërrisni Mua, do t'ju përgjigjem 💫 (El-Mumin 40:60)",
         "Të lumtur janë besimtarët që janë të përulur në namazet e tyre 🤲 (El-Mu'minun 23:1-2)",
@@ -68,10 +71,10 @@ const content = {
 };
 
 // ------------------------------------------------------------
-// Returns today's dynamic daily Message for a given language.
+// Returns today's dynamic daily Quote for a given language
 // ------------------------------------------------------------
 export function getDailyQuote(language = "en", { random = false } = {}) {
-    const messages = content[language] || content["en"];
+    const messages = quotes[language] || quotes["en"];
     if (random) {
         const randomIndex = Math.floor(Math.random() * messages.length);
         return messages[randomIndex];

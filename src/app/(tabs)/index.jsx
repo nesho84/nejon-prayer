@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -7,13 +6,13 @@ import { useSettingsContext } from '@/context/SettingsContext';
 import { usePrayersContext } from '@/context/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
-import { getDailyQuote } from "@/utils/dailyQuote";
 import AppTabScreen from "@root/src/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
+import QuoteCarousel from "@root/src/components/QuoteCarousel";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -52,13 +51,6 @@ export default function HomeScreen() {
             console.warn("Prayer times refresh failed:", err);
         }
     };
-
-    // ------------------------------------------------------------
-    // Dynamic daily quote for the middle section
-    // ------------------------------------------------------------
-    const dailyMessage = useMemo(() => {
-        return getDailyQuote(language, { random: true });
-    }, [language]);
 
     // ------------------------------------------------------------
     // Prayer icon resolver
@@ -166,6 +158,10 @@ export default function HomeScreen() {
     // Main Content
     return (
         <AppTabScreen>
+            {/* Notifications Debug utility */}
+            {/* <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} /> */}
+            {/* <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} /> */}
+
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -190,10 +186,6 @@ export default function HomeScreen() {
                     </View>
                 </View>
 
-                {/* Notifications Debug utility */}
-                {/* <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} /> */}
-                {/* <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} /> */}
-
                 {/* 2. COUNTDOWN CIRCLE CARD */}
                 <AppCard style={styles.countdownCard}>
                     {nextPrayerName && (
@@ -212,16 +204,9 @@ export default function HomeScreen() {
                     )}
                 </AppCard>
 
-                {/* 3. QUOTES/MESSAGE CARD */}
+                {/* 3. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
-                    <View style={styles.quotesHeader}>
-                        <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
-                        <Ionicons name="book-outline" size={18} color={theme.accent} />
-                        <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
-                    </View>
-                    <Text style={[styles.quotesText, { color: theme.text2 }]}>
-                        {dailyMessage}
-                    </Text>
+                    <QuoteCarousel language={language} />
                 </AppCard>
 
                 {/* 4. PRAYER TIMES CARD */}
@@ -350,23 +335,6 @@ const styles = StyleSheet.create({
     quotesCard: {
         paddingVertical: 12,
         paddingHorizontal: 20,
-    },
-    quotesHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 6,
-    },
-    decorativeLine: {
-        height: 1,
-        flex: 1,
-        opacity: 0.3,
-    },
-    quotesText: {
-        fontSize: 14,
-        lineHeight: 22,
-        textAlign: 'center',
-        fontStyle: 'italic',
-        opacity: 0.75,
     },
 
     // Prayer Card

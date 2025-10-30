@@ -126,7 +126,7 @@ export const cancelPrayerNotifications = async () => {
         for (const n of scheduled) {
             const type = n.notification.data?.type;
             if (type === 'prayer-notification' || type === 'prayer-reminder') {
-                await notifee.cancelNotification(n.notification.id);
+                await notifee.cancelTriggerNotification(n.notification.id);
             }
         }
         console.log('🔴 All existing notifications cancelled');
@@ -143,8 +143,6 @@ async function clearAll(notificationId) {
         if (notificationId) {
             await notifee.cancelNotification(notificationId);
         }
-        // Optional: clear all displayed notifications
-        // await notifee.cancelDisplayedNotifications();
         await stopSound();
     } catch (err) {
         console.error('❌ [Cleanup] Failed to clear:', err);
