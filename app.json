@@ -79,14 +79,6 @@
         }
       ],
       [
-        "expo-navigation-bar",
-        {
-          "position": "absolute",
-          "visibility": "visible",
-          "behavior": "overlay-swipe"
-        }
-      ],
-      [
         "expo-sensors",
         {
           "motionPermission": "Allow $(PRODUCT_NAME) to access device motion for Qibla direction"
@@ -116,7 +108,8 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     },
     "extra": {
       "eas": {
