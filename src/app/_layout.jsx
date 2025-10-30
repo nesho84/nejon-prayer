@@ -1,8 +1,8 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { AppProvider } from "@root/src/context/AppContext";
-import { useAppContext } from "@root/src/context/AppContext";
+import { AppProvider } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { PrayersProvider } from "@/context/PrayersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import AppLoading from "@/components/AppLoading";

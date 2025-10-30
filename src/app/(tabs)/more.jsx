@@ -3,7 +3,7 @@ import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons"
 import { Link } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppTabScreen from "@root/src/components/AppTabScreen";
+import AppTabScreen from "@/components/AppTabScreen";
 import AppCard from "@/components/AppCard";
 
 export default function ExtrasScreen() {

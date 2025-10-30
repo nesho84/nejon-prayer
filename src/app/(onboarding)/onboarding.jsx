@@ -3,12 +3,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
-import AppTabScreen from "@root/src/components/AppTabScreen";
+import AppTabScreen from "@/components/AppTabScreen";
 
 export default function OnboardingScreen() {
   const router = useRouter();

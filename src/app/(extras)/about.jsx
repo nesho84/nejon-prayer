@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View, Alert } from "react-native";
 import Constants from "expo-constants";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppFullScreen from "@root/src/components/AppFullScreen";
+import AppFullScreen from "@/components/AppFullScreen";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();

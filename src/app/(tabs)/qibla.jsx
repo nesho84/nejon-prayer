@@ -1,8 +1,8 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppTabScreen from "@root/src/components/AppTabScreen";
+import AppTabScreen from "@/components/AppTabScreen";
 import QiblaCompass from "@/components/QiblaCompass";
 
 export default function QiblaScreen() {

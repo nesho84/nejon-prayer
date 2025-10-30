@@ -2,17 +2,17 @@ import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, View } fro
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useAppContext } from '@root/src/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
 import { usePrayersContext } from '@/context/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
-import AppTabScreen from "@root/src/components/AppTabScreen";
+import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
-import QuoteCarousel from "@root/src/components/QuoteCarousel";
+import QuoteCarousel from "@/components/QuoteCarousel";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();

@@ -1,5 +1,5 @@
 import { translations } from "@/constants/translations";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 export default function useTranslation() {
     const { appSettings } = useAppContext();

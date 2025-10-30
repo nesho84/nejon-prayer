@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppFullScreen from "@root/src/components/AppFullScreen";
+import AppFullScreen from "@/components/AppFullScreen";
 import CounterCircle from "@/components/CounterCircle";
 
 export default function QiblaScreen() {

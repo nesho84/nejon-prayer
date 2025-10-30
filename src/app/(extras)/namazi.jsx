@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import AppFullScreen from "@root/src/components/AppFullScreen";
+import AppFullScreen from "@/components/AppFullScreen";
 
 export default function NamaziScreen() {
     const { theme } = useThemeContext();

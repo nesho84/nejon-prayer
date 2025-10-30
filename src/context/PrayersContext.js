@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
-import { getPrayerTimes } from "@root/src/services/prayersService";
+import { getPrayerTimes } from "@/services/prayersService";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import webPrayers from "@/services/webPrayers.json";
 

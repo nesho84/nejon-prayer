@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
 import notifee, { AndroidNotificationSetting, TriggerType, RepeatFrequency, AndroidColor, AndroidStyle } from "@notifee/react-native";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
-import { createNotificationChannels, cancelPrayerNotifications, handleNotificationEvent } from '@root/src/services/notificationsService';
+import { createNotificationChannels, cancelPrayerNotifications, handleNotificationEvent } from '@/services/notificationsService';
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();

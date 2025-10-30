@@ -16,13 +16,13 @@ import Slider from '@react-native-community/slider';
 import { Picker } from "@react-native-picker/picker";
 import * as Haptics from "expo-haptics";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useAppContext } from "@root/src/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AppTabScreen from "@root/src/components/AppTabScreen";
+import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
 
