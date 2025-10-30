@@ -16,7 +16,7 @@ import Slider from '@react-native-community/slider';
 import { Picker } from "@react-native-picker/picker";
 import * as Haptics from "expo-haptics";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useAppContext } from "@root/src/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
@@ -36,7 +36,7 @@ export default function SettingsScreen() {
         settingsError,
         saveAppSettings,
         reloadAppSettings
-    } = useSettingsContext();
+    } = useAppContext();
     const {
         prayerTimes,
         isLoading: prayersLoading,

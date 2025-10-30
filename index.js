@@ -8,7 +8,7 @@ import 'expo-router/entry'; // This auto-registers the root app
 // Notification action is pressed
 // ------------------------------------------------------------
 import notifee from '@notifee/react-native';
-import { handleNotificationEvent } from './src/services/notificationService';
+import { handleNotificationEvent } from './src/services/notificationsService';
 
 notifee.onBackgroundEvent(async ({ type, detail }) => {
     const { notification, pressAction } = detail;

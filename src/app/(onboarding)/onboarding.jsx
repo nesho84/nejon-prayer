@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useAppContext } from "@root/src/context/AppContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +18,7 @@ export default function OnboardingScreen() {
     isReady: settingsReady,
     isLoading: settingsLoading,
     saveAppSettings
-  } = useSettingsContext();
+  } = useAppContext();
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
@@ -101,12 +101,12 @@ export default function OnboardingScreen() {
   }
 
   // ------------------------------------------------------------
-  // 🏁 (Finish) Update SettingsContext and redirect to HomeScreen
+  // 🏁 (Finish) Update AppContext and redirect to HomeScreen
   // ------------------------------------------------------------
   async function finishOnboarding() {
     setLocalLoading(true);
     try {
-      // Update SettingsContext
+      // Update AppContext
       await saveAppSettings({
         onboarding: true,
         language: languageRef.current,

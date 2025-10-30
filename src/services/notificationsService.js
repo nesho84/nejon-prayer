@@ -153,7 +153,7 @@ async function clearAll(notificationId) {
 // Handle Notifee Notification event (Public API)
 // ------------------------------------------------------------
 export async function handleNotificationEvent(type, notification, pressAction, source = 'unknown') {
-    // Get notification data passed from SettingsContext
+    // Get notification data passed from AppContext
     const language = notification?.data?.language ?? 'en'; // not used currently
     const volume = Number(notification?.data?.volume ?? 1.0);
     const vibration = notification?.data?.vibration ?? 'on';

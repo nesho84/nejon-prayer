@@ -6,7 +6,7 @@ import { getDailyQuote } from "@/utils/dailyQuote";
 
 const MAX_QUOTES = 5;
 const PEEK = 12; // small visible edge of next/previous card
-const SPACING = 10; // space between cards
+const SPACING = 8; // space between cards
 
 export default function QuoteCarousel({ language }) {
     const { theme } = useThemeContext();
@@ -88,10 +88,7 @@ export default function QuoteCarousel({ language }) {
                 {quotes.map((_, idx) => (
                     <View
                         key={idx}
-                        style={[
-                            styles.dot,
-                            { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight },
-                        ]}
+                        style={[styles.dot, { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight }]}
                     />
                 ))}
             </View>

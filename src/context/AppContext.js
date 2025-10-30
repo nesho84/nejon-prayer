@@ -5,7 +5,7 @@ import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
 import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
 
-export const SettingsContext = createContext();
+export const AppContext = createContext();
 
 const SETTINGS_KEY = "@app_settings_v1";
 
@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS = {
     }
 };
 
-export function SettingsProvider({ children }) {
+export function AppProvider({ children }) {
     // Persistent storage app-level settings
     const [appSettings, setAppSettings] = useState(DEFAULT_SETTINGS);
 
@@ -170,14 +170,14 @@ export function SettingsProvider({ children }) {
     }), [appSettings, deviceSettings, saveAppSettings, loadAppSettings, isReady, isLoading, settingsError]);
 
     return (
-        <SettingsContext.Provider value={contextValue}>
+        <AppContext.Provider value={contextValue}>
             {children}
-        </SettingsContext.Provider>
+        </AppContext.Provider>
     );
 }
 
-export function useSettingsContext() {
-    const context = useContext(SettingsContext);
-    if (!context) throw new Error('useSettingsContext must be used within a SettingsProvider');
+export function useAppContext() {
+    const context = useContext(AppContext);
+    if (!context) throw new Error('useAppContext must be used within a AppProvider');
     return context;
 }

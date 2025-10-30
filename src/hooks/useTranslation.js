@@ -1,8 +1,8 @@
 import { translations } from "@/constants/translations";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useAppContext } from "@root/src/context/AppContext";
 
 export default function useTranslation() {
-    const { appSettings } = useSettingsContext();
+    const { appSettings } = useAppContext();
 
     const language = appSettings.language || "en";
 

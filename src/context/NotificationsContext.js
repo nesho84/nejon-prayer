@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
 import notifee, { AndroidNotificationSetting, TriggerType, RepeatFrequency, AndroidColor, AndroidStyle } from "@notifee/react-native";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useAppContext } from "@root/src/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
-import { cancelPrayerNotifications, createNotificationChannels, handleNotificationEvent } from '@/services/notificationService';
+import { createNotificationChannels, cancelPrayerNotifications, handleNotificationEvent } from '@root/src/services/notificationsService';
 import useTranslation from "@/hooks/useTranslation";
 
 export const NotificationsContext = createContext();
@@ -10,7 +10,7 @@ export const NotificationsContext = createContext();
 const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 export function NotificationsProvider({ children }) {
-    const { appSettings, deviceSettings, isReady: settingsReady } = useSettingsContext();
+    const { appSettings, deviceSettings, isReady: settingsReady } = useAppContext();
     const { prayerTimes, isReady: prayersReady } = usePrayersContext();
     const { tr, language } = useTranslation();
 

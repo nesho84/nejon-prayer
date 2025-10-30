@@ -37,7 +37,7 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     snooze: String(notificationsConfig?.snooze ?? 5),
                 },
                 android: {
-                    // (is created in notificationService.js)
+                    // (is created in notificationsService.js)
                     channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",

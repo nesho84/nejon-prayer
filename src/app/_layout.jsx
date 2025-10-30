@@ -1,14 +1,14 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { SettingsProvider } from "@/context/SettingsContext";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { AppProvider } from "@root/src/context/AppContext";
+import { useAppContext } from "@root/src/context/AppContext";
 import { PrayersProvider } from "@/context/PrayersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import AppLoading from "@/components/AppLoading";
 
 const RootStack = () => {
-  const { appSettings, isReady, isLoading } = useSettingsContext();
+  const { appSettings, isReady, isLoading } = useAppContext();
 
   if (!isReady || isLoading) return <AppLoading />;
 
@@ -34,13 +34,13 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ThemeProvider>
-        <SettingsProvider>
+        <AppProvider>
           <PrayersProvider>
             <NotificationsProvider>
               <RootStack />
             </NotificationsProvider>
           </PrayersProvider>
-        </SettingsProvider>
+        </AppProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

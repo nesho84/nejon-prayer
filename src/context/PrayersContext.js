@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useSettingsContext } from "@/context/SettingsContext";
+import { useAppContext } from "@root/src/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
-import { getPrayerTimes } from "@/services/prayerService";
+import { getPrayerTimes } from "@root/src/services/prayersService";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import webPrayers from "@/services/webPrayers.json";
 
@@ -13,7 +13,7 @@ const PRAYERS_KEY = "@app_prayers_v1";
 const STALE_DAYS = 7;
 
 export function PrayersProvider({ children }) {
-    const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useSettingsContext();
+    const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useAppContext();
     const { tr } = useTranslation();
 
     const [prayerTimes, setPrayerTimes] = useState(null);

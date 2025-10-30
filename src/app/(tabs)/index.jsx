@@ -2,7 +2,7 @@ import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, View } fro
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
-import { useSettingsContext } from '@/context/SettingsContext';
+import { useAppContext } from '@root/src/context/AppContext';
 import { usePrayersContext } from '@/context/PrayersContext';
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
@@ -24,7 +24,7 @@ export default function HomeScreen() {
         isLoading: settingsLoading,
         settingsError,
         saveAppSettings
-    } = useSettingsContext();
+    } = useAppContext();
 
     const {
         prayerTimes,
