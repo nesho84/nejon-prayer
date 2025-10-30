@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Button, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
@@ -24,7 +24,9 @@ export default function HomeScreen() {
         isReady: settingsReady,
         isLoading: settingsLoading,
         settingsError,
+        saveAppSettings
     } = useSettingsContext();
+
     const {
         prayerTimes,
         isReady: prayersReady,
@@ -32,6 +34,7 @@ export default function HomeScreen() {
         prayersError,
         reloadPrayerTimes,
     } = usePrayersContext();
+
     const {
         nextPrayerName,
         prayerCountdown,
@@ -60,8 +63,8 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Prayer icon resolver
     // ------------------------------------------------------------
-    const resolvePrayerIcon = (name) => {
-        const p = String(name || "").toLowerCase();
+    const resolvePrayerIcon = (prayerName) => {
+        const p = String(prayerName || "").toLowerCase();
         if (p.includes("imsak")) return { lib: 'Ionicons', name: 'time-outline' };
         if (p.includes("fajr")) return { lib: 'Ionicons', name: 'moon-outline' };
         if (p.includes("sunrise")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-up' };
@@ -70,6 +73,46 @@ export default function HomeScreen() {
         if (p.includes("maghrib")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-down' };
         if (p.includes("isha")) return { lib: 'Ionicons', name: 'moon-sharp' };
         return "time-outline";
+    };
+
+    // ------------------------------------------------------------
+    // Prayer icon state
+    // ------------------------------------------------------------
+    const isNotificationEnabled = (prayerName) => {
+        return deviceSettings.notificationPermission && appSettings.notificationsConfig?.prayers?.[prayerName];
+    };
+
+    // ------------------------------------------------------------
+    // Toggle prayer notification
+    // ------------------------------------------------------------
+    const togglePrayerNotification = async (prayerName) => {
+        // Check system notifications first
+        if (!deviceSettings.notificationPermission) {
+            Alert.alert(
+                tr("labels.notificationsDisabled"),
+                tr("labels.notificationsDisabledMessage"),
+                [
+                    { text: tr ? tr("buttons.cancel") : "Cancel", style: "cancel" },
+                    {
+                        text: tr("labels.goToSettings"),
+                        onPress: () => router.navigate("/(tabs)/settings")
+                    },
+                ],
+                { cancelable: true }
+            );
+            return;
+        }
+
+        // Save appSettings
+        await saveAppSettings({
+            notificationsConfig: {
+                ...appSettings.notificationsConfig,
+                prayers: {
+                    ...appSettings.notificationsConfig.prayers,
+                    [prayerName]: !appSettings.notificationsConfig.prayers?.[prayerName],
+                },
+            },
+        });
     };
 
     // Loading state: settings
@@ -222,7 +265,7 @@ export default function HomeScreen() {
                                     >
                                         {/* Prayer Name */}
                                         <View style={styles.prayerNameSection}>
-                                            <IconComponent name={iconData.name} size={20} color={isNext ? theme.accent : theme.text2} />
+                                            <IconComponent name={iconData.name} size={22} color={isNext ? theme.accent : theme.text2} />
                                             <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
                                                 {tr(`prayers.${name}`) || name}
                                             </Text>
@@ -233,12 +276,23 @@ export default function HomeScreen() {
                                             <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
                                                 {time}
                                             </Text>
-                                            <Ionicons
-                                                name={deviceSettings.notificationPermission ? "notifications-outline" : "notifications-off-outline"}
-                                                size={20}
-                                                color={theme.text2}
-                                                style={{ opacity: 0.5 }}
-                                            />
+
+                                            {/* Prayer Time Icon (Notification on/off) */}
+                                            {(!name.includes("Imsak") && !name.includes("Sunrise"))
+                                                ? <Ionicons
+                                                    name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
+                                                    size={22}
+                                                    color={theme.text2}
+                                                    style={{ opacity: isNotificationEnabled(name) ? 0.5 : 0.3 }}
+                                                    onPress={() => togglePrayerNotification(name)}
+                                                />
+                                                : <Ionicons
+                                                    name={"information-circle-outline"}
+                                                    size={22}
+                                                    color={theme.text2}
+                                                    style={{ opacity: 0.5 }}
+                                                />
+                                            }
                                         </View>
                                     </View>
 
@@ -346,7 +400,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 14,
+        paddingVertical: 13,
         paddingHorizontal: 18,
     },
     prayerRowActive: {

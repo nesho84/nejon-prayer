@@ -96,7 +96,7 @@ export function ThemeProvider({ children }) {
     }, [themeMode]);
 
     // ------------------------------------------------------------
-    // Memoize context value
+    // Memoize context value to prevent unnecessary re-renders
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         theme,

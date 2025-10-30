@@ -19,6 +19,13 @@ const DEFAULT_SETTINGS = {
         volume: 1, // off or 0.0 to 1.0
         vibration: 'on', // on or off
         snooze: 5, // minutes (1, 5, 10, 15, 20, 30, 60)
+        prayers: {
+            Fajr: true,
+            Dhuhr: true,
+            Asr: true,
+            Maghrib: true,
+            Isha: true,
+        },
     }
 };
 
@@ -150,7 +157,7 @@ export function SettingsProvider({ children }) {
     }, [syncDeviceSettings]);
 
     // ------------------------------------------------------------
-    // Memoize context value
+    // Memoize context value to prevent unnecessary re-renders
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         appSettings,

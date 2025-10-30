@@ -17,46 +17,63 @@ export function NotificationsProvider({ children }) {
     const [isReady, setIsReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    // Prevent concurrent scheduling operations
     const isSchedulingRef = useRef(false);
 
     // Extract config for cleaner dependency tracking
     const notificationsConfig = appSettings?.notificationsConfig;
 
     // ------------------------------------------------------------
-    // Check if notifications need rescheduling
+    // Check if notifications need rescheduling & clean up disabled ones
+    // Returns: true if all enabled notifications are up-to-date, false if rescheduling needed
     // ------------------------------------------------------------
-    const shouldReschedule = useCallback(async (times) => {
+    const syncPrayerNotifications = useCallback(async (times) => {
         try {
             // Get all currently scheduled notifications
             const scheduled = await notifee.getTriggerNotifications();
 
-            // Check each prayer in order
-            return PRAYER_ORDER.every(prayerName => {
-                // Skip prayers without a time
+            // Step 1: Remove notifications for prayers that are disabled
+            for (const { notification } of scheduled) {
+                const prayer = notification?.data?.prayer;
+                if (prayer && notificationsConfig?.prayers?.[prayer] === false) {
+                    await notifee.cancelTriggerNotification(notification.id);
+                    console.log(`🚫 Removed Notification for the prayer: ${prayer}`);
+                }
+            }
+
+            // Step 2: Check if remaining enabled prayers are up-to-date
+            const areUpToDate = PRAYER_ORDER.every(prayerName => {
                 const timeString = times[prayerName];
+
+                // Skip prayers without a time
                 if (!timeString) return true;
 
-                // Find the scheduled notification
+                // Skip prayers disabled by user
+                if (notificationsConfig?.prayers?.[prayerName] === false) return true;
+
+                // Find scheduled notification
                 const notification = scheduled.find(
                     n => n.notification.id === `prayer-${prayerName.toLowerCase()}`
                 );
-                if (!notification) return false; // needs scheduling
 
+                // Not scheduled yet - needs rescheduling
+                if (!notification) return false;
+
+                // Extract Notification data
                 const notifData = notification.notification.data;
 
-                // Check if language hasn't changed
-                if (notifData.language !== language) return false;
-
-                // Convert to strings for comparison (saved data is always string)
+                // Check if notification config has changed
                 const currentVolume = String(notificationsConfig?.volume ?? 1);
-                const currentVibration = String(notificationsConfig?.vibration ?? 'on');
-                const currentSnooze = String(notificationsConfig?.snooze ?? 5);
-                // Check if notification config hasn't changed
                 if (notifData.volume !== currentVolume) return false;
+                const currentVibration = String(notificationsConfig?.vibration ?? 'on');
                 if (notifData.vibration !== currentVibration) return false;
+                const currentSnooze = String(notificationsConfig?.snooze ?? 5);
                 if (notifData.snooze !== currentSnooze) return false;
 
-                // Check if prayer time hasn't changed
+                // Check if language has changed
+                if (notifData.language !== language) return false;
+
+                // Check if prayer time has changed
                 const [hourStr, minuteStr] = timeString.split(":");
                 const hour = Number(hourStr);
                 const minute = Number(minuteStr);
@@ -66,34 +83,41 @@ export function NotificationsProvider({ children }) {
                 const targetTime = new Date();
                 targetTime.setHours(hour, minute, 0, 0);
 
-                // If time already passed today, it should be scheduled for tomorrow
-                if (targetTime <= now) targetTime.setDate(targetTime.getDate() + 1);
+                // If time passed today, should be scheduled for tomorrow
+                if (targetTime <= now) {
+                    targetTime.setDate(targetTime.getDate() + 1);
+                }
 
                 // Compare scheduled timestamp with expected timestamp
-                if (notification.trigger.timestamp !== targetTime.getTime()) return false;
+                if (notification.trigger.timestamp !== targetTime.getTime()) {
+                    return false;
+                }
 
-                return true; // All checks passed
+                // All enabled notifications are up-to-date
+                return true;
             });
+
+            return areUpToDate;
         } catch (err) {
-            console.error("❌ Failed to check notifications schedule:", err);
-            return false; // On error, needs rescheduling
+            console.error('Error during notification delete/reschedule check:', err);
+            return false; // Force reschedule on error
         }
     }, [language, notificationsConfig]);
 
     // ------------------------------------------------------------
-    // Schedule prayer notifications
+    // Schedule prayer notifications for all enabled prayers
     // ------------------------------------------------------------
     const schedulePrayerNotifications = useCallback(async (times) => {
-        // Prevent concurrent scheduling operations
+        // Prevent concurrent scheduling
         if (isSchedulingRef.current) {
-            console.log("🔴 Scheduling already in progress - skipping");
+            console.log("⏸️ Scheduling already in progress - skipping");
             return;
         }
 
-        // Prevent duplicate scheduling
-        const isUpToDate = await shouldReschedule(times)
+        // Check if rescheduling is needed
+        const isUpToDate = await syncPrayerNotifications(times);
         if (isUpToDate) {
-            console.log("🟤 Prayer notifications already up to date");
+            console.log("✅ Prayer notifications synced - no scheduling needed");
             return;
         }
 
@@ -105,21 +129,25 @@ export function NotificationsProvider({ children }) {
             // Create Channels (Android only)
             await createNotificationChannels(notificationsConfig);
 
-            // Check Alarm & Reminders permission
+            // Check if alarm manager permission is granted
             const settings = await notifee.getNotificationSettings();
             const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
             let scheduledCount = 0;
             const now = new Date();
 
+            // Schedule notifications for each enabled prayer
             for (const prayerName of PRAYER_ORDER) {
+                // Skip disabled prayers
+                if (!notificationsConfig?.prayers?.[prayerName]) continue;
+
                 const timeStringRaw = times[prayerName];
                 if (!timeStringRaw) {
-                    console.log(`⚠️ No time for ${prayerName}`);
+                    console.log(`⚠️ No time available for ${prayerName}`);
                     continue;
                 }
 
-                // Normalize: trim + replace NBSP + Parse "HH:mm" strictly
+                // Normalize time string: trim + replace NBSP + Parse "HH:mm" strictly
                 const timeString = String(timeStringRaw).replace(/\u00A0/g, " ").trim();
                 const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
                 if (!match) {
@@ -127,13 +155,13 @@ export function NotificationsProvider({ children }) {
                     continue;
                 }
 
-                // Calculate next occurrence
+                // Calculate trigger time
                 const hour = Number(match[1]);
                 const minute = Number(match[2]);
                 const triggerTime = new Date();
                 triggerTime.setHours(hour, minute, 0, 0);
 
-                // If time already passed today, schedule for tomorrow
+                // If time has passed today, schedule for tomorrow
                 if (triggerTime <= now) {
                     triggerTime.setDate(triggerTime.getDate() + 1);
                 }
@@ -188,23 +216,23 @@ export function NotificationsProvider({ children }) {
 
                 scheduledCount++;
 
-                // Debug logging: Format date as DD/MM/YYYY, HH:mm:ss
+                // Log scheduled time: Format date as DD/MM/YYYY, HH:mm:ss
                 const formattedDate = triggerTime.toLocaleDateString('en-GB') + ', ' +
                     triggerTime.toLocaleTimeString('en-GB', { hour12: false });
                 console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}`);
             }
 
-            console.log(`🔔 ${scheduledCount} notifications scheduled`);
+            console.log(`🔔 Successfully scheduled ${scheduledCount} prayer notification(s)`);
         } catch (err) {
             console.error("❌ Failed to schedule notifications:", err);
         } finally {
             isSchedulingRef.current = false;
             setIsLoading(false);
         }
-    }, [language, tr, notificationsConfig, shouldReschedule, cancelPrayerNotifications, createNotificationChannels]);
+    }, [language, tr, notificationsConfig, syncPrayerNotifications, cancelPrayerNotifications, createNotificationChannels]);
 
     // ------------------------------------------------------------
-    // Auto-load on mount (only if settingsReady and PrayersReady)
+    // Auto-Schedule notifications when contexts are ready and permission granted
     // ------------------------------------------------------------
     useEffect(() => {
         if (!settingsReady || !prayersReady) return;
@@ -220,7 +248,13 @@ export function NotificationsProvider({ children }) {
         if (mounted) setIsReady(true);
 
         return () => { mounted = false; };
-    }, [settingsReady, appSettings, deviceSettings?.notificationPermission, prayersReady, prayerTimes]);
+    }, [
+        settingsReady,
+        appSettings,
+        deviceSettings?.notificationPermission,
+        prayersReady,
+        prayerTimes
+    ]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee
@@ -234,7 +268,7 @@ export function NotificationsProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
-    // Memoize context value
+    // Memoize context value to prevent unnecessary re-renders
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         schedulePrayerNotifications,

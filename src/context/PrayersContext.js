@@ -211,7 +211,7 @@ export function PrayersProvider({ children }) {
     }, [settingsReady, location]);
 
     // ------------------------------------------------------------
-    // Memoize context value
+    // Memoize context value to prevent unnecessary re-renders
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         prayerTimes,
