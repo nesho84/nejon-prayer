@@ -2,7 +2,9 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
 
 export default function AppLoading({ text = "Loading...", inline = false, style = null }) {
-    const { theme } = useThemeContext();
+    const { isReady, theme } = useThemeContext();
+
+    if (!isReady) return null;
 
     const containerStyle = inline
         ? [styles.inlineContainer, { backgroundColor: "rgba(0,0,0,0.75)" }]

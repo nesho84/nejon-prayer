@@ -18,18 +18,6 @@ export function AppProvider({ children }) {
         location: null,
         fullAddress: null,
         timeZone: null,
-        notificationsConfig: {
-            volume: 1, // off or 0.0 to 1.0
-            vibration: 'on', // on or off
-            snooze: 5, // minutes (1, 5, 10, 15, 20, 30, 60)
-            prayers: {
-                Fajr: true,
-                Dhuhr: true,
-                Asr: true,
-                Maghrib: true,
-                Isha: true,
-            },
-        }
     });
 
     // Live device/system settings (not stored)
@@ -48,7 +36,7 @@ export function AppProvider({ children }) {
     const appStateRef = useRef(AppState.currentState);
 
     // ------------------------------------------------------------
-    // Load settings from MMKV storage
+    // Load app settings from MMKV storage
     // ------------------------------------------------------------
     const loadAppSettings = useCallback(() => {
         setIsLoading(true);
@@ -66,14 +54,14 @@ export function AppProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
-    // Save settings to MMKV storage
+    // Save app settings to MMKV storage (top-level updates)
     // ------------------------------------------------------------
-    const saveAppSettings = useCallback(async (newSettings) => {
+    const saveAppSettings = useCallback((updates) => {
         setIsLoading(true);
         setSettingsError(null);
         try {
             setAppSettings((prev) => {
-                const updated = { ...prev, ...newSettings };
+                const updated = { ...prev, ...updates };
                 storage.set(SETTINGS_KEY, JSON.stringify(updated));
                 return updated;
             });
@@ -129,9 +117,7 @@ export function AppProvider({ children }) {
 
         loadAppSettings();
 
-        (async () => {
-            if (mounted) syncDeviceSettings();
-        })();
+        if (mounted) syncDeviceSettings();
 
         return () => { mounted = false; };
     }, [loadAppSettings, syncDeviceSettings]);

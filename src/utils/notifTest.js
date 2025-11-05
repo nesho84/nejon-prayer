@@ -8,13 +8,10 @@ import notifee, {
 // ------------------------------------------------------------
 // Debug utility: schedule a test notification
 // ------------------------------------------------------------
-export async function testNotification({ appSettings = null, seconds = 10 } = {}) {
+export async function testNotification({ appSettings = null, notifSettings = null, seconds = 10 } = {}) {
     try {
         // Default to 10 seconds later if no timestamp passed
-        const fireTime = Date.now() + seconds * 1000;
-
-        // Extract config for cleaner dependency tracking
-        const notificationsConfig = appSettings?.notificationsConfig;
+        const triggerTime = Date.now() + seconds * 1000;
 
         // Check alarm permission
         const settings = await notifee.getNotificationSettings();
@@ -32,13 +29,14 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
                     language: appSettings?.language,
-                    volume: String(notificationsConfig?.volume ?? 1.0),
-                    vibration: notificationsConfig?.vibration ?? 'on',
-                    snooze: String(notificationsConfig?.snooze ?? 5),
+                    volume: String(notifSettings?.volume ?? 1.0),
+                    vibration: notifSettings?.vibration ?? 'on',
+                    snooze: String(notifSettings?.snooze ?? 5),
+                    offset: String(notifSettings?.offset ?? 0),
                 },
                 android: {
                     // (is created in notificationsService.js)
-                    channelId: `prayer-notif-channel-vib-${notificationsConfig?.vibration ?? 'on'}`,
+                    channelId: `prayer-notif-channel-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
@@ -63,20 +61,20 @@ export async function testNotification({ appSettings = null, seconds = 10 } = {}
             },
             {
                 type: TriggerType.TIMESTAMP,
-                timestamp: fireTime,
+                timestamp: triggerTime,
                 alarmManager: hasAlarm,
             }
         );
 
-        const remainingSeconds = Math.max(0, Math.floor((fireTime - Date.now()) / 1000) + 1);
+        const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
-            channelId: ${`prayer-notif-channel-vib-${notificationsConfig?.vibration}`}
+            channelId: ${`prayer-notif-channel-vib-${notifSettings?.vibration}`}
             language: ${appSettings?.language},
             alarm: ${hasAlarm},
-            volume: ${notificationsConfig?.volume},
-            vibration: ${notificationsConfig?.vibration},
-            snooze: ${notificationsConfig?.snooze}
+            volume: ${notifSettings?.volume},
+            vibration: ${notifSettings?.vibration},
+            snooze: ${notifSettings?.snooze}
             `);
 
     } catch (err) {

@@ -1,81 +1,26 @@
-import Sound from 'react-native-sound';
+import { startSound, stopSound } from "@/utils/notifSound";
 import notifee, {
     EventType,
-    TriggerType,
-    AndroidColor,
     AndroidNotificationSetting,
     AndroidImportance,
-    AndroidVisibility
+    AndroidVisibility,
+    TriggerType,
+    RepeatFrequency,
+    AndroidColor,
+    AndroidStyle
 } from '@notifee/react-native';
 import { Platform } from 'react-native';
 
-// ------------------------------------------------------------
-// Internal state
-// ------------------------------------------------------------
-let currentSound = null;
-
-// ------------------------------------------------------------
-// Start Sound
-// ------------------------------------------------------------
-async function startSound(file, volume) {
-    if (!file || volume <= 0) return;
-
-    try {
-        await stopSound();
-
-        currentSound = new Sound(file, Sound.MAIN_BUNDLE, (err) => {
-            if (err) {
-                console.error('❌ [Sound] Failed to load:', err);
-                return;
-            }
-
-            currentSound.setVolume(volume);
-            currentSound.setNumberOfLoops(0); // play once
-
-            const duration = currentSound.getDuration();
-
-            console.log(`🔊 [Sound] Playing "${file} ${duration.toFixed(2)}sec" at volume ${volume}`);
-
-            currentSound.play((success) => {
-                if (success) {
-                    // console.log('✅ [Sound] Finished playback');
-                } else {
-                    console.error('❌ [Sound] Playback failed');
-                }
-                stopSound();
-            });
-        });
-    } catch (err) {
-        console.error('❌ [Sound] Error starting:', err);
-    }
-}
-
-// ------------------------------------------------------------
-// Stop Sound
-// ------------------------------------------------------------
-async function stopSound() {
-    return new Promise((resolve) => {
-        if (currentSound) {
-            currentSound.stop(() => {
-                currentSound.release();
-                currentSound = null;
-                console.log('🔇 [Sound] Stopped & released');
-                resolve();
-            });
-        } else {
-            resolve();
-        }
-    });
-}
+const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 // ------------------------------------------------------------
 // Create notification channels once (Android only)
 // ------------------------------------------------------------
-export const createNotificationChannels = async (notificationsConfig) => {
+export const createNotificationChannels = async (notifSettings) => {
     if (Platform.OS !== 'android') return;
 
     try {
-        const vibration = notificationsConfig?.vibration ?? 'on';
+        const vibration = notifSettings?.vibration ?? 'on';
         const isEnabled = vibration === 'on';
         const pattern = Array(30).fill([1000, 300]).flat(); // 30s total, 15 cycles of 1s on / 300ms off
 
@@ -93,20 +38,16 @@ export const createNotificationChannels = async (notificationsConfig) => {
             bypassDnd: true,
         };
 
-        // Use vibrationMode in channel IDs
-        const notificationsChannelId = `prayer-notif-channel-vib-${vibration}`;
-        const remindersChannelId = `prayer-remind-channel-vib-${vibration}`;
-
         // Create prayer-notifications Channel
         await notifee.createChannel({
-            id: notificationsChannelId,
+            id: `prayer-notif-channel-vib-${vibration}`,
             name: "Prayer Notifications",
             description: "Notifications for daily prayer times",
             ...channelConfig,
         });
         // Create prayer-reminders Channel
         await notifee.createChannel({
-            id: remindersChannelId,
+            id: `prayer-remind-channel-vib-${vibration}`,
             name: 'Prayer Reminders',
             description: "Reminder for daily prayer times",
             ...channelConfig,
@@ -117,11 +58,10 @@ export const createNotificationChannels = async (notificationsConfig) => {
 };
 
 // ------------------------------------------------------------
-// Cancel All Scheduled Prayer Notifications
+// Cancel all scheduled prayer notifications
 // ------------------------------------------------------------
 export const cancelPrayerNotifications = async () => {
     try {
-        // Cancel scheduled notifications
         const scheduled = await notifee.getTriggerNotifications();
         for (const n of scheduled) {
             const type = n.notification.data?.type;
@@ -136,13 +76,11 @@ export const cancelPrayerNotifications = async () => {
 };
 
 // ------------------------------------------------
-// Clear everything: stop sound + remove notification
+// Cancel everything: stop sound + remove notification
 // ------------------------------------------------
-async function clearAll(notificationId) {
+async function cancelDisplayedNotification(notificationId) {
     try {
-        if (notificationId) {
-            await notifee.cancelNotification(notificationId);
-        }
+        await notifee.cancelNotification(notificationId);
         await stopSound();
     } catch (err) {
         console.error('❌ [Cleanup] Failed to clear:', err);
@@ -150,14 +88,225 @@ async function clearAll(notificationId) {
 }
 
 // ------------------------------------------------------------
-// Handle Notifee Notification event (Public API)
+// Parse a time string and return trigger time (today or tomorrow)
+// ------------------------------------------------------------
+export function getTriggerTime(timeStringRaw, prayerName) {
+    // Normalize: trim + replace NBSP + parse "HH:mm" strictly
+    const timeString = String(timeStringRaw).replace(/\u00A0/g, " ").trim();
+    const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
+
+    if (!match) {
+        console.warn(`⚠️ Invalid time format for ${prayerName}:`, timeStringRaw);
+        return null;
+    }
+
+    // Calculate trigger time
+    const hour = Number(match[1]);
+    const minute = Number(match[2]);
+    const triggerTime = new Date();
+    triggerTime.setHours(hour, minute, 0, 0);
+
+    // If time has passed today, schedule for tomorrow
+    const now = new Date();
+    if (triggerTime <= now) {
+        triggerTime.setDate(triggerTime.getDate() + 1);
+    }
+
+    return triggerTime;
+}
+
+// ------------------------------------------------------------
+// Check if notifications need rescheduling & cancel disabled ones
+// ------------------------------------------------------------
+export async function syncPrayerNotifications(settings) {
+    const { prayerTimes, notifSettings, language } = settings;
+
+    try {
+        // Get all currently scheduled notifications
+        const scheduled = await notifee.getTriggerNotifications();
+
+        // Cancel notifications for prayers that are disabled
+        for (const { notification } of scheduled) {
+            const prayer = notification?.data?.prayer;
+            if (prayer && notifSettings?.prayers?.[prayer]?.enabled === false) {
+                await notifee.cancelTriggerNotification(notification.id);
+                console.log(`🚫 Removed Notification for the prayer: ${prayer}`);
+            }
+        }
+
+        // Check if remaining enabled prayers are up-to-date
+        const areUpToDate = PRAYER_ORDER.every(prayerName => {
+            // Skip prayers disabled by user
+            if (notifSettings?.prayers?.[prayerName]?.enabled === false) return true;
+
+            const timeString = prayerTimes[prayerName];
+
+            // Skip prayers without a time
+            if (!timeString) return true;
+
+            // Find scheduled notification
+            const notification = scheduled.find(
+                n => n.notification.id === `prayer-${prayerName.toLowerCase()}`
+            );
+
+            // Not scheduled yet - needs rescheduling
+            if (!notification) return false;
+
+            // Extract Notification data
+            const notifData = notification.notification.data;
+
+            // Check if notification settings has changed
+            const currentVolume = String(notifSettings?.volume ?? 1);
+            if (notifData.volume !== currentVolume) return false;
+            const currentVibration = String(notifSettings?.vibration ?? 'on');
+            if (notifData.vibration !== currentVibration) return false;
+            const currentSnooze = String(notifSettings?.snooze ?? 5);
+            if (notifData.snooze !== currentSnooze) return false;
+            const currentOffset = String(notifSettings?.offset ?? 0);
+            if (notifData.offset !== currentOffset) return false;
+
+            // Check if language has changed
+            if (notifData.language !== language) return false;
+
+            // Check if prayer time has changed
+            const targetTime = getTriggerTime(timeString, prayerName);
+            if (!targetTime) return false;
+
+            // Compare scheduled timestamp with expected timestamp
+            if (notification.trigger.timestamp !== targetTime.getTime()) {
+                return false;
+            }
+
+            // All enabled notifications are up-to-date
+            return true;
+        });
+
+        return areUpToDate;
+    } catch (err) {
+        console.error('Error during notification delete/reschedule check:', err);
+        return false; // Force reschedule on error
+    }
+}
+
+// ------------------------------------------------------------
+// Schedule prayer notifications for all enabled prayers
+// ------------------------------------------------------------
+export async function schedulePrayerNotifications(settings) {
+    const { prayerTimes, notifSettings, language, tr } = settings;
+
+    if (!prayerTimes || !notifSettings) return;
+
+    // Check if anything changed and if rescheduling is needed
+    const isUpToDate = await syncPrayerNotifications(settings);
+    if (isUpToDate) {
+        console.log("✅ Prayer notifications are up-to-date - no scheduling needed");
+        return;
+    }
+
+    try {
+        // Cancel all existing notifications and create channels
+        await cancelPrayerNotifications();
+        await createNotificationChannels(notifSettings);
+
+        // Check if alarm manager permission is granted
+        const settings = await notifee.getNotificationSettings();
+        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
+
+        let scheduledCount = 0;
+
+        // Schedule notifications for each enabled prayer
+        for (const prayerName of PRAYER_ORDER) {
+            // Skip disabled prayers
+            if (notifSettings?.prayers?.[prayerName]?.enabled === false) continue;
+
+            const timeString = prayerTimes[prayerName];
+
+            // Skip prayers without a time
+            if (!timeString) {
+                console.log(`⚠️ No time available for ${prayerName}`);
+                continue;
+            }
+
+            // Get the next valid trigger time (tomorrow if already passed)
+            const triggerTime = getTriggerTime(timeString, prayerName);
+            if (!triggerTime) continue;
+
+            // Schedule notification
+            await notifee.createTriggerNotification(
+                {
+                    id: `prayer-${prayerName.toLowerCase()}`,
+                    title: `» ${tr(`prayers.${prayerName}`)} «`,
+                    body: `${tr("labels.alertBody")} (${timeString})`,
+                    data: {
+                        type: "prayer-notification",
+                        prayer: prayerName,
+                        reminderTitle: `» ${tr(`prayers.${prayerName}`)} «`,
+                        reminderBody: tr("labels.prayerReminder"),
+                        language: language,
+                        volume: String(notifSettings?.volume ?? 1.0),
+                        vibration: notifSettings?.vibration ?? 'on',
+                        snooze: String(notifSettings?.snooze ?? 5),
+                        offset: String(notifSettings?.offset ?? 0),
+                    },
+                    android: {
+                        channelId: `prayer-notif-channel-vib-${notifSettings?.vibration ?? 'on'}`,
+                        showTimestamp: true,
+                        smallIcon: 'ic_stat_prayer', // Must exist in android/app/src/main/res/drawable
+                        largeIcon: require('../../assets/images/moon-islam.png'), // Custom large icon
+                        color: AndroidColor.OLIVE,
+                        pressAction: { id: 'default', launchActivity: 'default' },
+                        actions: [
+                            { title: tr("actions.dismiss"), pressAction: { id: 'dismiss' } },
+                            { title: tr("actions.snooze"), pressAction: { id: 'snooze' } },
+                        ],
+                        style: {
+                            type: AndroidStyle.INBOX, // Show all action buttons immediately
+                            lines: [`${tr("labels.alertBody")} (${timeString})`],
+                        },
+                        autoCancel: false,
+                        ongoing: true,
+                    },
+                    ios: {
+                        categoryId: 'prayer-category',
+                        critical: false,
+                        interruptionLevel: 'active',
+                    }
+                },
+                {
+                    type: TriggerType.TIMESTAMP,
+                    timestamp: triggerTime.getTime(),
+                    alarmManager: hasAlarm,
+                    repeatFrequency: RepeatFrequency.DAILY,
+                }
+            );
+
+            scheduledCount++;
+
+            // Log scheduled time: Format date as DD/MM/YYYY, HH:mm:ss
+            const formattedDate = triggerTime.toLocaleDateString('en-GB') + ', ' +
+                triggerTime.toLocaleTimeString('en-GB', { hour12: false });
+            console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}`);
+        }
+
+        console.log(`🔔 Successfully scheduled ${scheduledCount} prayer notification(s)`);
+    } catch (err) {
+        console.error("❌ Failed to schedule notifications:", err);
+    }
+}
+
+// ------------------------------------------------------------
+// Handle Notifee Notification event
 // ------------------------------------------------------------
 export async function handleNotificationEvent(type, notification, pressAction, source = 'unknown') {
-    // Get notification data passed from AppContext
-    const language = notification?.data?.language ?? 'en'; // not used currently
+    // Get notification data passed from schedulePrayerNotifications function
+    const prayer = notification?.data?.prayer;
+    const reminderTitle = notification?.data?.reminderTitle;
+    const reminderBody = notification?.data?.reminderBody;
+    const language = notification?.data?.language ?? 'en';
     const volume = Number(notification?.data?.volume ?? 1.0);
     const vibration = notification?.data?.vibration ?? 'on';
     const snooze = Number(notification?.data?.snooze ?? 5);
+    const offset = Number(notification?.data?.offset ?? 0);
 
     // Check Alarm & Reminders permission
     const notifSettings = await notifee.getNotificationSettings();
@@ -182,23 +331,28 @@ export async function handleNotificationEvent(type, notification, pressAction, s
         case EventType.ACTION_PRESS:
             switch (pressAction?.id) {
                 case 'dismiss':
-                    console.log(`🛑 ${prefix} Notification "Dismiss" pressed`);
-                    await clearAll(notification.id);
+                    console.log(`🔘 ${prefix} Notification "Dismiss" pressed`);
+                    await cancelDisplayedNotification(notification.id);
                     break;
 
                 case 'snooze':
                     console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
-                    await clearAll(notification.id);
+                    await cancelDisplayedNotification(notification.id);
                     try {
                         // Schedule timestamp reminder
                         await notifee.createTriggerNotification(
                             {
-                                id: `prayer-reminder-${notification?.data?.prayer}`,
-                                title: notification?.data?.reminderTitle,
-                                body: notification?.data?.reminderBody,
+                                id: `prayer-reminder-${prayer}`,
+                                title: reminderTitle,
+                                body: reminderBody,
                                 data: {
                                     type: "prayer-reminder",
-                                    volume: volume,
+                                    prayer: prayer,
+                                    language: language,
+                                    volume: String(volume),
+                                    vibration: vibration,
+                                    snooze: String(snooze),
+                                    offset: String(offset),
                                 },
                                 android: {
                                     channelId: `prayer-remind-channel-vib-${vibration}`,
@@ -232,19 +386,19 @@ export async function handleNotificationEvent(type, notification, pressAction, s
 
                 case 'OK':
                     console.log(`✅ ${prefix} Notification Reminder "OK" pressed`);
-                    await clearAll(notification.id);
+                    await cancelDisplayedNotification(notification.id);
                     break;
             }
             break;
 
         case EventType.PRESS:
             console.log(`👆 ${prefix} Notification pressed`);
-            await clearAll(notification.id);
+            await cancelDisplayedNotification(notification.id);
             break;
 
         case EventType.DISMISSED:
             console.log(`👆 ${prefix} Notification dismissed`);
-            await clearAll(notification.id);
+            await cancelDisplayedNotification(notification.id);
             break;
     }
 }

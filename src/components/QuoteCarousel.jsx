@@ -74,13 +74,14 @@ export default function QuoteCarousel({ language }) {
                 data={quotes}
                 renderItem={renderQuoteCard}
                 keyExtractor={(_, idx) => idx.toString()}
-                horizontal
+                horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 scrollEventThrottle={16}
+                pagingEnabled={true}
                 onMomentumScrollEnd={handleScroll}
-                decelerationRate="fast"
                 snapToInterval={containerWidth - PEEK * 2 + SPACING}
                 snapToAlignment="start"
+                decelerationRate="fast"
             />
 
             {/* Dots */}

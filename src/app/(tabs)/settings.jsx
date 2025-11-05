@@ -18,6 +18,7 @@ import * as Haptics from "expo-haptics";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
+import { useNotificationsContext } from "@/context/NotificationsContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
@@ -37,6 +38,7 @@ export default function SettingsScreen() {
         saveAppSettings,
         reloadAppSettings
     } = useAppContext();
+
     const {
         prayerTimes,
         isLoading: prayersLoading,
@@ -46,12 +48,17 @@ export default function SettingsScreen() {
         reloadPrayerTimes
     } = usePrayersContext();
 
-    // Extract config for cleaner dependency tracking
-    const notificationsConfig = appSettings?.notificationsConfig;
+    const {
+        notifSettings,
+        isLoading: notifLoading,
+        notifError,
+        saveNotifSettings,
+        reloadNotifSettings
+    } = useNotificationsContext();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
-    const [tempVolume, setTempVolume] = useState(Number(notificationsConfig?.volume ?? 1.0));
+    const [tempVolume, setTempVolume] = useState(Number(notifSettings?.volume ?? 1.0));
 
     const saveTimeout = useRef(null);
 
@@ -61,6 +68,7 @@ export default function SettingsScreen() {
     const handleSettingsRefresh = async () => {
         try {
             await reloadAppSettings();
+            await reloadNotifSettings();
         } catch (err) {
             console.warn("Settings refresh failed:", err);
         }
@@ -90,7 +98,7 @@ export default function SettingsScreen() {
     // Change Language
     // ------------------------------------------------------------
     const handleLanguage = async (value) => {
-        if (appSettings.language === value) return; // no change
+        if (appSettings?.language === value) return; // no change
 
         setLocalLoading(true);
         try {
@@ -207,9 +215,7 @@ export default function SettingsScreen() {
     // Change Notification Sound Volume
     // ------------------------------------------------------------
     const handleVolume = async (value) => {
-        if (notificationsConfig?.volume === Number(value.toFixed(2))) {
-            return; // no change
-        }
+        if (notifSettings?.volume === Number(value.toFixed(2))) return; // no change
 
         setLocalLoading(true);
 
@@ -219,13 +225,8 @@ export default function SettingsScreen() {
         // Schedule save after debounce
         saveTimeout.current = setTimeout(async () => {
             try {
-                // Save appSettings
-                await saveAppSettings({
-                    notificationsConfig: {
-                        ...appSettings.notificationsConfig,
-                        volume: Number(value.toFixed(1)),
-                    }
-                });
+                // Save notifSettings
+                await saveNotifSettings({ volume: Number(value.toFixed(1)) });
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 console.log("🌐 Sound Volume changed to:", Number(value.toFixed(1)));
@@ -244,15 +245,9 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     const handleVibration = async (value) => {
         setLocalLoading(true);
-
         try {
-            // Save appSettings
-            await saveAppSettings({
-                notificationsConfig: {
-                    ...appSettings.notificationsConfig,
-                    vibration: value ? 'on' : 'off',
-                },
-            });
+            // Save notifSettings
+            await saveNotifSettings({ vibration: value ? 'on' : 'off' });
 
             console.log("📳 Vibration changed to:", value ? 'on' : 'off');
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -268,19 +263,12 @@ export default function SettingsScreen() {
     // Change Notification snozee timeout
     // ------------------------------------------------------------
     const handleSnooze = async (value) => {
-        if (notificationsConfig?.snooze === value) {
-            return; // no change
-        }
+        if (notifSettings?.snooze === value) return; // no change
 
         setLocalLoading(true);
         try {
-            // Save appSettings
-            await saveAppSettings({
-                notificationsConfig: {
-                    ...appSettings.notificationsConfig,
-                    snooze: value,
-                },
-            });
+            // Save notifSettings
+            await saveNotifSettings({ snooze: value });
 
             console.log(`⏳ Snooze timeout changed to: ${value}min`);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -326,12 +314,12 @@ export default function SettingsScreen() {
     };
 
     // Loading state
-    if (settingsLoading) {
+    if (settingsLoading || notifLoading) {
         return <AppLoading text={tr("labels.loadingSettings")} />
     }
 
     // Error state
-    if (settingsError) {
+    if (settingsError || notifError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
@@ -423,16 +411,16 @@ export default function SettingsScreen() {
                     >
                         <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} onPress={handlePrayersRefresh} />
                         <Text style={[styles.updateLocationButtonText, { color: theme.text2 }]}>
-                            {appSettings.location
+                            {appSettings?.location
                                 ? (tr("labels.locationButtonText1"))
                                 : (tr("labels.locationButtonText2"))}
                         </Text>
                     </TouchableOpacity>
 
                     {/* fullAddress */}
-                    {appSettings.fullAddress && (
+                    {appSettings?.fullAddress && (
                         <Text style={[styles.addressText, { color: theme.placeholder }]}>
-                            {appSettings.fullAddress || (tr("labels.loading"))}
+                            {appSettings?.fullAddress || (tr("labels.loading"))}
                         </Text>
                     )}
                 </AppCard>
@@ -501,7 +489,7 @@ export default function SettingsScreen() {
                         />
                     </View>
 
-                    {/* ------ notificationsConfig (show only if notificationPermission=true) ------ */}
+                    {/* ------ notifications (show only if notificationPermission=true) ------ */}
                     {deviceSettings.notificationPermission && (
                         <>
                             {/* Divider */}
@@ -538,11 +526,11 @@ export default function SettingsScreen() {
                                     {tr("labels.vibration")}
                                 </Text>
                                 <Switch
-                                    value={notificationsConfig?.vibration === 'on'}
+                                    value={notifSettings?.vibration === 'on'}
                                     onValueChange={handleVibration}
                                     disabled={localLoading}
                                     trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={notificationsConfig?.vibration === 'on' ? theme.border : theme.border}
+                                    thumbColor={notifSettings?.vibration === 'on' ? theme.border : theme.border}
                                 />
                             </View>
                             {/* Vibration Note */}
@@ -562,7 +550,7 @@ export default function SettingsScreen() {
                                     {tr("labels.snooze")}
                                 </Text>
                                 <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                                    {notificationsConfig?.snooze ?? 5}min
+                                    {notifSettings?.snooze ?? 5}min
                                 </Text>
                             </View>
                             <View style={styles.presets}>
@@ -572,8 +560,8 @@ export default function SettingsScreen() {
                                         style={[
                                             styles.presetBtn,
                                             {
-                                                backgroundColor: notificationsConfig?.snooze === st ? theme.primary + '20' : theme.card,
-                                                borderColor: notificationsConfig?.snooze === st ? theme.primary : 'transparent',
+                                                backgroundColor: notifSettings?.snooze === st ? theme.primary + '20' : theme.card,
+                                                borderColor: notifSettings?.snooze === st ? theme.primary : 'transparent',
                                                 marginTop: 8,
                                                 marginBottom: 3
                                             }
@@ -582,7 +570,7 @@ export default function SettingsScreen() {
                                     >
                                         <Text style={[
                                             styles.presetText,
-                                            { color: notificationsConfig?.snooze === st ? theme.primary : theme.text2 }
+                                            { color: notifSettings?.snooze === st ? theme.primary : theme.text2 }
                                         ]}>
                                             {st}
                                         </Text>

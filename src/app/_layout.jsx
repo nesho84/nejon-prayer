@@ -8,7 +8,7 @@ import { NotificationsProvider } from "@/context/NotificationsContext";
 import AppLoading from "@/components/AppLoading";
 
 const RootStack = () => {
-  const { appSettings, isReady, isLoading } = useAppContext();
+  const { isReady, isLoading, appSettings } = useAppContext();
 
   if (!isReady || isLoading) return <AppLoading />;
 

@@ -1,9 +1,18 @@
-import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+    Alert,
+    Button,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View
+} from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from '@/context/AppContext';
 import { usePrayersContext } from '@/context/PrayersContext';
+import { useNotificationsContext } from "@/context/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import useTranslation from "@/hooks/useTranslation";
 import AppTabScreen from "@/components/AppTabScreen";
@@ -11,8 +20,8 @@ import AppLoading from "@/components/AppLoading";
 import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
-import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
 import QuoteCarousel from "@/components/QuoteCarousel";
+import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -22,8 +31,7 @@ export default function HomeScreen() {
         deviceSettings,
         isReady: settingsReady,
         isLoading: settingsLoading,
-        settingsError,
-        saveAppSettings
+        settingsError
     } = useAppContext();
 
     const {
@@ -31,7 +39,7 @@ export default function HomeScreen() {
         isReady: prayersReady,
         isLoading: prayersLoading,
         prayersError,
-        reloadPrayerTimes,
+        reloadPrayerTimes
     } = usePrayersContext();
 
     const {
@@ -40,6 +48,14 @@ export default function HomeScreen() {
         remainingSeconds,
         totalSeconds
     } = useNextPrayer(prayerTimes);
+
+    const {
+        notifSettings,
+        isReady: notifReady,
+        isLoading: notifLoading,
+        notifError,
+        savePrayerNotifSettings
+    } = useNotificationsContext();
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
@@ -68,16 +84,16 @@ export default function HomeScreen() {
     };
 
     // ------------------------------------------------------------
-    // Prayer icon state
+    // Prayer notification icon state
     // ------------------------------------------------------------
     const isNotificationEnabled = (prayerName) => {
-        return deviceSettings.notificationPermission && appSettings.notificationsConfig?.prayers?.[prayerName];
+        return deviceSettings.notificationPermission && notifSettings?.prayers?.[prayerName].enabled;
     };
 
     // ------------------------------------------------------------
     // Toggle prayer notification
     // ------------------------------------------------------------
-    const togglePrayerNotification = async (prayerName) => {
+    const handlePrayerNotification = (prayerName) => {
         // Check system notifications first
         if (!deviceSettings.notificationPermission) {
             Alert.alert(
@@ -95,25 +111,16 @@ export default function HomeScreen() {
             return;
         }
 
-        // Save appSettings
-        await saveAppSettings({
-            notificationsConfig: {
-                ...appSettings.notificationsConfig,
-                prayers: {
-                    ...appSettings.notificationsConfig.prayers,
-                    [prayerName]: !appSettings.notificationsConfig.prayers?.[prayerName],
-                },
-            },
-        });
+        // Save notifSettings
+        savePrayerNotifSettings(prayerName, { enabled: !notifSettings?.prayers[prayerName]?.enabled });
     };
 
-    // Loading state: settings
-    if (!settingsReady || settingsLoading || !prayersReady || prayersLoading) {
+    // Loading contexts state
+    if (!settingsReady || settingsLoading || !prayersReady || prayersLoading || !notifReady || notifLoading) {
         return <AppLoading text={tr("labels.loading")} />;
     }
 
     // Settings error
-    // ------------------------------------------------------------
     if (settingsError) {
         return (
             <AppError
@@ -155,11 +162,25 @@ export default function HomeScreen() {
         );
     }
 
+    // Notifications Settings error
+    if (notifError) {
+        return (
+            <AppError
+                icon="alert-circle-outline"
+                iconColor={theme.danger}
+                message={settingsError || tr("labels.settingsError")}
+                buttonText={tr("labels.goToSettings")}
+                buttonColor={theme.primary}
+                onPress={() => router.navigate("/(tabs)/settings")}
+            />
+        );
+    }
+
     // Main Content
     return (
         <AppTabScreen>
             {/* Notifications Debug utility */}
-            {/* <Button title="Test Notifications" onPress={() => testNotification({ appSettings, seconds: 10 })} /> */}
+            {/* <Button title="Test Notifications" onPress={() => testNotification({ appSettings, notifSettings, seconds: 10 })} /> */}
             {/* <Button title="Debug Notifications" onPress={debugChannelsAndScheduled} /> */}
 
             <ScrollView
@@ -262,22 +283,14 @@ export default function HomeScreen() {
                                                 {time}
                                             </Text>
 
-                                            {/* Prayer Time Icon (Notification on/off) */}
-                                            {(!name.includes("Imsak") && !name.includes("Sunrise"))
-                                                ? <Ionicons
-                                                    name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
-                                                    size={22}
-                                                    color={theme.text2}
-                                                    style={{ opacity: isNotificationEnabled(name) ? 0.5 : 0.3 }}
-                                                    onPress={() => togglePrayerNotification(name)}
-                                                />
-                                                : <Ionicons
-                                                    name={"information-circle-outline"}
-                                                    size={22}
-                                                    color={theme.text2}
-                                                    style={{ opacity: 0.5 }}
-                                                />
-                                            }
+                                            {/* Prayer Time Icon (Notifications settings Modal) */}
+                                            <Ionicons
+                                                name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
+                                                size={22}
+                                                color={theme.text2}
+                                                style={{ opacity: isNotificationEnabled(name) ? 0.5 : 0.3 }}
+                                                onPress={() => handlePrayerNotification(name)}
+                                            />
                                         </View>
                                     </View>
 
