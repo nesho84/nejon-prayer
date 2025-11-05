@@ -22,6 +22,7 @@ import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuoteCarousel from "@/components/QuoteCarousel";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
+import OptionModal from "@/components/OptionModal";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
@@ -93,7 +94,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Toggle prayer notification
     // ------------------------------------------------------------
-    const handlePrayerNotification = (prayerName) => {
+    const handlePrayerNotification = (selected, prayerName) => {
         // Check system notifications first
         if (!deviceSettings.notificationPermission) {
             Alert.alert(
@@ -112,13 +113,20 @@ export default function HomeScreen() {
         }
 
         // Save notifSettings
-        savePrayerNotifSettings(prayerName, { enabled: !notifSettings?.prayers[prayerName]?.enabled });
+        if (typeof selected === "boolean") {
+            savePrayerNotifSettings(prayerName, { enabled: selected });
+        }
+        if (typeof selected === "number") {
+            savePrayerNotifSettings(prayerName, { offset: selected });
+        }
     };
 
     // Loading contexts state
     if (!settingsReady || settingsLoading || !prayersReady || prayersLoading || !notifReady || notifLoading) {
         return <AppLoading text={tr("labels.loading")} />;
     }
+
+    // console.log(notifSettings);
 
     // Settings error
     if (settingsError) {
@@ -250,13 +258,13 @@ export default function HomeScreen() {
                     {/* Divider */}
                     <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
 
-                    {/* Prayer Times */}
+                    {/* Prayer Times List */}
                     <View style={styles.prayerTable}>
-                        {Object.entries(prayerTimes || {}).map(([name, time], index) => {
+                        {Object.entries(prayerTimes).map(([name, time], index) => {
                             const isNext = nextPrayerName === name;
+                            const isLast = index === Object.entries(prayerTimes).length - 1;
                             const iconData = resolvePrayerIcon(name);
                             const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
-                            const isLast = index === Object.entries(prayerTimes || {}).length - 1;
 
                             return (
                                 <View key={name}>
@@ -284,12 +292,18 @@ export default function HomeScreen() {
                                             </Text>
 
                                             {/* Prayer Time Icon (Notifications settings Modal) */}
-                                            <Ionicons
-                                                name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
-                                                size={22}
-                                                color={theme.text2}
-                                                style={{ opacity: isNotificationEnabled(name) ? 0.5 : 0.3 }}
-                                                onPress={() => handlePrayerNotification(name)}
+                                            <OptionModal
+                                                mode="prayers"
+                                                header={`${name} Notifications`}
+                                                onSelect={(selected) => handlePrayerNotification(selected, name)}
+                                                button={
+                                                    <Ionicons
+                                                        name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
+                                                        size={22}
+                                                        color={theme.text2}
+                                                        style={{ opacity: isNotificationEnabled(name) ? 0.6 : 0.3 }}
+                                                    />
+                                                }
                                             />
                                         </View>
                                     </View>

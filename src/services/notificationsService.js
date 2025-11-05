@@ -209,8 +209,8 @@ export async function schedulePrayerNotifications(settings) {
         await createNotificationChannels(notifSettings);
 
         // Check if alarm manager permission is granted
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
+        const nf = await notifee.getNotificationSettings();
+        const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
 
         let scheduledCount = 0;
 
@@ -309,8 +309,8 @@ export async function handleNotificationEvent(type, notification, pressAction, s
     const offset = Number(notification?.data?.offset ?? 0);
 
     // Check Alarm & Reminders permission
-    const notifSettings = await notifee.getNotificationSettings();
-    const hasAlarm = notifSettings.android.alarm === AndroidNotificationSetting.ENABLED;
+    const nf = await notifee.getNotificationSettings();
+    const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
 
     const prefix = source === 'background' ? '[Background]' : '[Foreground]';
 

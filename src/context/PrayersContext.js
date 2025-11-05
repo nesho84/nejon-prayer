@@ -5,7 +5,6 @@ import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
 import { getPrayerTimes } from "@/services/prayersService";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
-import webPrayers from "@/services/webPrayers.json";
 
 export const PrayersContext = createContext();
 
@@ -82,14 +81,6 @@ export function PrayersProvider({ children }) {
         setPrayersError(null);
         setPrayersOutdated(false);
         try {
-            // Web platform: use mock data
-            if (Platform.OS === "web") {
-                const randomIndex = Math.floor(Math.random() * webPrayers.length);
-                setPrayerTimes(webPrayers[randomIndex]);
-                lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
-                return;
-            }
-
             // If no location, just exit
             if (!location) {
                 console.log("📍 No location available");
