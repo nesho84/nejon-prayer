@@ -191,14 +191,17 @@ export function PrayersProvider({ children }) {
         let mounted = true;
 
         (async () => {
+            if (!mounted) return;
+
             if (location) {
                 await loadPrayerTimes();
             } else {
                 setPrayerTimes(null);
             }
+
+            if (mounted) setIsReady(true);
         })();
 
-        if (mounted) setIsReady(true);
 
         return () => { mounted = false; };
     }, [settingsReady, location]);

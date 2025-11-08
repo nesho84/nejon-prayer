@@ -29,7 +29,7 @@ import AppCard from "@/components/AppCard";
 
 export default function SettingsScreen() {
     const { theme, themeMode, changeTheme } = useThemeContext();
-    const { tr, language } = useTranslation();
+    const { language, tr } = useTranslation();
     const {
         appSettings,
         deviceSettings,

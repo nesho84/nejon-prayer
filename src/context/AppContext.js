@@ -74,6 +74,14 @@ export function AppProvider({ children }) {
     }, []);
 
     // ------------------------------------------------------------
+    // Auto-load on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        loadAppSettings();
+        syncDeviceSettings();
+    }, []);
+
+    // ------------------------------------------------------------
     // Sync Device settings (Android only)
     // ------------------------------------------------------------
     const syncDeviceSettings = useCallback(async () => {
@@ -108,19 +116,6 @@ export function AppProvider({ children }) {
             console.warn('❌ Failed to sync device settings:', err);
         }
     }, []);
-
-    // ------------------------------------------------------------
-    // Auto-load on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        let mounted = true;
-
-        loadAppSettings();
-
-        if (mounted) syncDeviceSettings();
-
-        return () => { mounted = false; };
-    }, [loadAppSettings, syncDeviceSettings]);
 
     // ------------------------------------------------------------
     // AppState listener - sync device settings!

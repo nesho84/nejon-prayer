@@ -1,12 +1,5 @@
-import {
-    Alert,
-    Button,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View
-} from "react-native";
+import { useState } from "react";
+import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
@@ -22,11 +15,11 @@ import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuoteCarousel from "@/components/QuoteCarousel";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
-import OptionModal from "@/components/OptionModal";
+import PrayerModal from "@/components/PrayerModal";
 
 export default function HomeScreen() {
     const { theme } = useThemeContext();
-    const { tr, language } = useTranslation();
+    const { language, tr } = useTranslation();
     const {
         appSettings,
         deviceSettings,
@@ -58,6 +51,10 @@ export default function HomeScreen() {
         savePrayerNotifSettings
     } = useNotificationsContext();
 
+    // Local State
+    const [prayerModalVisible, setPrayerModalVisible] = useState(false);
+    const [selectedPrayer, setSelectedPrayer] = useState(null);
+
     // ------------------------------------------------------------
     // Handle prayer times refresh
     // ------------------------------------------------------------
@@ -82,6 +79,14 @@ export default function HomeScreen() {
         if (p.includes("maghrib")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-down' };
         if (p.includes("isha")) return { lib: 'Ionicons', name: 'moon-sharp' };
         return "time-outline";
+    };
+
+    // ------------------------------------------------------------
+    // Handle Prayers Modal
+    // ------------------------------------------------------------
+    const openPrayersModal = (prayerName) => {
+        setPrayerModalVisible(true);
+        setSelectedPrayer(prayerName);
     };
 
     // ------------------------------------------------------------
@@ -113,12 +118,8 @@ export default function HomeScreen() {
         }
 
         // Save notifSettings
-        if (typeof selected === "boolean") {
-            savePrayerNotifSettings(prayerName, { enabled: selected });
-        }
-        if (typeof selected === "number") {
-            savePrayerNotifSettings(prayerName, { offset: selected });
-        }
+        // selected = { enabled: boolean, offset: number }
+        savePrayerNotifSettings(prayerName, selected);
     };
 
     // Loading contexts state
@@ -238,11 +239,11 @@ export default function HomeScreen() {
                     <QuoteCarousel language={language} />
                 </AppCard>
 
-                {/* 4. PRAYER TIMES CARD */}
-                <AppCard style={styles.prayerCard}>
-                    {/* Date Header */}
-                    <View style={styles.dateHeader}>
-                        <Text style={[styles.dateText, { color: theme.text }]}>
+                {/* 4. PRAYERS CARD */}
+                <AppCard style={styles.prayersCard}>
+                    {/* Prayers Date Header */}
+                    <View style={styles.prayersDateHeader}>
+                        <Text style={[styles.dateHeaderText, { color: theme.text }]}>
                             {new Date().toLocaleDateString(tr("labels.localeDate"), {
                                 weekday: "long",
                                 day: "2-digit",
@@ -250,7 +251,7 @@ export default function HomeScreen() {
                                 year: "numeric",
                             }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                         </Text>
-                        <Text style={[styles.timezoneInfo, { color: theme.text2 }]}>
+                        <Text style={[styles.prayersTimezoneInfo, { color: theme.text2 }]}>
                             {appSettings.timeZone?.zoneName || ""} • {appSettings.timeZone?.offset || ""}
                         </Text>
                     </View>
@@ -258,55 +259,51 @@ export default function HomeScreen() {
                     {/* Divider */}
                     <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
 
-                    {/* Prayer Times List */}
-                    <View style={styles.prayerTable}>
-                        {Object.entries(prayerTimes).map(([name, time], index) => {
-                            const isNext = nextPrayerName === name;
+                    {/* Prayers List */}
+                    <View style={styles.prayersRowContainer}>
+                        {Object.entries(prayerTimes).map(([prayerName, prayerTime], index) => {
+                            const isNext = nextPrayerName === prayerName;
                             const isLast = index === Object.entries(prayerTimes).length - 1;
-                            const iconData = resolvePrayerIcon(name);
+                            const iconData = resolvePrayerIcon(prayerName);
                             const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
 
                             return (
-                                <View key={name}>
-                                    <View
-                                        style={[
-                                            styles.prayerRow,
-                                            isNext && [
-                                                styles.prayerRowActive,
-                                                { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
-                                            ]
-                                        ]}
-                                    >
-                                        {/* Prayer Name */}
-                                        <View style={styles.prayerNameSection}>
-                                            <IconComponent name={iconData.name} size={22} color={isNext ? theme.accent : theme.text2} />
-                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
-                                                {tr(`prayers.${name}`) || name}
-                                            </Text>
-                                        </View>
+                                <View key={prayerName}>
+                                    {/* Prayer row */}
+                                    <TouchableOpacity activeOpacity={0.3} onPress={() => openPrayersModal(prayerName)}>
+                                        <View
+                                            style={[
+                                                styles.prayerRow,
+                                                isNext && [
+                                                    styles.prayerRowActive,
+                                                    { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
+                                                ]
+                                            ]}
+                                        >
+                                            {/* Prayer Name */}
+                                            <View style={styles.prayerNameSection}>
+                                                <IconComponent name={iconData.name} size={22} color={isNext ? theme.accent : theme.text2} />
+                                                <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
+                                                    {tr(`prayers.${prayerName}`) || prayerName}
+                                                </Text>
+                                            </View>
 
-                                        {/* Prayer Time */}
-                                        <View style={styles.prayerTimeSection}>
-                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
-                                                {time}
-                                            </Text>
+                                            {/* Prayer Time */}
+                                            <View style={styles.prayerTimeSection}>
+                                                <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
+                                                    {prayerTime}
+                                                </Text>
 
-                                            {/* Prayer Time Icon (Notifications settings Modal) */}
-                                            <OptionModal
-                                                mode="prayers"
-                                                header={`${name} Notifications`}
-                                                onSelect={(selected) => handlePrayerNotification(selected, name)}
-                                                button={
-                                                    <Ionicons
-                                                        name={isNotificationEnabled(name) ? "notifications-outline" : "notifications-off-outline"}
-                                                        size={22}
-                                                        color={theme.text2}
-                                                        style={{ opacity: isNotificationEnabled(name) ? 0.6 : 0.3 }}
-                                                    />
-                                                }
-                                            />
+                                                {/* Prayer Time Icon */}
+                                                <Ionicons
+                                                    name={isNotificationEnabled(prayerName) ? "notifications-outline" : "notifications-off-outline"}
+                                                    size={22}
+                                                    color={theme.text}
+                                                    style={{ opacity: isNotificationEnabled(prayerName) ? 0.6 : 0.3 }}
+                                                />
+                                            </View>
                                         </View>
-                                    </View>
+                                    </TouchableOpacity>
 
                                     {/* Prayer Divider */}
                                     {!isLast && (
@@ -316,10 +313,21 @@ export default function HomeScreen() {
                             );
                         })}
                     </View>
+
+                    {/* Prayer Notifications settings Modal */}
+                    <PrayerModal
+                        visible={prayerModalVisible}
+                        setVisible={setPrayerModalVisible}
+                        header={selectedPrayer}
+                        theme={theme}
+                        tr={tr}
+                        selectedValue={notifSettings.prayers[selectedPrayer]}
+                        onSelect={(selected) => handlePrayerNotification(selected, selectedPrayer)}
+                    />
                 </AppCard>
 
             </ScrollView>
-        </AppTabScreen>
+        </AppTabScreen >
     );
 }
 
@@ -355,31 +363,32 @@ const styles = StyleSheet.create({
     countdownCard: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
     },
 
     // Quotes Card
     quotesCard: {
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+        paddingTop: 8,
+        paddingBottom: 10,
+        paddingHorizontal: 12,
     },
 
-    // Prayer Card
-    prayerCard: {
+    // Prayers Card
+    prayersCard: {
         overflow: 'hidden',
     },
     // Prayer Card - Date Header
-    dateHeader: {
-        paddingVertical: 14,
-        paddingHorizontal: 20,
+    prayersDateHeader: {
         alignItems: 'center',
+        padding: 12,
     },
-    dateText: {
+    dateHeaderText: {
         fontSize: 16,
         fontWeight: '600',
         marginBottom: 4,
     },
-    timezoneInfo: {
+    prayersTimezoneInfo: {
         fontSize: 12,
         opacity: 0.7,
     },
@@ -387,22 +396,23 @@ const styles = StyleSheet.create({
         height: 1,
         width: '100%',
     },
-    // Prayer Table
-    prayerTable: {
-        paddingVertical: 8,
+    // Prayers List
+    prayersRowContainer: {
+        paddingTop: 4,
+        paddingBottom: 12,
     },
     prayerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 13,
-        paddingHorizontal: 18,
+        paddingVertical: 11,
+        paddingHorizontal: 12,
     },
     prayerRowActive: {
         borderLeftWidth: 3,
         borderRightWidth: 3,
-        marginVertical: 3,
-        paddingHorizontal: 15,
+        marginVertical: 2,
+        paddingHorizontal: 10,
     },
     prayerNameSection: {
         flexDirection: 'row',
@@ -425,6 +435,6 @@ const styles = StyleSheet.create({
     },
     prayerDivider: {
         height: 1,
-        marginHorizontal: 18,
+        marginHorizontal: 12,
     },
 });

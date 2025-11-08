@@ -60,16 +60,20 @@ export const translations = {
             notLoaded: "🔴 Not Loaded",
 
             // Notifications
-            prayerReminder: "Prayer Reminder",
-            alertBody: "Time for Prayer",
+            prayerNotifBody: "Time for Prayer",
+            prayerRemindBody: "Prayer Reminder",
+            eventNotifBody: "Your Reminder",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
 
-            // Notifications config
+            // Notifications settings
             volume: "Volume",
             vibration: "Vibration",
             vibrationNote: "ℹ️ If vibration is not working, check your device notification settings.",
             snooze: "Reminder timeout",
+            offsetOff: "Off",
+            offsetOnTime: "On time",
+            offsetMinutes: "minutes before",
             batteryOptTitle: "Battery Optimization",
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.",
             alarmAccessTitle: "Alarms & Reminders",
@@ -187,16 +191,20 @@ export const translations = {
             notLoaded: "🔴 Jo i Ngarkuar",
 
             // Notifications
-            prayerReminder: "Kujtesë Lutjeje",
-            alertBody: "Koha për Namaz",
+            prayerNotifBody: "Koha për Namaz",
+            prayerRemindBody: "Kujtesë Lutjeje",
+            eventNotifBody: "Kujtesa juaj",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
 
-            // Notifications config
+            // Notifications settings
             volume: "Volumi i zërit",
             vibration: "Dridhje",
             vibrationNote: "ℹ️ Nëse dridhja nuk funksionon, kontrolloni cilësimet e njoftimeve të pajisjes suaj.",
             snooze: "Kohëzgjatja e kujtesës",
+            offsetOff: "Joaktiv",
+            offsetOnTime: "Në kohë",
+            offsetMinutes: "minuta më parë",
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
             alarmAccessTitle: "Alarme dhe Kujtesa",
@@ -314,16 +322,20 @@ export const translations = {
             notLoaded: "🔴 Nicht Geladen",
 
             // Notifications
-            prayerReminder: "Gebetserinnerung",
-            alertBody: "Zeit zum Gebet",
+            prayerNotifBody: "Zeit zum Gebet",
+            prayerRemindBody: "Gebetserinnerung",
+            eventNotifBody: "Ihre Erinnerung",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
 
-            // Notifications config
+            // Notifications settings
             volume: "Lautstärke",
             vibration: "Vibration",
             vibrationNote: "ℹ️ Wenn die Vibration nicht funktioniert, überprüfen Sie die Benachrichtigungseinstellungen Ihres Geräts.",
             snooze: "Erinnerungs-Timeout",
+            offsetOff: "Aus",
+            offsetOnTime: "Rechtzeitig",
+            offsetMinutes: "Minuten zuvor",
             batteryOptTitle: "Akkuoptimierung",
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen. Tippe oben, um die Systemeinstellungen anzupassen.",
             alarmAccessTitle: "Alarme & Erinnerungen",

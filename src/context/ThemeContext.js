@@ -71,12 +71,8 @@ export function ThemeProvider({ children }) {
     // Auto-load on mount
     // ------------------------------------------------------------
     useEffect(() => {
-        let mounted = true;
-
         loadTheme();
-
-        return () => { mounted = false; };
-    }, [loadTheme]);
+    }, []);
 
     // ------------------------------------------------------------
     // Listen to system changes

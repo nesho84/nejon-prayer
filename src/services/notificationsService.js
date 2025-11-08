@@ -11,7 +11,7 @@ import notifee, {
 } from '@notifee/react-native';
 import { Platform } from 'react-native';
 
-const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+const PRAYER_ORDER = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 // ------------------------------------------------------------
 // Create notification channels once (Android only)
@@ -90,7 +90,7 @@ async function cancelDisplayedNotification(notificationId) {
 // ------------------------------------------------------------
 // Parse a time string and return trigger time (today or tomorrow)
 // ------------------------------------------------------------
-export function getTriggerTime(timeStringRaw, prayerName) {
+export function getTriggerTime(timeStringRaw, prayerName, offsetMinutes = 0) {
     // Normalize: trim + replace NBSP + parse "HH:mm" strictly
     const timeString = String(timeStringRaw).replace(/\u00A0/g, " ").trim();
     const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
@@ -105,6 +105,11 @@ export function getTriggerTime(timeStringRaw, prayerName) {
     const minute = Number(match[2]);
     const triggerTime = new Date();
     triggerTime.setHours(hour, minute, 0, 0);
+
+    // Apply offset (can be negative for "before" or positive for "after")
+    if (offsetMinutes !== 0) {
+        triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
+    }
 
     // If time has passed today, schedule for tomorrow
     const now = new Date();
@@ -162,14 +167,16 @@ export async function syncPrayerNotifications(settings) {
             if (notifData.vibration !== currentVibration) return false;
             const currentSnooze = String(notifSettings?.snooze ?? 5);
             if (notifData.snooze !== currentSnooze) return false;
-            const currentOffset = String(notifSettings?.offset ?? 0);
+            // Check if per-prayer offset has changed
+            const currentOffset = String(notifSettings?.prayers?.[prayerName]?.offset ?? 0);
             if (notifData.offset !== currentOffset) return false;
 
             // Check if language has changed
             if (notifData.language !== language) return false;
 
-            // Check if prayer time has changed
-            const targetTime = getTriggerTime(timeString, prayerName);
+            // Check if prayer time has changed (with offset applied)
+            const offsetMinutes = notifSettings?.prayers?.[prayerName]?.offset ?? 0;
+            const targetTime = getTriggerTime(timeString, prayerName, offsetMinutes);
             if (!targetTime) return false;
 
             // Compare scheduled timestamp with expected timestamp
@@ -177,7 +184,7 @@ export async function syncPrayerNotifications(settings) {
                 return false;
             }
 
-            // All enabled notifications are up-to-date
+            // All checks passed - this prayer is up-to-date
             return true;
         });
 
@@ -228,7 +235,8 @@ export async function schedulePrayerNotifications(settings) {
             }
 
             // Get the next valid trigger time (tomorrow if already passed)
-            const triggerTime = getTriggerTime(timeString, prayerName);
+            const offsetMinutes = notifSettings?.prayers?.[prayerName]?.offset ?? 0;
+            const triggerTime = getTriggerTime(timeString, prayerName, offsetMinutes);
             if (!triggerTime) continue;
 
             // Schedule notification
@@ -236,17 +244,17 @@ export async function schedulePrayerNotifications(settings) {
                 {
                     id: `prayer-${prayerName.toLowerCase()}`,
                     title: `» ${tr(`prayers.${prayerName}`)} «`,
-                    body: `${tr("labels.alertBody")} (${timeString})`,
+                    body: `${tr("labels.prayerNotifBody")} (${timeString})`,
                     data: {
                         type: "prayer-notification",
                         prayer: prayerName,
                         reminderTitle: `» ${tr(`prayers.${prayerName}`)} «`,
-                        reminderBody: tr("labels.prayerReminder"),
+                        reminderBody: tr("labels.prayerRemindBody"),
                         language: language,
                         volume: String(notifSettings?.volume ?? 1.0),
                         vibration: notifSettings?.vibration ?? 'on',
                         snooze: String(notifSettings?.snooze ?? 5),
-                        offset: String(notifSettings?.offset ?? 0),
+                        offset: String(offsetMinutes),
                     },
                     android: {
                         channelId: `prayer-notif-channel-vib-${notifSettings?.vibration ?? 'on'}`,
@@ -261,7 +269,7 @@ export async function schedulePrayerNotifications(settings) {
                         ],
                         style: {
                             type: AndroidStyle.INBOX, // Show all action buttons immediately
-                            lines: [`${tr("labels.alertBody")} (${timeString})`],
+                            lines: [`${tr("labels.prayerNotifBody")} (${timeString})`],
                         },
                         autoCancel: false,
                         ongoing: true,
@@ -282,10 +290,12 @@ export async function schedulePrayerNotifications(settings) {
 
             scheduledCount++;
 
-            // Log scheduled time: Format date as DD/MM/YYYY, HH:mm:ss
+            // Log scheduled time with offset info: Format date as DD/MM/YYYY, HH:mm:ss
             const formattedDate = triggerTime.toLocaleDateString('en-GB') + ', ' +
                 triggerTime.toLocaleTimeString('en-GB', { hour12: false });
-            console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}`);
+            const offsetInfo = offsetMinutes !== 0 ? ` (offset: ${offsetMinutes > 0 ? '+' : ''}${offsetMinutes} min)` : '';
+
+            console.log(`⏰ Scheduled ${prayerName} at ${formattedDate}${offsetInfo}`);
         }
 
         console.log(`🔔 Successfully scheduled ${scheduledCount} prayer notification(s)`);

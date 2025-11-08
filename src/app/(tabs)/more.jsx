@@ -86,10 +86,7 @@ export default function ExtrasScreen() {
                             <Link href={item.href} asChild>
                                 <Pressable>
                                     {({ pressed }) => (
-                                        <View style={[
-                                            styles.listItem,
-                                            pressed && { backgroundColor: theme.accent + '08', opacity: pressed ? 0.3 : 1 }
-                                        ]}>
+                                        <View style={[styles.listItem, { opacity: pressed ? 0.3 : 1 }]}>
                                             <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
                                                 {item.icon}
                                             </View>

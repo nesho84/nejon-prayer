@@ -19,7 +19,7 @@ export function NotificationsProvider({ children }) {
         snooze: 5, // minutes: 1,5,10,15,20,30,60
         prayers: {
             Imsak: { enabled: false, offset: 0 },
-            Fajr: { enabled: true, offset: 0 },
+            Fajr: { enabled: true, offset: -15 },
             Sunrise: { enabled: false, offset: 0 },
             Dhuhr: { enabled: true, offset: 0 },
             Asr: { enabled: true, offset: 0 },
@@ -30,24 +30,24 @@ export function NotificationsProvider({ children }) {
 
     const [isReady, setIsReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [notifError, setSetNotifError] = useState(null);
+    const [notifError, setNotifError] = useState(null);
 
     const { deviceSettings, isReady: settingsReady } = useAppContext();
     const { prayerTimes, isReady: prayersReady } = usePrayersContext();
-    const { tr, language } = useTranslation();
+    const { language, tr } = useTranslation();
 
     // ------------------------------------------------------------
     // Load notification settings from MMKV storage
     // ------------------------------------------------------------
     const loadNotifSettings = useCallback(() => {
         setIsLoading(true);
-        setSetNotifError(null);
+        setNotifError(null);
         try {
             const saved = storage.getString(NOTIFICATIONS_KEY);
             if (saved) setNotifSettings(JSON.parse(saved));
         } catch (err) {
             console.warn("⚠️ Failed to load notification settings", err);
-            setSetNotifError(err.message);
+            setNotifError(err.message);
         } finally {
             setIsLoading(false);
             setIsReady(true);
@@ -59,7 +59,7 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     const saveNotifSettings = useCallback((updates) => {
         setIsLoading(true);
-        setSetNotifError(null);
+        setNotifError(null);
         try {
             setNotifSettings((prev) => {
                 const updated = { ...prev, ...updates };
@@ -68,7 +68,7 @@ export function NotificationsProvider({ children }) {
             });
         } catch (err) {
             console.warn("⚠️ Failed to save notification settings", err);
-            setSetNotifError(err.message);
+            setNotifError(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -79,7 +79,7 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     const savePrayerNotifSettings = useCallback((prayer, updates) => {
         setIsLoading(true);
-        setSetNotifError(null);
+        setNotifError(null);
         try {
             setNotifSettings((prev) => {
                 const updated = {
@@ -97,7 +97,7 @@ export function NotificationsProvider({ children }) {
             });
         } catch (err) {
             console.warn("⚠️ Failed to save prayer notification settings", err);
-            setSetNotifError(err.message);
+            setNotifError(err.message);
         } finally {
             setIsLoading(false);
         }
@@ -107,31 +107,32 @@ export function NotificationsProvider({ children }) {
     // Auto-load on mount
     // ------------------------------------------------------------
     useEffect(() => {
-        let mounted = true;
-
-        if (mounted) loadNotifSettings();
-
-        return () => { mounted = false; };
-    }, [loadNotifSettings]);
+        loadNotifSettings();
+    }, []);
 
     // ------------------------------------------------------------
     // Auto-Schedule notifications when contexts are ready and permission granted
     // ------------------------------------------------------------
     useEffect(() => {
         if (!settingsReady || !prayersReady) return;
+        if (!deviceSettings?.notificationPermission || !prayerTimes) return;
 
         let mounted = true;
 
         (async () => {
-            if (deviceSettings?.notificationPermission && prayerTimes) {
+            try {
                 await schedulePrayerNotifications({ prayerTimes, notifSettings, language, tr });
+            } catch (err) {
+                console.warn("⚠️ Failed to schedule notifications:", err);
+            } finally {
+                if (mounted) setIsReady(true);
             }
         })();
 
         if (mounted) setIsReady(true);
 
         return () => { mounted = false; };
-    }, [settingsReady, notifSettings, deviceSettings?.notificationPermission, prayersReady, prayerTimes]);
+    }, [settingsReady, deviceSettings?.notificationPermission, language, prayersReady, prayerTimes, notifSettings]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee
