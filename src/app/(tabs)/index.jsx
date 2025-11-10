@@ -67,21 +67,6 @@ export default function HomeScreen() {
     };
 
     // ------------------------------------------------------------
-    // Prayer icon resolver
-    // ------------------------------------------------------------
-    const resolvePrayerIcon = (prayerName) => {
-        const p = String(prayerName || "").toLowerCase();
-        if (p.includes("imsak")) return { lib: 'Ionicons', name: 'time-outline' };
-        if (p.includes("fajr")) return { lib: 'Ionicons', name: 'moon-outline' };
-        if (p.includes("sunrise")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-up' };
-        if (p.includes("dhuhr")) return { lib: 'Ionicons', name: 'sunny' };
-        if (p.includes("asr")) return { lib: 'Ionicons', name: 'partly-sunny-outline' };
-        if (p.includes("maghrib")) return { lib: 'MaterialCommunityIcons', name: 'weather-sunset-down' };
-        if (p.includes("isha")) return { lib: 'Ionicons', name: 'moon-sharp' };
-        return "time-outline";
-    };
-
-    // ------------------------------------------------------------
     // Handle Prayers Modal
     // ------------------------------------------------------------
     const openPrayersModal = (prayerName) => {
@@ -90,10 +75,37 @@ export default function HomeScreen() {
     };
 
     // ------------------------------------------------------------
-    // Prayer notification icon state
+    // Prayer name icon
     // ------------------------------------------------------------
-    const isNotificationEnabled = (prayerName) => {
-        return deviceSettings.notificationPermission && notifSettings?.prayers?.[prayerName].enabled;
+    const handlePrayerNameIcon = (prayerName) => {
+        const pn = String(prayerName || "").toLowerCase();
+
+        if (pn.includes("imsak")) return (props) => <Ionicons name="time-outline" {...props} />;
+        if (pn.includes("fajr")) return (props) => <Ionicons name="moon-outline" {...props} />;
+        if (pn.includes("sunrise")) return (props) => <MaterialCommunityIcons name="weather-sunset-up" {...props} />;
+        if (pn.includes("dhuhr")) return (props) => <Ionicons name="sunny" {...props} />;
+        if (pn.includes("asr")) return (props) => <Ionicons name="partly-sunny-outline" {...props} />;
+        if (pn.includes("maghrib")) return (props) => <MaterialCommunityIcons name="weather-sunset-down" {...props} />;
+        if (pn.includes("isha")) return (props) => <Ionicons name="moon-sharp" {...props} />;
+
+        return (props) => <Ionicons name="time-outline" {...props} />;
+    };
+
+    // ------------------------------------------------------------
+    // Prayer notification icon
+    // ------------------------------------------------------------
+    const handlePrayerNotificationIcon = (prayerName) => {
+        const pst = notifSettings?.prayers?.[prayerName];
+        const enabled = deviceSettings.notificationPermission && pst?.enabled;
+
+        if (!enabled)
+            return (props) => <Ionicons name="notifications-off-outline" {...props} style={[props.style, { opacity: 0.3 }]} />;
+        if (enabled && pst.offset === 0)
+            return (props) => <Ionicons name="notifications-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
+        if (enabled && pst.offset !== 0)
+            return (props) => <Ionicons name="timer-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
+
+        return (props) => <Ionicons name="notifications-outline" {...props} />;
     };
 
     // ------------------------------------------------------------
@@ -264,8 +276,8 @@ export default function HomeScreen() {
                         {Object.entries(prayerTimes).map(([prayerName, prayerTime], index) => {
                             const isNext = nextPrayerName === prayerName;
                             const isLast = index === Object.entries(prayerTimes).length - 1;
-                            const iconData = resolvePrayerIcon(prayerName);
-                            const IconComponent = iconData.lib === 'Ionicons' ? Ionicons : MaterialCommunityIcons;
+                            const NameIcon = handlePrayerNameIcon(prayerName);
+                            const NotifIcon = handlePrayerNotificationIcon(prayerName);
 
                             return (
                                 <View key={prayerName}>
@@ -282,7 +294,8 @@ export default function HomeScreen() {
                                         >
                                             {/* Prayer Name */}
                                             <View style={styles.prayerNameSection}>
-                                                <IconComponent name={iconData.name} size={22} color={isNext ? theme.accent : theme.text2} />
+                                                {/* Prayer Name Icon */}
+                                                <NameIcon size={22} color={isNext ? theme.accent : theme.text2} />
                                                 <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
                                                     {tr(`prayers.${prayerName}`) || prayerName}
                                                 </Text>
@@ -293,14 +306,8 @@ export default function HomeScreen() {
                                                 <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
                                                     {prayerTime}
                                                 </Text>
-
                                                 {/* Prayer Time Icon */}
-                                                <Ionicons
-                                                    name={isNotificationEnabled(prayerName) ? "notifications-outline" : "notifications-off-outline"}
-                                                    size={22}
-                                                    color={theme.text}
-                                                    style={{ opacity: isNotificationEnabled(prayerName) ? 0.6 : 0.3 }}
-                                                />
+                                                <NotifIcon size={22} color={theme.text} />
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -369,8 +376,8 @@ const styles = StyleSheet.create({
 
     // Quotes Card
     quotesCard: {
-        paddingTop: 8,
-        paddingBottom: 10,
+        paddingTop: 9,
+        paddingBottom: 11,
         paddingHorizontal: 12,
     },
 
@@ -381,7 +388,8 @@ const styles = StyleSheet.create({
     // Prayer Card - Date Header
     prayersDateHeader: {
         alignItems: 'center',
-        padding: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
     },
     dateHeaderText: {
         fontSize: 16,
@@ -398,8 +406,8 @@ const styles = StyleSheet.create({
     },
     // Prayers List
     prayersRowContainer: {
-        paddingTop: 4,
-        paddingBottom: 12,
+        paddingTop: 8,
+        paddingBottom: 16,
     },
     prayerRow: {
         flexDirection: 'row',

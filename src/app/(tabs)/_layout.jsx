@@ -2,7 +2,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
-import { MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
     const insets = useSafeAreaInsets();
@@ -29,7 +29,7 @@ export default function TabLayout() {
                 options={{
                     title: tr("labels.home"),
                     tabBarIcon: ({ focused, color, size }) =>
-                        <McIcons name={focused ? "home" : "home-outline"} size={size} color={color} />,
+                        <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -37,7 +37,7 @@ export default function TabLayout() {
                 options={{
                     title: tr("labels.qibla"),
                     tabBarIcon: ({ focused, color, size }) =>
-                        <McIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
+                        <MaterialCommunityIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -45,7 +45,7 @@ export default function TabLayout() {
                 options={{
                     title: tr("labels.settings"),
                     tabBarIcon: ({ focused, color, size }) =>
-                        <McIcons name={focused ? "cog" : "cog-outline"} size={size} color={color} />,
+                        <MaterialCommunityIcons name={focused ? "cog" : "cog-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -54,7 +54,7 @@ export default function TabLayout() {
                     title: "More",
                     tabBarLabel: tr("labels.more"),
                     tabBarIcon: ({ focused, color, size }) =>
-                        <McIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
+                        <MaterialCommunityIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
                 }}
             />
         </Tabs>

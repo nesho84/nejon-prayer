@@ -21,14 +21,14 @@ export default function PrayerModal({
 
     const options = useMemo(() => {
         return [
-            { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "close-circle-outline" },
-            { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "time-outline" },
-            { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "alarm-outline" },
-            { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "alarm-outline" },
-            { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "alarm-outline" },
-            { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "alarm-outline" },
-            { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "alarm-outline" },
-            { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "alarm-outline" },
+            { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "notifications-off-outline" },
+            { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "notifications-outline" },
+            { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "timer-outline" },
+            { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "timer-outline" },
+            { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "timer-outline" },
+            { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "timer-outline" },
+            { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "timer-outline" },
+            { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "timer-outline" },
         ];
     }, []);
 
@@ -60,8 +60,8 @@ export default function PrayerModal({
                                 <TouchableOpacity
                                     key={index}
                                     style={[styles.optionRow, isSelected && { backgroundColor: theme.accentLight }]}
+                                    activeOpacity={0.3}
                                     onPress={() => handleSelect(option.value)}
-                                    activeOpacity={0.7}
                                 >
                                     <View style={styles.optionLabel}>
                                         {/* Icon */}
@@ -119,21 +119,21 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 18,
         fontWeight: "600",
+        paddingVertical: 12,
         paddingHorizontal: 18,
-        paddingVertical: 14,
     },
     divider: {
         height: 1,
         width: '100%',
     },
     optionList: {
-        paddingVertical: 4,
+        paddingVertical: 6,
     },
     optionRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 18,
     },
     optionLabel: {
@@ -145,11 +145,11 @@ const styles = StyleSheet.create({
     },
     cancelBtn: {
         alignItems: "center",
+        paddingVertical: 12,
         paddingHorizontal: 18,
-        paddingVertical: 14,
     },
     cancelText: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: "500",
     },
 });
