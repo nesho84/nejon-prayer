@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function PrayerModal({
     visible,
@@ -21,14 +21,22 @@ export default function PrayerModal({
 
     const options = useMemo(() => {
         return [
-            { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "notifications-off-outline" },
-            { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "notifications-outline" },
-            { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "timer-outline" },
-            { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "timer-outline" },
-            { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "timer-outline" },
-            { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "timer-outline" },
-            { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "timer-outline" },
-            { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "timer-outline" },
+            // { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "notifications-off-outline" },
+            { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "bell-off-outline" },
+            // { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "notifications-outline" },
+            { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "bell-outline" },
+            // { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "timer-outline" },
+            // { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "timer-outline" },
+            // { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "timer-outline" },
+            // { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "timer-outline" },
+            // { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "timer-outline" },
+            // { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "timer-outline" },
+            { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "bell-cog-outline" },
+            { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "bell-cog-outline" },
+            { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "bell-cog-outline" },
+            { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "bell-cog-outline" },
+            { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "bell-cog-outline" },
+            { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "bell-cog-outline" },
         ];
     }, []);
 
@@ -65,11 +73,11 @@ export default function PrayerModal({
                                 >
                                     <View style={styles.optionLabel}>
                                         {/* Icon */}
-                                        <Ionicons
+                                        <MaterialCommunityIcons
                                             name={option.icon}
                                             size={20}
-                                            color={isSelected ? theme.accent : theme.placeholder}
-                                            style={{ marginRight: 10 }}
+                                            color={isSelected ? theme.accent : theme.text2}
+                                            style={{ marginRight: 10, opacity: 0.6 }}
                                         />
                                         {/* Label */}
                                         <Text

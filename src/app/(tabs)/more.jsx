@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
-import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -17,8 +17,8 @@ export default function ExtrasScreen() {
             label: tr("labels.abdes"),
             description: tr("labels.abdesDesc") || "Step by step ablution guide",
             color: "#06b6d4",
-            bg: "#06b6d426", // ✅ 15% opacity background
-            icon: <Ionicons name="water-outline" size={30} color="#06b6d4" />
+            bg: "#06b6d426",
+            icon: <MaterialCommunityIcons name="hand-wash-outline" size={32} color="#06b6d4" />
         },
         {
             id: 2,
@@ -27,7 +27,7 @@ export default function ExtrasScreen() {
             description: tr("labels.namazDesc") || "Learn how to perform Salah",
             color: "#3b82f6",
             bg: "#3b82f626",
-            icon: <Ionicons name="timer-outline" size={32} color="#3b82f6" />
+            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color="#3b82f6" />
         },
         {
             id: 3,
@@ -36,7 +36,7 @@ export default function ExtrasScreen() {
             description: tr("labels.tesbihDesc") || "Digital prayer beads counter",
             color: "#8b5cf6",
             bg: "#8b5cf626",
-            icon: <McIcons name="counter" size={32} color="#8b5cf6" />
+            icon: <MaterialCommunityIcons name="counter" size={36} color="#8b5cf6" />
         },
         {
             id: 4,
@@ -45,7 +45,7 @@ export default function ExtrasScreen() {
             description: tr("labels.ramadanDesc"),
             color: "#06b6d4",
             bg: "#06b6d426",
-            icon: <McIcons name="information-outline" size={32} color="#06b6d4" />
+            icon: <Ionicons name="moon-outline" size={32} color="#06b6d4" />
         },
         {
             id: 5,
@@ -54,7 +54,7 @@ export default function ExtrasScreen() {
             description: tr("labels.aboutDesc") || "App information & credits",
             color: "#f59e0b",
             bg: "#f59e0b26",
-            icon: <McIcons name="information-outline" size={32} color="#f59e0b" />
+            icon: <MaterialCommunityIcons name="information-outline" size={32} color="#f59e0b" />
         },
     ];
 

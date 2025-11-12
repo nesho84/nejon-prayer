@@ -15,16 +15,16 @@ export const translations = {
 
         // Abdesi
         abdesi: {
-            header: "",
-            step1: "",
-            step2: "",
-            step3: "",
-            step4: "",
-            step5: "",
-            step6: "",
-            step7: "",
-            step8: "",
-            footer: "",
+            step1: "Make your intention in your heart to perform ablution (wudu), and before starting, say 'Bismillah'.",
+            step2: "Wash your hands up to the wrists.",
+            step3: "Rinse your mouth three times.",
+            step4: "Rinse your nose three times.",
+            step5: "Wash your face three times.",
+            step6: "Wash your arms up to the elbows three times, starting with the right arm, then the left.",
+            step7: "Wipe your head with wet hands.",
+            step8: "Wipe your ears with wet hands.",
+            step9: "Wash your right foot, then your left foot up to the ankles three times.",
+            step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
         },
         labels: {
             // Navigation
@@ -160,18 +160,16 @@ export const translations = {
 
         // Abdesi
         abdesi: {
-            header: "Para se të fillojmë faljen e namazit, duhet të marrim abdes. Abdesi është kusht për faljen e namazit!",
-            step1: "Thuaje nijetin tënd në zemër për marjen e abdesit dhe para se të filosh thuaj Bismilah.",
-            step2: "Laj duart deri në kyçe",
-            step3: "Shpërlaj gojën 3 herë",
-            step4: "Shpërlaj hundën 3 herë",
-            step5: "Laj fytyrën 3 herë",
+            step1: "Bëje nijetin tënd me zemër për të marrë abdesin dhe, para se të fillosh, thuaj Bismilah.",
+            step2: "Laj duart deri në kyçe.",
+            step3: "Shpërlaj gojën 3 herë.",
+            step4: "Shpërlaj hundën 3 herë.",
+            step5: "Laj fytyrën 3 herë.",
             step6: "Laj krahët deri në bërryl 3 herë duke filluar nga krahu i djathtë, pastaj të majtin.",
-            step7: "Me duar të lagura fërko kokën",
-            step8: "Me duar të lagura fërko veshët",
-            step9: "Laj kembën e djathtë pastaj të majtën deri mbi kyçe nga 3 herë",
+            step7: "Me duar të lagura, fërko kokën.",
+            step8: "Me duar të lagura, fërko veshët.",
+            step9: "Laj këmbën e djathtë, pastaj të majtën, deri mbi kyçe, nga 3 herë.",
             step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
-            footer: "Abdesi është përfunduar! Tani je gati për Namaz me pastërti dhe përkushtim.",
         },
         labels: {
             // Navigation
@@ -307,16 +305,16 @@ export const translations = {
 
         // Abdesi
         abdesi: {
-            header: "",
-            step1: "",
-            step2: "",
-            step3: "",
-            step4: "",
-            step5: "",
-            step6: "",
-            step7: "",
-            step8: "",
-            footer: "",
+            step1: "Fasse die Absicht in deinem Herzen, die Waschung (Wudu) zu verrichten, und sage vor Beginn 'Bismillah'.",
+            step2: "Wasche deine Hände bis zu den Handgelenken.",
+            step3: "Spüle deinen Mund drei Mal aus.",
+            step4: "Spüle deine Nase drei Mal aus.",
+            step5: "Wasche dein Gesicht drei Mal.",
+            step6: "Wasche deine Arme bis zu den Ellbogen drei Mal, beginnend mit dem rechten Arm, dann dem linken.",
+            step7: "Wische mit nassen Händen über deinen Kopf.",
+            step8: "Wische mit nassen Händen über deine Ohren.",
+            step9: "Wasche zuerst den rechten Fuß, dann den linken bis zu den Knöcheln drei Mal.",
+            step10: "Sprich abschließend:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Ich bezeuge, dass es keinen Gott außer Allah gibt, der einzig ist, ohne Partner, und dass Muhammad sein Diener und Gesandter ist).",
         },
         labels: {
             // Navigation
