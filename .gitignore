@@ -34,7 +34,7 @@ yarn-error.*
 .env*.local
 
 # assets
-assets/psd/
+/.assets/psd/
 
 # typescript
 *.tsbuildinfo
@@ -42,3 +42,4 @@ assets/psd/
 # IDE - VSCode
 /.vscode
 **/.vscode/
+assets/psd/
