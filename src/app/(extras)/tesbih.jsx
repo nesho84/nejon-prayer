@@ -185,7 +185,7 @@ export default function QiblaScreen() {
                         currentCount={count}
                         totalCount={totalCount}
                         onCountReached={setCountReached}
-                        size={280}
+                        size={260}
                         strokeWidth={10}
                         strokeColor={theme.divider}
                         color={theme.primary}

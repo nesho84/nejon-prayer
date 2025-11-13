@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "jsEngine": "hermes",
-    "owner": "nejon",
+    "owner": "nesho84",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -34,7 +34,9 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.VIBRATE",
         "android.permission.INTERNET",
-        "android.permission.ACCESS_NETWORK_STATE"
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "ios": {
@@ -113,8 +115,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "YOUR-EAS-PROJECT-ID"
-      }
+        "projectId": "4d4c4cab-c707-41be-b1a4-3d6d6d3e5781"
+      },
+      "router": {}
     },
     "backgroundColor": "#000000",
     "primaryColor": "#000000"

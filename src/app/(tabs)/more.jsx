@@ -42,7 +42,7 @@ export default function ExtrasScreen() {
             id: 4,
             href: "(extras)/ramazani",
             label: tr("labels.ramadan"),
-            description: tr("labels.ramadanDesc"),
+            description: tr("labels.ramadanDesc") || "Digital prayer beads counter",
             color: "#06b6d4",
             bg: "#06b6d426",
             icon: <Ionicons name="moon-outline" size={32} color="#06b6d4" />

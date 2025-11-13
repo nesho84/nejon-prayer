@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
         position: "relative",
         alignItems: "center",
         justifyContent: "center",
-        width: 270,
-        borderRadius: 135,
+        width: 260,
+        borderRadius: 130,
         backgroundColor: 'rgba(0,0,0,0.05)',
     },
     innerSection: {

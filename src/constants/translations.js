@@ -15,6 +15,8 @@ export const translations = {
 
         // Abdesi
         abdesi: {
+            headerTitle: "Performing Wudu",
+            headerSubtitle: "How to perform Wudu step by step",
             step1: "Make your intention in your heart to perform ablution (wudu), and before starting, say 'Bismillah'.",
             step2: "Wash your hands up to the wrists.",
             step3: "Rinse your mouth three times.",
@@ -26,6 +28,43 @@ export const translations = {
             step9: "Wash your right foot, then your left foot up to the ankles three times.",
             step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
         },
+
+        // Ramazani
+        ramazani: {
+            headerTitle: "Ramadan Guidance",
+            headerSubtitle: "Essential Tips for a Blessed Ramadan",
+            title1: "Pure Intentions",
+            desc1: "Fast Ramadan with faith and determination to seek the reward of Allah Almighty, with the aim of forgiveness of past sins.",
+            title2: "Preserve the Fast",
+            desc2: "Beware of breaking the fast during the days of Ramadan without any legitimate Islamic exemption, for that is one of the major sins.",
+            title3: "Halal Earnings",
+            desc3: "Make sure that your food, drink and clothing are from halal earnings, so that your deeds and prayers are accepted. Be careful not to leave aside the halal and break the fast with haram.",
+            title4: "Feed the Fasting Person",
+            desc4: "Feed the fasting person so that you may gain the reward of their fasting.",
+            title5: "The Five Prayers",
+            desc5: "Pray five times a day at their appointed times, with the aim of to gain the reward and protection of Allah.",
+            title6: "Give Sadaqah",
+            desc6: "Give sadaqah because the best sadaqah is that which is given in Ramadan.",
+            title7: "Value Time",
+            desc7: "Beware of spending time without doing any good deed, because you will be responsible and will be accounted for the time spent, and you will receive the reward for everything you did during this time.",
+            title8: "Read the Quran",
+            desc8: "Take advantage of the opportunity that has been given to you in this Ramadan with good deeds that are part of it, by reading the Holy Quran, giving it its due and thinking about its meanings, so that this will be an argument before your Lord and an intercessor on the Day of Account.",
+            title9: "Guard Your Tongue",
+            desc9: "Guard your tongue from lying, insulting, slander, backbiting because they reduce the reward of fasting.",
+            title10: "Repent Sincerely",
+            desc10: "Repent to Allah with sincere repentance at all times by turning away from sins, feeling regret for what you have done in the past and demonstratively deciding not to return to them in the future. Allah accepts the repentance of those who repent.",
+            title11: "Taraweeh Prayer",
+            desc11: "Perform Taraweeh prayer and continue praying especially during the Night of Power with faith and determination to seek the reward of Allah Almighty, and aim for forgiveness of past sins.",
+            title12: "Laylat al-Qadr",
+            desc12: "Try to enliven the Night of Power with worship in the last ten odd nights of Ramadan. The Night of Power is better than a thousand months and whoever enlivens it with faith, his past sins will be forgiven.",
+            title13: "Sufyur",
+            desc13: "Support your daily fast by eating the suhoor meal in the last part of the night before sunrise. There is a blessing in this meal and it strengthens you for the day to come.",
+            title14: "Iftar",
+            desc14: "Hasten and do not delay in breaking the fast after the sun has set so that you may earn the love of Allah. Break the fast with dates and water according to the Sunnah.",
+            title15: "Continue After Ramadan",
+            desc15: "Maintain the state of complete faith and piety, and performing good deeds even after the month of Ramadan, until you die. 'And worship your Lord until the truth (death) comes to you.' (Quran 15:99)",
+        },
+
         labels: {
             // Navigation
             home: "Home",
@@ -137,6 +176,10 @@ export const translations = {
             openSettings: "Open Settings",
             retry: "Retry",
             continue: "Continue",
+            copy: "Copy",
+            copied: "Copied!",
+            share: "Share",
+            Shared: "Shared!",
         },
         actions: {
             dismiss: "Dismiss",
@@ -160,6 +203,8 @@ export const translations = {
 
         // Abdesi
         abdesi: {
+            headerTitle: "Marrja e abdesit",
+            headerSubtitle: "Si të merret abdesi hap pas hapi",
             step1: "Bëje nijetin tënd me zemër për të marrë abdesin dhe, para se të fillosh, thuaj Bismilah.",
             step2: "Laj duart deri në kyçe.",
             step3: "Shpërlaj gojën 3 herë.",
@@ -171,6 +216,43 @@ export const translations = {
             step9: "Laj këmbën e djathtë, pastaj të majtën, deri mbi kyçe, nga 3 herë.",
             step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
         },
+
+        // Ramazani
+        ramazani: {
+            headerTitle: "Udhëzime për Ramazan",
+            headerSubtitle: "Këshilla kryesore për një Ramazan produktiv",
+            title1: "Nijet i Pastër",
+            desc1: "Agjëro Ramazanin me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, me synim faljen e mëkateve të kaluara.",
+            title2: "Ruaje Agjërimin",
+            desc2: "Kujdes nga prishja e agjërimit gjatë ditëve të Ramazanit pa ndonjë përjashtim të ligjshëm islam, sepse kjo është prej mëkateve të mëdha.",
+            title3: "Fitimi Hallall",
+            desc3: "Sigurohu që ushqimi juaj, pijet dhe veshja juaj të jenë nga fitimi hallall, në mënyrë që veprat dhe lutjet tuaja të jenë të pranuara. Kujdes mos po lëni anash hallallet dhe po e prishni agjërimin me haram.",
+            title4: "Ushqe Agjëruesin",
+            desc4: "Jep ushqim njerëzve që agjërojnë në mënyrë që të fitosh sevapin e tyre të agjërimit.",
+            title5: "Pesë Namazet",
+            desc5: "Falu pesë herë në ditë në kohët e tyre, me qëllim që ta fitosh shpërblimin dhe mbrojtjen e Allahut.",
+            title6: "Jep Sadaka",
+            desc6: "Jep sadaka sepse sadakaja më e mirë është ajo që jipet në Ramazan.",
+            title7: "Vlerëso Kohën",
+            desc7: "Kujdes nga shpenzimi i kohës pa bërë ndonjë vepër të mirë, sepse ti do të jesh përgjegjës dhe do të llogaritesh për kohën e kaluar, dhe do të marrësh shpërblimin për gjithçka që ke punuar gjatë kësaj kohe.",
+            title8: "Lexo Kur'anin",
+            desc8: "Shfrytëzoje mundësinë që të është dhënë edhe në këtë Ramazan me vepra të mira që janë pjesë e tij, duke lexuar Kur’anin e shenjtë, duke ja dhënë hakun dhe menduar për kuptimet e tij, në mënyrë që kjo të jetë argument para Zotit tënd dhe ndërmjetësues në ditën e llogari dhënjes.",
+            title9: "Ruaje Gjuhën",
+            desc9: "Ruaje gjuhën tënde nga gënjeshtra, fyerja, shpifja, përgojimi sepse zvogëlojnë shpërblimin e agjërimit.",
+            title10: "Pendohu Sinqerisht",
+            desc10: "Pendohu tek Allahu me një pendim të sinqertë gjatë gjithë kohës duke u larguar nga mëkatet, duke ndier keqardhje për atë qka ke bërë më parë dhe në mënyrë demonstrative vendos mos ti kthehesh atyre në të ardhmen. Allahu pranon pendimin e atyre që pendohen.",
+            title11: "Namazi i Teravive",
+            desc11: "Fale namazin e teravive dhe vazhdo me namaz veçanërisht gjatë natës së Kadrit me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, dhe synim faljen mëkateve të kaluara.",
+            title12: "Nata e Kadrit",
+            desc12: "Përpjehu të gjallërosh me adhurim natën e Kadrit në dhjetë netët e fundit teke të Ramazanit. Nata e Kadrit është më e mirë se një mijë muaj dhe ai që e gjallëron atë me besim i falen mëkatet e kaluara.",
+            title13: "Syfyri",
+            desc13: "Ndihmoje agjërimin tënd ditor nëpërmjet ngrënies së ushqimit të syfyrit në pjesën e fundit të natës para lindjes së diellit. Ka bekim në këtë vakt dhe ai të fuqizon për ditën që vjen.",
+            title14: "Iftari",
+            desc14: "Shpejto dhe mos vono në prishjen e agjërimit pasi që dielli ka filluar së perënduari në mënyrë që të fitosh dashurinë e Allahut. Prish agjërimin me hurma dhe ujë sipas synetit.",
+            title15: "Vazhdo Pas Ramazanit",
+            desc15: "Ruaje gjendjen me iman të plotë dhe devotshmëri, dhe kryerjen e veprave të mira edhe pas muajit të Ramazanit, deri sa të vdesësh. 'Dhe adhuro Zotin tënd deri sa të vijë ty e vërteta (vdekja).' (Kur'an 15:99)",
+        },
+
         labels: {
             // Navigation
             home: "Kryefaqja",
@@ -282,6 +364,10 @@ export const translations = {
             openSettings: "Hap Cilësimet",
             retry: "Riprovo",
             continue: "Vazhdo",
+            copy: "Kopjo",
+            copied: "Kopjuar!",
+            share: "Shpërndaj",
+            shared: "Shpërndarë!",
         },
         actions: {
             dismiss: "Në rregull",
@@ -305,6 +391,8 @@ export const translations = {
 
         // Abdesi
         abdesi: {
+            headerTitle: "Wie man Wudu verrichtet",
+            headerSubtitle: "Wie man Wudu Schritt für Schritt durchführt",
             step1: "Fasse die Absicht in deinem Herzen, die Waschung (Wudu) zu verrichten, und sage vor Beginn 'Bismillah'.",
             step2: "Wasche deine Hände bis zu den Handgelenken.",
             step3: "Spüle deinen Mund drei Mal aus.",
@@ -316,6 +404,43 @@ export const translations = {
             step9: "Wasche zuerst den rechten Fuß, dann den linken bis zu den Knöcheln drei Mal.",
             step10: "Sprich abschließend:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Ich bezeuge, dass es keinen Gott außer Allah gibt, der einzig ist, ohne Partner, und dass Muhammad sein Diener und Gesandter ist).",
         },
+
+        // Ramazani
+        ramazani: {
+            headerTitle: "Ramadan-Anleitung",
+            headerSubtitle: "Wichtige Tipps für einen gesegneten Ramadan",
+            title1: "Reine Absichten",
+            desc1: "Faste im Ramadan mit Glauben und Entschlossenheit, um den Lohn Allahs des Allmächtigen zu erlangen und Vergebung für vergangene Sünden zu erhalten.",
+            title2: "Das Fasten einhalten",
+            desc2: "Hüte dich davor, das Fasten während des Ramadan ohne legitime islamische Ausnahme zu brechen, denn dies ist eine der großen Sünden.",
+            title3: "Halal-Einkommen",
+            desc3: "Stelle sicher, dass deine Speisen, Getränke und Kleidung aus halalem Einkommen stammen, damit deine Taten und Gebete angenommen werden. Achte darauf, das Halal nicht zu vernachlässigen und das Fasten nicht mit Haram zu brechen.",
+            title4: "Den Fastenden speisen",
+            desc4: "Speis den Fastenden, damit du den Lohn für sein Fasten erhältst.",
+            title5: "Die fünf Gebete",
+            desc5: "Bete fünfmal täglich zu den festgelegten Zeiten, um den Lohn und den Schutz Allahs zu erlangen.",
+            title6: "Geben Sadaqah",
+            desc6: "Gebt Sadaqah, denn die beste Sadaqah ist die, die im Ramadan gegeben wird.",
+            title7: "Wertschätze die Zeit",
+            desc7: "Hütet euch davor, Zeit zu verschwenden, ohne Gutes zu tun, denn ihr werdet für die verbrachte Zeit verantwortlich sein und zur Rechenschaft gezogen werden. Ihr werdet für alles, was ihr in dieser Zeit getan habt, belohnt werden.",
+            title8: "Lies den Koran",
+            desc8: "Nutzt die euch im Ramadan gegebene Gelegenheit, gute Taten zu vollbringen, indem ihr den Heiligen Koran lest, ihm die gebührende Bedeutung beimisst und über seine Bedeutung nachdenkt. So wird dies ein Argument vor eurem Herrn und ein Fürsprecher am Tag der Abrechnung sein.",
+            title9: "Bewahre deine Zunge",
+            desc9: "Bewahre deine Zunge vor Lügen, Beleidigungen, Verleumdungen und übler Nachrede, denn sie mindern den Lohn des Fastens.",
+            title10: "Bereue aufrichtig",
+            desc10: "Kehre aufrichtig zu Allah zurück. Bereue jederzeit, indem du dich von Sünden abwendest, Reue für deine vergangenen Taten empfindest und dich entschieden hast, in Zukunft nicht mehr zu ihnen zurückzukehren. Allah nimmt die Reue derer an, die bereuen.",
+            title11: "Taraweeh-Gebet",
+            desc11: "Verrichte das Taraweeh-Gebet und bete besonders in der Nacht der Bestimmung mit Glauben und Entschlossenheit, um den Lohn Allahs des Allmächtigen zu erlangen und die Vergebung vergangener Sünden zu erlangen.",
+            title12: "Laylat al-Qadr",
+            desc12: "Versuche, die Nacht der Bestimmung in den letzten zehn ungeraden Nächten des Ramadan mit Gebeten zu erfüllen. Die Nacht der Bestimmung ist besser als tausend Monate, und wem sie mit Glauben erfüllt, dem werden seine vergangenen Sünden vergeben.",
+            title13: "Suhur",
+            desc13: "Unterstütze dein tägliches Fasten, indem du das Suhur-Mahl in der letzten Nacht vor Sonnenaufgang einnimmst. Dieses Mahl ist gesegnet und stärkt dich für den Tag. 'zukünftig.'",
+            title14: "Iftar",
+            desc14: "Beeilt euch und zögert nicht, das Fasten nach Sonnenuntergang zu brechen, damit ihr Allahs Liebe erlangt. Brecht das Fasten mit Datteln und Wasser gemäß der Sunna.",
+            title15: "Nach dem Ramadan weitermachen",
+            desc15: "Bewahrt den Zustand des vollkommenen Glaubens und der Frömmigkeit und vollbringt gute Taten auch nach dem Monat Ramadan bis zu eurem Tod. 'Und dient eurem Herrn, bis die Wahrheit (der Tod) zu euch kommt.' (Koran 15:99)"
+        },
+
         labels: {
             // Navigation
             home: "Startseite",
@@ -427,6 +552,10 @@ export const translations = {
             openSettings: "Einstellungen Öffnen",
             retry: "Wiederholen",
             continue: "Weiter",
+            copy: "Kopieren",
+            copied: "Kopiert!",
+            share: "Teilen",
+            shared: "Geteilt!",
         },
         actions: {
             dismiss: "Verstanden",

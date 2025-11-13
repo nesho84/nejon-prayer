@@ -2,9 +2,7 @@ import { ScrollView, View, Text, Image, StyleSheet } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 import AppFullScreen from "@/components/AppFullScreen";
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AppCard from "@/components/AppCard";
-
 
 export default function AbdesiScreen() {
     const { theme } = useThemeContext();
@@ -30,6 +28,16 @@ export default function AbdesiScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
+
+                {/* HEADER */}
+                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.danger }]}>
+                    <Text style={[styles.headerTitle, { color: theme.text }]}>
+                        {tr("abdesi.headerTitle")}
+                    </Text>
+                    <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
+                        {tr("abdesi.headerSubtitle")}
+                    </Text>
+                </AppCard>
 
                 {/* STEPS */}
                 {steps.map((step) => (
@@ -66,6 +74,24 @@ const styles = StyleSheet.create({
         gap: 16,
     },
 
+    // Header card
+    headerCard: {
+        alignItems: "center",
+        paddingVertical: 28,
+        paddingHorizontal: 16,
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+    },
+    headerTitle: {
+        fontSize: 25,
+        fontWeight: "700",
+        marginBottom: 8,
+    },
+    headerSubtitle: {
+        fontSize: 13,
+        fontWeight: "400",
+    },
+
     // Step cards
     stepCard: {
         padding: 16,
@@ -89,6 +115,7 @@ const styles = StyleSheet.create({
     stepText: {
         flex: 1,
         fontSize: 16,
+        textAlign: "justify",
         lineHeight: 22,
         fontWeight: "400",
     },

@@ -344,14 +344,15 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 24,
-        marginTop: 24,
+        paddingTop: 12,
+        paddingHorizontal: 24,
     },
 
     // Info top
     degreeText: {
         fontSize: 36,
         fontWeight: 'bold',
+        marginTop: 48,
         marginBottom: 4,
     },
     locationText: {
@@ -504,7 +505,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 6,
         paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         borderRadius: 20,
         borderWidth: 1,
     },

@@ -435,6 +435,7 @@ export default function SettingsScreen() {
                     <View style={[styles.divider, { borderColor: theme.divider }]}></View>
 
                     <View style={styles.statusRow}>
+                        {/* Prayers Status */}
                         <Text style={[styles.statusText, { color: theme.text2 }]}>
                             {prayerTimes ? (tr("labels.loaded")) : (tr("labels.notLoaded"))}
                         </Text>
@@ -489,7 +490,7 @@ export default function SettingsScreen() {
                         />
                     </View>
 
-                    {/* ------ notifications (show only if notificationPermission=true) ------ */}
+                    {/* ------ Notifications (show only if notificationPermission=true) ------ */}
                     {deviceSettings.notificationPermission && (
                         <>
                             {/* Divider */}
