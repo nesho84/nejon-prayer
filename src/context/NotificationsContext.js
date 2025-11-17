@@ -32,6 +32,9 @@ export function NotificationsProvider({ children }) {
     const [isLoading, setIsLoading] = useState(false);
     const [notifError, setNotifError] = useState(null);
 
+    // Ref to prevent race conditions
+    const schedulingInProgress = useRef(false);
+
     const { deviceSettings, isReady: settingsReady } = useAppContext();
     const { prayerTimes, isReady: prayersReady } = usePrayersContext();
     const { language, tr } = useTranslation();
@@ -58,7 +61,6 @@ export function NotificationsProvider({ children }) {
     // Save notifications settings to MMKV storage (top-level updates)
     // ------------------------------------------------------------
     const saveNotifSettings = useCallback((updates) => {
-        setIsLoading(true);
         setNotifError(null);
         try {
             setNotifSettings((prev) => {
@@ -69,8 +71,6 @@ export function NotificationsProvider({ children }) {
         } catch (err) {
             console.warn("⚠️ Failed to save notification settings", err);
             setNotifError(err.message);
-        } finally {
-            setIsLoading(false);
         }
     }, []);
 
@@ -78,7 +78,6 @@ export function NotificationsProvider({ children }) {
     // Save individual prayer notifications settings to MMKV storage (nested updates)
     // ------------------------------------------------------------
     const savePrayerNotifSettings = useCallback((prayer, updates) => {
-        setIsLoading(true);
         setNotifError(null);
         try {
             setNotifSettings((prev) => {
@@ -98,8 +97,6 @@ export function NotificationsProvider({ children }) {
         } catch (err) {
             console.warn("⚠️ Failed to save prayer notification settings", err);
             setNotifError(err.message);
-        } finally {
-            setIsLoading(false);
         }
     }, []);
 
@@ -116,8 +113,10 @@ export function NotificationsProvider({ children }) {
     useEffect(() => {
         if (!settingsReady || !prayersReady) return;
         if (!deviceSettings?.notificationPermission || !prayerTimes) return;
+        if (schedulingInProgress.current) return;
 
         let mounted = true;
+        schedulingInProgress.current = true;
 
         (async () => {
             try {
@@ -125,24 +124,32 @@ export function NotificationsProvider({ children }) {
             } catch (err) {
                 console.warn("⚠️ Failed to schedule notifications:", err);
             } finally {
+                schedulingInProgress.current = false;
                 if (mounted) setIsReady(true);
             }
         })();
 
-        if (mounted) setIsReady(true);
-
-        return () => { mounted = false; };
-    }, [settingsReady, deviceSettings?.notificationPermission, language, prayersReady, prayerTimes, notifSettings]);
+        return () => {
+            mounted = false;
+            schedulingInProgress.current = false;
+        };
+    }, [settingsReady, deviceSettings?.notificationPermission, prayersReady, prayerTimes, notifSettings, language, tr]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee
     // ------------------------------------------------------------
     useEffect(() => {
-        return notifee.onForegroundEvent(async ({ type, detail }) => {
+        const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
             const { notification, pressAction } = detail;
             if (!notification) return;
-            await handleNotificationEvent(type, notification, pressAction, 'foreground');
+
+            try {
+                await handleNotificationEvent(type, notification, pressAction, 'foreground');
+            } catch (err) {
+                console.error('Failed to handle notification event:', err);
+            }
         });
+        return () => { unsubscribe(); };
     }, []);
 
     // ------------------------------------------------------------

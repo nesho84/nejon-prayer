@@ -30,7 +30,8 @@ export default function AbdesiScreen() {
             >
 
                 {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.danger }]}>
+                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
+                    <Text style={[styles.headerIcon]}>✨</Text>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
                         {tr("abdesi.headerTitle")}
                     </Text>
@@ -43,8 +44,8 @@ export default function AbdesiScreen() {
                 {steps.map((step) => (
                     <AppCard key={step.id} style={[styles.stepCard, { backgroundColor: theme.card }]}>
                         <View style={styles.stepHeader}>
-                            <View style={[styles.stepNumberCircle, { backgroundColor: theme.danger }]}>
-                                <Text style={[styles.stepNumber, { color: theme.white }]}>{step.id}</Text>
+                            <View style={[styles.stepNumberCircle, { backgroundColor: theme.secondary }]}>
+                                <Text style={[styles.stepNumber, { color: theme.card }]}>{step.id}</Text>
                             </View>
                             <Text style={[styles.stepText, { color: theme.text2 }]}>{step.text}</Text>
                         </View>
@@ -77,10 +78,14 @@ const styles = StyleSheet.create({
     // Header card
     headerCard: {
         alignItems: "center",
-        paddingVertical: 28,
+        paddingVertical: 22,
         paddingHorizontal: 16,
         borderLeftWidth: 2,
         borderRightWidth: 2,
+    },
+    headerIcon: {
+        fontSize: 40,
+        marginBottom: 8,
     },
     headerTitle: {
         fontSize: 25,
@@ -90,6 +95,7 @@ const styles = StyleSheet.create({
     headerSubtitle: {
         fontSize: 13,
         fontWeight: "400",
+        textAlign: "center",
     },
 
     // Step cards
@@ -99,14 +105,16 @@ const styles = StyleSheet.create({
     stepHeader: {
         flexDirection: "row",
         alignItems: "center",
+        gap: 12,
     },
     stepNumberCircle: {
+        alignSelf: "flex-start",
         width: 32,
         height: 32,
         borderRadius: 16,
         alignItems: "center",
         justifyContent: "center",
-        marginRight: 12,
+        marginTop: 2,
     },
     stepNumber: {
         fontSize: 15,

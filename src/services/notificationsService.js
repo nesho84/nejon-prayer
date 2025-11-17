@@ -85,7 +85,7 @@ const getNotificationActions = (type, tr) => {
 // ------------------------------------------------------------
 // Create notification channels once (Android only)
 // ------------------------------------------------------------
-export const createNotificationChannels = async (notifSettings) => {
+const createNotificationChannels = async (notifSettings) => {
     if (Platform.OS !== 'android') return;
 
     try {
@@ -110,15 +110,15 @@ export const createNotificationChannels = async (notifSettings) => {
 
         // Channel 1: Prayer notifications (5 daily prayers)
         await notifee.createChannel({
-            id: `prayer-notif-channel-vib-${vibration}`,
-            name: "Prayer Notifications",
+            id: `prayer-vib-${vibration}`,
+            name: "Prayer Notifications Channel",
             description: "Notifications for daily prayer times",
             ...channelConfig,
         });
-        // Channel 2: General notifications (reminders, Imsak, Sunrise)
+        // Channel 2: General notifications (reminders, Imsak, Sunrise, etc.)
         await notifee.createChannel({
-            id: `general-notif-channel-vib-${vibration}`,
-            name: 'General Notifications',
+            id: `general-vib-${vibration}`,
+            name: 'General Notifications Channel',
             description: "Reminders and event notifications",
             ...channelConfig,
         });
@@ -130,7 +130,7 @@ export const createNotificationChannels = async (notifSettings) => {
 // ------------------------------------------------------------
 // Cancel all scheduled notifications
 // ------------------------------------------------------------
-export const cancelPrayerNotifications = async () => {
+const cancelPrayerNotifications = async () => {
     try {
         const scheduled = await notifee.getTriggerNotifications();
         const validTypes = ['prayer-notification', 'prayer-reminder', 'event-notification'];
@@ -162,7 +162,7 @@ async function cancelDisplayedNotification(notificationId) {
 // ------------------------------------------------------------
 // Parse a time string and return trigger time (today or tomorrow)
 // ------------------------------------------------------------
-export function getTriggerTime(timeStringRaw, prayerName, offsetMinutes = 0) {
+function getTriggerTime(timeStringRaw, prayerName, offsetMinutes = 0) {
     // Normalize: trim whitespace and replace non-breaking spaces
     const timeString = String(timeStringRaw).replace(/\u00A0/g, " ").trim();
 
@@ -196,19 +196,15 @@ export function getTriggerTime(timeStringRaw, prayerName, offsetMinutes = 0) {
 }
 
 // ------------------------------------------------------------
-// Check if scheduled notifications are up-to-date
-// Performs two operations:
-// 1. Cancels notifications for disabled prayers/events
-// 2. Checks if enabled notifications match current settings
+// Cancels notifications for disabled prayers/events
 // ------------------------------------------------------------
-export async function syncPrayerNotifications(settings) {
-    const { prayerTimes, notifSettings, language } = settings;
+async function cancelDisabledNotifications(settings) {
+    const { notifSettings } = settings;
 
     try {
         // Get all currently scheduled trigger notifications
         const scheduled = await notifee.getTriggerNotifications();
 
-        // Step 1: Cancel notifications for disabled items
         for (const { notification } of scheduled) {
             const prayer = notification?.data?.prayer;
             if (prayer && notifSettings?.prayers?.[prayer]?.enabled === false) {
@@ -216,15 +212,29 @@ export async function syncPrayerNotifications(settings) {
                 console.log(`🚫 Canceled Notification for: ${prayer}`);
             }
         }
+    } catch (err) {
+        console.error('Error during notification cancel', err);
+    }
+}
 
-        // Step 2: Check if remaining enabled items are up-to-date
+// ------------------------------------------------------------
+// Check if scheduled notifications are up-to-date
+// ------------------------------------------------------------
+async function syncPrayerNotifications(settings) {
+    const { prayerTimes, notifSettings, language } = settings;
+
+    try {
+        // Get all currently scheduled trigger notifications
+        const scheduled = await notifee.getTriggerNotifications();
+
+        // Check if remaining enabled notifications are up-to-date
         const areUpToDate = NOTIFICATIONS.every(({ name }) => {
-            // Skip disabled items (they're up-to-date by definition)
+            // Skip disabled notifications (they're up-to-date by definition)
             if (notifSettings?.prayers?.[name]?.enabled === false) return true;
 
             const timeString = prayerTimes[name];
 
-            // Skip items without a time (no prayer time available)
+            // Skip notifications without a time (no prayer time available)
             if (!timeString) return true;
 
             // Find scheduled notification
@@ -266,7 +276,7 @@ export async function syncPrayerNotifications(settings) {
 
         return areUpToDate;
     } catch (err) {
-        console.error('Error during notification cancel/reschedule check:', err);
+        console.error('Error during notification reschedule check:', err);
         return false; // Force reschedule on error
     }
 }
@@ -279,6 +289,9 @@ export async function schedulePrayerNotifications(settings) {
 
     // Guard: Ensure required data is available
     if (!prayerTimes || !notifSettings) return;
+
+    // Cancel notifications for disabled prayers/events
+    await cancelDisabledNotifications(settings);
 
     // Check if anything changed and if rescheduling is needed
     const isUpToDate = await syncPrayerNotifications(settings);
@@ -300,7 +313,7 @@ export async function schedulePrayerNotifications(settings) {
 
         // Schedule notifications for each enabled prayer/event
         for (const { name, type } of NOTIFICATIONS) {
-            // Skip disabled items
+            // Skip disabled notifications
             if (notifSettings?.prayers?.[name]?.enabled === false) continue;
 
             const timeString = prayerTimes[name];
@@ -320,7 +333,7 @@ export async function schedulePrayerNotifications(settings) {
             const nConfig = NOTIFICATION_CONFIG[type];
             const notifId = getNotificationId(name);
             const notifBody = `${tr(nConfig.notifBody)} (${timeString})`;
-            const channelId = `${nConfig.channel}-notif-channel-vib-${notifSettings?.vibration ?? 'on'}`;
+            const channelId = `${nConfig.channel}-vib-${notifSettings?.vibration}`;
             const actions = getNotificationActions(type, tr);
 
             // Create the trigger notification
@@ -337,7 +350,7 @@ export async function schedulePrayerNotifications(settings) {
                         reminderBody: type === 'prayer' ? tr("labels.prayerRemindBody") : "",
                         language: language,
                         volume: String(notifSettings?.volume ?? 1.0),
-                        vibration: notifSettings?.vibration ?? 'on',
+                        vibration: notifSettings?.vibration,
                         snooze: String(notifSettings?.snooze ?? 5),
                         offset: String(offsetMinutes),
                     },
@@ -436,17 +449,17 @@ export async function handleNotificationEvent(type, notification, pressAction, s
 
                 case 'snooze':
                     // Snooze button pressed (prayers only)
-                    // Cancel current notification and schedule a reminder
                     console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
                     await cancelDisplayedNotification(notification.id);
 
                     try {
                         const reminderConfig = NOTIFICATION_CONFIG['reminder'];
+                        const channelId = `${reminderConfig.channel}-vib-${vibration}`;
 
                         // Schedule a reminder notification after snooze duration
                         await notifee.createTriggerNotification(
                             {
-                                id: `prayer-reminder-${prayer}`,
+                                id: `prayer-reminder-${prayer}-${Date.now()}`,
                                 title: reminderTitle,
                                 body: reminderBody,
                                 data: {
@@ -459,7 +472,7 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                     offset: String(offset),
                                 },
                                 android: {
-                                    channelId: `${reminderConfig.channel}-notif-channel-vib-${vibration}`,
+                                    channelId: channelId,
                                     showTimestamp: true,
                                     smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
                                     largeIcon: require('../../assets/images/past.png'), // Custom large icon

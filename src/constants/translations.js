@@ -29,6 +29,37 @@ export const translations = {
             step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
         },
 
+        // Namazi
+        namazi: {
+            // Namazi tab
+            namaziTab: "PRAYER",
+            headerTitle: "How to Pray",
+            headerSubtitle: "Basic guide to 2-rak'ah prayer",
+            step1: "Stand facing the Qiblah and make intention in your heart. Raise your hands until your thumbs touch your earlobes and say 'Allahu Akbar' (Allah is the Greatest). Men: Fingers naturally spread, not too tight. Women: Hands up to shoulders.",
+            step2: "Place your right hand over the left below the navel (men) or on the chest (women). Recite Subhanaka:\n\n'Subhaanaka Allaahumma wa bihamdika wa tabaarakasmuka wa ta'aalaa jadduka wa laa ilaaha ghayruk.'\n\n(Glory be to You, O Allah, and praise be to You. Blessed is Your name, exalted is Your majesty, and there is no god but You.)",
+            step3: "Recite A'udhu, Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar):\n\n'A'udhu billahi minash-shaytaanir-rajeem. Bismillahir-Rahmaanir-Raheem...'\n\nThen Fatiha + a Surah. Feet parallel, 4 fingers apart (men).",
+            step4: "Say 'Allahu Akbar' and bow into Ruku. Back straight, head in line with back, hands on knees with fingers spread (men) or closed (women). Say 3 times:\n\n'Subhaana Rabbiyal Adheem.'\n\n(Glory be to my Lord, the Most Great.)\n\nEyes looking at the place of prostration.",
+            step5: "Rise from Ruku saying 'Sami Allahu liman hamidah' and when fully upright say:\n\n'Rabbanaa wa lakal hamd.'\n\n(Allah hears those who praise Him. Our Lord, all praise is for You.)\n\nHands by your sides.",
+            step6: "Say 'Allahu Akbar' and prostrate in Sajdah. 7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. Men: stomach raised, thighs away from shins, arms away from sides. Women: body compact. Say 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n\n(Glory be to my Lord, the Most High.)",
+            step7: "Say 'Allahu Akbar' and sit up. Left foot flat (men), right foot with toes towards Qiblah. Women: both feet to the right. Stay briefly in this position. You may say:\n\n'Rabbighfir lee, Rabbighfir lee.'\n\n(My Lord, forgive me. My Lord, forgive me.)",
+            step8: "Say 'Allahu Akbar' and prostrate again in the second Sajdah with the same position as step 6. Say 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n\nThis completes the first Rak'ah.",
+            step9: "Say 'Allahu Akbar' and stand up for the second Rak'ah. Do not raise your hands this time. Repeat steps 3 and 4: Recite Fatiha + Surah, perform Ruku.",
+            step10: "After the Ruku of the second Rak'ah, perform steps 5, 6, 7, and 8 (rise from Ruku, perform two Sajdahs).",
+            step11: "After the second Sajdah of the second Rak'ah, say 'Allahu Akbar' and sit in Qa'dah (final sitting). Recite Tashahhud, Durood Ibrahim, and supplications. The right index finger is raised when bearing witness.",
+            step12: "Turn your head to the right and say 'Assalamu alaikum wa rahmatullah', then turn left and say the same. The prayer is complete. You may make dua after the prayer.",
+            footerText: "This is a basic guide to praying 2 rak'ahs. For full details, the exact number of rak'ahs for each prayer, and specific rules, please consult scholars or see the prayer table.",
+            // Tabela e rekateve tab
+            rekatetTab: "TABLE OF RAKAT",
+            tableNameHeader: "prayer",
+            tableRekatetLabel: "rakat",
+            tableSunnetHeader: "Sunnah",
+            tableFarzHeader: "Fard",
+            tableVitriHeader: "Witr",
+            tableTitle: "Table of rak'ahs",
+            tableSubtitle: "Prayer consists of parts called rak'ahs.",
+            tableFooter: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
+        },
+
         // Ramazani
         ramazani: {
             headerTitle: "Ramadan Guidance",
@@ -217,6 +248,37 @@ export const translations = {
             step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
         },
 
+        // Namazi
+        namazi: {
+            // Namazi tab
+            namaziTab: "NAMAZI",
+            headerTitle: "Falja e namazit",
+            headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
+            step1: "Qëndro drejt Kibles dhe bëj nijet me zemër. Ngriti duart deri sa gishti i madh të prekë veshin dhe thuaj 'Allahu Ekber' (Allahu është më i Madhi). Burrat: Gishtat hapurshëm dhe jo tepër të shtrënguar. Gratë: Duart deri në sup.",
+            step2: "Vendosi dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti o Allah dhe i Lavdëruar, i Bekuar është emri Yt, e lartë është Madhëria Jote dhe s'ka zot tjetër përveç Teje.)",
+            step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther):\n\n'Eudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...'\n\nPastaj Fatiha + një sure. Këmbët paralele, me largësi 4 gishta (burrat).",
+            step4: "Thuaj 'Allahu Ekber' dhe përkulju në Ruku. Shpina e drejtë, kokë në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). Thuaj 3 herë:\n\n'Subhane Rabbijel Adhim.'\n\n(I Shenjtë është Zoti im, i Madhi.)\n\nSytë nga vendi i Sexhdes.",
+            step5: "Ngrihu nga Ruku duke thënë 'Semi Allahu limen hamideh' dhe kur je drejtuar tërësisht thuaj:\n\n'Rabbena ve lekel hamd.'\n\n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.)\n\nDuart anash trupit.",
+            step6: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. 7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. Burrat: bërryla e ngritur, bërryti larg nga kërciri, krahët larg nga brinjët. Gratë: të grumbulluar. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\n(I Shenjtë është Zoti im, më i Larti.)",
+            step7: "Thuaj 'Allahu Ekber' dhe ngrihu ulur. Këmba e majtë e shtrirë (burrat), e djathta me gishta nga Kibla. Gratë: të dy këmbët djathtas. Qëndro pak në këtë pozicion. Mund të thuash:\n\n'Rabbigfir li, Rabbigfir li.'\n\n(O Zoti im më fal, o Zoti im më fal.)",
+            step8: "Thuaj 'Allahu Ekber' dhe bie përsëri në Sexhde të dytë me të njëjtin pozicion si hapi 6. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\nKjo përfundon Rekatin e parë.",
+            step9: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për rekatin e dytë. Mos ngriti duart këtë herë. Përsërit hapin 3 dhe 4: Lexo Fatiha + sure, bëj Ruku.",
+            step10: "Pas Rukus së rekatit të dytë, kryej hapat 5, 6, 7 dhe 8 (ngrihe nga Ruku, bëj dy Sexhde).",
+            step11: "Pas Sexhdes së dytë të rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). Lexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë. Gishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
+            step12: "Kthe kokën djathtas dhe thuaj 'Es-selamu alejkum ve rahmetullah', pastaj ktheje majtas dhe thuaj të njëjtën. Namazi përfundon. Mund të bësh dua pas namazit.",
+            footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numër të saktë të rekatëve për çdo namaz, dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e namazeve.",
+            // Tabela e rekateve tab
+            rekatetTab: "TABELA E REKATEVE",
+            tableNameHeader: "namazi",
+            tableRekatetLabel: "rekate",
+            tableSunnetHeader: "Sunnet",
+            tableFarzHeader: "Farz",
+            tableVitriHeader: "Vitri",
+            tableTitle: "Tabela e rekateve",
+            tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
+            tableFooter: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër."
+        },
+
         // Ramazani
         ramazani: {
             headerTitle: "Udhëzime për Ramazan",
@@ -403,6 +465,37 @@ export const translations = {
             step8: "Wische mit nassen Händen über deine Ohren.",
             step9: "Wasche zuerst den rechten Fuß, dann den linken bis zu den Knöcheln drei Mal.",
             step10: "Sprich abschließend:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Ich bezeuge, dass es keinen Gott außer Allah gibt, der einzig ist, ohne Partner, und dass Muhammad sein Diener und Gesandter ist).",
+        },
+
+        // Namazi
+        namazi: {
+            // Namazi tab
+            namaziTab: "GEBET",
+            headerTitle: "Wie man betet",
+            headerSubtitle: "Grundlegende Anleitung zum 2-Rak'ah-Gebet",
+            step1: "Stehe in Richtung Qibla und fasse die Absicht (Niyya) im Herzen. Hebe die Hände, bis die Daumen die Ohrläppchen berühren und sage 'Allahu Akbar' (Allah ist der Größte). Männer: Finger natürlich gespreizt. Frauen: Hände bis zu den Schultern.",
+            step2: "Lege die rechte Hand über die linke unterhalb des Nabels (Männer) oder auf der Brust (Frauen). Rezitiere Subhanaka:\n\n'Subhaanaka Allaahumma wa bihamdika wa tabaarakasmuka wa ta'aalaa jadduka wa laa ilaaha ghayruk.'\n\n(Gepriesen seist Du, o Allah, und gelobt seist Du. Gesegnet ist Dein Name, erhaben ist Deine Herrschaft, und es gibt keinen Gott außer Dir.)",
+            step3: "Rezitiere A'udhu, Bismillah, dann Sura Fatiha und eine weitere Sura (wie Ikhlas oder Kawthar):\n\n'A'udhu billahi minash-shaytaanir-rajeem. Bismillahir-Rahmaanir-Raheem...'\n\nDann Fatiha + eine Sura. Füße parallel, 4 Finger Abstand (Männer).",
+            step4: "Sage 'Allahu Akbar' und beuge dich in Ruku. Rücken gerade, Kopf in einer Linie mit dem Rücken, Hände auf den Knien mit gespreizten Fingern (Männer) oder geschlossenen (Frauen). Sage 3-mal:\n\n'Subhaana Rabbiyal Adheem.'\n\n(Gepriesen sei mein Herr, der Allgewaltige.)\n\nAugen auf die Stelle der Niederwerfung gerichtet.",
+            step5: "Erhebe dich aus Ruku und sage 'Sami Allahu liman hamidah', und wenn du vollständig aufrecht stehst, sage:\n\n'Rabbanaa wa lakal hamd.'\n\n(Allah hört denjenigen, der Ihn lobpreist. Unser Herr, Dir gebührt alles Lob.)\n\nHände an den Seiten.",
+            step6: "Sage 'Allahu Akbar' und wirf dich in Sajdah (Niederwerfung). 7 Punkte müssen den Boden berühren: Stirn, Nase, beide Handflächen, beide Knie und Zehenspitzen beider Füße. Männer: Bauch angehoben, Oberschenkel von Unterschenkeln weg, Arme von den Seiten weg. Frauen: Körper kompakt. Sage 3-mal:\n\n'Subhaana Rabbiyal A'laa.'\n\n(Gepriesen sei mein Herr, der Allerhöchste.)",
+            step7: "Sage 'Allahu Akbar' und setze dich auf. Linker Fuß flach (Männer), rechter Fuß mit Zehen zur Qibla. Frauen: beide Füße nach rechts. Verweile kurz in dieser Position. Du kannst sagen:\n\n'Rabbighfir lee, Rabbighfir lee.'\n\n(Mein Herr, vergib mir. Mein Herr, vergib mir.)",
+            step8: "Sage 'Allahu Akbar' und wirf dich erneut in die zweite Sajdah mit derselben Position wie in Schritt 6. Sage 3-mal:\n\n'Subhaana Rabbiyal A'laa.'\n\nDamit ist das erste Rakat abgeschlossen.",
+            step9: "Sage 'Allahu Akbar' und stehe für das zweite Rakat auf. Hebe diesmal nicht die Hände. Wiederhole die Schritte 3 und 4: Rezitiere Fatiha + Sura, führe Ruku aus.",
+            step10: "Nach dem Ruku des zweiten Rakats führe die Schritte 5, 6, 7 und 8 aus (erhebe dich aus Ruku, vollziehe zwei Sajdahs).",
+            step11: "Nach der zweiten Sajdah des zweiten Rakats sage 'Allahu Akbar' und setze dich in Qa'dah (abschließendes Sitzen). Rezitiere Tashahhud, Durood Ibrahim und Bittgebete. Der rechte Zeigefinger wird beim Glaubensbekenntnis erhoben.",
+            step12: "Drehe deinen Kopf nach rechts und sage 'Assalamu alaikum wa rahmatullah', dann nach links und sage dasselbe. Das Gebet ist abgeschlossen. Du kannst nach dem Gebet Dua machen.",
+            footerText: "Dies ist eine kurze Anleitung zum Verrichten von zwei Rak'ahs. Für detaillierte Informationen, die genaue Anzahl der Rak'ahs für jedes Gebet und spezifische Regeln konsultieren Sie bitte Gelehrte oder die Gebetstabelle.",
+            // Tabela e rekateve tab
+            rekatetTab: "TABELLE DER RAKAT",
+            tableNameHeader: "Gebet",
+            tableRekatetLabel: "Rakat",
+            tableSunnetHeader: "Sunna",
+            tableFarzHeader: "Pflicht",
+            tableVitriHeader: "Witr",
+            tableTitle: "Tabelle der Rak'ahs",
+            tableSubtitle: "Das Gebet besteht aus Teilen, die Rak'ahs genannt werden.",
+            tableFooter: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
         },
 
         // Ramazani

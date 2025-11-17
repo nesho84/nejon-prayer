@@ -86,7 +86,8 @@ export default function RamadanScreen() {
             >
 
                 {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.success }]}>
+                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.accent }]}>
+                    <Text style={[styles.headerIcon]}>🌙</Text>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
                         {tr("ramazani.headerTitle")}
                     </Text>
@@ -104,7 +105,7 @@ export default function RamadanScreen() {
                                 {item.title}
                             </Text>
                         </View>
-                        <Text style={[styles.sectionDesc, { color: theme.placeholder, textAlign: "justify" }]}>
+                        <Text style={[styles.sectionDesc, { color: theme.placeholder }]}>
                             {item.desc}
                         </Text>
 
@@ -169,10 +170,14 @@ const styles = StyleSheet.create({
     // Header card
     headerCard: {
         alignItems: "center",
-        paddingVertical: 28,
+        paddingVertical: 22,
         paddingHorizontal: 16,
         borderLeftWidth: 2,
         borderRightWidth: 2,
+    },
+    headerIcon: {
+        fontSize: 40,
+        marginBottom: 8,
     },
     headerTitle: {
         fontSize: 25,
@@ -182,6 +187,7 @@ const styles = StyleSheet.create({
     headerSubtitle: {
         fontSize: 13,
         fontWeight: "400",
+        textAlign: "center",
     },
 
     // Section cards
@@ -206,6 +212,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         lineHeight: 20,
         fontWeight: "400",
+        textAlign: "justify",
         marginBottom: 16,
     },
 

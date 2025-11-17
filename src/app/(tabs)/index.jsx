@@ -100,14 +100,14 @@ export default function HomeScreen() {
 
         if (!enabled)
             // return (props) => <Ionicons name="notifications-off-outline" {...props} style={[props.style, { opacity: 0.3 }]} />;
-            return (props) => <MaterialCommunityIcons name="bell-off-outline" {...props} style={[props.style, { opacity: 0.3 }]} />;
+            return (props) => <MaterialCommunityIcons name="bell-off-outline" {...props} style={[props.style, { opacity: 0.3, paddingBottom: 1 }]} />;
         if (enabled && pst.offset === 0)
             // return (props) => <Ionicons name="notifications-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
-            return (props) => <MaterialCommunityIcons name="bell-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
+            return (props) => <MaterialCommunityIcons name="bell-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
         if (enabled && pst.offset !== 0)
             // return (props) => <Ionicons name="timer-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
             // return (props) => <MaterialCommunityIcons name="progress-clock" {...props} style={[props.style, { opacity: 0.6 }]} />;
-            return (props) => <MaterialCommunityIcons name="bell-cog-outline" {...props} style={[props.style, { opacity: 0.6 }]} />;
+            return (props) => <MaterialCommunityIcons name="bell-cog-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
 
         return (props) => <Ionicons name="notifications-outline" {...props} />;
     };
