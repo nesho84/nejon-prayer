@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { Appearance } from "react-native";
 import { storage } from "@/utils/storage";
-import { darkTheme, lightTheme } from "@/constants/colors";
+import { DARKTHEME, LIGHTTHEME } from "@/constants/colors";
 
 export const ThemeContext = createContext();
 
@@ -10,7 +10,7 @@ const THEME_KEY = "@theme_key";
 
 export function ThemeProvider({ children }) {
     const [themeMode, setThemeMode] = useState("system"); // "light" | "dark" | "system"
-    const [theme, setTheme] = useState(lightTheme); // actual theme object for UI
+    const [theme, setTheme] = useState(LIGHTTHEME); // actual theme object for UI
     const [resolvedTheme, setResolvedTheme] = useState("light"); // "light" or "dark"
     const [isReady, setIsReady] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export function ThemeProvider({ children }) {
         const system = Appearance.getColorScheme() || "light";
         const finalMode = mode === "system" ? system : mode;
         setResolvedTheme(finalMode);
-        return finalMode === "dark" ? darkTheme : lightTheme;
+        return finalMode === "dark" ? DARKTHEME : LIGHTTHEME;
     }, []);
 
     // ------------------------------------------------------------
@@ -44,7 +44,7 @@ export function ThemeProvider({ children }) {
         } catch (err) {
             console.warn("⚠️ Failed to load theme, defaulting to system", err);
             setThemeMode("system");
-            setTheme(lightTheme);
+            setTheme(LIGHTTHEME);
         } finally {
             setLoading(false);
             setIsReady(true);
@@ -83,7 +83,7 @@ export function ThemeProvider({ children }) {
         const listener = ({ colorScheme }) => {
             const newResolvedName = colorScheme || "light";
             setResolvedTheme(newResolvedName);
-            setTheme(newResolvedName === "dark" ? darkTheme : lightTheme);
+            setTheme(newResolvedName === "dark" ? DARKTHEME : LIGHTTHEME);
         };
 
         const subscription = Appearance.addChangeListener(listener);

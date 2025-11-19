@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: "100%",
-        height: 161,
+        padding: 10,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 16,

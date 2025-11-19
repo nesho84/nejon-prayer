@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
 import { storage } from "@/utils/storage";
-import notifee from "@notifee/react-native";
+import notifee, { AndroidColor } from "@notifee/react-native";
 import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
-import { schedulePrayerNotifications, handleNotificationEvent } from '@/services/notificationsService';
+import { scheduleNotifications, handleNotificationEvent } from '@/services/notificationsService';
+
+import { DEFAULT_NOTIFICATION_SETTINGS } from "@/constants/notifications"; // this is work in progress!
 
 export const NotificationsContext = createContext();
 
@@ -120,7 +122,7 @@ export function NotificationsProvider({ children }) {
 
         (async () => {
             try {
-                await schedulePrayerNotifications({ prayerTimes, notifSettings, language, tr });
+                await scheduleNotifications({ prayerTimes, notifSettings, language, tr });
             } catch (err) {
                 console.warn("⚠️ Failed to schedule notifications:", err);
             } finally {

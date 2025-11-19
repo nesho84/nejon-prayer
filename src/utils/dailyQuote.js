@@ -1,7 +1,7 @@
 // ------------------------------------------------------------
 // AI generatede Islamic Daily Quotes
 // ------------------------------------------------------------
-const quotes = {
+const QUOTES = {
     en: [
         "Verily, in the remembrance of Allah do hearts find rest 💚 (Ar-Ra'd 13:28)",
         "Indeed, prayer prohibits immorality and wrongdoing 🌙 (Al-Ankabut 29:45)",
@@ -74,7 +74,7 @@ const quotes = {
 // Returns today's dynamic daily Quote for a given language
 // ------------------------------------------------------------
 export function getDailyQuote(language = "en", { random = false } = {}) {
-    const messages = quotes[language] || quotes["en"];
+    const messages = QUOTES[language] || QUOTES["en"];
     if (random) {
         const randomIndex = Math.floor(Math.random() * messages.length);
         return messages[randomIndex];

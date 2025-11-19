@@ -1,4 +1,4 @@
-export const translations = {
+export const TRANSLATIONS = {
     // ------------------------------------------------------------
     // English
     // ------------------------------------------------------------
@@ -254,19 +254,19 @@ export const translations = {
             namaziTab: "NAMAZI",
             headerTitle: "Falja e namazit",
             headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
-            step1: "Qëndro drejt Kibles dhe bëj nijet me zemër. Ngriti duart deri sa gishti i madh të prekë veshin dhe thuaj 'Allahu Ekber' (Allahu është më i Madhi). Burrat: Gishtat hapurshëm dhe jo tepër të shtrënguar. Gratë: Duart deri në sup.",
-            step2: "Vendosi dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti o Allah dhe i Lavdëruar, i Bekuar është emri Yt, e lartë është Madhëria Jote dhe s'ka zot tjetër përveç Teje.)",
+            step1: "Qëndro drejt Kibles dhe bëj nijetin me zemër. Ngriji duart derisa gishti i madh të prekë veshin dhe thuaj: 'Allahu Ekber' (Allahu është më i Madhi). Për burrat: Gishtat të hapur dhe jo të shtrënguar fort. Për gratë: Duart ngrihen deri në nivel të supit.",
+            step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti, o Allah, dhe i lavdëruar; i bekuar është emri Yt, e lartë është madhëria Jote dhe s’ka Zot tjetër përveç Teje.)",
             step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther):\n\n'Eudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...'\n\nPastaj Fatiha + një sure. Këmbët paralele, me largësi 4 gishta (burrat).",
             step4: "Thuaj 'Allahu Ekber' dhe përkulju në Ruku. Shpina e drejtë, kokë në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). Thuaj 3 herë:\n\n'Subhane Rabbijel Adhim.'\n\n(I Shenjtë është Zoti im, i Madhi.)\n\nSytë nga vendi i Sexhdes.",
             step5: "Ngrihu nga Ruku duke thënë 'Semi Allahu limen hamideh' dhe kur je drejtuar tërësisht thuaj:\n\n'Rabbena ve lekel hamd.'\n\n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.)\n\nDuart anash trupit.",
             step6: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. 7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. Burrat: bërryla e ngritur, bërryti larg nga kërciri, krahët larg nga brinjët. Gratë: të grumbulluar. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\n(I Shenjtë është Zoti im, më i Larti.)",
             step7: "Thuaj 'Allahu Ekber' dhe ngrihu ulur. Këmba e majtë e shtrirë (burrat), e djathta me gishta nga Kibla. Gratë: të dy këmbët djathtas. Qëndro pak në këtë pozicion. Mund të thuash:\n\n'Rabbigfir li, Rabbigfir li.'\n\n(O Zoti im më fal, o Zoti im më fal.)",
             step8: "Thuaj 'Allahu Ekber' dhe bie përsëri në Sexhde të dytë me të njëjtin pozicion si hapi 6. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\nKjo përfundon Rekatin e parë.",
-            step9: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për rekatin e dytë. Mos ngriti duart këtë herë. Përsërit hapin 3 dhe 4: Lexo Fatiha + sure, bëj Ruku.",
-            step10: "Pas Rukus së rekatit të dytë, kryej hapat 5, 6, 7 dhe 8 (ngrihe nga Ruku, bëj dy Sexhde).",
+            step9: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për rekatin e dytë. Mos i ngrit duart këtë herë. Përsërit hapin 3 dhe 4: lexo Fatiha + sure, bëj ruku.",
+            step10: "Pas Rukus së rekatit të dytë, kryej hapat 5, 6, 7 dhe 8 (ngrihu nga Ruku, bëj dy Sexhde).",
             step11: "Pas Sexhdes së dytë të rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). Lexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë. Gishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
             step12: "Kthe kokën djathtas dhe thuaj 'Es-selamu alejkum ve rahmetullah', pastaj ktheje majtas dhe thuaj të njëjtën. Namazi përfundon. Mund të bësh dua pas namazit.",
-            footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numër të saktë të rekatëve për çdo namaz, dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e namazeve.",
+            footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numrin e saktë të rekatëve për çdo namaz dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e rekateve.",
             // Tabela e rekateve tab
             rekatetTab: "TABELA E REKATEVE",
             tableNameHeader: "namazi",

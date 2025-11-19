@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { translations } from "@/constants/translations";
+import { TRANSLATIONS } from "@/constants/translations";
 import { useAppContext } from "@/context/AppContext";
 
 export default function useTranslation() {
@@ -12,7 +12,7 @@ export default function useTranslation() {
     // ------------------------------------------------------------
     const tr = useMemo(() => (path) => {
         const keys = path.split(".");
-        let result = translations[language];
+        let result = TRANSLATIONS[language];
         for (const key of keys) {
             result = result?.[key];
         }

@@ -1,4 +1,4 @@
-export const lightTheme = {
+export const LIGHTTHEME = {
     // Background layers
     bg: "#ffffff",
     bg2: "#f9fafb",
@@ -45,7 +45,7 @@ export const lightTheme = {
     transparent: "transparent",
 };
 
-export const darkTheme = {
+export const DARKTHEME = {
     // Background layers
     bg: "#121212",
     bg2: "#1e1e1e",

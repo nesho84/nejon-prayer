@@ -22,76 +22,18 @@ export default function NamaziScreen() {
 
     // Prayer tab data
     const steps = [
-        {
-            id: 1,
-            text: tr("namazi.step1"),
-            // image: require("../../../assets/images/namazi/step1.png")
-            image: null,
-        },
-        {
-            id: 2,
-            text: tr("namazi.step2"),
-            // image: require("../../../assets/images/namazi/step2.png")
-            image: null,
-        },
-        {
-            id: 3,
-            text: tr("namazi.step3"),
-            // image: require("../../../assets/images/namazi/step3.png")
-            image: null,
-        },
-        {
-            id: 4,
-            text: tr("namazi.step4"),
-            // image: require("../../../assets/images/namazi/step4.png")
-            image: null,
-        },
-        {
-            id: 5,
-            text: tr("namazi.step5"),
-            // image: require("../../../assets/images/namazi/step5.png")
-            image: null,
-        },
-        {
-            id: 6,
-            text: tr("namazi.step6"),
-            // image: require("../../../assets/images/namazi/step6.png")
-            image: null,
-        },
-        {
-            id: 7,
-            text: tr("namazi.step7"),
-            // image: require("../../../assets/images/namazi/step7.png")
-            image: null,
-        },
-        {
-            id: 8,
-            text: tr("namazi.step8"),
-            // image: require("../../../assets/images/namazi/step8.png")
-            image: null,
-        },
-        {
-            id: 9,
-            text: tr("namazi.step9"),
-            // image: require("../../../assets/images/namazi/step9.png")
-            image: null,
-        },
-        {
-            id: 10,
-            text: tr("namazi.step10"),
-            // image: require("../../../assets/images/namazi/step10.png")
-            image: null,
-        },
-        {
-            id: 11,
-            text: tr("namazi.step11"),
-            // image: require("../../../assets/images/namazi/step11.png")
-            image: null,
-        },
-        {
-            id: 12,
-            text: tr("namazi.step12")
-        },
+        { id: 1, text: tr("namazi.step1"), image: require("../../../assets/images/namazi/step1.png") },
+        { id: 2, text: tr("namazi.step2"), image: require("../../../assets/images/namazi/step2.png") },
+        { id: 3, text: tr("namazi.step3") },
+        { id: 4, text: tr("namazi.step4"), image: require("../../../assets/images/namazi/step4.png") },
+        { id: 5, text: tr("namazi.step5"), image: require("../../../assets/images/namazi/step5.png") },
+        { id: 6, text: tr("namazi.step6"), image: require("../../../assets/images/namazi/step6-8.png") },
+        { id: 7, text: tr("namazi.step7"), image: require("../../../assets/images/namazi/step7.png") },
+        { id: 8, text: tr("namazi.step8"), image: require("../../../assets/images/namazi/step6-8.png") },
+        { id: 9, text: tr("namazi.step9") },
+        { id: 10, text: tr("namazi.step10") },
+        { id: 11, text: tr("namazi.step11"), image: require("../../../assets/images/namazi/step11.png") },
+        { id: 12, text: tr("namazi.step12"), image: require("../../../assets/images/namazi/step12.png") },
     ];
 
     // ------------------------------------------------------------
@@ -124,13 +66,9 @@ export default function NamaziScreen() {
                         <Text style={[styles.stepText, { color: theme.text2 }]}>{step.text}</Text>
                     </View>
 
-                    {step.image ? (
+                    {step.image && (
                         <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
                             <Image source={step.image} style={styles.stepImage} />
-                        </View>
-                    ) : (
-                        <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
-                            <View style={styles.stepImage} />
                         </View>
                     )}
                 </AppCard>
@@ -252,6 +190,9 @@ export default function NamaziScreen() {
         </ScrollView>
     );
 
+    // ------------------------------------------------------------
+    // Tab View Scene Renderer
+    // ------------------------------------------------------------
     const renderScene = ({ route }) => {
         switch (route.key) {
             case 'steps':
@@ -360,15 +301,15 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: "100%",
-        height: 180,
+        padding: 10,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 16,
         borderRadius: 16,
     },
     stepImage: {
-        width: 160,
-        height: 160,
+        width: 241,
+        height: 241,
         borderRadius: 12,
         resizeMode: "contain",
     },
