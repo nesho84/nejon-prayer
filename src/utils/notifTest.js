@@ -36,15 +36,15 @@ export async function testNotification({ appSettings = null, notifSettings = nul
                 },
                 android: {
                     // (is created in notificationsService.js)
-                    channelId: `prayer-notif-channel-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `prayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
                     color: AndroidColor.OLIVE,
                     pressAction: { id: "default", launchActivity: "default" },
                     actions: [
-                        { title: "Dismiss", pressAction: { id: "dismiss" } },
-                        { title: "Remind me later", pressAction: { id: "snooze" } },
+                        { title: "Në rregull", pressAction: { id: "dismiss" } },
+                        { title: "Më kujto më vonë", pressAction: { id: "snooze" } },
                     ],
                     style: {
                         type: AndroidStyle.INBOX,

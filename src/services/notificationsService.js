@@ -450,7 +450,6 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                 case 'snooze':
                     // Snooze button pressed (prayers only)
                     console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
-                    await cancelDisplayedNotification(notification.id);
 
                     try {
                         const reminderConfig = NOTIFICATION_CONFIG['reminder'];
@@ -475,7 +474,6 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                     channelId: channelId,
                                     showTimestamp: true,
                                     smallIcon: 'ic_stat_prayer', // Must exist in drawable android/app/src/main/res/drawable
-                                    largeIcon: require('../../assets/images/past.png'), // Custom large icon
                                     color: reminderConfig.color,
                                     pressAction: { id: 'default', launchActivity: 'default' },
                                     actions: [
@@ -496,6 +494,9 @@ export async function handleNotificationEvent(type, notification, pressAction, s
                                 alarmManager: hasAlarm,
                             }
                         );
+
+                        // Cancel the original notification
+                        await cancelDisplayedNotification(notification.id);
                     } catch (err) {
                         console.error(`❌ ${prefix} Failed to schedule snooze reminder:`, err);
                     }
