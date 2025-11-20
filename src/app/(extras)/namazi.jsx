@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     stepImage: {
         width: 241,
         height: 241,
-        borderRadius: 50,
+        borderRadius: 12,
         resizeMode: "contain",
     },
 
