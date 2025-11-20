@@ -199,7 +199,7 @@ export const TRANSLATIONS = {
 
             // About
             aboutText1: "About this App",
-            aboutText2: "This app provides accurate prayer times based on your location. You can enable daily notifications to remind you of prayer times.",
+            aboutText2: "This app provides accurate prayer times based on your location. You can enable daily notifications to remind you of prayer times, follow a step-by-step guide, and check the Qibla direction. Designed to be simple and reliable, this app helps you maintain your prayer routine.",
         },
         buttons: {
             cancel: "Cancel",
@@ -418,7 +418,7 @@ export const TRANSLATIONS = {
 
             // About
             aboutText1: "Rreth këtij Aplikacioni",
-            aboutText2: "Ky aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t'ju kujtuar kohët e lutjeve.",
+            aboutText2: "Ky aplikacion ofron kohët e sakta të lutjeve bazuar në lokacionin tuaj. Mund të aktivizoni njoftime ditore për t’ju kujtuar kohët e lutjeve, të ndiqni udhëzues hap pas hapi, dhe të kontrolloni drejtimin e Kibles. I dizajnuar të jetë i thjeshtë dhe i besueshëm, ky aplikacion ju ndihmon të mbani rutinën tuaj të namazit.",
         },
         buttons: {
             cancel: "Anulo",
@@ -637,7 +637,7 @@ export const TRANSLATIONS = {
 
             // About
             aboutText1: "Über diese App",
-            aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie können tägliche Benachrichtigungen aktivieren, um Sie an die Gebetszeiten zu erinnern.",
+            aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie können tägliche Benachrichtigungen aktivieren, einem Schritt-für-Schritt-Leitfaden folgen und die Qibla-Richtung überprüfen. Einfach und zuverlässig gestaltet, hilft Ihnen diese App, Ihre Gebetsroutine einzuhalten.",
         },
         buttons: {
             cancel: "Abbrechen",
