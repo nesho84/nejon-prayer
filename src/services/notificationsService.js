@@ -7,7 +7,8 @@ import notifee, {
     TriggerType,
     RepeatFrequency,
     AndroidColor,
-    AndroidStyle
+    AndroidStyle,
+    AuthorizationStatus
 } from '@notifee/react-native';
 import { Platform } from 'react-native';
 
@@ -405,6 +406,18 @@ export async function scheduleNotifications(settings) {
 // Handle Notifee Notification events (Foreground & Background)
 // ------------------------------------------------------------
 export async function handleNotificationEvent(type, notification, pressAction, source = 'unknown') {
+    const prefix = source === 'background' ? '[Background]' : '[Foreground]';
+
+    // Check device-level notification permission first
+    const nf = await notifee.getNotificationSettings();
+    // Early exit: do not play sound or handle anything
+    if (nf.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
+        console.log(`[${source}] Notifications are disabled on device — ignoring event`);
+        return;
+    }
+    // Check if exact alarms are available
+    const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
+
     // Extract notification data
     const prayer = notification?.data?.prayer;
     const reminderTitle = notification?.data?.reminderTitle;
@@ -414,12 +427,6 @@ export async function handleNotificationEvent(type, notification, pressAction, s
     const vibration = notification?.data?.vibration ?? 'on';
     const snooze = Number(notification?.data?.snooze ?? 5);
     const offset = Number(notification?.data?.offset ?? 0);
-
-    // Check if exact alarms are available
-    const nf = await notifee.getNotificationSettings();
-    const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
-
-    const prefix = source === 'background' ? '[Background]' : '[Foreground]';
 
     switch (type) {
         case EventType.DELIVERED:
