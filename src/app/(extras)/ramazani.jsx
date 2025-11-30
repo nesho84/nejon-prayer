@@ -113,7 +113,7 @@ export default function RamadanScreen() {
                         <View style={styles.actionsRow}>
                             {/* Copy button */}
                             <TouchableOpacity
-                                onPress={() => handleCopy(item.id, item.title, item.text)}
+                                onPress={() => handleCopy(item.id, item.title, item.desc)}
                                 style={[styles.actionButton, { backgroundColor: theme.bg2 }]}
                             >
                                 <Feather
@@ -131,7 +131,7 @@ export default function RamadanScreen() {
 
                             {/* Share button */}
                             <TouchableOpacity
-                                onPress={() => handleShare(item.id, item.title, item.text)}
+                                onPress={() => handleShare(item.id, item.title, item.desc)}
                                 style={[styles.actionButton, { backgroundColor: theme.bg2 }]}
                             >
                                 <Feather
