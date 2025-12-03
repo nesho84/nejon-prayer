@@ -21,16 +21,8 @@ export default function PrayerModal({
 
     const options = useMemo(() => {
         return [
-            // { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "notifications-off-outline" },
             { label: `${tr('labels.offsetOff')}`, value: { enabled: false, offset: 0 }, icon: "bell-off-outline" },
-            // { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "notifications-outline" },
             { label: `${tr('labels.offsetOnTime')}`, value: { enabled: true, offset: 0 }, icon: "bell-outline" },
-            // { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "timer-outline" },
-            // { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "timer-outline" },
-            // { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "timer-outline" },
-            // { label: `30 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -30 }, icon: "timer-outline" },
-            // { label: `45 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -45 }, icon: "timer-outline" },
-            // { label: `60 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -60 }, icon: "timer-outline" },
             { label: `5 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -5 }, icon: "bell-cog-outline" },
             { label: `10 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -10 }, icon: "bell-cog-outline" },
             { label: `15 ${tr('labels.offsetMinutes')}`, value: { enabled: true, offset: -15 }, icon: "bell-cog-outline" },

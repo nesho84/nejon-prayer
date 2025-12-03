@@ -22,7 +22,7 @@ export async function testNotification({ appSettings = null, notifSettings = nul
             {
                 id: "prayer-test",
                 title: "» Sabahu «",
-                body: "Koha për namaz (06:15)",
+                body: "Koha për namaz (06:49)",
                 data: {
                     type: "prayer-notification",
                     prayer: "Sabahu",
