@@ -22,7 +22,7 @@ import { useNotificationsContext } from "@/context/NotificationsContext";
 import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
@@ -140,7 +140,6 @@ export default function SettingsScreen() {
                     fullAddress: data.fullAddress,
                     timeZone: data.timeZone
                 });
-
                 console.log("📍 Location updated to:", data.location);
             }
             // Reschedule notifications with new location (handled in NotificationsContext)
@@ -391,13 +390,10 @@ export default function SettingsScreen() {
                         <Text style={[styles.settingTitle, { color: theme.text }]}>
                             {tr("labels.location")}
                         </Text>
-                        <Switch
-                            value={deviceSettings.locationPermission}
-                            onValueChange={null}
-                            disabled={true}
-                            trackColor={{ false: theme.overlay, true: theme.placeholder }}
-                            thumbColor={deviceSettings.locationPermission ? theme.border : theme.border}
-                        />
+                        <MaterialIcons
+                            name={deviceSettings.locationPermission ? "location-on" : "location-off"}
+                            size={24}
+                            color={deviceSettings.locationPermission ? theme.accent : theme.border} />
                     </View>
 
                     {/* Divider */}
