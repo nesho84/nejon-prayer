@@ -1,6 +1,6 @@
 {
   "name": "nejon-prayer",
-  "version": "2.1.8",
+  "version": "2.1.9",
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
