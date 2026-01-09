@@ -1,5 +1,5 @@
-import { StyleSheet, View, Text, ScrollView, Pressable } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { StyleSheet, View, Text, ScrollView, Pressable, Linking } from "react-native";
+import { Fontisto, Ionicons, MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -13,6 +13,7 @@ export default function ExtrasScreen() {
     const features = [
         {
             id: 1,
+            type: 'internal',
             href: "(extras)/abdesi",
             label: tr("labels.abdes"),
             description: tr("labels.abdesDesc") || "Step by step ablution guide",
@@ -22,6 +23,7 @@ export default function ExtrasScreen() {
         },
         {
             id: 2,
+            type: 'internal',
             href: "(extras)/namazi",
             label: tr("labels.namaz"),
             description: tr("labels.namazDesc") || "Learn how to perform Salah",
@@ -31,6 +33,7 @@ export default function ExtrasScreen() {
         },
         {
             id: 3,
+            type: 'internal',
             href: "(extras)/tesbih",
             label: tr("labels.tesbih"),
             description: tr("labels.tesbihDesc") || "Digital prayer beads counter",
@@ -40,6 +43,7 @@ export default function ExtrasScreen() {
         },
         {
             id: 4,
+            type: 'internal',
             href: "(extras)/ramazani",
             label: tr("labels.ramadan"),
             description: tr("labels.ramadanDesc") || "Digital prayer beads counter",
@@ -49,12 +53,23 @@ export default function ExtrasScreen() {
         },
         {
             id: 5,
+            type: 'internal',
             href: "(extras)/about",
             label: tr("labels.about"),
             description: tr("labels.aboutDesc") || "App information & credits",
             color: "#f59e0b",
             bg: "#f59e0b26",
             icon: <MaterialCommunityIcons name="information-outline" size={32} color="#f59e0b" />
+        },
+        {
+            id: 6,
+            type: 'external',
+            href: 'https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT',
+            label: tr("labels.support"),
+            description: tr("labels.supportDesc") || "Support the development of this app",
+            color: "#0070ba", // PayPal blue
+            bg: "#0070ba26",
+            icon: <Fontisto name="heartbeat" size={32} color="#0070ba" />
         },
     ];
 
@@ -81,37 +96,46 @@ export default function ExtrasScreen() {
 
                 {/* Feature List Card */}
                 <AppCard style={styles.listCard}>
-                    {features.map((item, index) => (
-                        <View key={item.id}>
-                            <Link href={item.href} asChild>
-                                <Pressable>
-                                    {({ pressed }) => (
-                                        <View style={[styles.listItem, { opacity: pressed ? 0.3 : 1 }]}>
-                                            <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
-                                                {item.icon}
-                                            </View>
+                    {features.map((item, index) => {
+                        const renderContent = (pressed) => (
+                            <View style={[styles.listItem, { opacity: pressed ? 0.3 : 1 }]}>
+                                <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
+                                    {item.icon}
+                                </View>
 
-                                            <View style={styles.textContent}>
-                                                <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
-                                                    {item.label}
-                                                </Text>
-                                                <Text style={[styles.itemDescription, { color: theme.text2 }]} numberOfLines={2}>
-                                                    {item.description}
-                                                </Text>
-                                            </View>
+                                <View style={styles.textContent}>
+                                    <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
+                                        {item.label}
+                                    </Text>
+                                    <Text style={[styles.itemDescription, { color: theme.text2 }]} numberOfLines={2}>
+                                        {item.description}
+                                    </Text>
+                                </View>
 
-                                            <Ionicons name="chevron-forward" size={20} color={theme.text2} />
-                                        </View>
-                                    )}
-                                </Pressable>
-                            </Link>
+                                <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+                            </View>
+                        );
 
-                            {/* Divider */}
-                            {index < features.length - 1 && (
-                                <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-                            )}
-                        </View>
-                    ))}
+                        return (
+                            <View key={item.id}>
+                                {item.type === 'external' ? (
+                                    <Pressable onPress={() => Linking.openURL(item.href)}>
+                                        {({ pressed }) => renderContent(pressed)}
+                                    </Pressable>
+                                ) : (
+                                    <Link href={item.href} asChild>
+                                        <Pressable>
+                                            {({ pressed }) => renderContent(pressed)}
+                                        </Pressable>
+                                    </Link>
+                                )}
+
+                                {index < features.length - 1 && (
+                                    <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+                                )}
+                            </View>
+                        );
+                    })}
                 </AppCard>
 
             </ScrollView>
@@ -196,6 +220,5 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         marginHorizontal: 18,
-        // marginLeft: 86, // Aligns with text (icon width + gap + padding)
     },
 });

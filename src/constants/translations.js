@@ -180,6 +180,8 @@ export const TRANSLATIONS = {
             ramadanDesc: "Ramadan fasting & rules",
             about: "About",
             aboutDesc: "About this App",
+            support: "Support Me",
+            supportDesc: "Support the development of this app",
 
             // Tesbih
             tInstruction: "Tap the circle to count your Tasbeeh.",
@@ -399,6 +401,8 @@ export const TRANSLATIONS = {
             ramadanDesc: "Agjërimi dhe rregullat e Ramazanit",
             about: "Info",
             aboutDesc: "Rreth këtij Aplikacioni",
+            support: "Mbështetje",
+            supportDesc: "Mbështet zhvillimin e këtij aplikacioni",
 
             // Tesbih
             tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
@@ -618,6 +622,8 @@ export const TRANSLATIONS = {
             ramadanDesc: "Fasten & Regeln im Ramadan",
             about: "Info",
             aboutDesc: "Über diese App",
+            support: "Unterstützung",
+            supportDesc: "Unterstütze die Entwicklung dieser App",
 
             // Tesbih
             tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen.",
