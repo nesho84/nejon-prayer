@@ -58,16 +58,20 @@ export async function getUserLocation(tr = null) {
                 maximumAge: 10000, // Allow cached location up to 10s old
             };
 
-        // Get current position with single attempt
+        // Get current position
         let loc;
         try {
             loc = await Location.getCurrentPositionAsync(locationOptions);
         } catch (error) {
-            // Final fallback: try with last known location
-            loc = await Location.getLastKnownPositionAsync({
-                maxAge: 60000, // Accept location up to 1 minute old
-                requiredAccuracy: 100, // Within 100 meters
-            });
+            console.log('First location attempt failed, requesting permission again...', error);
+
+            // Request permission again...
+            const retryPermission = await Location.requestForegroundPermissionsAsync();
+            if (retryPermission.status !== 'granted') {
+                throw new Error('Permission denied on retry');
+            }
+            // Try getting location again after permission re-request
+            loc = await Location.getCurrentPositionAsync(locationOptions);
         }
 
         if (!loc?.coords) {
