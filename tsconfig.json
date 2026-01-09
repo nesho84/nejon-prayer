@@ -2,22 +2,19 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
+    "**/*.js",
+    "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "app/_layout.jsx",
-    "app/index.jsx",
-    "app/(tabs)/_layout.jsx",
-    "app/(tabs)/AboutScreen.jsx",
-    "app/(tabs)/HomeScreen.jsx",
-    "app/(tabs)/SettingsScreen.jsx"
+    "expo-env.d.ts"
   ]
 }
