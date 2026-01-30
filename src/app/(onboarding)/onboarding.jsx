@@ -1,18 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from "@/context/AppContext";
+import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
+import CustomPicker from "@/components/CustomPicker";
+
+// Language options with flags
+const LANGUAGES = [
+  { value: 'en', label: 'English', icon: '🇬🇧' },
+  { value: 'sq', label: 'Shqip', icon: '🇦🇱' },
+  { value: 'de', label: 'Deutsch', icon: '🇩🇪' },
+];
 
 export default function OnboardingScreen() {
-  const router = useRouter();
   const { theme } = useThemeContext();
+  const { language } = useTranslation();
+
   const {
     appSettings,
     isReady: settingsReady,
@@ -22,6 +30,7 @@ export default function OnboardingScreen() {
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(appSettings?.language || 'en');
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
@@ -145,16 +154,19 @@ export default function OnboardingScreen() {
               Select your preferred language to continue
             </Text>
             <View style={styles.inputArea}>
-              <Picker
-                selectedValue={languageRef.current}
-                onValueChange={(value) => (languageRef.current = value)}
-                dropdownIconColor={theme.text}
+              <CustomPicker
                 style={{ color: theme.text }}
-              >
-                <Picker.Item label="English" value="en" />
-                <Picker.Item label="Shqip" value="sq" />
-                <Picker.Item label="Deutsch" value="de" />
-              </Picker>
+                items={LANGUAGES}
+                selectedValue={selectedLanguage}
+                onValueChange={(value) => {
+                  languageRef.current = value;
+                  setSelectedLanguage(value);
+                }}
+                enabled={!localLoading}
+                textColor={theme.text}
+                selectedColor={theme.text}
+                modalBackgroundColor={theme.card}
+              />
             </View>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.primary }]}

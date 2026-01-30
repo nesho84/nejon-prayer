@@ -13,7 +13,6 @@ import {
     View
 } from "react-native";
 import Slider from '@react-native-community/slider';
-import { Picker } from "@react-native-picker/picker";
 import * as Haptics from "expo-haptics";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from "@/context/AppContext";
@@ -26,6 +25,21 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-ic
 import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
 import AppCard from "@/components/AppCard";
+import CustomPicker from "@/components/CustomPicker";
+
+// Theme options with icons
+const THEMES = [
+    { value: 'light', label: 'Light', icon: '☀️' },
+    { value: 'dark', label: 'Dark', icon: '🌙' },
+    { value: 'system', label: 'System', icon: '⚙️' },
+];
+
+// Language options with flags
+const LANGUAGES = [
+    { value: 'en', label: 'English', icon: '🇬🇧' },
+    { value: 'sq', label: 'Shqip', icon: '🇦🇱' },
+    { value: 'de', label: 'Deutsch', icon: '🇩🇪' },
+];
 
 export default function SettingsScreen() {
     const { theme, themeMode, changeTheme } = useThemeContext();
@@ -351,18 +365,17 @@ export default function SettingsScreen() {
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.theme")}
                     </Text>
-                    <Picker
+                    <CustomPicker
+                        style={styles.picker}
+                        items={THEMES}
                         selectedValue={themeMode}
                         onValueChange={handleTheme}
-                        dropdownIconColor={theme.text}
-                        dropdownIconRippleColor={theme.text}
                         enabled={!localLoading}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
-                    >
-                        <Picker.Item label="Dark" value="dark" />
-                        <Picker.Item label="Light" value="light" />
-                        <Picker.Item label="System" value="system" />
-                    </Picker>
+                        textColor={theme.text}
+                        selectedColor={theme.text}
+                        backgroundColor={theme.overlay}
+                        modalBackgroundColor={theme.card}
+                    />
                 </AppCard>
 
                 {/* ------ Language Setting ------ */}
@@ -370,18 +383,17 @@ export default function SettingsScreen() {
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
                         {tr("labels.language")}
                     </Text>
-                    <Picker
+                    <CustomPicker
+                        style={styles.picker}
+                        items={LANGUAGES}
                         selectedValue={language}
                         onValueChange={handleLanguage}
-                        dropdownIconColor={theme.text}
-                        dropdownIconRippleColor={theme.text}
                         enabled={!localLoading}
-                        style={[styles.picker, { backgroundColor: theme.overlay, color: theme.text }]}
-                    >
-                        <Picker.Item label="English" value="en" />
-                        <Picker.Item label="Shqip" value="sq" />
-                        <Picker.Item label="Deutsch" value="de" />
-                    </Picker>
+                        textColor={theme.text}
+                        selectedColor={theme.text}
+                        backgroundColor={theme.overlay}
+                        modalBackgroundColor={theme.card}
+                    />
                 </AppCard>
 
                 {/* ------ Location Setting ------ */}

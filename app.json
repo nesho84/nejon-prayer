@@ -13,6 +13,14 @@
     "runtimeVersion": {
       "policy": "appVersion"
     },
+    "updates": {
+      "url": "https://u.expo.dev/4d4c4cab-c707-41be-b1a4-3d6d6d3e5781",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
+    },
     "splash": {
       "image": "./assets/icons/splash-icon-dark.png",
       "resizeMode": "contain",

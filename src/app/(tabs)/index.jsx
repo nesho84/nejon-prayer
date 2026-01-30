@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Alert, Button, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
+import * as Updates from "expo-updates";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from '@/context/AppContext';
@@ -54,6 +55,35 @@ export default function HomeScreen() {
     // Local State
     const [prayerModalVisible, setPrayerModalVisible] = useState(false);
     const [selectedPrayer, setSelectedPrayer] = useState(null);
+
+    // ------------------------------------------------------------
+    // Check for expo OTA updates on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!Updates.isEnabled) return;
+
+        const checkForUpdates = async () => {
+            const update = await Updates.checkForUpdateAsync();
+
+            if (update.isAvailable) {
+                await Updates.fetchUpdateAsync();
+
+                Alert.alert(
+                    "Update available",
+                    "The app was updated. Restart now?",
+                    [
+                        { text: "Later", style: "cancel" },
+                        {
+                            text: "Restart",
+                            onPress: () => Updates.reloadAsync(),
+                        },
+                    ]
+                );
+            }
+        };
+
+        checkForUpdates();
+    }, []);
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
