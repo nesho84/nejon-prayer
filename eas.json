@@ -9,21 +9,33 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "autoIncrement": false,
+      "channel": "development"
+    },
+    "release-apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "autoIncrement": false,
+      "channel": "release-apk"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "app-bundle"
       },
-      "autoIncrement": false
+      "autoIncrement": false,
+      "channel": "preview"
     },
     "production": {
       "distribution": "store",
       "android": {
         "buildType": "app-bundle"
       },
-      "autoIncrement": false
+      "autoIncrement": false,
+      "channel": "production"
     }
   },
   "submit": {

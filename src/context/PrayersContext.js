@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { Platform } from "react-native";
 import { storage } from "@/utils/storage";
 import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
@@ -11,7 +10,7 @@ export const PrayersContext = createContext();
 // MMKV storage key
 const PRAYERS_KEY = "@prayers_key";
 
-const STALE_DAYS = 7;
+const STALE_DAYS = 3;
 
 export function PrayersProvider({ children }) {
     const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useAppContext();
@@ -45,7 +44,17 @@ export function PrayersProvider({ children }) {
     const readFromStorage = useCallback(() => {
         try {
             const stored = storage.getString(PRAYERS_KEY);
-            return stored ? JSON.parse(stored) : null;
+            if (stored) {
+                const parsed = JSON.parse(stored);
+
+                // Restore last fetched date from storage
+                if (parsed.lastFetched) {
+                    lastFetchedDateRef.current = parsed.lastFetched;
+                }
+
+                return parsed;
+            }
+            return null;
         } catch (err) {
             console.warn("⚠️ Failed to read/parse prayers:", err);
             return null;
@@ -57,7 +66,11 @@ export function PrayersProvider({ children }) {
     // ------------------------------------------------------------
     const saveToStorage = useCallback((timings) => {
         try {
-            const dataToSave = { timings, timestamp: Date.now() };
+            const dataToSave = {
+                timings,
+                timestamp: Date.now(),
+                lastFetched: new Date().toLocaleString("en-GB") // Persist last fetched date
+            };
             storage.set(PRAYERS_KEY, JSON.stringify(dataToSave));
             return true;
         } catch (err) {
@@ -95,13 +108,17 @@ export function PrayersProvider({ children }) {
 
             let timings = null;
 
-            // ONLINE: fetch from API
+            // ONLINE: fetch from API (always fetch when internet is available)
             if (hasInternet) {
                 try {
                     timings = await getPrayerTimes(location);
                     if (timings) {
-                        const isSame = savedTimings && JSON.stringify(savedTimings) === JSON.stringify(timings);
-                        if (!isSame) await saveToStorage(timings);
+                        // TTimestamp and lastFetched are always fresh (removed isSame check)
+                        saveToStorage(timings);
+
+                        // ONLY update ref when successfully fetched from internet
+                        lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
+
                         console.log("🌐 Prayer times loaded from API");
                     }
                 } catch (err) {
@@ -112,7 +129,9 @@ export function PrayersProvider({ children }) {
             // OFFLINE: Fallback to saved data if fetch failed
             if (!timings && savedTimings) {
                 timings = savedTimings;
-                if (checkIfOutdated(savedTimestamp)) setPrayersOutdated(true);
+                if (checkIfOutdated(savedTimestamp)) {
+                    setPrayersOutdated(true);
+                }
                 console.log("💾 Prayer times loaded from MMKV storage");
             }
 
@@ -131,7 +150,6 @@ export function PrayersProvider({ children }) {
 
             // Update state
             setPrayerTimes(timings);
-            lastFetchedDateRef.current = new Date().toLocaleString("en-GB");
         } catch (err) {
             console.warn("⚠️ Failed to load prayer times:", err);
             setPrayersError(err.message || "An unexpected error occurred.");
@@ -204,7 +222,7 @@ export function PrayersProvider({ children }) {
 
 
         return () => { mounted = false; };
-    }, [settingsReady, location]);
+    }, [settingsReady, location, hasInternet]);
 
     // ------------------------------------------------------------
     // Memoize context value to prevent unnecessary re-renders

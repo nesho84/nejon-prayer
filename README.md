@@ -302,7 +302,7 @@ adb logcat *:S ReactNative:V ReactNativeJS:V
 
 
 
-# Expo Project Dependency Update Workflow
+# ✅ Expo Dependency Update Workflow 1
 
 A safe, repeatable workflow for keeping your Expo project dependencies up-to-date while minimizing `expo-doctor` warnings and avoiding runtime/native issues.
 
@@ -369,6 +369,12 @@ npm install
 npx expo-doctor
 npx expo start -c
 ```
+
+# If => Uncaught Error: java.net.SocketTimeoutException:failed to connect to /192.168.1.49(port 8081) from /ipaddy (port 60524) after 10000ms.
+```bash
+npx expo start -c --tunnel
+```
+
 - Refreshes dependency map.
 - Removes stale warnings.
 - Ensures Metro and Expo caches are clean.
@@ -430,3 +436,80 @@ npx expo upgrade
 7. Ignore harmless warnings
 8. Upgrade Expo SDK when possible
 
+
+
+
+# ✅ Official expo Dependency Update Workflow 2
+## Step 0 — Backup (mandatory)
+git add .
+git commit -m "Backup before dependency update"
+
+## Step 1 — Update all packages via npm
+```bash
+npx npm-check-updates -u
+npx npm-check-updates -i
+npm install
+```
+
+
+This updates:
+
+JS-only packages
+
+Third-party native packages
+
+Expo patch/minor versions (same SDK)
+
+## Step 2 — Let Expo enforce compatibility
+```bash
+npx expo-doctor
+npx expo install --check
+```
+
+
+Fixes only mismatched Expo-managed packages
+
+Leaves third-party libraries untouched
+
+Ensures SDK compatibility
+
+## Step 3 — Clear caches
+```bash
+rm -rf node_modules android package-lock.json
+npm install
+npx expo start -c
+```
+
+## Step 4 — Test thoroughly
+
+Development build
+
+Android first (real device preferred)
+
+iOS simulator / device
+
+## Step 5 — Expo SDK upgrade (only when intended)
+```bash
+npx expo upgrade
+```
+
+## If some dependencies are not compatible (expo-doctor complaining) or the app does not build (in package.json) example:
+```bash
+"expo": {
+    "install": {
+      "exclude": [
+        "@react-native-picker/picker"
+      ]
+    }
+  }
+```
+
+
+Updates Expo, React, React Native, and Expo modules in sync
+
+Never upgrade SDKs via npm
+
+## Rules of Thumb
+Package Type	Update Rule
+Expo core	expo upgrade only
+Third-party native	Minor

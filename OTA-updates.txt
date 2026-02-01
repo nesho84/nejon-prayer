@@ -1,0 +1,153 @@
+Thanks — now I’ll give you a clean, correct, complete step‑by‑step guide for EAS Update (Expo OTA) that covers both workflows:
+✅ Local builds (no EAS Build)
+ ✅ EAS Build workflows
+This is based directly on the official Expo docs, including the part about manually configuring channels when not using EAS Build.
+
+🚀 Full EAS Update (OTA) Guide — Both Local & EAS Build
+
+1️⃣ Install Tools & Login (applies to both)
+Install EAS CLI:
+ npm install --global eas-cli
+# or
+npx eas-cli@latest
+
+Login to Expo:
+ eas login
+
+This connects your project to Expo’s OTA service.
+
+2️⃣ Install & Configure expo‑updates
+This is required in any case because that’s how the app checks for and fetches updates.
+Install expo‑updates:
+ npx expo install expo-updates
+
+Run:
+ eas update:configure
+ This auto‑inserts:
+updates.url (the server URL)
+runtimeVersion (used to match updates to builds)
+Expo project ID into your config
+After this you can see:
+"expo": {
+  "updates": {
+    "url": "https://u.expo.dev/<project-id>"
+  },
+  "runtimeVersion": { "policy": "appVersion" }
+}
+
+This is what the app will use to fetch updates.
+
+3️⃣ Configure Update Channels
+Channels let you separate “production”, “staging”, etc., so updates go only to the right builds.
+🟦 If you are using EAS Build
+Just set channels in eas.json:
+{
+  "build": {
+    "production": { "channel": "production" },
+    "staging": { "channel": "staging" }
+  }
+}
+
+EAS Build will automatically inject the correct channel into the native config at build time.
+Example:
+eas build --profile production --platform android
+
+
+🟧 If you are NOT using EAS Build (local builds)
+You must configure the channel manually in your native config.
+Option A — Using requestHeaders (managed config)
+In app.json:
+"expo": {
+  "updates": {
+    "requestHeaders": {
+      "expo-channel-name": "production"
+    }
+  }
+}
+
+Option B — Native Android
+Add into AndroidManifest.xml:
+<meta-data android:name="expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY"
+           android:value="{&quot;expo-channel-name&quot;:&quot;production&quot;}"/>
+
+Option C — Native iOS
+In Expo.plist:
+<key>EXUpdatesRequestHeaders</key>
+<dict>
+  <key>expo-channel-name</key>
+  <string>production</string>
+</dict>
+
+Then create the channel on the EAS Update server:
+eas channel:create production
+
+This lets the update server know that channel exists.
+
+4️⃣ Create a Build (so the binary can receive updates)
+📌 Option A — Local Build
+Run a release build locally:
+npx expo prebuild
+npx expo run:android --variant release
+# or for iOS:
+npx expo run:ios --configuration Release
+
+This includes expo‑updates and the configured channel.
+ This build can receive OTA updates afterward because it already has the update URL and channel.
+
+📌 Option B — EAS Build
+If you want EAS Build (for ease + CI):
+eas build --profile production --platform all
+
+This automatically embeds the channel from your eas.json into the native binary.
+
+5️⃣ Publish OTA Updates
+Once your app build is done (local or EAS), you do NOT have to rebuild for JS changes.
+Publish updates using the EAS Update service:
+eas update --branch production --platform all --message "first update"
+or
+eas update --branch production --platform android --message "first update"
+or
+eas update --branch production --platform android,ios --message "first update"
+
+This:
+Bundles your JS + assets
+Uploads them to EAS servers
+Makes them available to builds that match channel + runtimeVersion
+
+6️⃣ How Updates Reach the App
+When the app starts:
+expo‑updates checks the updates.url
+Sends channel and runtimeVersion
+If there’s a newer update for that channel + runtimeVersion, it downloads the bundle
+Update is applied on next launch (or immediately if you manually reload)
+
+7️⃣ Testing and Debugging Options
+You can debug config issues using the EAS Update docs debug guide.
+Make sure your build’s runtimeVersion matches the update’s runtimeVersion, or updates won’t apply.
+
+🧠 Summary: When You Build vs When You Update
+Step
+Local Build
+EAS Build
+Embed metadata (URL + channel + runtime)
+✔︎ manual + prebuild
+✔︎ automatic
+Create binary for stores
+✔︎ local native tools
+✔︎ EAS Build
+Publish OTA updates
+✔︎ eas update
+✔︎ eas update
+Rebuild required for JS change?
+✖︎ no
+✖︎ no
+Rebuild required for native change?
+✔︎ yes
+✔︎ yes
+
+🏁 Final Notes
+You only have to build once in either workflow — after that, publish OTA updates with eas update without rebuilding.
+If you avoid EAS Build, don’t forget the manual channel setup.
+The update service works independently and ships JS updates without needing store releases.
+
+If you want, I can give you a minimal example app.json + eas.json ready for both workflows. Just tell me!
