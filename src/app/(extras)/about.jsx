@@ -3,6 +3,7 @@ import Constants from "expo-constants";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";
 import AppFullScreen from "@/components/AppFullScreen";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function AboutScreen() {
     const { theme } = useThemeContext();
@@ -24,21 +25,21 @@ export default function AboutScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                {/* App Logo */}
+                {/* Logo */}
                 <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
 
-                {/* About Title */}
+                {/* Title */}
                 <Text style={[styles.title, { color: theme.text }]}>
                     {tr("labels.aboutText1")}
                 </Text>
 
-                {/* About Description */}
+                {/* Description */}
                 <Text style={[styles.desc, { color: theme.placeholder }]} adjustsFontSizeToFit>
                     {tr("labels.aboutText2")}
                 </Text>
 
                 {/* Website & Privacy */}
-                <View style={styles.linksContainer}>
+                <View style={[styles.linksContainer, { backgroundColor: 'transparent' }]}>
                     <TouchableOpacity onPress={() => openLink("https://nejon.net")}>
                         <Text style={[styles.linkText, { color: theme.info }]}>nejon.net</Text>
                     </TouchableOpacity>
@@ -47,10 +48,26 @@ export default function AboutScreen() {
                     </TouchableOpacity>
                 </View>
 
-                {/* Year & App Version */}
-                <Text style={[styles.yearText, { color: theme.text2 }]}>
-                    © {new Date().getFullYear()}
-                </Text>
+                {/* Support Section */}
+                <TouchableOpacity
+                    style={[styles.supportButton, {
+                        backgroundColor: theme.primary + '08',
+                        borderColor: theme.primary + '20'
+                    }]}
+                    onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')}
+                    activeOpacity={0.8}
+                >
+                    <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                        <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
+                    </View>
+                    <View style={styles.supportTextContainer}>
+                        <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr("labels.supportDesc")}</Text>
+                        <Text style={[styles.supportSubtitle, { color: theme.primary }]}>via PayPal</Text>
+                    </View>
+                    <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                </TouchableOpacity>
+
+                {/* Version */}
                 <Text style={[styles.versionText, { color: theme.placeholder }]}>
                     Version {Constants?.expoConfig?.version}
                 </Text>
@@ -92,20 +109,48 @@ const styles = StyleSheet.create({
         marginVertical: 12,
         paddingHorizontal: 10,
     },
+
+    // Support Button
+    supportButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 18,
+        paddingHorizontal: 20,
+        borderWidth: 1,
+        borderRadius: 16,
+        marginTop: 16,
+        gap: 16,
+    },
+    iconContainer: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    supportTextContainer: {
+        flex: 1,
+        gap: 3,
+    },
+    supportTitle: {
+        fontSize: 16,
+        fontWeight: "600",
+        letterSpacing: -0.3,
+    },
+    supportSubtitle: {
+        fontSize: 14,
+        fontWeight: "400",
+        opacity: 0.6,
+    },
+
     linksContainer: {
         flexDirection: "row",
         gap: 16,
-        marginBottom: 16,
     },
     linkText: {
         fontSize: 16,
         fontWeight: "600",
         textDecorationLine: "underline",
-    },
-    yearText: {
-        fontSize: 14,
-        fontWeight: "500",
-        marginBottom: 4,
     },
     versionText: {
         fontSize: 14,

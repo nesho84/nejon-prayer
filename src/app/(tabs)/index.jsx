@@ -60,7 +60,7 @@ export default function HomeScreen() {
     // Check for expo OTA updates on mount
     // ------------------------------------------------------------
     useEffect(() => {
-        if (!Updates.isEnabled) return;
+        if (__DEV__) return; // Skip in dev mode
 
         const checkForUpdates = async () => {
             const update = await Updates.checkForUpdateAsync();

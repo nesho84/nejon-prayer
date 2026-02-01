@@ -39,6 +39,7 @@ const LANGUAGES = [
     { value: 'en', label: 'English', icon: '🇬🇧' },
     { value: 'sq', label: 'Shqip', icon: '🇦🇱' },
     { value: 'de', label: 'Deutsch', icon: '🇩🇪' },
+    { value: 'ar', label: 'العربية', icon: '🇸🇦' },
 ];
 
 export default function SettingsScreen() {

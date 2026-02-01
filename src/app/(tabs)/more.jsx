@@ -61,16 +61,6 @@ export default function ExtrasScreen() {
             bg: "#f59e0b26",
             icon: <MaterialCommunityIcons name="information-outline" size={32} color="#f59e0b" />
         },
-        {
-            id: 6,
-            type: 'external',
-            href: 'https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT',
-            label: tr("labels.support"),
-            description: tr("labels.supportDesc") || "Support the development of this app",
-            color: "#0070ba", // PayPal blue
-            bg: "#0070ba26",
-            icon: <Fontisto name="heartbeat" size={32} color="#0070ba" />
-        },
     ];
 
     return (
