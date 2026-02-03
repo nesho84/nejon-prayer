@@ -2,17 +2,16 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AppProvider } from "@/context/AppContext";
-import { useAppContext } from "@/context/AppContext";
 import { PrayersProvider } from "@/context/PrayersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import AppLoading from "@/components/AppLoading";
+import { useOnboardingStore } from "@/store/onboardingStore";
 
 const RootStack = () => {
-  const { isReady, isLoading, appSettings } = useAppContext();
+  const isReady = useOnboardingStore((s) => s.isReady);
+  const onboardingComplete = useOnboardingStore((s) => s.onboardingComplete);
 
-  if (!isReady || isLoading) return <AppLoading />;
-
-  const onboardingComplete = appSettings?.onboarding ?? false;
+  if (!isReady) return <AppLoading />;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

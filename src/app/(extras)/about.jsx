@@ -9,6 +9,9 @@ export default function AboutScreen() {
     const { theme } = useThemeContext();
     const { tr } = useTranslation();
 
+    // ------------------------------------------------------------
+    // Open external link
+    // ------------------------------------------------------------
     const openLink = (url) => {
         Linking.canOpenURL(url).then((supported) => {
             if (supported) {
@@ -91,9 +94,8 @@ const styles = StyleSheet.create({
         gap: 16,
     },
     logo: {
-        width: 160,
-        height: 160,
-        marginBottom: 16,
+        width: 120,
+        height: 120,
         borderRadius: 20,
     },
     title: {
@@ -106,8 +108,19 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         textAlign: "center",
         lineHeight: 22,
-        marginVertical: 12,
+        marginBottom: 8,
         paddingHorizontal: 10,
+    },
+
+    // Links
+    linksContainer: {
+        flexDirection: "row",
+        gap: 16,
+    },
+    linkText: {
+        fontSize: 16,
+        fontWeight: "600",
+        textDecorationLine: "underline",
     },
 
     // Support Button
@@ -118,7 +131,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderWidth: 1,
         borderRadius: 16,
-        marginTop: 16,
+        marginTop: 18,
+        marginBottom: 12,
         gap: 16,
     },
     iconContainer: {
@@ -143,15 +157,6 @@ const styles = StyleSheet.create({
         opacity: 0.6,
     },
 
-    linksContainer: {
-        flexDirection: "row",
-        gap: 16,
-    },
-    linkText: {
-        fontSize: 16,
-        fontWeight: "600",
-        textDecorationLine: "underline",
-    },
     versionText: {
         fontSize: 14,
         fontWeight: "400",

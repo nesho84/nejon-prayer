@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { AppState, Platform } from "react-native";
-import { storage } from "@/utils/storage";
+import { storage } from "@/store/storage";
 import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
 import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
@@ -13,7 +13,6 @@ const SETTINGS_KEY = "@settings_key";
 export function AppProvider({ children }) {
     // Persistent storage app-level settings
     const [appSettings, setAppSettings] = useState({
-        onboarding: false,
         language: "en",
         location: null,
         fullAddress: null,

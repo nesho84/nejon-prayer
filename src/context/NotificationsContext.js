@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
-import { storage } from "@/utils/storage";
+import { storage } from "@/store/storage";
 import notifee, { AndroidColor } from "@notifee/react-native";
 import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";

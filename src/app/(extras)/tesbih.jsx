@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, AppState, Vibration } from "react-native";
 import { useFocusEffect } from '@react-navigation/native';
-import { storage } from "@/utils/storage";
+import { storage } from "@/store/storage";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { useThemeContext } from "@/context/ThemeContext";
 import useTranslation from "@/hooks/useTranslation";

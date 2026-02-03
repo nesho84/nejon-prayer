@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { storage } from "@/utils/storage";
+import { storage } from "@/store/storage";
 import { useAppContext } from "@/context/AppContext";
 import useTranslation from "@/hooks/useTranslation";
 import { getPrayerTimes } from "@/services/prayersService";

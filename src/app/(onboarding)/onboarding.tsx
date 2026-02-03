@@ -2,25 +2,27 @@ import { useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from "@/context/AppContext";
-import useTranslation from "@/hooks/useTranslation";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
+import { useOnboardingStore } from "@/store/onboardingStore";
+
+export type Language = "en" | "sq" | "de" | "ar";
 
 // Language options with flags
 const LANGUAGES = [
-  { value: 'en', label: 'English', icon: '🇬🇧' },
-  { value: 'sq', label: 'Shqip', icon: '🇦🇱' },
-  { value: 'de', label: 'Deutsch', icon: '🇩🇪' },
-  { value: 'ar', label: 'العربية', icon: '🇸🇦' },
+  { value: 'en' as Language, label: 'English', icon: '🇬🇧' },
+  { value: 'sq' as Language, label: 'Shqip', icon: '🇦🇱' },
+  { value: 'de' as Language, label: 'Deutsch', icon: '🇩🇪' },
+  { value: 'ar' as Language, label: 'العربية', icon: '🇸🇦' },
 ];
 
 export default function OnboardingScreen() {
   const { theme } = useThemeContext();
-  const { language } = useTranslation();
+  const setOnboarding = useOnboardingStore((state) => state.setOnboarding);
 
   const {
     appSettings,
@@ -31,7 +33,7 @@ export default function OnboardingScreen() {
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(appSettings?.language || 'en');
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>(appSettings?.language || 'en');
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
@@ -116,9 +118,11 @@ export default function OnboardingScreen() {
   async function finishOnboarding() {
     setLocalLoading(true);
     try {
+      // Update onboarding store
+      setOnboarding(true);
+
       // Update AppContext
       await saveAppSettings({
-        onboarding: true,
         language: languageRef.current,
         location: locationRef.current,
         fullAddress: fullAddressRef.current,
@@ -161,7 +165,7 @@ export default function OnboardingScreen() {
                 selectedValue={selectedLanguage}
                 onValueChange={(value) => {
                   languageRef.current = value;
-                  setSelectedLanguage(value);
+                  setSelectedLanguage(value as Language);
                 }}
                 enabled={!localLoading}
                 textColor={theme.text}

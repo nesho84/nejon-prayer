@@ -212,7 +212,7 @@ export const TRANSLATIONS = {
             copy: "Copy",
             copied: "Copied!",
             share: "Share",
-            Shared: "Shared!",
+            shared: "Shared!",
         },
         actions: {
             dismiss: "Dismiss",
@@ -873,7 +873,7 @@ export const TRANSLATIONS = {
             copy: "نسخ",
             copied: "تم النسخ!",
             share: "مشاركة",
-            Shared: "تمت المشاركة!",
+            shared: "تمت المشاركة!",
         },
         actions: {
             dismiss: "إغلاق",
