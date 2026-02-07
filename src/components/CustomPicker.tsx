@@ -2,13 +2,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export interface Item {
-  label: string;
-  value: string | number;
-  icon?: string;
-  color?: string;
-}
-
 interface Props {
   items: Item[];
   selectedValue: string | number;
@@ -21,6 +14,13 @@ interface Props {
   modalBackgroundColor?: string;
   borderColor?: string;
   enabled?: boolean;
+}
+
+export interface Item {
+  label: string;
+  value: string | number;
+  icon?: string;
+  color?: string;
 }
 
 export default function CustomPicker({
@@ -36,9 +36,13 @@ export default function CustomPicker({
   borderColor = "#ddd",
   enabled = true,
 }: Props) {
+  // Local state
   const [modalVisible, setModalVisible] = useState(false);
   const selectedItem = items.find(item => item.value === selectedValue);
 
+  // ------------------------------------------------------------
+  // Handle Option Select
+  // ------------------------------------------------------------
   const handleSelect = (value: string | number) => {
     onValueChange(value);
     setModalVisible(false);

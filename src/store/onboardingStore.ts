@@ -16,6 +16,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       isReady: false,
 
       setOnboarding: (onboardingComplete) => set({ onboardingComplete }),
+
       setReady: (ready) => set({ isReady: ready }),
     }),
     {

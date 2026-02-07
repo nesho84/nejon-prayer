@@ -12,8 +12,6 @@ export const TRANSLATIONS = {
             Maghrib: "Maghrib",
             Isha: "Isha",
         },
-
-        // Abdesi
         abdesi: {
             headerTitle: "Performing Wudu",
             headerSubtitle: "How to perform Wudu step by step",
@@ -28,8 +26,6 @@ export const TRANSLATIONS = {
             step9: "Wash your right foot, then your left foot up to the ankles three times.",
             step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
         },
-
-        // Namazi
         namazi: {
             // Namazi tab
             namaziTab: "PRAYER",
@@ -59,8 +55,6 @@ export const TRANSLATIONS = {
             tableSubtitle: "Prayer consists of parts called rak'ahs.",
             tableFooter: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
         },
-
-        // Ramazani
         ramazani: {
             headerTitle: "Ramadan Guidance",
             headerSubtitle: "Essential Tips for a Blessed Ramadan",
@@ -95,27 +89,23 @@ export const TRANSLATIONS = {
             title15: "Continue After Ramadan",
             desc15: "Maintain the state of complete faith and piety, and performing good deeds even after the month of Ramadan, until you die. 'And worship your Lord until the truth (death) comes to you.' (Quran 15:99)",
         },
-
         labels: {
             // Navigation
             home: "Home",
             settings: "Settings",
             qibla: "Qibla",
             more: "More",
-
             // General
             loading: "Loading...",
             loadingSettings: "Loading settings...",
             error: "Error",
             accuracy: "Accuracy",
-
             // Settings
             theme: "Theme",
             language: "Language",
             location: "Location",
             notifications: "Notifications",
             localeDate: "en-GB",
-
             // Location
             locationButtonText1: "Update Location",
             locationButtonText2: "Set Location",
@@ -129,27 +119,23 @@ export const TRANSLATIONS = {
             locationDeniedMessage: "Please allow location access to detect your city and display the correct prayer times.",
             gpsOfflineWarningTitle: "No Internet Connection",
             gpsOfflineWarningMessage: "Without internet, GPS may take several minutes and only works outdoors.\n\nFor faster results, connect to internet first.",
-
             // Compass
             compasAligned: "Aligned with Qibla",
             compasNotAligned: "Rotate until arrow points upward",
             compassWarning1: "Hold device flat",
             compassWarning2: "Move device in figure-8 motion to calibrate",
             compassWarning3: "Move away from electronics",
-
             // Prayer Times
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
-            loaded: "🟢 Loaded",
-            notLoaded: "🔴 Not Loaded",
-
+            loaded: "🟢  Loaded",
+            notLoaded: "🔴  Not Loaded",
             // Notifications
             prayerNotifBody: "Time for Prayer",
             prayerRemindBody: "Prayer Reminder",
             eventNotifBody: "Your Reminder",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
-
             // Notifications settings
             volume: "Volume",
             vibration: "Vibration",
@@ -162,11 +148,9 @@ export const TRANSLATIONS = {
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed. Tap above to adjust in system settings.",
             alarmAccessTitle: "Alarms & Reminders",
             alarmAccessBody: "⚠️ Alarms & reminders may be disabled. Tap above to verify.",
-
             // Settings States
             updatingSettings: "Updating settings...",
             goToSettings: "Go to Settings",
-
             // Extras
             extrasTitle: "Additional Tools and Resources",
             extrasSubtitle: "Useful tools and guides to learn more",
@@ -182,12 +166,10 @@ export const TRANSLATIONS = {
             aboutDesc: "About this App",
             support: "Support Me",
             supportDesc: "Support the development",
-
             // Tesbih
             tInstruction: "Tap the circle to count your Tasbeeh.",
             tLap: "LAP",
             tLimit: "LIMIT",
-
             // Errors
             noInternet: "No internet connection. Please connect to download prayer times.",
             languageError: "Failed to update language setting.",
@@ -198,7 +180,6 @@ export const TRANSLATIONS = {
             snoozeError: "Failed to update notifications snooze timeout.",
             settingsError: "Failed to load settings.",
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
-
             // About
             aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times based on your location. Designed to be simple, reliable and help you maintain your prayer routine.",
@@ -221,227 +202,6 @@ export const TRANSLATIONS = {
     },
 
     // ------------------------------------------------------------
-    // Shqip
-    // ------------------------------------------------------------
-    sq: {
-        prayers: {
-            Imsak: "Imsaku",
-            Fajr: "Sabahu",
-            Sunrise: "Lindja e Diellit",
-            Dhuhr: "Dreka",
-            Asr: "Ikindia",
-            Maghrib: "Akshami",
-            Isha: "Jacia",
-        },
-
-        // Abdesi
-        abdesi: {
-            headerTitle: "Marrja e abdesit",
-            headerSubtitle: "Si të merret abdesi hap pas hapi",
-            step1: "Bëje nijetin tënd me zemër për të marrë abdesin dhe, para se të fillosh, thuaj Bismilah.",
-            step2: "Laj duart deri në kyçe.",
-            step3: "Shpërlaj gojën 3 herë.",
-            step4: "Shpërlaj hundën 3 herë.",
-            step5: "Laj fytyrën 3 herë.",
-            step6: "Laj krahët deri në bërryl 3 herë duke filluar nga krahu i djathtë, pastaj të majtin.",
-            step7: "Me duar të lagura, fërko kokën.",
-            step8: "Me duar të lagura, fërko veshët.",
-            step9: "Laj këmbën e djathtë, pastaj të majtën, deri mbi kyçe, nga 3 herë.",
-            step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
-        },
-
-        // Namazi
-        namazi: {
-            // Namazi tab
-            namaziTab: "NAMAZI",
-            headerTitle: "Falja e namazit",
-            headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
-            step1: "Qëndro drejt Kibles dhe bëj nijetin me zemër. Ngriji duart derisa gishti i madh të prekë veshin dhe thuaj: 'Allahu Ekber' (Allahu është më i Madhi). Për burrat: Gishtat të hapur dhe jo të shtrënguar fort. Për gratë: Duart ngrihen deri në nivel të supit.",
-            step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti, o Allah, dhe i lavdëruar; i bekuar është emri Yt, e lartë është madhëria Jote dhe s’ka Zot tjetër përveç Teje.)",
-            step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther):\n\n'Eudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...'\n\nPastaj Fatiha + një sure. Këmbët paralele, me largësi 4 gishta (burrat).",
-            step4: "Thuaj 'Allahu Ekber' dhe përkulju në Ruku. Shpina e drejtë, kokë në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). Thuaj 3 herë:\n\n'Subhane Rabbijel Adhim.'\n\n(I Shenjtë është Zoti im, i Madhi.)\n\nSytë nga vendi i Sexhdes.",
-            step5: "Ngrihu nga Ruku duke thënë 'Semi Allahu limen hamideh' dhe kur je drejtuar tërësisht thuaj:\n\n'Rabbena ve lekel hamd.'\n\n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.)\n\nDuart anash trupit.",
-            step6: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. 7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. Burrat: bërryla e ngritur, bërryti larg nga kërciri, krahët larg nga brinjët. Gratë: të grumbulluar. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\n(I Shenjtë është Zoti im, më i Larti.)",
-            step7: "Thuaj 'Allahu Ekber' dhe ngrihu ulur. Këmba e majtë e shtrirë (burrat), e djathta me gishta nga Kibla. Gratë: të dy këmbët djathtas. Qëndro pak në këtë pozicion. Mund të thuash:\n\n'Rabbigfir li, Rabbigfir li.'\n\n(O Zoti im më fal, o Zoti im më fal.)",
-            step8: "Thuaj 'Allahu Ekber' dhe bie përsëri në Sexhde të dytë me të njëjtin pozicion si hapi 6. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\nKjo përfundon Rekatin e parë.",
-            step9: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për rekatin e dytë. Mos i ngrit duart këtë herë. Përsërit hapin 3 dhe 4: lexo Fatiha + sure, bëj ruku.",
-            step10: "Pas Rukus së rekatit të dytë, kryej hapat 5, 6, 7 dhe 8 (ngrihu nga Ruku, bëj dy Sexhde).",
-            step11: "Pas Sexhdes së dytë të rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). Lexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë. Gishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
-            step12: "Kthe kokën djathtas dhe thuaj 'Es-selamu alejkum ve rahmetullah', pastaj ktheje majtas dhe thuaj të njëjtën. Namazi përfundon. Mund të bësh dua pas namazit.",
-            footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numrin e saktë të rekatëve për çdo namaz dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e rekateve.",
-            // Tabela e rekateve tab
-            rekatetTab: "TABELA E REKATEVE",
-            tableNameHeader: "namazi",
-            tableRekatetLabel: "rekate",
-            tableSunnetHeader: "Sunnet",
-            tableFarzHeader: "Farz",
-            tableVitriHeader: "Vitri",
-            tableTitle: "Tabela e rekateve",
-            tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
-            tableFooter: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër."
-        },
-
-        // Ramazani
-        ramazani: {
-            headerTitle: "Udhëzime për Ramazan",
-            headerSubtitle: "Këshilla kryesore për një Ramazan produktiv",
-            title1: "Nijet i Pastër",
-            desc1: "Agjëro Ramazanin me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, me synim faljen e mëkateve të kaluara.",
-            title2: "Ruaje Agjërimin",
-            desc2: "Kujdes nga prishja e agjërimit gjatë ditëve të Ramazanit pa ndonjë përjashtim të ligjshëm islam, sepse kjo është prej mëkateve të mëdha.",
-            title3: "Fitimi Hallall",
-            desc3: "Sigurohu që ushqimi juaj, pijet dhe veshja juaj të jenë nga fitimi hallall, në mënyrë që veprat dhe lutjet tuaja të jenë të pranuara. Kujdes mos po lëni anash hallallet dhe po e prishni agjërimin me haram.",
-            title4: "Ushqe Agjëruesin",
-            desc4: "Jep ushqim njerëzve që agjërojnë në mënyrë që të fitosh sevapin e tyre të agjërimit.",
-            title5: "Pesë Namazet",
-            desc5: "Falu pesë herë në ditë në kohët e tyre, me qëllim që ta fitosh shpërblimin dhe mbrojtjen e Allahut.",
-            title6: "Jep Sadaka",
-            desc6: "Jep sadaka sepse sadakaja më e mirë është ajo që jipet në Ramazan.",
-            title7: "Vlerëso Kohën",
-            desc7: "Kujdes nga shpenzimi i kohës pa bërë ndonjë vepër të mirë, sepse ti do të jesh përgjegjës dhe do të llogaritesh për kohën e kaluar, dhe do të marrësh shpërblimin për gjithçka që ke punuar gjatë kësaj kohe.",
-            title8: "Lexo Kur'anin",
-            desc8: "Shfrytëzoje mundësinë që të është dhënë edhe në këtë Ramazan me vepra të mira që janë pjesë e tij, duke lexuar Kur’anin e shenjtë, duke ja dhënë hakun dhe menduar për kuptimet e tij, në mënyrë që kjo të jetë argument para Zotit tënd dhe ndërmjetësues në ditën e llogari dhënjes.",
-            title9: "Ruaje Gjuhën",
-            desc9: "Ruaje gjuhën tënde nga gënjeshtra, fyerja, shpifja, përgojimi sepse zvogëlojnë shpërblimin e agjërimit.",
-            title10: "Pendohu Sinqerisht",
-            desc10: "Pendohu tek Allahu me një pendim të sinqertë gjatë gjithë kohës duke u larguar nga mëkatet, duke ndier keqardhje për atë qka ke bërë më parë dhe në mënyrë demonstrative vendos mos ti kthehesh atyre në të ardhmen. Allahu pranon pendimin e atyre që pendohen.",
-            title11: "Namazi i Teravive",
-            desc11: "Fale namazin e teravive dhe vazhdo me namaz veçanërisht gjatë natës së Kadrit me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, dhe synim faljen mëkateve të kaluara.",
-            title12: "Nata e Kadrit",
-            desc12: "Përpjehu të gjallërosh me adhurim natën e Kadrit në dhjetë netët e fundit teke të Ramazanit. Nata e Kadrit është më e mirë se një mijë muaj dhe ai që e gjallëron atë me besim i falen mëkatet e kaluara.",
-            title13: "Syfyri",
-            desc13: "Ndihmoje agjërimin tënd ditor nëpërmjet ngrënies së ushqimit të syfyrit në pjesën e fundit të natës para lindjes së diellit. Ka bekim në këtë vakt dhe ai të fuqizon për ditën që vjen.",
-            title14: "Iftari",
-            desc14: "Shpejto dhe mos vono në prishjen e agjërimit pasi që dielli ka filluar së perënduari në mënyrë që të fitosh dashurinë e Allahut. Prish agjërimin me hurma dhe ujë sipas synetit.",
-            title15: "Vazhdo Pas Ramazanit",
-            desc15: "Ruaje gjendjen me iman të plotë dhe devotshmëri, dhe kryerjen e veprave të mira edhe pas muajit të Ramazanit, deri sa të vdesësh. 'Dhe adhuro Zotin tënd deri sa të vijë ty e vërteta (vdekja).' (Kur'an 15:99)",
-        },
-
-        labels: {
-            // Navigation
-            home: "Kryefaqja",
-            settings: "Cilësimet",
-            qibla: "Kibla",
-            more: "Më Tepër",
-
-            // General
-            loading: "Duke u ngarkuar...",
-            loadingSettings: "Duke ngarkuar cilësimet...",
-            error: "Gabim",
-            accuracy: "Saktësia",
-
-            // Settings
-            theme: "Pamja",
-            language: "Gjuha",
-            location: "Lokacioni",
-            notifications: "Njoftimet",
-            localeDate: "sq-AL",
-
-            // Location
-            locationButtonText1: "Përditëso Lokacionin",
-            locationButtonText2: "Vendos Lokacionin",
-            locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
-            locationSet: "Ju lutemi caktoni lokacionin tuaj për të parë kohët e lutjeve.",
-            locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
-            // Location error messages
-            locationAccessTitle: "Aktivizo qasjen e lokacionit",
-            locationAccessMessage: "Për të shfaqur oraret e sakta të lutjeve, duhet të lejoni qasjen e lokacionit. Ju lutemi hapni cilësimet e pajisjes dhe aktivizoni lokacionin.",
-            locationDeniedTitle: "Lejo qasjen e lokacionit",
-            locationDeniedMessage: "Ju lutemi lejoni qasjen e lokacionit për të përcaktuar qytetin tuaj dhe për të shfaqur oraret e sakta të lutjeve.",
-            gpsOfflineWarningTitle: "Nuk ka lidhje interneti",
-            gpsOfflineWarningMessage: "Pa internet, GPS-i mund të zgjasë disa minuta dhe funksionon vetëm jashtë.\n\nPër rezultate më të shpejta, lidheni së pari me internet.",
-
-            // Compass
-            compasAligned: "I rreshtuar me Kiblën",
-            compasNotAligned: "Rrotullo derisa shigjeta të tregojë nga lart",
-            compassWarning1: "Mbajeni pajisjen drejt (rrafshët)",
-            compassWarning2: "Zhvendos pajisjen në lëvizjen e figurës 8 për të kalibruar",
-            compassWarning3: "Largohuni nga elektronika",
-
-            // Prayer Times
-            prayerTimesStatus: "Gjendja e kohëve të lutjeve",
-            prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
-            loaded: "🟢 Ngarkuar",
-            notLoaded: "🔴 Jo i Ngarkuar",
-
-            // Notifications
-            prayerNotifBody: "Koha për Namaz",
-            prayerRemindBody: "Kujtesë për Namaz",
-            eventNotifBody: "Kujtesa juaj",
-            notificationsDisabled: "Njoftimet janë Çaktivizuar",
-            notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
-
-            // Notifications settings
-            volume: "Volumi i zërit",
-            vibration: "Dridhje",
-            vibrationNote: "ℹ️ Nëse dridhja nuk funksionon, kontrolloni cilësimet e njoftimeve të pajisjes suaj.",
-            snooze: "Kohëzgjatja e kujtesës",
-            offsetOff: "Joaktiv",
-            offsetOnTime: "Në kohë",
-            offsetMinutes: "minuta më parë",
-            batteryOptTitle: "Optimizimi i Baterisë",
-            batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
-            alarmAccessTitle: "Alarme dhe Kujtesa",
-            alarmAccessBody: "⚠️ Alarmet dhe përkujtuesit mund të jenë të çaktivizuar. Shtyp më sipër për të verifikuar.",
-
-            // Settings States
-            updatingSettings: "Duke përditësuar cilësimet...",
-            goToSettings: "Shko te Cilësimet",
-
-            // Extras
-            extrasTitle: "Mjete dhe burime shtesë",
-            extrasSubtitle: "Mjete dhe udhëzues të dobishëm për të mësuar më shumë",
-            abdes: "Abdesi",
-            abdesDesc: "Udhëzues hap pas hapi për abdesin",
-            namaz: "Namazi",
-            namazDesc: "Mëso si të falësh Namazin",
-            tesbih: "Tesbih",
-            tesbihDesc: "Numërues digjital për tesbih",
-            ramadan: "Ramazani",
-            ramadanDesc: "Agjërimi dhe rregullat e Ramazanit",
-            about: "Info",
-            aboutDesc: "Rreth këtij Aplikacioni",
-            support: "Mbështetje",
-            supportDesc: "Ndihmo zhvillimin e aplikacionit",
-
-            // Tesbih
-            tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
-            tLap: "RAUNDI",
-            tLimit: "LIMIT",
-
-            // Errors
-            noInternet: "Nuk ka lidhje interneti. Ju lutemi kyçuni për të shkarkuar kohët e lutjeve.",
-            languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
-            themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
-            notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
-            volumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
-            vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
-            snoozeError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
-            settingsError: "Cilësimet nuk mund të ngarkohen.",
-            prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
-
-            // About
-            aboutText1: "Rreth këtij Aplikacioni",
-            aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
-        },
-        buttons: {
-            cancel: "Anulo",
-            later: "Më vonë",
-            openSettings: "Hap Cilësimet",
-            retry: "Riprovo",
-            continue: "Vazhdo",
-            copy: "Kopjo",
-            copied: "Kopjuar!",
-            share: "Shpërndaj",
-            shared: "Shpërndarë!",
-        },
-        actions: {
-            dismiss: "Në rregull",
-            snooze: "Më kujto më vonë",
-        },
-    },
-
-    // ------------------------------------------------------------
     // Deutsch
     // ------------------------------------------------------------
     de: {
@@ -454,8 +214,6 @@ export const TRANSLATIONS = {
             Maghrib: "Maghrib",
             Isha: "Isha",
         },
-
-        // Abdesi
         abdesi: {
             headerTitle: "Wie man Wudu verrichtet",
             headerSubtitle: "Wie man Wudu Schritt für Schritt durchführt",
@@ -470,8 +228,6 @@ export const TRANSLATIONS = {
             step9: "Wasche zuerst den rechten Fuß, dann den linken bis zu den Knöcheln drei Mal.",
             step10: "Sprich abschließend:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Ich bezeuge, dass es keinen Gott außer Allah gibt, der einzig ist, ohne Partner, und dass Muhammad sein Diener und Gesandter ist).",
         },
-
-        // Namazi
         namazi: {
             // Namazi tab
             namaziTab: "GEBET",
@@ -501,8 +257,6 @@ export const TRANSLATIONS = {
             tableSubtitle: "Das Gebet besteht aus Teilen, die Rak'ahs genannt werden.",
             tableFooter: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
         },
-
-        // Ramazani
         ramazani: {
             headerTitle: "Ramadan-Anleitung",
             headerSubtitle: "Wichtige Tipps für einen gesegneten Ramadan",
@@ -537,27 +291,23 @@ export const TRANSLATIONS = {
             title15: "Nach dem Ramadan weitermachen",
             desc15: "Bewahrt den Zustand des vollkommenen Glaubens und der Frömmigkeit und vollbringt gute Taten auch nach dem Monat Ramadan bis zu eurem Tod. 'Und dient eurem Herrn, bis die Wahrheit (der Tod) zu euch kommt.' (Koran 15:99)"
         },
-
         labels: {
             // Navigation
             home: "Startseite",
             settings: "Einstellungen",
             qibla: "Qibla",
             more: "Mehr",
-
             // General
             loading: "Lädt...",
             loadingSettings: "Einstellungen werden geladen...",
             error: "Fehler",
             accuracy: "Genauigkeit",
-
             // Settings
             theme: "Darstellung",
             language: "Sprache",
             location: "Standort",
             notifications: "Benachrichtigungen",
             localeDate: "de-DE",
-
             // Location
             locationButtonText1: "Standort aktualisieren",
             locationButtonText2: "Standort festlegen",
@@ -571,27 +321,23 @@ export const TRANSLATIONS = {
             locationDeniedMessage: "Bitte erlauben Sie den Standortzugriff, um Ihre Stadt zu erkennen und genaue Gebetszeiten anzuzeigen.",
             gpsOfflineWarningTitle: "Keine Internetverbindung",
             gpsOfflineWarningMessage: "Ohne Internet kann GPS mehrere Minuten dauern und funktioniert nur im Freien.\n\nUm schnellere Ergebnisse zu erzielen, stellen Sie zuerst eine Verbindung zum Internet her.",
-
             // Compass
             compasAligned: "Auf Qibla ausgerichtet",
             compasNotAligned: "Drehen, bis der Pfeil nach oben zeigt",
             compassWarning1: "Gerät flach halten",
             compassWarning2: "Bewegen Sie das Gerät zum Kalibrieren in einer 8-förmigen Bewegung",
             compassWarning3: "Weg von der Elektronik",
-
             // Prayer Times
             prayerTimesStatus: "Status der Gebetszeiten",
             prayerTimesOutdated: "⚠️ Die Gebetszeiten sind veraltet. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
-            loaded: "🟢 Geladen",
-            notLoaded: "🔴 Nicht Geladen",
-
+            loaded: "🟢  Geladen",
+            notLoaded: "🔴  Nicht Geladen",
             // Notifications
             prayerNotifBody: "Zeit zum Gebet",
             prayerRemindBody: "Gebetserinnerung",
             eventNotifBody: "Ihre Erinnerung",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
-
             // Notifications settings
             volume: "Lautstärke",
             vibration: "Vibration",
@@ -604,11 +350,9 @@ export const TRANSLATIONS = {
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen. Tippe oben, um die Systemeinstellungen anzupassen.",
             alarmAccessTitle: "Alarme & Erinnerungen",
             alarmAccessBody: "⚠️ Alarme und Erinnerungen sind möglicherweise deaktiviert. Tippen Sie oben, um dies zu bestätigen.",
-
             // Settings States
             updatingSettings: "Einstellungen werden aktualisiert...",
             goToSettings: "Zu Einstellungen",
-
             // Extras
             extrasTitle: "Zusätzliche Werkzeuge und Ressourcen",
             extrasSubtitle: "Nützliche Tools und Anleitungen, um mehr zu lernen",
@@ -624,12 +368,10 @@ export const TRANSLATIONS = {
             aboutDesc: "Über diese App",
             support: "Unterstützung",
             supportDesc: "Unterstütze die App-Entwicklung",
-
             // Tesbih
             tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen.",
             tLap: "RUNDE",
             tLimit: "LIMIT",
-
             // Errors
             noInternet: "Keine Internetverbindung. Bitte verbinden Sie sich, um die Gebetszeiten herunterzuladen.",
             languageError: "Spracheinstellung konnte nicht aktualisiert werden.",
@@ -640,7 +382,6 @@ export const TRANSLATIONS = {
             snoozeError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             settingsError: "Einstellungen konnten nicht geladen werden.",
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
-
             // About
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie ist so konzipiert, dass sie einfach, zuverlässig ist und Ihnen hilft, Ihre Gebetsroutine einzuhalten.",
@@ -663,6 +404,410 @@ export const TRANSLATIONS = {
     },
 
     // ------------------------------------------------------------
+    // Shqip
+    // ------------------------------------------------------------
+    sq: {
+        prayers: {
+            Imsak: "Imsaku",
+            Fajr: "Sabahu",
+            Sunrise: "Lindja e Diellit",
+            Dhuhr: "Dreka",
+            Asr: "Ikindia",
+            Maghrib: "Akshami",
+            Isha: "Jacia",
+        },
+        abdesi: {
+            headerTitle: "Marrja e abdesit",
+            headerSubtitle: "Si të merret abdesi hap pas hapi",
+            step1: "Bëje nijetin tënd me zemër për të marrë abdesin dhe, para se të fillosh, thuaj Bismilah.",
+            step2: "Laj duart deri në kyçe.",
+            step3: "Shpërlaj gojën 3 herë.",
+            step4: "Shpërlaj hundën 3 herë.",
+            step5: "Laj fytyrën 3 herë.",
+            step6: "Laj krahët deri në bërryl 3 herë duke filluar nga krahu i djathtë, pastaj të majtin.",
+            step7: "Me duar të lagura, fërko kokën.",
+            step8: "Me duar të lagura, fërko veshët.",
+            step9: "Laj këmbën e djathtë, pastaj të majtën, deri mbi kyçe, nga 3 herë.",
+            step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
+        },
+        namazi: {
+            // Namazi tab
+            namaziTab: "NAMAZI",
+            headerTitle: "Falja e namazit",
+            headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
+            step1: "Qëndro drejt Kibles dhe bëj nijetin me zemër. Ngriji duart derisa gishti i madh të prekë veshin dhe thuaj: 'Allahu Ekber' (Allahu është më i Madhi). Për burrat: Gishtat të hapur dhe jo të shtrënguar fort. Për gratë: Duart ngrihen deri në nivel të supit.",
+            step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti, o Allah, dhe i lavdëruar; i bekuar është emri Yt, e lartë është madhëria Jote dhe s’ka Zot tjetër përveç Teje.)",
+            step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther):\n\n'Eudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...'\n\nPastaj Fatiha + një sure. Këmbët paralele, me largësi 4 gishta (burrat).",
+            step4: "Thuaj 'Allahu Ekber' dhe përkulju në Ruku. Shpina e drejtë, kokë në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). Thuaj 3 herë:\n\n'Subhane Rabbijel Adhim.'\n\n(I Shenjtë është Zoti im, i Madhi.)\n\nSytë nga vendi i Sexhdes.",
+            step5: "Ngrihu nga Ruku duke thënë 'Semi Allahu limen hamideh' dhe kur je drejtuar tërësisht thuaj:\n\n'Rabbena ve lekel hamd.'\n\n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.)\n\nDuart anash trupit.",
+            step6: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. 7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. Burrat: bërryla e ngritur, bërryti larg nga kërciri, krahët larg nga brinjët. Gratë: të grumbulluar. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\n(I Shenjtë është Zoti im, më i Larti.)",
+            step7: "Thuaj 'Allahu Ekber' dhe ngrihu ulur. Këmba e majtë e shtrirë (burrat), e djathta me gishta nga Kibla. Gratë: të dy këmbët djathtas. Qëndro pak në këtë pozicion. Mund të thuash:\n\n'Rabbigfir li, Rabbigfir li.'\n\n(O Zoti im më fal, o Zoti im më fal.)",
+            step8: "Thuaj 'Allahu Ekber' dhe bie përsëri në Sexhde të dytë me të njëjtin pozicion si hapi 6. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\nKjo përfundon Rekatin e parë.",
+            step9: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për rekatin e dytë. Mos i ngrit duart këtë herë. Përsërit hapin 3 dhe 4: lexo Fatiha + sure, bëj ruku.",
+            step10: "Pas Rukus së rekatit të dytë, kryej hapat 5, 6, 7 dhe 8 (ngrihu nga Ruku, bëj dy Sexhde).",
+            step11: "Pas Sexhdes së dytë të rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). Lexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë. Gishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
+            step12: "Kthe kokën djathtas dhe thuaj 'Es-selamu alejkum ve rahmetullah', pastaj ktheje majtas dhe thuaj të njëjtën. Namazi përfundon. Mund të bësh dua pas namazit.",
+            footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numrin e saktë të rekatëve për çdo namaz dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e rekateve.",
+            // Tabela e rekateve tab
+            rekatetTab: "TABELA E REKATEVE",
+            tableNameHeader: "namazi",
+            tableRekatetLabel: "rekate",
+            tableSunnetHeader: "Sunnet",
+            tableFarzHeader: "Farz",
+            tableVitriHeader: "Vitri",
+            tableTitle: "Tabela e rekateve",
+            tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
+            tableFooter: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër."
+        },
+        ramazani: {
+            headerTitle: "Udhëzime për Ramazan",
+            headerSubtitle: "Këshilla kryesore për një Ramazan produktiv",
+            title1: "Nijet i Pastër",
+            desc1: "Agjëro Ramazanin me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, me synim faljen e mëkateve të kaluara.",
+            title2: "Ruaje Agjërimin",
+            desc2: "Kujdes nga prishja e agjërimit gjatë ditëve të Ramazanit pa ndonjë përjashtim të ligjshëm islam, sepse kjo është prej mëkateve të mëdha.",
+            title3: "Fitimi Hallall",
+            desc3: "Sigurohu që ushqimi juaj, pijet dhe veshja juaj të jenë nga fitimi hallall, në mënyrë që veprat dhe lutjet tuaja të jenë të pranuara. Kujdes mos po lëni anash hallallet dhe po e prishni agjërimin me haram.",
+            title4: "Ushqe Agjëruesin",
+            desc4: "Jep ushqim njerëzve që agjërojnë në mënyrë që të fitosh sevapin e tyre të agjërimit.",
+            title5: "Pesë Namazet",
+            desc5: "Falu pesë herë në ditë në kohët e tyre, me qëllim që ta fitosh shpërblimin dhe mbrojtjen e Allahut.",
+            title6: "Jep Sadaka",
+            desc6: "Jep sadaka sepse sadakaja më e mirë është ajo që jipet në Ramazan.",
+            title7: "Vlerëso Kohën",
+            desc7: "Kujdes nga shpenzimi i kohës pa bërë ndonjë vepër të mirë, sepse ti do të jesh përgjegjës dhe do të llogaritesh për kohën e kaluar, dhe do të marrësh shpërblimin për gjithçka që ke punuar gjatë kësaj kohe.",
+            title8: "Lexo Kur'anin",
+            desc8: "Shfrytëzoje mundësinë që të është dhënë edhe në këtë Ramazan me vepra të mira që janë pjesë e tij, duke lexuar Kur’anin e shenjtë, duke ja dhënë hakun dhe menduar për kuptimet e tij, në mënyrë që kjo të jetë argument para Zotit tënd dhe ndërmjetësues në ditën e llogari dhënjes.",
+            title9: "Ruaje Gjuhën",
+            desc9: "Ruaje gjuhën tënde nga gënjeshtra, fyerja, shpifja, përgojimi sepse zvogëlojnë shpërblimin e agjërimit.",
+            title10: "Pendohu Sinqerisht",
+            desc10: "Pendohu tek Allahu me një pendim të sinqertë gjatë gjithë kohës duke u larguar nga mëkatet, duke ndier keqardhje për atë qka ke bërë më parë dhe në mënyrë demonstrative vendos mos ti kthehesh atyre në të ardhmen. Allahu pranon pendimin e atyre që pendohen.",
+            title11: "Namazi i Teravive",
+            desc11: "Fale namazin e teravive dhe vazhdo me namaz veçanërisht gjatë natës së Kadrit me besim dhe vendosmëri për të kërkuar shpërblimin e Allahut fuqiplotë, dhe synim faljen mëkateve të kaluara.",
+            title12: "Nata e Kadrit",
+            desc12: "Përpjehu të gjallërosh me adhurim natën e Kadrit në dhjetë netët e fundit teke të Ramazanit. Nata e Kadrit është më e mirë se një mijë muaj dhe ai që e gjallëron atë me besim i falen mëkatet e kaluara.",
+            title13: "Syfyri",
+            desc13: "Ndihmoje agjërimin tënd ditor nëpërmjet ngrënies së ushqimit të syfyrit në pjesën e fundit të natës para lindjes së diellit. Ka bekim në këtë vakt dhe ai të fuqizon për ditën që vjen.",
+            title14: "Iftari",
+            desc14: "Shpejto dhe mos vono në prishjen e agjërimit pasi që dielli ka filluar së perënduari në mënyrë që të fitosh dashurinë e Allahut. Prish agjërimin me hurma dhe ujë sipas synetit.",
+            title15: "Vazhdo Pas Ramazanit",
+            desc15: "Ruaje gjendjen me iman të plotë dhe devotshmëri, dhe kryerjen e veprave të mira edhe pas muajit të Ramazanit, deri sa të vdesësh. 'Dhe adhuro Zotin tënd deri sa të vijë ty e vërteta (vdekja).' (Kur'an 15:99)",
+        },
+        labels: {
+            // Navigation
+            home: "Kryefaqja",
+            settings: "Cilësimet",
+            qibla: "Kibla",
+            more: "Më Tepër",
+            // General
+            loading: "Duke u ngarkuar...",
+            loadingSettings: "Duke ngarkuar cilësimet...",
+            error: "Gabim",
+            accuracy: "Saktësia",
+            // Settings
+            theme: "Pamja",
+            language: "Gjuha",
+            location: "Lokacioni",
+            notifications: "Njoftimet",
+            localeDate: "sq-AL",
+            // Location
+            locationButtonText1: "Përditëso Lokacionin",
+            locationButtonText2: "Vendos Lokacionin",
+            locationOff: "Lokacioni është çaktivizuar. Shtyp butonin më poshtë për të hapur cilësimet dhe për të lejuar qasjen.",
+            locationSet: "Ju lutemi caktoni lokacionin tuaj për të parë kohët e lutjeve.",
+            locationError: "Dështoi në marrjen e lokacionit. Ju lutemi provoni përsëri.",
+            // Location error messages
+            locationAccessTitle: "Aktivizo qasjen e lokacionit",
+            locationAccessMessage: "Për të shfaqur oraret e sakta të lutjeve, duhet të lejoni qasjen e lokacionit. Ju lutemi hapni cilësimet e pajisjes dhe aktivizoni lokacionin.",
+            locationDeniedTitle: "Lejo qasjen e lokacionit",
+            locationDeniedMessage: "Ju lutemi lejoni qasjen e lokacionit për të përcaktuar qytetin tuaj dhe për të shfaqur oraret e sakta të lutjeve.",
+            gpsOfflineWarningTitle: "Nuk ka lidhje interneti",
+            gpsOfflineWarningMessage: "Pa internet, GPS-i mund të zgjasë disa minuta dhe funksionon vetëm jashtë.\n\nPër rezultate më të shpejta, lidheni së pari me internet.",
+            // Compass
+            compasAligned: "I rreshtuar me Kiblën",
+            compasNotAligned: "Rrotullo derisa shigjeta të tregojë nga lart",
+            compassWarning1: "Mbajeni pajisjen drejt (rrafshët)",
+            compassWarning2: "Zhvendos pajisjen në lëvizjen e figurës 8 për të kalibruar",
+            compassWarning3: "Largohuni nga elektronika",
+            // Prayer Times
+            prayerTimesStatus: "Gjendja e kohëve të lutjeve",
+            prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
+            loaded: "🟢  Ngarkuar",
+            notLoaded: "🔴  Jo i Ngarkuar",
+            // Notifications
+            prayerNotifBody: "Koha për Namaz",
+            prayerRemindBody: "Kujtesë për Namaz",
+            eventNotifBody: "Kujtesa juaj",
+            notificationsDisabled: "Njoftimet janë Çaktivizuar",
+            notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
+            // Notifications settings
+            volume: "Volumi i zërit",
+            vibration: "Dridhje",
+            vibrationNote: "ℹ️ Nëse dridhja nuk funksionon, kontrolloni cilësimet e njoftimeve të pajisjes suaj.",
+            snooze: "Kohëzgjatja e kujtesës",
+            offsetOff: "Joaktiv",
+            offsetOnTime: "Në kohë",
+            offsetMinutes: "minuta më parë",
+            batteryOptTitle: "Optimizimi i Baterisë",
+            batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
+            alarmAccessTitle: "Alarme dhe Kujtesa",
+            alarmAccessBody: "⚠️ Alarmet dhe përkujtuesit mund të jenë të çaktivizuar. Shtyp më sipër për të verifikuar.",
+            // Settings States
+            updatingSettings: "Duke përditësuar cilësimet...",
+            goToSettings: "Shko te Cilësimet",
+            // Extras
+            extrasTitle: "Mjete dhe burime shtesë",
+            extrasSubtitle: "Mjete dhe udhëzues të dobishëm për të mësuar më shumë",
+            abdes: "Abdesi",
+            abdesDesc: "Udhëzues hap pas hapi për abdesin",
+            namaz: "Namazi",
+            namazDesc: "Mëso si të falësh Namazin",
+            tesbih: "Tesbih",
+            tesbihDesc: "Numërues digjital për tesbih",
+            ramadan: "Ramazani",
+            ramadanDesc: "Agjërimi dhe rregullat e Ramazanit",
+            about: "Info",
+            aboutDesc: "Rreth këtij Aplikacioni",
+            support: "Mbështetje",
+            supportDesc: "Ndihmo zhvillimin e aplikacionit",
+            // Tesbih
+            tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
+            tLap: "RAUNDI",
+            tLimit: "LIMIT",
+            // Errors
+            noInternet: "Nuk ka lidhje interneti. Ju lutemi kyçuni për të shkarkuar kohët e lutjeve.",
+            languageError: "Dështoi në përditësimin e cilësimit të gjuhës.",
+            themeError: "Dështoi në përditësimin e cilësimit të pamjes.",
+            notificationError: "Dështoi në përditësimin e cilësimit të njoftimeve.",
+            volumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
+            vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
+            snoozeError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
+            settingsError: "Cilësimet nuk mund të ngarkohen.",
+            prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
+            // About
+            aboutText1: "Rreth këtij Aplikacioni",
+            aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
+        },
+        buttons: {
+            cancel: "Anulo",
+            later: "Më vonë",
+            openSettings: "Hap Cilësimet",
+            retry: "Riprovo",
+            continue: "Vazhdo",
+            copy: "Kopjo",
+            copied: "Kopjuar!",
+            share: "Shpërndaj",
+            shared: "Shpërndarë!",
+        },
+        actions: {
+            dismiss: "Në rregull",
+            snooze: "Më kujto më vonë",
+        },
+    },
+
+    // ------------------------------------------------------------
+    // Türkçe
+    // ------------------------------------------------------------
+    tr: {
+        prayers: {
+            Imsak: "İmsak",
+            Fajr: "Sabah",
+            Sunrise: "Güneş",
+            Dhuhr: "Öğle",
+            Asr: "İkindi",
+            Maghrib: "Akşam",
+            Isha: "Yatsı",
+        },
+        abdesi: {
+            headerTitle: "Abdest Alma",
+            headerSubtitle: "Adım adım abdest alma rehberi",
+            step1: "Abdest alma niyetinizi kalben yapın ve başlamadan önce Bismillah deyin.",
+            step2: "Ellerinizi bileklere kadar yıkayın.",
+            step3: "Ağzınızı üç kez çalkalayın.",
+            step4: "Burnunuzu üç kez çalkalayın.",
+            step5: "Yüzünüzü üç kez yıkayın.",
+            step6: "Kollarınızı dirseklere kadar üç kez yıkayın, önce sağ kol sonra sol kol.",
+            step7: "Islak ellerinizle başınızı mesh edin.",
+            step8: "Islak ellerinizle kulaklarınızı mesh edin.",
+            step9: "Sağ ayağınızı sonra sol ayağınızı bileklere kadar üç kez yıkayın.",
+            step10: "Son olarak şunu söyleyin:\nEşhedü en la ilahe illallah vahdehu la şerike leh ve eşhedü enne Muhammeden abduhu ve resuluhu.\n\n(Allah'tan başka ilah olmadığına, O'nun bir olduğuna ve Muhammed'in O'nun kulu ve elçisi olduğuna şehadet ederim).",
+        },
+        namazi: {
+            // Namazi tab
+            namaziTab: "Namaz",
+            headerTitle: "Namaz Kılma",
+            headerSubtitle: "2 rekat namaz için temel rehber",
+            step1: "Kıbleye dönün ve kalben niyet edin. Elleriniz başparmaklar kulak memelerine gelecek şekilde kaldırın ve 'Allahu Ekber' deyin. Erkekler: Parmaklar doğal olarak açık, sıkılmamış. Kadınlar: Eller omuz hizasına kadar kaldırılır.",
+            step2: "Sağ elinizi solunuzun üzerine göbek altına (erkekler) veya göğsüne (kadınlar) koyun. İstiftah duasını okuyun:\n\nSubhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.\n\n(Sen çok yücesin Allah'ım, hamd sanadır, ismin mübarektir, yüceliğin büyüktür ve sana ortak yoktur).",
+            step3: "Eudhu, Besmele'yi okuyun, sonra Fatiha suresini ve başka bir sure (örneğin İhlas veya Kevser) okuyun:\n\nEudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...\n\nSonra Fatiha + başka bir sure. Ayaklar paralel, aralarında dört parmak mesafe (erkekler).",
+            step4: "'Allahu Ekber' deyin ve rükûa gidin. Sırt düz, baş sırtla hizalı, eller dizlere açık (erkekler) veya kapalı (kadınlar). Üç kez söyleyin:\n\nSubhane Rabbijel Adhim.\n\n(Rabbim çok yücedir).\n\nGözler secde yerindedir.",
+            step5: "Rükûdan 'Semi Allahu limen hamideh' diyerek kalkın ve tam ayağa kalktığınızda söyleyin:\n\nRabbena ve lekel hamd.\n\n(Allah, kendisini hamd ile övenleri işitir. Ey Rabbimiz, hamd sana aittir).\n\nEller vücudun yanında.",
+            step6: "'Allahu Ekber' deyin ve secdeye gidin. Yedi organın yere temas etmesi gerekir: Alın, burun, iki avuç, iki diz ve ayak parmaklarının uçları. Erkekler: Dirsekler kalkık, karnı uyluklardan uzak, kollar kaburga kemiklerinden uzak. Kadınlar: Vücut toplanmış. Üç kez söyleyin:\n\nSubhane Rabbijel A'la.\n\n(Rabbim çok yüksektir).",
+            step7: "'Allahu Ekber' deyin ve oturun. Erkekler: Sol ayak açık, sağ ayak dik ve parmakları kıbleye dönük. Kadınlar: Her iki ayak sağa doğru. Biraz bu pozisyonda kalın. Şöyle diyebilirsiniz:\n\nRabbigfir li, Rabbigfir li.\n\n(Ey Rabbim beni bağışla, ey Rabbim beni bağışla).",
+            step8: "'Allahu Ekber' deyin ve ikinci secdeye aynı şekilde gidin. Üç kez söyleyin:\n\nSubhane Rabbijel A'la.\n\nBöylece ilk rekat tamamlanır.",
+            step9: "'Allahu Ekber' deyin ve ikinci rekata kalkın, bu sefer ellerinizi kaldırmayın. 3. ve 4. adımları tekrarlayın: Fatiha + sure okuyun, sonra rükûa gidin.",
+            step10: "İkinci rekatın rükûundan sonra, önceki gibi kalkın ve iki secdeyi yapın.",
+            step11: "İkinci rekatın ikinci secdesinden sonra, 'Allahu Ekber' deyin ve oturun. Ettehiyyatü, Allahumme Sal-li, Allahumme Barik ve Rabbena dualarını okuyun. Sağ elin işaret parmağı şehadet getirilirken kaldırılır.",
+            step12: "Sağa selam vererek 'Es-selamu alejkum ve rahmetullah' deyin, sonra sola dönün ve aynı şeyi söyleyin. Namaz tamamlanır. Namazdan sonra dua edebilirsiniz.",
+            footerText: "Bu, 2 rekat namaz için temel bir rehberdir. Detaylar, her namaz için doğru rekat sayısı ve özel kurallar için lütfen alimlere danışın veya rekat tablosuna bakın.",
+            // Tabela e rekateve tab
+            rekatetTab: "Rekat Tablosu",
+            tableNameHeader: "Namaz",
+            tableRekatetLabel: "Rekat",
+            tableSunnetHeader: "Sünnet",
+            tableFarzHeader: "Farz",
+            tableVitriHeader: "Vitr",
+            tableTitle: "Rekat Tablosu",
+            tableSubtitle: "Namaz, rekat adı verilen bölümlerden oluşur.",
+            tableFooter: "Her namaz, farz veya sünnet olsun, Allah rızası için kılınır ve başka hiç kimse için değil."
+        },
+        ramazani: {
+            headerTitle: "Ramazan Rehberi",
+            headerSubtitle: "Verimli bir Ramazan için temel ipuçları",
+            title1: "Temiz Niyet",
+            desc1: "Ramazan'ı iman ve Allah'ın rızasını arama kararlılığıyla tutun, geçmiş günahların affını hedefleyin.",
+            title2: "Oruç Tutun",
+            desc2: "Ramazan günlerinde, İslami olarak geçerli bir mazeret olmadan orucunuzu bozacak şeylerden sakının, çünkü bu büyük günahlardan biridir.",
+            title3: "Helal Kazanç",
+            desc3: "Yiyeceklerinizin, içeceklerinizin ve giysilerinizin helal kazançtan olduğundan emin olun, böylece amelleriniz ve dualarınız kabul edilir. Helalleri ihmal etmeyin ve haram ile orucunuzu bozmayın.",
+            title4: "Oruçluları Besleyin",
+            desc4: "Oruç tutan insanlara yiyecek vererek onların sevabını kazanın.",
+            title5: "Beş Vakit Namaz",
+            desc5: "Günde beş vakit namaz kılın, böylece Allah'ın rızasını ve korumasını kazanın.",
+            title6: "Sadaka Verin",
+            desc6: "Sadaka verin çünkü en iyi sadaka Ramazan ayında verilen sadakadır.",
+            title7: "Zamanı Değerlendirin",
+            desc7: "Zamanınızı iyi ameller yapmadan harcamaktan kaçının, çünkü geçirdiğiniz zaman için sorumlu tutulacak ve bu süre boyunca yaptığınız her şeyin sevabını alacaksınız.",
+            title8: "Kur'an Okuyun",
+            desc8: "Bu Ramazan'da size verilen fırsatı, Kuran-ı Kerim'i okuyarak, ona hakkını vererek ve anlamları üzerinde düşünerek iyi amellerle değerlendirin, böylece bu sizin için Allah katında bir delil ve hesap gününde bir şefaatçi olur.",
+            title9: "Dilini Koru",
+            desc9: "Yalan söylemekten, hakaret etmekten, iftira atmaktan ve gıybetten uzak durun çünkü bunlar oruç sevabını azaltır.",
+            title10: "Samimi Tövbe",
+            desc10: "Sürekli olarak Allah'a samimi bir tövbe ile tövbe edin, günahlardan uzak durarak, geçmişte yaptıklarınız için pişmanlık duyarak ve gelecekte onlara dönmeme kararı alarak. Allah tövbeleri kabul eder.",
+            title11: "Teravih Namazı",
+            desc11: "Teravih namazını kılın ve özellikle Kadir Gecesi'nde namaza devam edin, iman ve Allah'ın rızasını arama kararlılığıyla, geçmiş günahların affını hedefleyin.",
+            title12: "Kadir Gecesi",
+            desc12: "Ramazan'ın son on gecesinde Kadir Gecesi'ni ibadetle ihya etmeye çalışın. Kadir Gecesi bin aydan daha hayırlıdır ve onu imanla ihya edenin geçmiş günahları affedilir.",
+            title13: "Sahur",
+            desc13: "Güne başlamanıza yardımcı olmak için, güneş doğmadan önceki gece yarısına yakın bir zamanda sahur yemeği yiyin. Bu vakitte bereket vardır ve sizi gelecek gün için güçlendirir.",
+            title14: "İftar",
+            desc14: "Güneş batmaya başladığında orucunuzu bozmada gecikmeyin, böylece Allah'ın sevgisini kazanın. Sünnete uygun olarak hurma ve su ile orucunuzu açın.",
+            title15: "Ramazan Sonrası Devam",
+            desc15: "İmanınızı ve ibadetlerinizi tam tutun, ve Ramazan ayından sonra da iyi ameller yapmaya devam edin, ta ki ölünceye kadar. 'Ve Rabbine ibadet et, ta ki sana hak geldiği zamana kadar.' (Kuran 15:99)",
+        },
+        labels: {
+            // Navigation
+            home: "Ana Sayfa",
+            settings: "Ayarlar",
+            qibla: "Kıble",
+            more: "Daha Fazla",
+            // General
+            loading: "Yükleniyor...",
+            loadingSettings: "Ayarlar yükleniyor...",
+            error: "Hata",
+            accuracy: "Doğruluk",
+            // Settings
+            theme: "Tema",
+            language: "Dil",
+            location: "Konum",
+            notifications: "Bildirimler",
+            localeDate: "tr-TR",
+            // Location
+            locationButtonText1: "Konumu Güncelle",
+            locationButtonText2: "Konumu Ayarla",
+            locationOff: "Konum kapalı. Aşağıdaki butona basarak ayarları açıp erişime izin verin.",
+            locationSet: "Namaz vakitlerini görmek için lütfen konumunuzu ayarlayın.",
+            locationError: "Konum alınamadı. Lütfen tekrar deneyin.",
+            // Location error messages
+            locationAccessTitle: "Konum Erişimini Aç",
+            locationAccessMessage: "Doğru namaz vakitlerini göstermek için konum erişimine izin vermeniz gerekir. Lütfen cihaz ayarlarını açın ve konumu etkinleştirin.",
+            locationDeniedTitle: "Konum Erişimine İzin Ver",
+            locationDeniedMessage: "Lütfen konum erişimine izin verin, böylece şehrinizi belirleyebilir ve doğru namaz vakitlerini gösterebiliriz.",
+            gpsOfflineWarningTitle: "İnternet Bağlantısı Yok",
+            gpsOfflineWarningMessage: "İnternet olmadan GPS birkaç dakika sürebilir ve sadece dışarıda çalışır.\n\nDaha hızlı sonuçlar için önce internete bağlanın.",
+            // Compass
+            compasAligned: "Kıble ile hizalanmış",
+            compasNotAligned: "Yukarıdaki oku gösterecek şekilde cihazı döndürün",
+            compassWarning1: "Cihazınızı düz tutun (yatay)",
+            compassWarning2: "Kalibrasyon için cihazı 8 şeklinde hareket ettirin",
+            compassWarning3: "Elektronik cihazlardan uzak durun",
+            // Prayer Times
+            prayerTimesStatus: "Namaz vakitleri durumu",
+            prayerTimesOutdated: "⚠️ Namaz vakitleri güncel değil. Güncellemek için yukarıdaki yenileme simgesine basın.",
+            loaded: "🟢  Yüklendi",
+            notLoaded: "🔴  Yüklenmedi",
+            // Notifications
+            prayerNotifBody: "Namaz vakti",
+            prayerRemindBody: "Namaz hatırlatıcısı",
+            eventNotifBody: "Hatırlatmanız",
+            notificationsDisabled: "Bildirimler Devre Dışı",
+            notificationsDisabledMessage: "Namaz hatırlatmaları almak için lütfen sistem ayarlarından bildirimleri etkinleştirin.",
+            // Notifications settings
+            volume: "Bildirim Sesi",
+            vibration: "Titreşim",
+            vibrationNote: "ℹ️ Titreşim çalışmazsa, lütfen cihazınızın bildirim ayarlarını kontrol edin.",
+            snooze: "Hatırlatma Erteleme Süresi",
+            offsetOff: "Kapalı",
+            offsetOnTime: "Zamanında",
+            offsetMinutes: "dakika önce",
+            batteryOptTitle: "Pil Optimizasyonu",
+            batteryOptBody: "⚠️ Pil optimizasyonu etkin. Bildirimler gecikebilir. Düzeltmek için yukarıya basarak sistem ayarlarına gidin.",
+            alarmAccessTitle: "Alarmlar ve Hatırlatıcılar",
+            alarmAccessBody: "⚠️ Alarmlar ve hatırlatıcılar devre dışı olabilir. Lütfen doğrulamak için yukarıya basın.",
+            // Settings States
+            updatingSettings: "Ayarlar güncelleniyor...",
+            goToSettings: "Ayarlar'a Git",
+            // Extras
+            extrasTitle: "Ek Araçlar ve Kaynaklar",
+            extrasSubtitle: "Daha fazla öğrenmek için faydalı araçlar ve rehberler",
+            abdes: "Abdest",
+            abdesDesc: "Abdest için adım adım rehber",
+            namaz: "Namaz",
+            namazDesc: "Namaz nasıl kılınır öğrenin",
+            tesbih: "Tesbih",
+            tesbihDesc: "Dijital tesbih sayacı",
+            ramadan: "Ramazan",
+            ramadanDesc: "Ramazan orucu ve kuralları",
+            about: "Hakkında",
+            aboutDesc: "Bu Uygulama Hakkında",
+            support: "Destek",
+            supportDesc: "Uygulama geliştirmeye yardım edin",
+            // Tesbih
+            tInstruction: "Tesbih saymak için daireye dokunun.",
+            tLap: "TUR",
+            tLimit: "LİMİT",
+            // Errors
+            noInternet: "İnternet bağlantısı yok. Namaz vakitlerini indirmek için lütfen bağlanın.",
+            languageError: "Dil ayarı güncellenemedi.",
+            themeError: "Tema ayarı güncellenemedi.",
+            notificationError: "Bildirim ayarı güncellenemedi.",
+            volumeError: "Bildirim sesi güncellenemedi.",
+            vibrationError: "Bildirim titreşimi güncellenemedi.",
+            snoozeError: "Bildirim erteleme süresi güncellenemedi.",
+            settingsError: "Ayarlar yüklenemedi.",
+            prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
+            // About
+            aboutText1: "Bu Uygulama Hakkında",
+            aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri sağlar. Basit, güvenilir ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
+        },
+        buttons: {
+            cancel: "İptal",
+            later: "Daha sonra",
+            openSettings: "Ayarları Aç",
+            retry: "Tekrar dene",
+            continue: "Devam",
+            copy: "Kopyala",
+            copied: "Kopyalandı!",
+            share: "Paylaş",
+            shared: "Paylaşıldı!",
+        },
+        actions: {
+            dismiss: "Tamam",
+            snooze: "Bana daha sonra hatırlat",
+        },
+    },
+
+    // ------------------------------------------------------------
     // Arabic
     // ------------------------------------------------------------
     ar: {
@@ -675,8 +820,6 @@ export const TRANSLATIONS = {
             Maghrib: "المغرب",
             Isha: "العشاء",
         },
-
-        // Abdesi
         abdesi: {
             headerTitle: "الوضوء",
             headerSubtitle: "كيفية أداء الوضوء خطوة بخطوة",
@@ -691,8 +834,6 @@ export const TRANSLATIONS = {
             step9: "اغسل قدمك اليمنى ثم اليسرى إلى الكعبين ثلاث مرات.",
             step10: "ثم قل:\nأشهد أن لا إله إلا الله وحده لا شريك له، وأشهد أن محمدًا عبده ورسوله.\n\n(أشهد أن لا معبود بحق إلا الله، وأن محمدًا عبده ورسوله).",
         },
-
-        // Namazi
         namazi: {
             namaziTab: "الصلاة",
             headerTitle: "كيفية الصلاة",
@@ -720,8 +861,6 @@ export const TRANSLATIONS = {
             tableSubtitle: "تتكون الصلاة من أجزاء تُسمى ركعات.",
             tableFooter: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
         },
-
-        // Ramazani
         ramazani: {
             headerTitle: "إرشادات رمضان",
             headerSubtitle: "نصائح أساسية لشهر رمضان المبارك",
@@ -756,27 +895,23 @@ export const TRANSLATIONS = {
             title15: "الاستمرار بعد رمضان",
             desc15: "داوم على الطاعة والعمل الصالح بعد رمضان حتى تلقى الله. ﴿واعبد ربك حتى يأتيك اليقين﴾ (الحجر: 99)",
         },
-
         labels: {
             // Navigation
             home: "الرئيسية",
             settings: "الإعدادات",
             qibla: "القبلة",
             more: "المزيد",
-
             // General
             loading: "جاري التحميل...",
             loadingSettings: "جاري تحميل الإعدادات...",
             error: "خطأ",
             accuracy: "الدقة",
-
             // Settings
             theme: "المظهر",
             language: "اللغة",
             location: "الموقع",
             notifications: "الإشعارات",
             localeDate: "ar",
-
             // Location
             locationButtonText1: "تحديث الموقع",
             locationButtonText2: "تحديد الموقع",
@@ -790,27 +925,23 @@ export const TRANSLATIONS = {
             locationDeniedMessage: "يرجى السماح بالوصول إلى الموقع لاكتشاف مدينتك وعرض أوقات الصلاة الصحيحة.",
             gpsOfflineWarningTitle: "لا يوجد اتصال بالإنترنت",
             gpsOfflineWarningMessage: "بدون إنترنت قد يستغرق GPS عدة دقائق ولا يعمل إلا في الأماكن المفتوحة.\n\nلنتائج أسرع، اتصل بالإنترنت أولًا.",
-
             // Compass
             compasAligned: "متجه نحو القبلة",
             compasNotAligned: "قم بتدوير الجهاز حتى يشير السهم للأعلى",
             compassWarning1: "أمسك الجهاز بشكل مستوٍ",
             compassWarning2: "حرّك الجهاز على شكل رقم 8 للمعايرة",
             compassWarning3: "ابتعد عن الأجهزة الإلكترونية",
-
             // Prayer Times
             prayerTimesStatus: "حالة أوقات الصلاة",
             prayerTimesOutdated: "⚠️ أوقات الصلاة قديمة. اضغط على أيقونة التحديث.",
-            loaded: "🟢 تم التحميل",
-            notLoaded: "🔴 غير محمّل",
-
+            loaded: "🟢  تم التحميل",
+            notLoaded: "🔴  غير محمّل",
             // Notifications
             prayerNotifBody: "حان وقت الصلاة",
             prayerRemindBody: "تذكير بالصلاة",
             eventNotifBody: "تذكيرك",
             notificationsDisabled: "الإشعارات معطلة",
             notificationsDisabledMessage: "لتلقي تذكيرات الصلاة، يرجى تفعيل الإشعارات من إعدادات النظام.",
-
             // Notifications settings
             volume: "مستوى الصوت",
             vibration: "الاهتزاز",
@@ -823,11 +954,9 @@ export const TRANSLATIONS = {
             batteryOptBody: "⚠️ تحسين البطارية مفعل. قد تتأخر الإشعارات. اضغط لتعديل الإعدادات.",
             alarmAccessTitle: "المنبهات والتذكيرات",
             alarmAccessBody: "⚠️ قد تكون المنبهات والتذكيرات معطلة. اضغط للتحقق.",
-
             // Settings States
             updatingSettings: "جاري تحديث الإعدادات...",
             goToSettings: "الانتقال إلى الإعدادات",
-
             // Extras
             extrasTitle: "أدوات وموارد إضافية",
             extrasSubtitle: "أدلة وأدوات مفيدة للتعلّم",
@@ -843,12 +972,10 @@ export const TRANSLATIONS = {
             aboutDesc: "حول هذا التطبيق",
             support: "ادعمني",
             supportDesc: "ادعم تطوير التطبيق",
-
             // Tesbih
             tInstruction: "اضغط على الدائرة لعدّ التسبيح.",
             tLap: "دورة",
             tLimit: "الحد",
-
             // Errors
             noInternet: "لا يوجد اتصال بالإنترنت. يرجى الاتصال لتحميل أوقات الصلاة.",
             languageError: "فشل في تحديث إعداد اللغة.",
@@ -859,7 +986,6 @@ export const TRANSLATIONS = {
             snoozeError: "فشل في تحديث مدة تأجيل الإشعارات.",
             settingsError: "فشل في تحميل الإعدادات.",
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
-
             // About
             aboutText1: "حول هذا التطبيق",
             aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة بناءً على موقعك. تم تصميمه ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",

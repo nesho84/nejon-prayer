@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { storage } from "@/store/storage";
 import { useAppContext } from "@/context/AppContext";
-import useTranslation from "@/hooks/useTranslation";
+import { useLanguageStore } from "@/store/languageStore";
 import { getPrayerTimes } from "@/services/prayersService";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 
@@ -14,7 +14,9 @@ const STALE_DAYS = 3;
 
 export function PrayersProvider({ children }) {
     const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useAppContext();
-    const { tr } = useTranslation();
+
+    // languageStore
+    const tr = useLanguageStore((state) => state.tr);
 
     const [prayerTimes, setPrayerTimes] = useState(null);
     const [prayersError, setPrayersError] = useState(null);
@@ -98,7 +100,7 @@ export function PrayersProvider({ children }) {
             if (!location) {
                 console.log("📍 No location available");
                 setPrayerTimes(null);
-                setPrayersError(tr("labels.noLocation"));
+                setPrayersError(tr.labels.locationSet);
                 return;
             }
 
@@ -140,10 +142,10 @@ export function PrayersProvider({ children }) {
                 setPrayerTimes(null);
                 if (!hasInternet) {
                     // First time user with no internet
-                    setPrayersError(tr("labels.noInternet"));
+                    setPrayersError(tr.labels.noInternet);
                 } else {
                     // Online but no data
-                    setPrayersError(tr("labels.prayersError"));
+                    setPrayersError(tr.labels.prayersError);
                 }
                 return;
             }
@@ -191,7 +193,7 @@ export function PrayersProvider({ children }) {
             await loadPrayerTimes();
         } catch (err) {
             console.error("Location access error:", err);
-            setPrayersError(tr("labels.locationError"));
+            setPrayersError(tr.labels.locationError);
         } finally {
             setIsLoading(false);
             setIsReady(true);

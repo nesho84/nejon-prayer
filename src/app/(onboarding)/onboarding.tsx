@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useThemeContext } from "@/context/ThemeContext";
 import { useAppContext } from "@/context/AppContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
@@ -9,21 +8,19 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
 import { useOnboardingStore } from "@/store/onboardingStore";
-
-export type Language = "en" | "sq" | "de" | "ar";
-
-// Language options with flags
-const LANGUAGES = [
-  { value: 'en' as Language, label: 'English', icon: '🇬🇧' },
-  { value: 'sq' as Language, label: 'Shqip', icon: '🇦🇱' },
-  { value: 'de' as Language, label: 'Deutsch', icon: '🇩🇪' },
-  { value: 'ar' as Language, label: 'العربية', icon: '🇸🇦' },
-];
+import { useLanguageStore } from "@/store/languageStore";
+import { Language, LANGUAGES } from "@/types/language.types";
+import { useThemeStore } from "@/store/themeStore";
 
 export default function OnboardingScreen() {
-  const { theme } = useThemeContext();
+  // Stores
+  const theme = useThemeStore((state) => state.theme);
   const setOnboarding = useOnboardingStore((state) => state.setOnboarding);
+  const language = useLanguageStore((state) => state.language);
+  const tr = useLanguageStore((state) => state.tr);
+  const setLanguage = useLanguageStore((state) => state.setLanguage);
 
+  // Contexts
   const {
     appSettings,
     isReady: settingsReady,
@@ -31,25 +28,31 @@ export default function OnboardingScreen() {
     saveAppSettings
   } = useAppContext();
 
+
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>(appSettings?.language || 'en');
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
-  const languageRef = useRef(appSettings?.language ?? "en");
+  const languageRef = useRef(language); // @TODO: should be removed after refactor
   const locationRef = useRef(appSettings?.location);
   const fullAddressRef = useRef(appSettings?.fullAddress);
   const timeZoneRef = useRef(appSettings?.timeZone);
 
-  // ----------------------------
+  // ------------------------------------------------------------
   // 1️⃣ (Step 1) Handle language
-  // ----------------------------
-  async function handleLanguage() {
+  // ------------------------------------------------------------
+  async function handleLanguage(value?: string | number) {
     setLocalLoading(true);
     try {
-      // Update languageRef: updated in picker->onValueChange
-      setStep(2);
+      // If called with a language value (from picker), update language
+      if (value && typeof value === 'string') {
+        languageRef.current = value as Language;
+        setLanguage(value as Language);
+      } else {
+        // If called from Next button, proceed to next step
+        setStep(2);
+      }
     } catch (err) {
       console.error("Language change error:", err);
       Alert.alert("Error", "Failed to save language setting.");
@@ -64,7 +67,7 @@ export default function OnboardingScreen() {
   async function requestLocation() {
     setLocalLoading(true);
     try {
-      const data = await getUserLocation();
+      const data = await getUserLocation(tr);
 
       if (!data) {
         console.log("📍 Location denied or unavailable, continuing anyway");
@@ -123,7 +126,7 @@ export default function OnboardingScreen() {
 
       // Update AppContext
       await saveAppSettings({
-        language: languageRef.current,
+        language: languageRef.current, // @TODO: should be removed after refactor
         location: locationRef.current,
         fullAddress: fullAddressRef.current,
         timeZone: timeZoneRef.current,
@@ -162,11 +165,8 @@ export default function OnboardingScreen() {
               <CustomPicker
                 style={{ color: theme.text }}
                 items={LANGUAGES}
-                selectedValue={selectedLanguage}
-                onValueChange={(value) => {
-                  languageRef.current = value;
-                  setSelectedLanguage(value as Language);
-                }}
+                selectedValue={language}
+                onValueChange={handleLanguage}
                 enabled={!localLoading}
                 textColor={theme.text}
                 selectedColor={theme.text}
@@ -175,7 +175,7 @@ export default function OnboardingScreen() {
             </View>
             <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.primary }]}
-              onPress={handleLanguage}
+              onPress={() => handleLanguage()}
             >
               <Text style={[styles.buttonText, { color: theme.white }]}>Next</Text>
             </TouchableOpacity>

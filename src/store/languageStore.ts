@@ -1,14 +1,15 @@
 import { TRANSLATIONS } from "@/constants/translations";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Language } from "@/types/language.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-export type Language = keyof typeof TRANSLATIONS;
+import { mmkvStorage } from "./storage";
 
 interface LanguageState {
   language: Language;
   tr: typeof TRANSLATIONS.en;
+  isReady: boolean;
   setLanguage: (language: Language) => void;
+  setReady: (isReady: boolean) => void;
 }
 
 export const useLanguageStore = create<LanguageState>()(
@@ -16,16 +17,20 @@ export const useLanguageStore = create<LanguageState>()(
     (set) => ({
       language: "en",
       tr: TRANSLATIONS.en,
+      isReady: false,
 
       setLanguage: (language) => set({ language: language, tr: TRANSLATIONS[language] }),
+
+      setReady: (ready) => set({ isReady: ready }),
     }),
     {
       name: "language-store",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({ language: state.language }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.tr = TRANSLATIONS[state.language];
+          state.setReady(true);
         }
       },
     }

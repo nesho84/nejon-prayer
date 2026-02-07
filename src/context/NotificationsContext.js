@@ -6,8 +6,6 @@ import { usePrayersContext } from "@/context/PrayersContext";
 import useTranslation from "@/hooks/useTranslation";
 import { scheduleNotifications, handleNotificationEvent } from '@/services/notificationsService';
 
-import { DEFAULT_NOTIFICATION_SETTINGS } from "@/constants/notifications"; // this is work in progress!
-
 export const NotificationsContext = createContext();
 
 // MMKV storage key
