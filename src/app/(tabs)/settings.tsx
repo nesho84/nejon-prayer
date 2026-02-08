@@ -28,22 +28,24 @@ import { Theme, THEMES } from "@/types/theme.types";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 
 export default function SettingsScreen() {
-    // themeStore
+    // Stores
     const theme = useThemeStore((state) => state.theme);
     const themeMode = useThemeStore((state) => state.themeMode);
     const setTheme = useThemeStore((state) => state.setTheme);
-
-    // languageStore
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
     const setLanguage = useLanguageStore((state) => state.setLanguage);
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+    const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
+    const batteryOptimization = useDeviceSettingsStore((state) => state.batteryOptimization);
+    const alarmPermission = useDeviceSettingsStore((state) => state.alarmPermission);
 
     // Contexts
     const {
         appSettings,
-        deviceSettings,
         isLoading: settingsLoading,
         settingsError,
         saveAppSettings,
@@ -185,7 +187,7 @@ export default function SettingsScreen() {
     async function handleNotifications() {
         setLocalLoading(true);
         try {
-            if (!deviceSettings.notificationPermission) {
+            if (!notificationPermission) {
                 const settings = await notifee.requestPermission();
                 if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
                     // Not allowed → open system settings
@@ -403,9 +405,9 @@ export default function SettingsScreen() {
                             {tr.labels.location}
                         </Text>
                         <MaterialIcons
-                            name={deviceSettings.locationPermission ? "location-on" : "location-off"}
+                            name={locationPermission ? "location-on" : "location-off"}
                             size={24}
-                            color={deviceSettings.locationPermission ? theme.accent : theme.border} />
+                            color={locationPermission ? theme.accent : theme.border} />
                     </View>
 
                     {/* Divider */}
@@ -490,16 +492,16 @@ export default function SettingsScreen() {
                             {tr.labels.notifications}
                         </Text>
                         <Switch
-                            value={deviceSettings.notificationPermission}
+                            value={notificationPermission}
                             onValueChange={handleNotifications}
                             disabled={localLoading}
                             trackColor={{ false: theme.overlay, true: theme.accent }}
-                            thumbColor={deviceSettings.notificationPermission ? theme.border : theme.border}
+                            thumbColor={notificationPermission ? theme.border : theme.border}
                         />
                     </View>
 
                     {/* ------ Notifications (show only if notificationPermission=true) ------ */}
-                    {deviceSettings.notificationPermission && (
+                    {notificationPermission && (
                         <>
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider }]}></View>
@@ -593,19 +595,19 @@ export default function SettingsScreen() {
                             {/* ------ Battery Optimization ------ */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.batteryOptTitle} {deviceSettings.batteryOptimization ? "" : "✅"}
+                                    {tr.labels.batteryOptTitle} {batteryOptimization ? "" : "✅"}
                                 </Text>
                                 <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
                                     <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
                                 </Pressable>
                             </View>
-                            {deviceSettings.batteryOptimization &&
+                            {batteryOptimization &&
                                 <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                     {tr.labels.batteryOptBody}
                                 </Text>}
 
                             {/* ------ Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) ------ */}
-                            {(!deviceSettings.alarmPermission && deviceSettings.batteryOptimization) &&
+                            {(!alarmPermission && batteryOptimization) &&
                                 <>
                                     {/* Divider */}
                                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>

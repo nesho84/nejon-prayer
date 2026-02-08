@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback, use } from "react";
 import { storage } from "@/store/storage";
 import { useAppContext } from "@/context/AppContext";
 import { useLanguageStore } from "@/store/languageStore";
 import { getPrayerTimes } from "@/services/prayersService";
 import { getUserLocation, hasLocationChanged } from "@/services/locationService";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 
 export const PrayersContext = createContext();
 
@@ -13,10 +14,11 @@ const PRAYERS_KEY = "@prayers_key";
 const STALE_DAYS = 3;
 
 export function PrayersProvider({ children }) {
-    const { appSettings, deviceSettings, isReady: settingsReady, saveAppSettings } = useAppContext();
+    const { appSettings, isReady: settingsReady, saveAppSettings } = useAppContext();
 
-    // languageStore
+    // Stores
     const tr = useLanguageStore((state) => state.tr);
+    const hasInternet = useDeviceSettingsStore((state) => state.hasInternet);
 
     const [prayerTimes, setPrayerTimes] = useState(null);
     const [prayersError, setPrayersError] = useState(null);
@@ -29,7 +31,6 @@ export function PrayersProvider({ children }) {
 
     // Extract location for cleaner dependency tracking
     const location = appSettings?.location;
-    const hasInternet = deviceSettings?.internetConnection;
 
     // ------------------------------------------------------------
     // Check if data is outdated (older than STALE_DAYS)

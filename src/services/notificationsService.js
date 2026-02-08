@@ -25,7 +25,7 @@ const NOTIFICATION_CONFIG = {
         channel: 'prayer',
         color: AndroidColor.OLIVE,
         categoryId: 'prayer-category',
-        notifBody: 'labels.prayerNotifBody', // "Time for Prayer"
+        notifBody: 'prayerNotifBody', // "Time for Prayer"
     },
     reminder: {
         type: 'prayer-reminder',
@@ -33,7 +33,7 @@ const NOTIFICATION_CONFIG = {
         channel: 'general',
         color: AndroidColor.RED,
         categoryId: 'prayer-reminder-category',
-        notifBody: 'labels.prayerRemindBody', // "Prayer Reminder"
+        notifBody: 'prayerRemindBody', // "Prayer Reminder"
     },
     event: {
         type: 'event-notification',
@@ -41,7 +41,7 @@ const NOTIFICATION_CONFIG = {
         channel: 'general',
         color: AndroidColor.BLUE,
         categoryId: 'event-category',
-        notifBody: 'labels.eventNotifBody', // "???"
+        notifBody: 'eventNotifBody', // "???"
     },
 };
 
@@ -119,8 +119,8 @@ const getNotificationId = (name) => {
 const getNotificationActions = (type, tr) => {
     if (type === 'prayer') {
         return [
-            { title: tr("actions.dismiss"), pressAction: { id: 'dismiss' } },
-            { title: tr("actions.snooze"), pressAction: { id: 'snooze' } },
+            { title: tr.actions.dismiss, pressAction: { id: 'dismiss' } },
+            { title: tr.actions.snooze, pressAction: { id: 'snooze' } },
         ];
     }
     return [
@@ -333,7 +333,7 @@ export async function scheduleNotifications(settings) {
             // Get configuration for this notification type
             const nConfig = NOTIFICATION_CONFIG[type];
             const notifId = getNotificationId(name);
-            const notifBody = `${tr(nConfig.notifBody)} (${timeString})`;
+            const notifBody = `${tr.labels[nConfig.notifBody]} (${timeString})`;
             const channelId = `${nConfig.channel}-vib-${notifSettings?.vibration}`;
             const actions = getNotificationActions(type, tr);
 
@@ -342,14 +342,14 @@ export async function scheduleNotifications(settings) {
                 // Notification configuration
                 {
                     id: notifId,
-                    title: `» ${tr(`prayers.${name}`)} «`,
+                    title: `» ${tr.prayers[name]}} «`,
                     body: notifBody,
                     data: {
                         type: nConfig.type,
                         prayer: name,
-                        reminderTitle: `» ${tr(`prayers.${name}`)} «`,
-                        reminderBody: type === 'prayer' ? tr("labels.prayerRemindBody") : "",
-                        language: language,
+                        reminderTitle: `» ${tr.prayers[name]}} «`,
+                        reminderBody: type === 'prayer' ? tr.labels.prayerRemindBody : "",
+                        language: String(language),
                         volume: String(notifSettings?.volume ?? 1.0),
                         vibration: notifSettings?.vibration,
                         snooze: String(notifSettings?.snooze ?? 5),
@@ -396,7 +396,7 @@ export async function scheduleNotifications(settings) {
             console.log(`${typeEmoji} Scheduled ${name} at ${formattedDate}${offsetInfo}`);
         }
 
-        console.log(`🔔 Successfully scheduled ${scheduledCount} notification(s)`);
+        console.log(`🔔 Successfully scheduled ${scheduledCount} notification(s) with Language ${String(language)}`);
     } catch (err) {
         console.error("❌ Failed to schedule notifications:", err);
     }

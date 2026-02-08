@@ -5,7 +5,8 @@ import { PrayersProvider } from "@/context/PrayersContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 import AppLoading from "@/components/AppLoading";
 import { useOnboardingStore } from "@/store/onboardingStore";
-import { useSystemThemeListener } from "@/hooks/useSystemThemeListener";
+import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
+import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 
 const RootStack = () => {
   const isReady = useOnboardingStore((s) => s.isReady);
@@ -31,8 +32,8 @@ const RootStack = () => {
 
 export default function RootLayout() {
   // Set up all listeners
-  useSystemThemeListener();
-  // useDeviceSettingsSync(); // @TODO: upcoming
+  useSystemThemeSync();
+  useDeviceSettingsSync();
   // useNotificationForegroundHandler(); // @TODO: upcoming
 
   return (

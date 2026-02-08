@@ -19,17 +19,18 @@ import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { PrayerCountdown, PrayerName, PrayerSettings, PrayerTimeEntry } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 
 export default function HomeScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
 
     // Contexts
     const {
         appSettings,
-        deviceSettings,
         isReady: settingsReady,
         isLoading: settingsLoading,
         settingsError
@@ -133,7 +134,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     const handlePrayerNotificationIcon = (prayerName: PrayerName) => {
         const pst = notifSettings?.prayers?.[prayerName];
-        const enabled = deviceSettings.notificationPermission && pst?.enabled;
+        const enabled = notificationPermission && pst?.enabled;
 
         if (!enabled)
             return (props: IconProps) => <MaterialCommunityIcons name="bell-off-outline" {...props} style={[props.style, { opacity: 0.3, paddingBottom: 1 }]} />;
@@ -150,7 +151,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     const handlePrayerNotification = (selected: PrayerSettings, prayerName: PrayerName) => {
         // Check system notifications first
-        if (!deviceSettings.notificationPermission) {
+        if (!notificationPermission) {
             Alert.alert(
                 tr.labels.notificationsDisabled,
                 tr.labels.notificationsDisabledMessage,

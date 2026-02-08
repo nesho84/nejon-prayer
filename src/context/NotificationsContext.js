@@ -3,8 +3,9 @@ import { storage } from "@/store/storage";
 import notifee, { AndroidColor } from "@notifee/react-native";
 import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
-import useTranslation from "@/hooks/useTranslation";
+import { useLanguageStore } from "@/store/languageStore";
 import { scheduleNotifications, handleNotificationEvent } from '@/services/notificationsService';
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 
 export const NotificationsContext = createContext();
 
@@ -35,9 +36,14 @@ export function NotificationsProvider({ children }) {
     // Ref to prevent race conditions
     const schedulingInProgress = useRef(false);
 
-    const { deviceSettings, isReady: settingsReady } = useAppContext();
+    const { isReady: settingsReady } = useAppContext();
     const { prayerTimes, isReady: prayersReady } = usePrayersContext();
-    const { language, tr } = useTranslation();
+
+    // Stores
+    const language = useLanguageStore((state) => state.language);
+    const tr = useLanguageStore((state) => state.tr);
+
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
 
     // ------------------------------------------------------------
     // Load notification settings from MMKV storage
@@ -112,7 +118,7 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     useEffect(() => {
         if (!settingsReady || !prayersReady) return;
-        if (!deviceSettings?.notificationPermission || !prayerTimes) return;
+        if (!notificationPermission || !prayerTimes) return;
         if (schedulingInProgress.current) return;
 
         let mounted = true;
@@ -133,7 +139,7 @@ export function NotificationsProvider({ children }) {
             mounted = false;
             schedulingInProgress.current = false;
         };
-    }, [settingsReady, deviceSettings?.notificationPermission, prayersReady, prayerTimes, notifSettings, language, tr]);
+    }, [settingsReady, notificationPermission, prayersReady, prayerTimes, notifSettings, language, tr]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee

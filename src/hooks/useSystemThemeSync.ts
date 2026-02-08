@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
 import { useThemeStore } from "@/store/themeStore";
 
-export function useSystemThemeListener() {
+export function useSystemThemeSync() {
   const themeMode = useThemeStore((state) => state.themeMode);
   const applySystemTheme = useThemeStore((state) => state.applySystemTheme);
 

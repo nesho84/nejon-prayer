@@ -1,9 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { AppState, Platform } from "react-native";
 import { storage } from "@/store/storage";
-import NetInfo from "@react-native-community/netinfo";
-import * as Location from "expo-location";
-import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
 
 export const AppContext = createContext();
 
@@ -19,20 +15,9 @@ export function AppProvider({ children }) {
         timeZone: null,
     });
 
-    // Live device/system settings (not stored)
-    const [deviceSettings, setDeviceSettings] = useState({
-        internetConnection: false,
-        locationPermission: false,
-        notificationPermission: false,
-        batteryOptimization: true,
-        alarmPermission: false,
-    });
-
     const [isReady, setIsReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [settingsError, setSettingsError] = useState(null);
-
-    const appStateRef = useRef(AppState.currentState);
 
     // ------------------------------------------------------------
     // Load app settings from MMKV storage
@@ -77,72 +62,19 @@ export function AppProvider({ children }) {
     // ------------------------------------------------------------
     useEffect(() => {
         loadAppSettings();
-        syncDeviceSettings();
     }, []);
-
-    // ------------------------------------------------------------
-    // Sync Device settings (Android only)
-    // ------------------------------------------------------------
-    const syncDeviceSettings = useCallback(async () => {
-        if (Platform.OS !== 'android') return;
-
-        try {
-            // Location permissions
-            const locationEnabled = await Location.hasServicesEnabledAsync();
-            // Notification permissions
-            const ns = await notifee.getNotificationSettings();
-            const notificationsEnabled = ns.authorizationStatus === AuthorizationStatus.AUTHORIZED;
-            const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
-            const alarmEnabled = ns.android?.alarm === AndroidNotificationSetting.ENABLED;
-            // Internet connection
-            const netInfo = await NetInfo.fetch();
-            const internetEnabled = !!(netInfo.isConnected && netInfo.isInternetReachable);
-
-            const newDeviceSettings = {
-                internetConnection: internetEnabled,
-                locationPermission: locationEnabled,
-                notificationPermission: notificationsEnabled,
-                batteryOptimization: batteryOptimizationEnabled,
-                alarmPermission: alarmEnabled,
-            };
-
-            // Only update state if something actually changed
-            setDeviceSettings((prevSettings) => {
-                const hasChanged = JSON.stringify(prevSettings) !== JSON.stringify(newDeviceSettings);
-                return hasChanged ? newDeviceSettings : prevSettings;
-            });
-        } catch (err) {
-            console.warn('❌ Failed to sync device settings:', err);
-        }
-    }, []);
-
-    // ------------------------------------------------------------
-    // AppState listener - sync device settings!
-    // ------------------------------------------------------------
-    useEffect(() => {
-        const subscription = AppState.addEventListener("change", (nextAppState) => {
-            if (appStateRef.current.match(/inactive|background/) && nextAppState === "active") {
-                syncDeviceSettings();
-            }
-            appStateRef.current = nextAppState;
-            console.log('👁‍🗨 AppState →', appStateRef.current);
-        });
-
-        return () => subscription.remove(); //
-    }, [syncDeviceSettings]);
 
     // ------------------------------------------------------------
     // Memoize context value to prevent unnecessary re-renders
     // ------------------------------------------------------------
     const contextValue = useMemo(() => ({
         appSettings,
-        deviceSettings,
         saveAppSettings,
         reloadAppSettings: loadAppSettings,
         isReady,
         isLoading,
         settingsError,
-    }), [appSettings, deviceSettings, saveAppSettings, loadAppSettings, isReady, isLoading, settingsError]);
+    }), [appSettings, saveAppSettings, loadAppSettings, isReady, isLoading, settingsError]);
 
     return (
         <AppContext.Provider value={contextValue}>
