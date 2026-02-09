@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
-import { useAppContext } from "@/context/AppContext";
 import { usePrayersContext } from "@/context/PrayersContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
@@ -29,6 +28,7 @@ import { Language, LANGUAGES } from "@/types/language.types";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useLocationStore } from "@/store/locationStore";
 
 export default function SettingsScreen() {
     // Stores
@@ -42,16 +42,12 @@ export default function SettingsScreen() {
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const batteryOptimization = useDeviceSettingsStore((state) => state.batteryOptimization);
     const alarmPermission = useDeviceSettingsStore((state) => state.alarmPermission);
+    const location = useLocationStore((state) => state.location);
+    const fullAddress = useLocationStore((state) => state.fullAddress);
+    const timeZone = useLocationStore((state) => state.timeZone);
+    const setLocation = useLocationStore((state) => state.setLocation);
 
     // Contexts
-    const {
-        appSettings,
-        isLoading: settingsLoading,
-        settingsError,
-        saveAppSettings,
-        reloadAppSettings
-    } = useAppContext();
-
     const {
         prayerTimes,
         isLoading: prayersLoading,
@@ -80,7 +76,6 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     const handleSettingsRefresh = async () => {
         try {
-            await reloadAppSettings();
             await reloadNotifSettings();
         } catch (err) {
             console.warn("Settings refresh failed:", err);
@@ -118,9 +113,6 @@ export default function SettingsScreen() {
             // Update languageStore
             setLanguage(value);
 
-            // Update AppContext
-            await saveAppSettings({ language: value }); // @TODO: should be removed after refactor
-
             console.log("🌐 Language changed to:", value);
             // Reschedule notifications with new language (handled in NotificationsContext)
         } catch (err) {
@@ -137,6 +129,13 @@ export default function SettingsScreen() {
     const updateLocation = async () => {
         setLocalLoading(true);
         try {
+            // Current location data
+            const current = {
+                location: location || null,
+                fullAddress: fullAddress || "",
+                timeZone: timeZone || null,
+            };
+
             // Get fresh location
             const data = await getUserLocation(tr);
 
@@ -146,16 +145,16 @@ export default function SettingsScreen() {
             }
 
             // Check for location changes
-            if (!hasLocationChanged(appSettings, data)) {
+            if (!hasLocationChanged(current, data)) {
                 console.log("📍 Location unchanged — skipping save");
                 return;
             } else {
-                // Save appSettings
-                await saveAppSettings({
-                    location: data.location,
-                    fullAddress: data.fullAddress,
-                    timeZone: data.timeZone
-                });
+                // Update locationStore
+                setLocation(
+                    data.location,
+                    data.fullAddress,
+                    data.timeZone
+                );
                 console.log("📍 Location updated to:", data.location);
             }
             // Reschedule notifications with new location (handled in NotificationsContext)
@@ -329,12 +328,12 @@ export default function SettingsScreen() {
     };
 
     // Loading state
-    if (settingsLoading || notifLoading) {
+    if (notifLoading) {
         return <AppLoading text={tr.labels.loadingSettings} />
     }
 
     // Error state
-    if (settingsError || notifError) {
+    if (notifError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
@@ -421,16 +420,16 @@ export default function SettingsScreen() {
                     >
                         <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} onPress={handlePrayersRefresh} />
                         <Text style={[styles.updateLocationButtonText, { color: theme.text2 }]}>
-                            {appSettings?.location
+                            {location
                                 ? (tr.labels.locationButtonText1)
                                 : (tr.labels.locationButtonText2)}
                         </Text>
                     </TouchableOpacity>
 
                     {/* fullAddress */}
-                    {appSettings?.fullAddress && (
+                    {fullAddress && (
                         <Text style={[styles.addressText, { color: theme.placeholder }]}>
-                            {appSettings?.fullAddress || (tr.labels.loading)}
+                            {fullAddress || (tr.labels.loading)}
                         </Text>
                     )}
                 </AppCard>

@@ -34,6 +34,7 @@ export default function RootLayout() {
   // Set up all listeners
   useSystemThemeSync();
   useDeviceSettingsSync();
+  // usePrayersSync(); // @TODO: upcoming
   // useNotificationForegroundHandler(); // @TODO: upcoming
 
   return (

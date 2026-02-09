@@ -3,7 +3,6 @@ import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, 
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAppContext } from '@/context/AppContext';
 import { usePrayersContext } from '@/context/PrayersContext';
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
@@ -17,6 +16,7 @@ import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
 import PrayerModal from "@/components/PrayerModal";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useLocationStore } from "@/store/locationStore";
 import { PrayerCountdown, PrayerName, PrayerSettings, PrayerTimeEntry } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -26,16 +26,12 @@ export default function HomeScreen() {
     const theme = useThemeStore((state) => state.theme);
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
+    const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+    const location = useLocationStore((state) => state.location);
+    const timeZone = useLocationStore((state) => state.timeZone);
 
     // Contexts
-    const {
-        appSettings,
-        isReady: settingsReady,
-        isLoading: settingsLoading,
-        settingsError
-    } = useAppContext();
-
     const {
         prayerTimes,
         isReady: prayersReady,
@@ -46,7 +42,6 @@ export default function HomeScreen() {
 
     const {
         nextPrayerName,
-        nextPrayerTime,
         prayerCountdown,
         remainingSeconds,
         totalSeconds
@@ -172,26 +167,12 @@ export default function HomeScreen() {
     };
 
     // Loading contexts state
-    if (!settingsReady || settingsLoading || !prayersReady || prayersLoading || !notifReady || notifLoading) {
+    if (!prayersReady || prayersLoading || !notifReady || notifLoading) {
         return <AppLoading text={tr.labels.loading} />;
     }
 
-    // Settings error
-    if (settingsError) {
-        return (
-            <AppError
-                icon="alert-circle-outline"
-                iconColor={theme.danger}
-                message={settingsError || tr.labels.settingsError}
-                buttonText={tr.labels.goToSettings}
-                buttonColor={theme.primary}
-                onPress={() => router.navigate("/(tabs)/settings")}
-            />
-        );
-    }
-
     // No location set
-    if (!appSettings.locationPermission && !appSettings.location) {
+    if (!locationPermission && !location) {
         return (
             <AppError
                 icon="location-outline"
@@ -224,7 +205,7 @@ export default function HomeScreen() {
             <AppError
                 icon="alert-circle-outline"
                 iconColor={theme.danger}
-                message={settingsError || tr.labels.settingsError}
+                message={tr.labels.notificationError}
                 buttonText={tr.labels.goToSettings}
                 buttonColor={theme.primary}
                 onPress={() => router.navigate("/(tabs)/settings")}
@@ -249,7 +230,7 @@ export default function HomeScreen() {
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
-                        refreshing={prayersLoading || settingsLoading}
+                        refreshing={prayersLoading}
                         onRefresh={handlePrayersRefresh}
                         tintColor={theme.accent}
                         colors={[theme.accent]}
@@ -262,7 +243,7 @@ export default function HomeScreen() {
                     <View style={styles.locationLeft}>
                         <Ionicons name="location-outline" size={18} color={theme.accent} />
                         <Text style={[styles.locationText, { color: theme.text2 }]}>
-                            {appSettings.timeZone?.location || "Location"}
+                            {timeZone?.location || "Location"}
                         </Text>
                     </View>
                 </View>
@@ -301,7 +282,7 @@ export default function HomeScreen() {
                             }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                         </Text>
                         <Text style={[styles.prayersTimezoneInfo, { color: theme.text2 }]}>
-                            {appSettings.timeZone?.zoneName || ""} • {appSettings.timeZone?.offset || ""}
+                            {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
                         </Text>
                     </View>
 

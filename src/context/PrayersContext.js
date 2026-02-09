@@ -18,7 +18,7 @@ export function PrayersProvider({ children }) {
 
     // Stores
     const tr = useLanguageStore((state) => state.tr);
-    const hasInternet = useDeviceSettingsStore((state) => state.hasInternet);
+    const internetConnection = useDeviceSettingsStore((state) => state.internetConnection);
 
     const [prayerTimes, setPrayerTimes] = useState(null);
     const [prayersError, setPrayersError] = useState(null);
@@ -112,7 +112,7 @@ export function PrayersProvider({ children }) {
             let timings = null;
 
             // ONLINE: fetch from API (always fetch when internet is available)
-            if (hasInternet) {
+            if (internetConnection) {
                 try {
                     timings = await getPrayerTimes(location);
                     if (timings) {
@@ -141,7 +141,7 @@ export function PrayersProvider({ children }) {
             // No data available
             if (!timings) {
                 setPrayerTimes(null);
-                if (!hasInternet) {
+                if (!internetConnection) {
                     // First time user with no internet
                     setPrayersError(tr.labels.noInternet);
                 } else {
@@ -161,7 +161,7 @@ export function PrayersProvider({ children }) {
             isFetchingRef.current = false;
             setIsLoading(false);
         }
-    }, [location, hasInternet, tr, readFromStorage, saveToStorage, checkIfOutdated]);
+    }, [location, internetConnection, tr, readFromStorage, saveToStorage, checkIfOutdated]);
 
     // ------------------------------------------------------------
     // Reload prayer times (requests location first, then loads)
@@ -225,7 +225,7 @@ export function PrayersProvider({ children }) {
 
 
         return () => { mounted = false; };
-    }, [settingsReady, location, hasInternet]);
+    }, [settingsReady, location, internetConnection]);
 
     // ------------------------------------------------------------
     // Memoize context value to prevent unnecessary re-renders

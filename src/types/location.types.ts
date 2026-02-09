@@ -14,7 +14,7 @@ export interface TimeZone {
 }
 
 export interface LocationData {
-  location: Coordinates;
-  fullAddress: string;
+  location: Coordinates | null;
+  fullAddress: string | null;
   timeZone: TimeZone | null;
 }

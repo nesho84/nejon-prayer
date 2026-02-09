@@ -8,9 +8,9 @@ import { useLanguageStore } from "@/store/languageStore";
 
 interface Props {
     loading: boolean;
-    latitude: number | null;
-    longitude: number | null;
-    timeZone: string | null;
+    latitude: number | undefined;
+    longitude: number | undefined;
+    timeZone: string | undefined;
     bgColor?: string;
     color?: string;
     textColor?: string;

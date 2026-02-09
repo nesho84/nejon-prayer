@@ -54,7 +54,9 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: "theme-storage",
       storage: createJSONStorage(() => mmkvStorage),
-      partialize: (state) => ({ themeMode: state.themeMode }),
+      partialize: (state) => ({
+        themeMode: state.themeMode
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Resolve theme based on persisted mode

@@ -9,7 +9,6 @@ const SETTINGS_KEY = "@settings_key";
 export function AppProvider({ children }) {
     // Persistent storage app-level settings
     const [appSettings, setAppSettings] = useState({
-        language: "en",
         location: null,
         fullAddress: null,
         timeZone: null,

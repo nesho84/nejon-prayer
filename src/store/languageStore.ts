@@ -19,14 +19,18 @@ export const useLanguageStore = create<LanguageState>()(
       tr: TRANSLATIONS.en,
       isReady: false,
 
-      setLanguage: (language) => set({ language: language, tr: TRANSLATIONS[language] }),
+      setLanguage: (language) => {
+        set({ language: language, tr: TRANSLATIONS[language] });
+      },
 
       setReady: (ready) => set({ isReady: ready }),
     }),
     {
-      name: "language-store",
+      name: "language-storage",
       storage: createJSONStorage(() => mmkvStorage),
-      partialize: (state) => ({ language: state.language }),
+      partialize: (state) => ({
+        language: state.language
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.tr = TRANSLATIONS[state.language];

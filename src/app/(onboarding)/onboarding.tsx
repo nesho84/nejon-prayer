@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useAppContext } from "@/context/AppContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { getUserLocation } from "@/services/locationService";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,33 +10,29 @@ import { useOnboardingStore } from "@/store/onboardingStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { useThemeStore } from "@/store/themeStore";
+import { useLocationStore } from "@/store/locationStore";
 
 export default function OnboardingScreen() {
   // Stores
-  const theme = useThemeStore((state) => state.theme);
   const setOnboarding = useOnboardingStore((state) => state.setOnboarding);
+  const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
   const tr = useLanguageStore((state) => state.tr);
   const setLanguage = useLanguageStore((state) => state.setLanguage);
-
-  // Contexts
-  const {
-    appSettings,
-    isReady: settingsReady,
-    isLoading: settingsLoading,
-    saveAppSettings
-  } = useAppContext();
-
+  const location = useLocationStore((state) => state.location);
+  const fullAddress = useLocationStore((state) => state.fullAddress);
+  const timeZone = useLocationStore((state) => state.timeZone);
+  const setLocation = useLocationStore((state) => state.setLocation);
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
   const [step, setStep] = useState(1);
 
   // Refs for onboarding data
-  const languageRef = useRef(language); // @TODO: should be removed after refactor
-  const locationRef = useRef(appSettings?.location);
-  const fullAddressRef = useRef(appSettings?.fullAddress);
-  const timeZoneRef = useRef(appSettings?.timeZone);
+  const languageRef = useRef(language);
+  const locationRef = useRef(location);
+  const fullAddressRef = useRef(fullAddress);
+  const timeZoneRef = useRef(timeZone);
 
   // ------------------------------------------------------------
   // 1️⃣ (Step 1) Handle language
@@ -121,16 +116,15 @@ export default function OnboardingScreen() {
   async function finishOnboarding() {
     setLocalLoading(true);
     try {
-      // Update onboarding store
+      // Update onboardingStore
       setOnboarding(true);
 
-      // Update AppContext
-      await saveAppSettings({
-        language: languageRef.current, // @TODO: should be removed after refactor
-        location: locationRef.current,
-        fullAddress: fullAddressRef.current,
-        timeZone: timeZoneRef.current,
-      });
+      // Update locationStore
+      setLocation(
+        locationRef.current,
+        fullAddressRef.current,
+        timeZoneRef.current
+      );
 
       // Redirect to HomeScreen
       // Stack.Protected will auto-redirect to (tabs) when onboarding becomes true
@@ -143,7 +137,7 @@ export default function OnboardingScreen() {
   }
 
   // Loadng state
-  if (!settingsReady || settingsLoading || localLoading) {
+  if (localLoading) {
     return <AppLoading />;
   }
 

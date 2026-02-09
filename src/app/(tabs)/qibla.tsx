@@ -1,16 +1,15 @@
 import { ScrollView, StyleSheet } from "react-native";
-import { useAppContext } from "@/context/AppContext";
 import AppTabScreen from "@/components/AppTabScreen";
 import QiblaCompass from "@/components/QiblaCompass";
 import { useThemeStore } from "@/store/themeStore";
-import { useLanguageStore } from "@/store/languageStore";
+import { useLocationStore } from "@/store/locationStore";
 
 export default function QiblaScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
-
-    // Contexts
-    const { appSettings, settingsLoading } = useAppContext();
+    const isReady = useLocationStore((state) => state.isReady);
+    const location = useLocationStore((state) => state.location);
+    const timeZone = useLocationStore((state) => state.timeZone);
 
     return (
         <AppTabScreen>
@@ -21,10 +20,10 @@ export default function QiblaScreen() {
             >
 
                 <QiblaCompass
-                    loading={settingsLoading}
-                    latitude={appSettings.location?.latitude}
-                    longitude={appSettings.location?.longitude}
-                    timeZone={appSettings.timeZone?.location}
+                    loading={!isReady}
+                    latitude={location?.latitude}
+                    longitude={location?.longitude}
+                    timeZone={timeZone?.location}
                     bgColor={theme.bg}
                     color={theme.primary}
                     textColor={theme.text}

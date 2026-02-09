@@ -105,13 +105,23 @@ export async function getUserLocation(tr: Translations): Promise<LocationData | 
 // ------------------------------------------------------------
 // Detects if user's location, address, or timezone has changed
 // ------------------------------------------------------------
-export const hasLocationChanged = (storedSettings: Partial<LocationData> | null | undefined, newData: LocationData): boolean => {
+export const hasLocationChanged = (
+    storedSettings: Partial<LocationData> | null | undefined,
+    newData: LocationData
+): boolean => {
     const current = storedSettings?.location;
+
+    // Early return if newData.location is null
+    if (!newData.location) {
+        return true; // Consider it changed if new location is null
+    }
 
     const LAT_LON_THRESHOLD = 0.00005; // roughly 5 meters
 
     // Compare coordinates individually to detect changes
     const hasChanged = !current
+        || typeof current.latitude !== 'number'
+        || typeof current.longitude !== 'number'
         || Math.abs(current.latitude - newData.location.latitude) > LAT_LON_THRESHOLD
         || Math.abs(current.longitude - newData.location.longitude) > LAT_LON_THRESHOLD;
 

@@ -15,14 +15,18 @@ export const useOnboardingStore = create<OnboardingState>()(
       onboardingComplete: false,
       isReady: false,
 
-      setOnboarding: (onboardingComplete) => set({ onboardingComplete }),
+      setOnboarding: (onboardingComplete) => {
+        set({ onboardingComplete });
+      },
 
       setReady: (ready) => set({ isReady: ready }),
     }),
     {
-      name: "onboarding-store",
+      name: "onboarding-storage",
       storage: createJSONStorage(() => mmkvStorage),
-      partialize: (state) => ({ onboardingComplete: state.onboardingComplete }),
+      partialize: (state) => ({
+        onboardingComplete: state.onboardingComplete
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.setReady(true);
