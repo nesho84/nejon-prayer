@@ -1,4 +1,4 @@
-export interface Coordinates {
+export interface Cords {
   latitude: number;
   longitude: number;
 }
@@ -14,7 +14,7 @@ export interface TimeZone {
 }
 
 export interface LocationData {
-  location: Coordinates | null;
+  location: Cords | null;
   fullAddress: string | null;
   timeZone: TimeZone | null;
 }

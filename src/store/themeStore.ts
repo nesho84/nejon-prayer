@@ -14,7 +14,6 @@ interface ThemeState {
   isReady: boolean;
   setTheme: (themeMode: ThemeMode) => void;
   applySystemTheme: (isDark: boolean) => void;
-  setReady: (isReady: boolean) => void;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -48,8 +47,6 @@ export const useThemeStore = create<ThemeState>()(
           });
         }
       },
-
-      setReady: (ready) => set({ isReady: ready }),
     }),
     {
       name: "theme-storage",
@@ -62,11 +59,11 @@ export const useThemeStore = create<ThemeState>()(
           // Resolve theme based on persisted mode
           const systemTheme = Appearance.getColorScheme() || "light";
           const resolved: ResolvedTheme = state.themeMode === "system" ? systemTheme : state.themeMode;
-
+          // Set resolved theme and theme colors
           state.resolvedTheme = resolved;
           state.theme = resolved === "dark" ? DARK_COLORS : LIGHT_COLORS;
 
-          state.setReady(true);
+          state.isReady = true;
         }
       },
     }

@@ -1,19 +1,18 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "./storage";
-import { Coordinates, TimeZone } from "@/types/location.types";
+import { Cords, TimeZone } from "@/types/location.types";
 
 interface LocationState {
-  location: Coordinates | null;
+  location: Cords | null;
   fullAddress: string | null;
   timeZone: TimeZone | null;
   isReady: boolean;
   setLocation: (
-    location: Coordinates | null,
+    location: Cords | null,
     fullAddress: string | null,
     timeZone: TimeZone | null
   ) => void;
-  setReady: (isReady: boolean) => void;
 }
 
 export const useLocationStore = create<LocationState>()(
@@ -27,8 +26,6 @@ export const useLocationStore = create<LocationState>()(
       setLocation: (location, fullAddress, timeZone) => {
         set({ location, fullAddress, timeZone });
       },
-
-      setReady: (ready) => set({ isReady: ready }),
     }),
     {
       name: 'location-storage',
@@ -40,7 +37,7 @@ export const useLocationStore = create<LocationState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.setReady(true);
+          state.isReady = true;
         }
       },
     }

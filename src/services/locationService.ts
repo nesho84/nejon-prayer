@@ -1,7 +1,7 @@
 import { Alert, Linking } from 'react-native';
 import * as Location from 'expo-location';
 import NetInfo from '@react-native-community/netinfo';
-import type { Coordinates, TimeZone, LocationData } from '@/types/location.types';
+import { Cords, TimeZone, LocationData } from '@/types/location.types';
 
 type Translations = Record<string, any> | null;
 
@@ -138,7 +138,7 @@ export const hasLocationChanged = (
 // ------------------------------------------------------------
 // Helper: for reverse-geocoding
 // ------------------------------------------------------------
-async function fetchReverseGeocode(coordinates: Coordinates) {
+async function fetchReverseGeocode(coordinates: Cords) {
     // Validate location services
     const locationEnabled = await Location.hasServicesEnabledAsync();
     if (!locationEnabled) {
@@ -174,7 +174,7 @@ async function fetchReverseGeocode(coordinates: Coordinates) {
 // ------------------------------------------------------------
 // Get timezone and location information (works offline too)
 // ------------------------------------------------------------
-export async function getTimeZoneInfo(coordinates: Coordinates): Promise<TimeZone | null> {
+export async function getTimeZoneInfo(coordinates: Cords): Promise<TimeZone | null> {
     try {
         const place = await fetchReverseGeocode(coordinates);
 
@@ -217,7 +217,7 @@ export async function getTimeZoneInfo(coordinates: Coordinates): Promise<TimeZon
 // ------------------------------------------------------------
 // Reverse-geocodes given coordinates into a human-readable Address
 // ------------------------------------------------------------
-export async function formatUserAddress(coordinates: Coordinates): Promise<string | null> {
+export async function formatUserAddress(coordinates: Cords): Promise<string | null> {
     try {
         const place = await fetchReverseGeocode(coordinates);
 

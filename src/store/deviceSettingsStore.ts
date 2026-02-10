@@ -10,6 +10,8 @@ interface DeviceSettingsState {
   notificationPermission: boolean;
   batteryOptimization: boolean;
   alarmPermission: boolean;
+  isReady: boolean;
+  deviceSettingsError: string | null;
   syncDeviceSettings: () => Promise<void>;
 }
 
@@ -20,6 +22,8 @@ export const useDeviceSettingsStore = create<DeviceSettingsState>((set, get) => 
   notificationPermission: false,
   batteryOptimization: true,
   alarmPermission: false,
+  deviceSettingsError: null,
+  isReady: false,
 
   // Sync device settings (Android only)
   syncDeviceSettings: async () => {
@@ -61,8 +65,11 @@ export const useDeviceSettingsStore = create<DeviceSettingsState>((set, get) => 
         set(newSettings);
         // console.log('📱 Device settings synced:', JSON.stringify(newSettings, null, 2));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn('❌ Failed to sync device settings:', err);
+      set({ deviceSettingsError: err.message || 'Failed to sync device settings' });
+    } finally {
+      set({ isReady: true });
     }
   },
 }));

@@ -6,7 +6,6 @@ interface OnboardingState {
   onboardingComplete: boolean;
   isReady: boolean;
   setOnboarding: (onboardingComplete: boolean) => void;
-  setReady: (isReady: boolean) => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -18,8 +17,6 @@ export const useOnboardingStore = create<OnboardingState>()(
       setOnboarding: (onboardingComplete) => {
         set({ onboardingComplete });
       },
-
-      setReady: (ready) => set({ isReady: ready }),
     }),
     {
       name: "onboarding-storage",
@@ -29,7 +26,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.setReady(true);
+          state.isReady = true;
         }
       },
     }

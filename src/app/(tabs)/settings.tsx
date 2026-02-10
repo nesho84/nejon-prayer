@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,10 +14,8 @@ import {
 } from "react-native";
 import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
-import { usePrayersContext } from "@/context/PrayersContext";
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { getUserLocation, hasLocationChanged } from "@/services/locationService";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
@@ -29,36 +27,33 @@ import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLocationStore } from "@/store/locationStore";
+import { usePrayersStore } from "@/store/prayersStore";
 
 export default function SettingsScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const themeMode = useThemeStore((state) => state.themeMode);
-    const setTheme = useThemeStore((state) => state.setTheme);
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
-    const setLanguage = useLanguageStore((state) => state.setLanguage);
     const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const batteryOptimization = useDeviceSettingsStore((state) => state.batteryOptimization);
     const alarmPermission = useDeviceSettingsStore((state) => state.alarmPermission);
+    const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
+    const deviceSettingsError = useDeviceSettingsStore((state) => state.deviceSettingsError);
     const location = useLocationStore((state) => state.location);
     const fullAddress = useLocationStore((state) => state.fullAddress);
-    const timeZone = useLocationStore((state) => state.timeZone);
-    const setLocation = useLocationStore((state) => state.setLocation);
+    const locationReady = useLocationStore.getState().isReady;
+    const prayerTimes = usePrayersStore((state) => state.prayerTimes);
+    const prayersError = usePrayersStore((state) => state.prayersError);
+    const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
+    const lastFetchedDate = usePrayersStore((state) => state.lastFetchedDate);
+    const prayersLoading = usePrayersStore((state) => state.isLoading);
 
     // Contexts
     const {
-        prayerTimes,
-        isLoading: prayersLoading,
-        prayersOutdated,
-        lastFetchedDate,
-        prayersError,
-        reloadPrayerTimes
-    } = usePrayersContext();
-
-    const {
         notifSettings,
+        isReady: notifReady,
         isLoading: notifLoading,
         notifError,
         saveNotifSettings,
@@ -69,6 +64,7 @@ export default function SettingsScreen() {
     const [localLoading, setLocalLoading] = useState(false);
     const [tempVolume, setTempVolume] = useState(Number(notifSettings?.volume ?? 1.0));
 
+    // Refs
     const saveTimeout = useRef<NodeJS.Timeout | number | null>(null);
 
     // ------------------------------------------------------------
@@ -91,7 +87,7 @@ export default function SettingsScreen() {
         setLocalLoading(true);
         try {
             // Update themeStore
-            setTheme(value);
+            useThemeStore.getState().setTheme(value);
 
             console.log("✅ Theme changed to:", value);
         } catch (err) {
@@ -111,10 +107,10 @@ export default function SettingsScreen() {
         setLocalLoading(true);
         try {
             // Update languageStore
-            setLanguage(value);
+            useLanguageStore.getState().setLanguage(value);
 
             console.log("🌐 Language changed to:", value);
-            // Reschedule notifications with new language (handled in NotificationsContext)
+            // @TODO: Reschedule notifications with new language (umpcoming...)
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr.labels.error, tr.labels.languageError);
@@ -129,38 +125,9 @@ export default function SettingsScreen() {
     const updateLocation = async () => {
         setLocalLoading(true);
         try {
-            // Current location data
-            const current = {
-                location: location || null,
-                fullAddress: fullAddress || "",
-                timeZone: timeZone || null,
-            };
-
-            // Get fresh location
-            const data = await getUserLocation(tr);
-
-            if (!data) {
-                console.log("❌ Could not get location");
-                return;
-            }
-
-            // Check for location changes
-            if (!hasLocationChanged(current, data)) {
-                console.log("📍 Location unchanged — skipping save");
-                return;
-            } else {
-                // Update locationStore
-                setLocation(
-                    data.location,
-                    data.fullAddress,
-                    data.timeZone
-                );
-                console.log("📍 Location updated to:", data.location);
-            }
-            // Reschedule notifications with new location (handled in NotificationsContext)
+            await usePrayersStore.getState().reloadPrayerTimes();
         } catch (err) {
-            console.error("Location access error:", err);
-            Alert.alert(tr.labels.error, tr.labels.locationError);
+            console.warn("Prayers refresh failed:", err);
         } finally {
             setLocalLoading(false);
         }
@@ -172,7 +139,7 @@ export default function SettingsScreen() {
     const handlePrayersRefresh = async () => {
         setLocalLoading(true);
         try {
-            await reloadPrayerTimes();
+            await usePrayersStore.getState().reloadPrayerTimes();
         } catch (err) {
             console.warn("Prayers refresh failed:", err);
         } finally {
@@ -328,18 +295,19 @@ export default function SettingsScreen() {
     };
 
     // Loading state
-    if (notifLoading) {
+    if (!deviceSettingsReady || !locationReady || !notifReady || notifLoading) {
+        // prayersLoading is not used, because it covers the entire screen!
         return <AppLoading text={tr.labels.loadingSettings} />
     }
 
     // Error state
-    if (notifError) {
+    if (deviceSettingsError || notifError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>
                     <Ionicons name="settings-outline" size={80} color={theme.primary} />
                 </View>
-                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr.labels.settingsError}</Text>
+                <Text style={[styles.errorText, { color: theme.text2 }]}>{tr.labels.deviceSettingsError}</Text>
                 <TouchableOpacity
                     style={[styles.errorButton, { backgroundColor: theme.danger }]}
                     onPress={handleSettingsRefresh}>
@@ -455,7 +423,8 @@ export default function SettingsScreen() {
                             </Text>
                         )}
                         {/* Prayers loading icon */}
-                        {(prayersLoading || localLoading) ? (<ActivityIndicator size="small" color={theme.accent} />)
+                        {(prayersLoading || localLoading)
+                            ? (<ActivityIndicator size="small" color={theme.accent} />)
                             : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
                     </View>
 

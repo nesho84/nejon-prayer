@@ -9,7 +9,6 @@ interface LanguageState {
   tr: typeof TRANSLATIONS.en;
   isReady: boolean;
   setLanguage: (language: Language) => void;
-  setReady: (isReady: boolean) => void;
 }
 
 export const useLanguageStore = create<LanguageState>()(
@@ -22,8 +21,6 @@ export const useLanguageStore = create<LanguageState>()(
       setLanguage: (language) => {
         set({ language: language, tr: TRANSLATIONS[language] });
       },
-
-      setReady: (ready) => set({ isReady: ready }),
     }),
     {
       name: "language-storage",
@@ -34,7 +31,7 @@ export const useLanguageStore = create<LanguageState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.tr = TRANSLATIONS[state.language];
-          state.setReady(true);
+          state.isReady = true;
         }
       },
     }

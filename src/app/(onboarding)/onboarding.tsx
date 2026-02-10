@@ -62,18 +62,18 @@ export default function OnboardingScreen() {
   async function requestLocation() {
     setLocalLoading(true);
     try {
-      const data = await getUserLocation(tr);
+      const newLocation = await getUserLocation(tr);
 
-      if (!data) {
-        console.log("📍 Location denied or unavailable, continuing anyway");
+      if (!newLocation) {
+        console.log("📍 Location access denied, continuing anyway");
         setStep(3);
         return;
       }
 
       // Update Refs
-      locationRef.current = data.location;
-      fullAddressRef.current = data.fullAddress;
-      timeZoneRef.current = data.timeZone;
+      locationRef.current = newLocation.location;
+      fullAddressRef.current = newLocation.fullAddress;
+      timeZoneRef.current = newLocation.timeZone;
 
       setStep(3);
     } catch (err) {
@@ -111,7 +111,7 @@ export default function OnboardingScreen() {
   }
 
   // ------------------------------------------------------------
-  // 🏁 (Finish) Update AppContext and redirect to HomeScreen
+  // 🏁 (Finish) Save data and redirect to HomeScreen
   // ------------------------------------------------------------
   async function finishOnboarding() {
     setLocalLoading(true);

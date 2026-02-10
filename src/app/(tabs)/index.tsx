@@ -3,7 +3,6 @@ import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, 
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { usePrayersContext } from '@/context/PrayersContext';
 import { useNotificationsContext } from "@/context/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import AppTabScreen from "@/components/AppTabScreen";
@@ -20,6 +19,7 @@ import { useLocationStore } from "@/store/locationStore";
 import { PrayerCountdown, PrayerName, PrayerSettings, PrayerTimeEntry } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { usePrayersStore } from "@/store/prayersStore";
 
 export default function HomeScreen() {
     // Stores
@@ -28,18 +28,16 @@ export default function HomeScreen() {
     const tr = useLanguageStore((state) => state.tr);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+    const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
+    const deviceSettingsError = useDeviceSettingsStore((state) => state.deviceSettingsError);
     const location = useLocationStore((state) => state.location);
     const timeZone = useLocationStore((state) => state.timeZone);
+    const locationReady = useLocationStore.getState().isReady;
+    const prayerTimes = usePrayersStore((state) => state.prayerTimes);
+    const prayersError = usePrayersStore((state) => state.prayersError);
+    const prayersLoading = usePrayersStore((state) => state.isLoading);
 
-    // Contexts
-    const {
-        prayerTimes,
-        isReady: prayersReady,
-        isLoading: prayersLoading,
-        prayersError,
-        reloadPrayerTimes
-    } = usePrayersContext();
-
+    // Next prayer countdown
     const {
         nextPrayerName,
         prayerCountdown,
@@ -47,6 +45,7 @@ export default function HomeScreen() {
         totalSeconds
     } = useNextPrayer(prayerTimes);
 
+    // Contexts
     const {
         notifSettings,
         isReady: notifReady,
@@ -89,11 +88,22 @@ export default function HomeScreen() {
     }, []);
 
     // ------------------------------------------------------------
+    // Load prayer times on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!deviceSettingsReady || !locationReady) return;
+
+        // Load prayer times
+        usePrayersStore.getState().loadPrayerTimes();
+
+    }, [deviceSettingsReady, locationReady, location]);
+
+    // ------------------------------------------------------------
     // Handle prayer times refresh
     // ------------------------------------------------------------
     const handlePrayersRefresh = async () => {
         try {
-            await reloadPrayerTimes();
+            await usePrayersStore.getState().reloadPrayerTimes();
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }
@@ -166,13 +176,27 @@ export default function HomeScreen() {
         savePrayerNotifSettings(prayerName, selected);
     };
 
-    // Loading contexts state
-    if (!prayersReady || prayersLoading || !notifReady || notifLoading) {
+    // Loading state
+    if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady || notifLoading) {
         return <AppLoading text={tr.labels.loading} />;
     }
 
+    // Device Settings error
+    if (deviceSettingsError) {
+        return (
+            <AppError
+                icon="alert-circle-outline"
+                iconColor={theme.danger}
+                message={deviceSettingsError || tr.labels.deviceSettingsError}
+                buttonText={tr.labels.goToSettings}
+                buttonColor={theme.primary}
+                onPress={() => router.navigate("/(tabs)/settings")}
+            />
+        );
+    }
+
     // No location set
-    if (!locationPermission && !location) {
+    if (!locationPermission || !location) {
         return (
             <AppError
                 icon="location-outline"
@@ -186,7 +210,7 @@ export default function HomeScreen() {
     }
 
     // Prayer times error
-    if (prayersError || !prayerTimes) {
+    if (!prayerTimes || prayersError) {
         return (
             <AppError
                 icon="time-outline"
@@ -216,11 +240,13 @@ export default function HomeScreen() {
     // Main Content
     return (
         <AppTabScreen>
-            {/* Notifications Debug utility */}
+            {/* Notifications Test utility */}
             {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={() => testNotification({ appSettings, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={debugChannelsAndScheduled}>
+            </TouchableOpacity> */}
+
+            {/* Notifications Debug utility */}
+            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
             </TouchableOpacity> */}
 

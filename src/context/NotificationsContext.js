@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
 import { storage } from "@/store/storage";
-import notifee, { AndroidColor } from "@notifee/react-native";
-import { useAppContext } from "@/context/AppContext";
-import { usePrayersContext } from "@/context/PrayersContext";
+import notifee from "@notifee/react-native";
 import { useLanguageStore } from "@/store/languageStore";
 import { scheduleNotifications, handleNotificationEvent } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useLocationStore } from "@/store/locationStore";
+import { usePrayersStore } from "@/store/prayersStore";
 
 export const NotificationsContext = createContext();
 
@@ -29,21 +29,21 @@ export function NotificationsProvider({ children }) {
         },
     });
 
+    // Stores
+    const language = useLanguageStore((state) => state.language);
+    const tr = useLanguageStore((state) => state.tr);
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+    const locationReady = useLocationStore((state) => state.isReady);
+    const prayerTimes = usePrayersStore((state) => state.prayerTimes);
+    const prayersLoading = usePrayersStore((state) => state.isLoading);
+
+    // Local state
     const [isReady, setIsReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [notifError, setNotifError] = useState(null);
 
     // Ref to prevent race conditions
     const schedulingInProgress = useRef(false);
-
-    const { isReady: settingsReady } = useAppContext();
-    const { prayerTimes, isReady: prayersReady } = usePrayersContext();
-
-    // Stores
-    const language = useLanguageStore((state) => state.language);
-    const tr = useLanguageStore((state) => state.tr);
-
-    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
 
     // ------------------------------------------------------------
     // Load notification settings from MMKV storage
@@ -117,7 +117,7 @@ export function NotificationsProvider({ children }) {
     // Auto-Schedule notifications when contexts are ready and permission granted
     // ------------------------------------------------------------
     useEffect(() => {
-        if (!settingsReady || !prayersReady) return;
+        if (!locationReady || prayersLoading) return;
         if (!notificationPermission || !prayerTimes) return;
         if (schedulingInProgress.current) return;
 
@@ -139,7 +139,7 @@ export function NotificationsProvider({ children }) {
             mounted = false;
             schedulingInProgress.current = false;
         };
-    }, [settingsReady, notificationPermission, prayersReady, prayerTimes, notifSettings, language, tr]);
+    }, [locationReady, notificationPermission, prayersLoading, prayerTimes, notifSettings, language, tr]);
 
     // ------------------------------------------------------------
     // Foreground event handler for Notifee

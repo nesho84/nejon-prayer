@@ -178,7 +178,7 @@ export const TRANSLATIONS = {
             volumeError: "Failed to update notifications sound volume.",
             vibrationError: "Failed to update notifications vibration.",
             snoozeError: "Failed to update notifications snooze timeout.",
-            settingsError: "Failed to load settings.",
+            deviceSettingsError: "Failed to load settings.",
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
             // About
             aboutText1: "About this App",
@@ -380,7 +380,7 @@ export const TRANSLATIONS = {
             volumeError: "Die Lautstärke der Benachrichtigungen konnte nicht aktualisiert werden.",
             vibrationError: "Die Aktualisierung der Benachrichtigungsvibration ist fehlgeschlagen.",
             snoozeError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
-            settingsError: "Einstellungen konnten nicht geladen werden.",
+            deviceSettingsError: "Einstellungen konnten nicht geladen werden.",
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             // About
             aboutText1: "Über diese App",
@@ -582,7 +582,7 @@ export const TRANSLATIONS = {
             volumeError: "Dështoi përditësimi i volumit të zërit të njoftimeve.",
             vibrationError: "Dështoi përditësimi i dridhjes të njoftimeve.",
             snoozeError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
-            settingsError: "Cilësimet nuk mund të ngarkohen.",
+            deviceSettingsError: "Cilësimet nuk mund të ngarkohen.",
             prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             // About
             aboutText1: "Rreth këtij Aplikacioni",
@@ -784,7 +784,7 @@ export const TRANSLATIONS = {
             volumeError: "Bildirim sesi güncellenemedi.",
             vibrationError: "Bildirim titreşimi güncellenemedi.",
             snoozeError: "Bildirim erteleme süresi güncellenemedi.",
-            settingsError: "Ayarlar yüklenemedi.",
+            deviceSettingsError: "Ayarlar yüklenemedi.",
             prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             // About
             aboutText1: "Bu Uygulama Hakkında",
@@ -984,7 +984,7 @@ export const TRANSLATIONS = {
             volumeError: "فشل في تحديث مستوى صوت الإشعارات.",
             vibrationError: "فشل في تحديث اهتزاز الإشعارات.",
             snoozeError: "فشل في تحديث مدة تأجيل الإشعارات.",
-            settingsError: "فشل في تحميل الإعدادات.",
+            deviceSettingsError: "فشل في تحميل الإعدادات.",
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
             // About
             aboutText1: "حول هذا التطبيق",
