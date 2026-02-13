@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
-import { useNotificationsContext } from "@/context/NotificationsContext";
 import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AppTabScreen from "@/components/AppTabScreen";
@@ -44,22 +43,15 @@ export default function SettingsScreen() {
     const deviceSettingsError = useDeviceSettingsStore((state) => state.deviceSettingsError);
     const location = useLocationStore((state) => state.location);
     const fullAddress = useLocationStore((state) => state.fullAddress);
-    const locationReady = useLocationStore.getState().isReady;
+    const locationReady = useLocationStore((state) => state.isReady);
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
     const lastFetchedDate = usePrayersStore((state) => state.lastFetchedDate);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
-    // const notifSettings = useNotificationsStore((state) => state.notifSettings);
+    const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const notifLoading = useNotificationsStore((state) => state.isLoading);
-
-    // Contexts
-    const {
-        notifSettings,
-        saveNotifSettings,
-        reloadNotifSettings
-    } = useNotificationsContext();
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -67,17 +59,6 @@ export default function SettingsScreen() {
 
     // Refs
     const saveTimeout = useRef<NodeJS.Timeout | number | null>(null);
-
-    // ------------------------------------------------------------
-    // Handle settings refresh
-    // ------------------------------------------------------------
-    const handleSettingsRefresh = async () => {
-        try {
-            await reloadNotifSettings();
-        } catch (err) {
-            console.warn("Settings refresh failed:", err);
-        }
-    }
 
     // ------------------------------------------------------------
     // Change theme
@@ -112,7 +93,7 @@ export default function SettingsScreen() {
 
             console.log("🌐 Language changed to:", value);
 
-            // Reschedule notifications with new language
+            // Reschedule notifications
             await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Language change error:", err);
@@ -198,7 +179,7 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     // Change Notification Sound Volume
     // ------------------------------------------------------------
-    const handleVolume = async (value: Number) => {
+    const handleVolume = async (value: number) => {
         if (notifSettings?.volume === Number(value.toFixed(2))) return; // no change
 
         setLocalLoading(true);
@@ -210,11 +191,13 @@ export default function SettingsScreen() {
         saveTimeout.current = setTimeout(async () => {
             try {
                 // Save notifSettings
-                await saveNotifSettings({ volume: Number(value.toFixed(1)) });
+                useNotificationsStore.getState().setSettings({ volume: Number(value.toFixed(1)) });
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 console.log("🌐 Sound Volume changed to:", Number(value.toFixed(1)));
-                // Reschedule notifications with new volume (handled in NotificationsContext)
+
+                // Reschedule notifications
+                await useNotificationsStore.getState().syncNotifications();
             } catch (err) {
                 console.error("Sound volume change error:", err);
                 Alert.alert(tr.labels.error, tr.labels.volumeError);
@@ -231,10 +214,13 @@ export default function SettingsScreen() {
         setLocalLoading(true);
         try {
             // Save notifSettings
-            await saveNotifSettings({ vibration: value ? 'on' : 'off' });
+            useNotificationsStore.getState().setSettings({ vibration: value ? 'on' : 'off' });
 
             console.log("📳 Vibration changed to:", value ? 'on' : 'off');
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+            // Reschedule notifications
+            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Vibration change error:", err);
             Alert.alert(tr.labels.error, tr.labels.vibrationError);
@@ -246,16 +232,19 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     // Change Notification snozee timeout
     // ------------------------------------------------------------
-    const handleSnooze = async (value: Number) => {
+    const handleSnooze = async (value: number) => {
         if (notifSettings?.snooze === value) return; // no change
 
         setLocalLoading(true);
         try {
             // Save notifSettings
-            await saveNotifSettings({ snooze: value });
+            useNotificationsStore.getState().setSettings({ snooze: value });
 
             console.log(`⏳ Snooze timeout changed to: ${value}min`);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+            // Reschedule notifications
+            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Snooze timeout change error:", err);
             Alert.alert(tr.labels.error, tr.labels.snoozeError);
@@ -311,11 +300,6 @@ export default function SettingsScreen() {
                     <Ionicons name="settings-outline" size={80} color={theme.primary} />
                 </View>
                 <Text style={[styles.errorText, { color: theme.text2 }]}>{tr.labels.deviceSettingsError}</Text>
-                <TouchableOpacity
-                    style={[styles.errorButton, { backgroundColor: theme.danger }]}
-                    onPress={handleSettingsRefresh}>
-                    <Text style={styles.errorButtonText}>{tr.buttons.retry}</Text>
-                </TouchableOpacity>
             </View>
         );
     }

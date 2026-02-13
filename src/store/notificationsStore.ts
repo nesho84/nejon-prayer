@@ -14,6 +14,7 @@ import {
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
 import { usePrayersStore } from './prayersStore';
+import { useDeviceSettingsStore } from './deviceSettingsStore';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -122,18 +123,21 @@ export const useNotificationsStore = create<NotificationsState>()(
       // Main scheduling function
       syncNotifications: async () => {
         // Pull fresh data from other stores using getState()
+        const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
+
+        // Extract current notification settings
         const { notifSettings, prayers, events, special } = get();
 
         // Check if prayerTimes is available
-        if (!prayerTimes) {
-          console.warn('⚠️ Cannot schedule notifications: Prayer times not available');
+        if (!notificationPermission || !prayerTimes) {
+          console.warn('⚠️ Cannot schedule notifications: Missing notification permission or prayer times');
           return;
         }
 
-        // 1. Calculate current state hash
+        // 1. Create a hash of current settings
         const currentHash = JSON.stringify({
           prayerTimes,
           prayers,
@@ -142,9 +146,10 @@ export const useNotificationsStore = create<NotificationsState>()(
           language,
           volume: notifSettings.volume,
           vibration: notifSettings.vibration,
+          snooze: notifSettings.snooze
         });
 
-        // 2. Compare with last hash
+        // 2. Compare with last scheduled hash to avoid unnecessary rescheduling
         if (get().lastScheduledHash === currentHash) {
           console.log('⏸️ [notificationsStore] Notification unchanged, skipping reschedule');
           return;

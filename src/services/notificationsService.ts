@@ -443,6 +443,8 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 export async function scheduleNotificationsService(params: ScheduleParams) {
   const { settings, prayerTimes, language } = params;
 
+  console.log("settings: ", JSON.stringify(settings, null, 2));
+
   try {
     // @TODO: Uncoment these below when ready to test full scheduling flow
 

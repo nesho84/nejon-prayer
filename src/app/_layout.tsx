@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
-import { NotificationsProvider } from "@/context/NotificationsContext";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
@@ -30,16 +29,14 @@ const RootStack = () => {
 }
 
 export default function RootLayout() {
-  // Sync system theme, device settings, and notifications on app load
+  // Sync system theme, device settings, and notifications
   useSystemThemeSync();
   useDeviceSettingsSync();
   useNotificationsSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <NotificationsProvider>
-        <RootStack />
-      </NotificationsProvider>
+      <RootStack />
     </SafeAreaProvider>
   );
 }

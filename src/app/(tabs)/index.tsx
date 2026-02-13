@@ -244,9 +244,9 @@ export default function HomeScreen() {
             </TouchableOpacity> */}
 
             {/* Notifications Debug utility */}
-            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={debugChannelsAndScheduled}>
+            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
