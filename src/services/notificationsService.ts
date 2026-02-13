@@ -14,7 +14,7 @@ import notifee, {
 } from '@notifee/react-native';
 import {
   PrayerType,
-  EventPrayerType,
+  PrayerEventType,
   SpecialType,
   NotifSettings,
   PrayerSettings,
@@ -26,7 +26,7 @@ import { PrayerTimes } from "@/types/prayer.types";
 interface ServiceSettings {
   notifSettings: NotifSettings;
   prayers: Record<PrayerType, PrayerSettings>;
-  events: Record<EventPrayerType, EventSettings>;
+  events: Record<PrayerEventType, EventSettings>;
   special: Record<SpecialType, SpecialSettings>;
 }
 
@@ -39,7 +39,8 @@ interface ScheduleParams {
 
 // Notification collections
 const PRAYERS: PrayerType[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const PRAYER_EVENTS: EventPrayerType[] = ['Imsak', 'Sunrise'];
+const PRAYER_EVENTS: PrayerEventType[] = ['Imsak', 'Sunrise'];
+const SPECIAL: SpecialType[] = ['Friday', 'Ramadan', 'Eid'];
 
 // ------------------------------------------------------------
 // Create notification channels once (Android only)
@@ -443,6 +444,8 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
   const { settings, prayerTimes, language } = params;
 
   try {
+    // @TODO: Uncoment these below when ready to test full scheduling flow
+
     // // Step 1: Cancel all existing
     // await cancelAllNotifications();
 
@@ -458,7 +461,7 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
     // // Step 5: Schedule special
     // await scheduleSpecialNotifications(params);
 
-    console.log('🔔 [notificationsService] All notifications scheduled successfully');;
+    console.log('🔔 [notificationsService] All notifications scheduled successfully [debugging...]');;
   } catch (err) {
     console.error('❌ Failed to schedule notifications:', err);
     throw err;
@@ -506,7 +509,7 @@ export async function handleNotificationEvent(
 
       // For prayer notification
       if (notifType === "prayer") {
-        // @TODO: will be implemented in future - allow users to choose different sounds for each prayer
+        // @TODO: allow users to choose different sounds for each prayer
         // const soundFile = notification?.data?.sound || 'azan1.mp3';
         // await startSound(soundFile, volume);
         await startSound('azan1.mp3', volume); // 29sec - Azan for prayers

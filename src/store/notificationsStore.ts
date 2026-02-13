@@ -3,10 +3,9 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { mmkvStorage } from '@/store/storage';
 import { scheduleNotificationsService } from '@/services/notificationsService';
 import { useLanguageStore } from '@/store/languageStore';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import {
   PrayerType,
-  EventPrayerType,
+  PrayerEventType,
   SpecialType,
   NotifSettings,
   PrayerSettings,
@@ -19,16 +18,16 @@ import { usePrayersStore } from './prayersStore';
 interface NotificationsState {
   notifSettings: NotifSettings;
   prayers: Record<PrayerType, PrayerSettings>;
-  events: Record<EventPrayerType, EventSettings>;
+  events: Record<PrayerEventType, EventSettings>;
   special: Record<SpecialType, SpecialSettings>;
   lastScheduledHash: string | null;
   isLoading: boolean;
   isReady: boolean;
   setSettings: (updates: Partial<NotifSettings>) => void;
   setPrayer: (prayer: PrayerType, enabled: boolean, offset?: number, sound?: string) => void;
-  setEvent: (event: EventPrayerType, enabled: boolean, offset?: number) => void;
+  setEvent: (event: PrayerEventType, enabled: boolean, offset?: number, sound?: string) => void;
   setSpecial: (special: SpecialType, enabled: boolean) => void;
-  scheduleNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
+  syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
 }
 
 const DEFAULT_NOTIF_SETTINGS: NotifSettings = {
@@ -45,7 +44,7 @@ const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
   Isha: { enabled: true, offset: 0, sound: 'azan1.mp3' },
 };
 
-const DEFAULT_EVENTS: Record<EventPrayerType, EventSettings> = {
+const DEFAULT_EVENTS: Record<PrayerEventType, EventSettings> = {
   Imsak: { enabled: false, offset: 0 },
   Sunrise: { enabled: false, offset: 0 },
 };
@@ -73,7 +72,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           notifSettings: { ...state.notifSettings, ...updates },
         }));
 
-        get().scheduleNotifications();
+        get().syncNotifications();
       },
 
       // Update individual prayer settings
@@ -89,22 +88,23 @@ export const useNotificationsStore = create<NotificationsState>()(
           },
         }));
 
-        get().scheduleNotifications();
+        get().syncNotifications();
       },
 
       // Update individual event settings
-      setEvent: (event, enabled, offset) => {
+      setEvent: (event, enabled, offset, sound) => {
         set((state) => ({
           events: {
             ...state.events,
             [event]: {
               enabled,
               offset: offset ?? state.events[event].offset,
+              sound: sound ?? state.events[event].sound,
             },
           },
         }));
 
-        get().scheduleNotifications();
+        get().syncNotifications();
       },
 
       // Update individual special notification settings
@@ -116,11 +116,11 @@ export const useNotificationsStore = create<NotificationsState>()(
           },
         }));
 
-        get().scheduleNotifications();
+        get().syncNotifications();
       },
 
       // Main scheduling function
-      scheduleNotifications: async () => {
+      syncNotifications: async () => {
         // Pull fresh data from other stores using getState()
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const language = useLanguageStore.getState().language;

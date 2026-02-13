@@ -4,19 +4,19 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { PrayerName } from "@/types/prayer.types";
-import { PrayerSettings } from "@/types/notification.types";
+import { PrayerSettings, EventSettings } from "@/types/notification.types";
 
 interface Props {
     visible: boolean;
     setVisible: (visible: boolean) => void;
     header: PrayerName;
-    selectedValue: PrayerSettings;
-    onSelect: (value: PrayerSettings) => void;
+    selectedValue: PrayerSettings | EventSettings;
+    onSelect: (value: PrayerSettings | EventSettings) => void;
 }
 
 interface OptionType {
     label: string;
-    value: PrayerSettings;
+    value: PrayerSettings | EventSettings;
     icon: any;
 }
 
@@ -28,7 +28,7 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
     // ------------------------------------------------------------
     // Handle Option Select
     // ------------------------------------------------------------
-    const handleSelect = (value: PrayerSettings) => {
+    const handleSelect = (value: PrayerSettings | EventSettings) => {
         setVisible(false);
         onSelect(value);
     };
@@ -46,6 +46,7 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
             { label: `30 ${tr.labels.offsetMinutes}`, value: { enabled: true, offset: -30 }, icon: "bell-cog-outline" },
             { label: `45 ${tr.labels.offsetMinutes}`, value: { enabled: true, offset: -45 }, icon: "bell-cog-outline" },
             { label: `60 ${tr.labels.offsetMinutes}`, value: { enabled: true, offset: -60 }, icon: "bell-cog-outline" },
+            // @TODO: add sound option later
         ];
     }, [tr]);
 

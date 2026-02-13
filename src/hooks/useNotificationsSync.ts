@@ -31,7 +31,7 @@ export function useNotificationsSync() {
 
     (async () => {
       try {
-        await useNotificationsStore.getState().scheduleNotifications();
+        await useNotificationsStore.getState().syncNotifications();
       } catch (err) {
         console.error('Failed to schedule notifications:', err);
       } finally {

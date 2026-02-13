@@ -113,7 +113,7 @@ export default function SettingsScreen() {
             console.log("🌐 Language changed to:", value);
 
             // Reschedule notifications with new language
-            await useNotificationsStore.getState().scheduleNotifications();
+            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr.labels.error, tr.labels.languageError);

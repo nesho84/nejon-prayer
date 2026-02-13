@@ -3,7 +3,6 @@ import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, 
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNotificationsContext } from "@/context/NotificationsContext";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import AppTabScreen from "@/components/AppTabScreen";
 import AppLoading from "@/components/AppLoading";
@@ -17,7 +16,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { PrayerCountdown, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
-import { PrayerSettings } from "@/types/notification.types";
+import { PrayerType, PrayerSettings, PrayerEventType, EventSettings } from "@/types/notification.types";
 import { IconProps } from "@/types/types";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { usePrayersStore } from "@/store/prayersStore";
@@ -38,9 +37,10 @@ export default function HomeScreen() {
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
-    // const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const notifLoading = useNotificationsStore((state) => state.isLoading);
+    const prayers = useNotificationsStore((state) => state.prayers);
+    const events = useNotificationsStore((state) => state.events);
 
     // Next prayer countdown
     const {
@@ -50,15 +50,9 @@ export default function HomeScreen() {
         totalSeconds
     } = useNextPrayer(prayerTimes);
 
-    // Contexts
-    const {
-        notifSettings,
-        savePrayerNotifSettings
-    } = useNotificationsContext();
-
     // Local State
     const [prayerModalVisible, setPrayerModalVisible] = useState(false);
-    const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
+    const [selectedPrayerName, setSelectedPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -116,7 +110,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     const openPrayersModal = (prayerName: PrayerName) => {
         setPrayerModalVisible(true);
-        setSelectedPrayer(prayerName);
+        setSelectedPrayerName(prayerName);
     };
 
     // ------------------------------------------------------------
@@ -139,15 +133,20 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Prayer notification icon
     // ------------------------------------------------------------
-    const handlePrayerNotificationIcon = (prayerName: PrayerName) => {
-        const pst = notifSettings?.prayers?.[prayerName];
-        const enabled = notificationPermission && pst?.enabled;
+    const handlePrayerNotificationIcon = (prayerName: string) => {
+        // Check if it's a prayer or event
+        const prayerSettings = prayers?.[prayerName as PrayerType];
+        const eventSettings = events?.[prayerName as PrayerEventType];
+
+        // Use whichever exists
+        const settings = prayerSettings || eventSettings;
+        const enabled = notificationPermission && settings?.enabled;
 
         if (!enabled)
             return (props: IconProps) => <MaterialCommunityIcons name="bell-off-outline" {...props} style={[props.style, { opacity: 0.3, paddingBottom: 1 }]} />;
-        if (enabled && pst.offset === 0)
+        if (enabled && settings.offset === 0)
             return (props: IconProps) => <MaterialCommunityIcons name="bell-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
-        if (enabled && pst.offset !== 0)
+        if (enabled && settings.offset !== 0)
             return (props: IconProps) => <MaterialCommunityIcons name="bell-cog-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
 
         return (props: IconProps) => <Ionicons name="notifications-outline" {...props} />;
@@ -156,7 +155,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Toggle prayer notification
     // ------------------------------------------------------------
-    const handlePrayerNotification = (selected: PrayerSettings, prayerName: PrayerName) => {
+    const handlePrayerSettingsModal = (prayerName: PrayerName, settings: PrayerSettings | EventSettings) => {
         // Check system notifications first
         if (!notificationPermission) {
             Alert.alert(
@@ -174,8 +173,18 @@ export default function HomeScreen() {
             return;
         }
 
-        // Save notifSettings
-        savePrayerNotifSettings(prayerName, selected);
+        // Determine if this is a prayer or event
+        const isPrayer = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayerName);
+        const isEvent = ['Imsak', 'Sunrise'].includes(prayerName);
+
+        // Save to appropriate store method with destructured values
+        if (isPrayer) {
+            const { enabled, offset, sound } = settings as PrayerSettings;
+            useNotificationsStore.getState().setPrayer(prayerName as PrayerType, enabled, offset, sound);
+        } else if (isEvent) {
+            const { enabled, offset, sound } = settings as EventSettings;
+            useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, enabled, offset, sound);
+        }
     };
 
     // Loading state
@@ -355,13 +364,17 @@ export default function HomeScreen() {
                     </View>
 
                     {/* Prayer Notifications settings Modal */}
-                    {selectedPrayer && (
+                    {selectedPrayerName && (
                         <PrayerModal
                             visible={prayerModalVisible}
                             setVisible={setPrayerModalVisible}
-                            header={selectedPrayer}
-                            selectedValue={notifSettings.prayers[selectedPrayer]}
-                            onSelect={(selected) => handlePrayerNotification(selected, selectedPrayer)}
+                            header={selectedPrayerName}
+                            selectedValue={
+                                prayers[selectedPrayerName as PrayerType] ||
+                                events[selectedPrayerName as PrayerEventType] ||
+                                { enabled: false, offset: 0, sound: '' }
+                            }
+                            onSelect={(selectedSettings) => handlePrayerSettingsModal(selectedPrayerName, selectedSettings)}
                         />
                     )}
                 </AppCard>
