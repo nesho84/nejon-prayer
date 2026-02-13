@@ -1,10 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { mmkvStorage } from './storage';
-import { useLocationStore } from './locationStore';
-import { useLanguageStore } from './languageStore';
-import { useDeviceSettingsStore } from './deviceSettingsStore';
-// import { useNotificationsStore } from './notificationsStore';
+import { mmkvStorage } from '@/store/storage';
+import { useLocationStore } from '@/store/locationStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { getPrayerTimes } from '@/services/prayersService';
 import { getUserLocation, hasLocationChanged } from '@/services/locationService';
 import { PrayerTimes } from '@/types/prayer.types';
@@ -15,8 +14,9 @@ interface PrayersState {
   prayerTimes: PrayerTimes | null;
   prayersError: string | null;
   prayersOutdated: boolean;
-  isLoading: boolean;
   lastFetchedDate: string | null;
+  isLoading: boolean;
+  isReady: boolean;
   loadPrayerTimes: () => Promise<void>;
   reloadPrayerTimes: () => Promise<void>;
 }
@@ -27,8 +27,9 @@ export const usePrayersStore = create<PrayersState>()(
       prayerTimes: null,
       prayersError: null,
       prayersOutdated: false,
-      isLoading: false,
       lastFetchedDate: null,
+      isLoading: false,
+      isReady: false,
 
       // Load prayer times (uses existing location)
       loadPrayerTimes: async () => {
@@ -36,7 +37,7 @@ export const usePrayersStore = create<PrayersState>()(
 
         try {
           const { location } = useLocationStore.getState();
-          const { internetConnection, notificationPermission } = useDeviceSettingsStore.getState();
+          const { internetConnection } = useDeviceSettingsStore.getState();
           const { tr } = useLanguageStore.getState();
 
           // Validate location first
@@ -52,8 +53,6 @@ export const usePrayersStore = create<PrayersState>()(
 
               if (timings) {
                 const lastFetched = new Date().toLocaleString('en-GB');
-                const currentTimes = get().prayerTimes;
-                const timesChanged = JSON.stringify(currentTimes) !== JSON.stringify(timings);
 
                 set({
                   prayerTimes: timings,
@@ -61,16 +60,7 @@ export const usePrayersStore = create<PrayersState>()(
                   prayersOutdated: false
                 });
 
-                console.log('🌐 Prayer times loaded from API');
-
-                // Only reschedule if changed
-                if (timesChanged) {
-                  if (notificationPermission) {
-                    console.log('🔔 Prayer times changed, rescheduling notifications...[not implemented yet!]');
-                    // @TODO: <-- when notifications store is implemented
-                    // await useNotificationsStore.getState().scheduleNotifications();
-                  }
-                }
+                console.log('🌐 [prayersStore]  Prayer times loaded from API');
 
                 return; // Exit early
               }
@@ -83,7 +73,7 @@ export const usePrayersStore = create<PrayersState>()(
           const savedTimes = get().prayerTimes;
           const lastFetched = get().lastFetchedDate;
           if (savedTimes) {
-            console.log('💾 Using storage prayer times');
+            console.log('💾 [prayersStore] Using storage prayer times');
 
             // Check if outdated EVERY time we use storage
             let isOutdated = false;
@@ -168,7 +158,7 @@ export const usePrayersStore = create<PrayersState>()(
           const daysDiff = (Date.now() - timestamp) / (1000 * 60 * 60 * 24);
           state.prayersOutdated = daysDiff > STALE_DAYS;
 
-          state.isLoading = false;
+          state.isReady = true;
         }
       },
     }

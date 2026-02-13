@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "./storage";
+import { mmkvStorage } from "@/store/storage";
 import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Appearance } from "react-native";
 

@@ -3,7 +3,8 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
-import { PrayerName, PrayerSettings } from "@/types/prayer.types";
+import { PrayerName } from "@/types/prayer.types";
+import { PrayerSettings } from "@/types/notification.types";
 
 interface Props {
     visible: boolean;

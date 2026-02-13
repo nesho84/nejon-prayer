@@ -2,7 +2,7 @@ import { TRANSLATIONS } from "@/constants/translations";
 import { Language } from "@/types/language.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "./storage";
+import { mmkvStorage } from "@/store/storage";
 
 interface LanguageState {
   language: Language;

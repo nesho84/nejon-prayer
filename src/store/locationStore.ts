@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "./storage";
+import { mmkvStorage } from "@/store/storage";
 import { Cords, TimeZone } from "@/types/location.types";
 
 interface LocationState {

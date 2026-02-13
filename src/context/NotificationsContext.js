@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useCallback, useState } from "react";
 import { storage } from "@/store/storage";
-import notifee from "@notifee/react-native";
 import { useLanguageStore } from "@/store/languageStore";
-import { scheduleNotifications, handleNotificationEvent } from '@/services/notificationsService';
+import { scheduleNotificationsService } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
@@ -109,54 +108,37 @@ export function NotificationsProvider({ children }) {
     // ------------------------------------------------------------
     // Auto-load on mount
     // ------------------------------------------------------------
-    useEffect(() => {
-        loadNotifSettings();
-    }, []);
+    // useEffect(() => {
+    //     loadNotifSettings();
+    // }, []);
 
     // ------------------------------------------------------------
     // Auto-Schedule notifications when contexts are ready and permission granted
     // ------------------------------------------------------------
-    useEffect(() => {
-        if (!locationReady || prayersLoading) return;
-        if (!notificationPermission || !prayerTimes) return;
-        if (schedulingInProgress.current) return;
+    // useEffect(() => {
+    //     if (!locationReady || prayersLoading) return;
+    //     if (!notificationPermission || !prayerTimes) return;
+    //     if (schedulingInProgress.current) return;
 
-        let mounted = true;
-        schedulingInProgress.current = true;
+    //     let mounted = true;
+    //     schedulingInProgress.current = true;
 
-        (async () => {
-            try {
-                await scheduleNotifications({ prayerTimes, notifSettings, language, tr });
-            } catch (err) {
-                console.warn("⚠️ Failed to schedule notifications:", err);
-            } finally {
-                schedulingInProgress.current = false;
-                if (mounted) setIsReady(true);
-            }
-        })();
+    //     (async () => {
+    //         try {
+    //             await scheduleNotificationsService({ prayerTimes, notifSettings, language, tr });
+    //         } catch (err) {
+    //             console.warn("⚠️ Failed to schedule notifications:", err);
+    //         } finally {
+    //             schedulingInProgress.current = false;
+    //             if (mounted) setIsReady(true);
+    //         }
+    //     })();
 
-        return () => {
-            mounted = false;
-            schedulingInProgress.current = false;
-        };
-    }, [locationReady, notificationPermission, prayersLoading, prayerTimes, notifSettings, language, tr]);
-
-    // ------------------------------------------------------------
-    // Foreground event handler for Notifee
-    // ------------------------------------------------------------
-    useEffect(() => {
-        const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
-            const { notification, pressAction } = detail;
-            if (!notification) return;
-
-            try {
-                await handleNotificationEvent(type, notification, pressAction, 'foreground');
-            } catch (err) {
-                console.error('Failed to handle notification event:', err);
-            }
-        });
-        return () => { unsubscribe(); };
-    }, []);
+    //     return () => {
+    //         mounted = false;
+    //         schedulingInProgress.current = false;
+    //     };
+    // }, [locationReady, notificationPermission, prayersLoading, prayerTimes, notifSettings, language, tr]);
 
     // ------------------------------------------------------------
     // Memoize context value to prevent unnecessary re-renders

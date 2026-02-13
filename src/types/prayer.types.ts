@@ -19,8 +19,3 @@ export interface PrayerCountdown {
   minutes: string;
   seconds: string;
 }
-
-export interface PrayerSettings {
-  enabled: boolean;
-  offset: number;
-}

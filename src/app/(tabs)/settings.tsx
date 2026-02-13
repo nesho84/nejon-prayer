@@ -28,6 +28,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
+import { useNotificationsStore } from "@/store/notificationsStore";
 
 export default function SettingsScreen() {
     // Stores
@@ -49,13 +50,13 @@ export default function SettingsScreen() {
     const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
     const lastFetchedDate = usePrayersStore((state) => state.lastFetchedDate);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
+    // const notifSettings = useNotificationsStore((state) => state.notifSettings);
+    const notifReady = useNotificationsStore((state) => state.isReady);
+    const notifLoading = useNotificationsStore((state) => state.isLoading);
 
     // Contexts
     const {
         notifSettings,
-        isReady: notifReady,
-        isLoading: notifLoading,
-        notifError,
         saveNotifSettings,
         reloadNotifSettings
     } = useNotificationsContext();
@@ -110,7 +111,9 @@ export default function SettingsScreen() {
             useLanguageStore.getState().setLanguage(value);
 
             console.log("🌐 Language changed to:", value);
-            // @TODO: Reschedule notifications with new language (umpcoming...)
+
+            // Reschedule notifications with new language
+            await useNotificationsStore.getState().scheduleNotifications();
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr.labels.error, tr.labels.languageError);
@@ -301,7 +304,7 @@ export default function SettingsScreen() {
     }
 
     // Error state
-    if (deviceSettingsError || notifError) {
+    if (deviceSettingsError) {
         return (
             <View style={[styles.errorContainer, { backgroundColor: theme.bg }]}>
                 <View style={styles.errorBanner}>

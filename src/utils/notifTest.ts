@@ -6,7 +6,7 @@ import notifee, {
     TimestampTrigger,
 } from "@notifee/react-native";
 
-interface AppSettings {
+interface Options {
     language: string;
     location?: any;
     fullAddress?: string | null;
@@ -24,11 +24,11 @@ interface NotifSettings {
 // Debug utility: schedule a test notification
 // ------------------------------------------------------------
 export async function testNotification({
-    appSettings = null,
+    options = null,
     notifSettings = null,
     seconds = 10
 }: {
-    appSettings?: AppSettings | null;
+    options?: Options | null;
     notifSettings?: NotifSettings | null;
     seconds?: number;
 } = {}): Promise<void> {
@@ -51,7 +51,7 @@ export async function testNotification({
                     prayer: "Sabahu",
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
-                    language: appSettings?.language ?? 'en',
+                    language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
@@ -93,7 +93,7 @@ export async function testNotification({
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
             channelId: ${`prayer-notif-channel-vib-${notifSettings?.vibration}`}
-            language: ${appSettings?.language},
+            language: ${options?.language},
             alarm: ${hasAlarm},
             volume: ${notifSettings?.volume},
             vibration: ${notifSettings?.vibration},

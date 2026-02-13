@@ -16,10 +16,12 @@ import PrayerModal from "@/components/PrayerModal";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
-import { PrayerCountdown, PrayerName, PrayerSettings, PrayerTimeEntry } from "@/types/prayer.types";
+import { PrayerCountdown, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
+import { PrayerSettings } from "@/types/notification.types";
 import { IconProps } from "@/types/types";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { usePrayersStore } from "@/store/prayersStore";
+import { useNotificationsStore } from "@/store/notificationsStore";
 
 export default function HomeScreen() {
     // Stores
@@ -36,6 +38,9 @@ export default function HomeScreen() {
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
+    // const notifSettings = useNotificationsStore((state) => state.notifSettings);
+    const notifReady = useNotificationsStore((state) => state.isReady);
+    const notifLoading = useNotificationsStore((state) => state.isLoading);
 
     // Next prayer countdown
     const {
@@ -48,15 +53,23 @@ export default function HomeScreen() {
     // Contexts
     const {
         notifSettings,
-        isReady: notifReady,
-        isLoading: notifLoading,
-        notifError,
         savePrayerNotifSettings
     } = useNotificationsContext();
 
     // Local State
     const [prayerModalVisible, setPrayerModalVisible] = useState(false);
     const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
+
+    // ------------------------------------------------------------
+    // Load prayer times on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!deviceSettingsReady || !locationReady) return;
+
+        // Load prayer times
+        usePrayersStore.getState().loadPrayerTimes();
+
+    }, [deviceSettingsReady, locationReady, location]);
 
     // ------------------------------------------------------------
     // Check for expo OTA updates on mount
@@ -86,17 +99,6 @@ export default function HomeScreen() {
 
         checkForUpdates();
     }, []);
-
-    // ------------------------------------------------------------
-    // Load prayer times on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (!deviceSettingsReady || !locationReady) return;
-
-        // Load prayer times
-        usePrayersStore.getState().loadPrayerTimes();
-
-    }, [deviceSettingsReady, locationReady, location]);
 
     // ------------------------------------------------------------
     // Handle prayer times refresh
@@ -223,25 +225,12 @@ export default function HomeScreen() {
         );
     }
 
-    // Notifications Settings error
-    if (notifError) {
-        return (
-            <AppError
-                icon="alert-circle-outline"
-                iconColor={theme.danger}
-                message={tr.labels.notificationError}
-                buttonText={tr.labels.goToSettings}
-                buttonColor={theme.primary}
-                onPress={() => router.navigate("/(tabs)/settings")}
-            />
-        );
-    }
-
     // Main Content
     return (
         <AppTabScreen>
             {/* Notifications Test utility */}
-            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={() => testNotification({ appSettings, notifSettings, seconds: 10 })}>
+            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }}
+                onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
             </TouchableOpacity> */}
 

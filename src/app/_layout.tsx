@@ -4,6 +4,7 @@ import { NotificationsProvider } from "@/context/NotificationsContext";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
+import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import AppLoading from "@/components/AppLoading";
 
 const RootStack = () => {
@@ -29,9 +30,10 @@ const RootStack = () => {
 }
 
 export default function RootLayout() {
-  // Setup listeners
+  // Sync system theme, device settings, and notifications on app load
   useSystemThemeSync();
   useDeviceSettingsSync();
+  useNotificationsSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
