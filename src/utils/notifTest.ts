@@ -14,10 +14,9 @@ interface Options {
 }
 
 interface NotifSettings {
-    volume: number;
+    volume: number; // 0.0 to 1.0
     vibration: 'on' | 'off';
-    snooze: number;
-    offset?: number;
+    snooze: number; // Minutes
 }
 
 // ------------------------------------------------------------
@@ -47,7 +46,7 @@ export async function testNotification({
                 title: "» Sabahu «",
                 body: "Koha për namaz (06:49)",
                 data: {
-                    type: "prayer-notification",
+                    type: "prayer",
                     prayer: "Sabahu",
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
@@ -55,7 +54,6 @@ export async function testNotification({
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
-                    offset: String(notifSettings?.offset ?? 0),
                 },
                 android: {
                     // (is created in notificationsService.js)
@@ -105,6 +103,9 @@ export async function testNotification({
     }
 }
 
+// ------------------------------------------------------------
+// Debug utility: log all channels and scheduled notifications
+// ------------------------------------------------------------
 export async function debugChannelsAndScheduled(): Promise<void> {
     try {
         const channels = await notifee.getChannels();

@@ -54,6 +54,7 @@ const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
   Ramadan: { enabled: false },
   Eid: { enabled: false },
+  DailyQuote: { enabled: false },
 };
 
 export const useNotificationsStore = create<NotificationsState>()(
@@ -131,7 +132,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         // Extract current notification settings
         const { notifSettings, prayers, events, special } = get();
 
-        // Check if prayerTimes is available
+        // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
           console.warn('⚠️ Cannot schedule notifications: Missing notification permission or prayer times');
           return;
@@ -161,7 +162,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           // 3. Call service to schedule notifications with current settings and prayer times
           await scheduleNotificationsService({
             prayerTimes,
-            settings: { notifSettings, prayers, events, special },
+            config: { notifSettings, prayers, events, special },
             language,
             tr
           });

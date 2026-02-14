@@ -1,6 +1,6 @@
 export type PrayerType = 'Fajr' | 'Dhuhr' | 'Asr' | 'Maghrib' | 'Isha';
 export type PrayerEventType = 'Imsak' | 'Sunrise';
-export type SpecialType = 'Friday' | 'Ramadan' | 'Eid';
+export type SpecialType = 'Friday' | 'Ramadan' | 'Eid' | 'DailyQuote';
 
 export interface NotifSettings {
   volume: number; // 0.0 to 1.0

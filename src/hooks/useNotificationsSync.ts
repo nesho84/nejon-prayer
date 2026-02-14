@@ -4,19 +4,22 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { handleNotificationEvent } from '@/services/notificationsService';
 import { usePrayersStore } from '@/store/prayersStore';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useLanguageStore } from '@/store/languageStore';
 
 export function useNotificationsSync() {
-  // Access and initialize necessary state from stores
+  // Check isReady - needs initialization
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
+  const notificationsReady = useNotificationsStore((state) => state.isReady);
+  // Direct values - null/default check is enough
   const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
   const prayerTimes = usePrayersStore((state) => state.prayerTimes);
-  const notificationsReady = useNotificationsStore((state) => state.isReady);
+  const language = useLanguageStore((state) => state.language);
 
   // Ref to prevent race conditions
   const isSchedulingRef = useRef(false);
 
   // ------------------------------------------------------------
-  // Auto-schedule notifications when prayer times are ready and notifications are enabled
+  // AUTO-SCHEDULE notifications when prayer times are ready and notifications are enabled
   // This runs on initial load and whenever prayer times change
   // ------------------------------------------------------------
   useEffect(() => {
@@ -29,7 +32,7 @@ export function useNotificationsSync() {
     let mounted = true;
     isSchedulingRef.current = true;
 
-    (async () => {
+    const syncNotifications = async () => {
       try {
         await useNotificationsStore.getState().syncNotifications();
       } catch (err) {
@@ -37,16 +40,17 @@ export function useNotificationsSync() {
       } finally {
         if (mounted) isSchedulingRef.current = false;
       }
-    })();
+    };
+    syncNotifications();
 
     return () => {
       mounted = false;
       isSchedulingRef.current = false;
     };
-  }, [deviceSettingsReady, notificationsReady, prayerTimes, notificationPermission]);
+  }, [deviceSettingsReady, notificationsReady, prayerTimes, notificationPermission, language]);
 
   // ------------------------------------------------------------
-  // Notify FOREGROUND EVENT HANDLER
+  // FOREGROUND EVENT HANDLER - Notify
   // Listens for notification events while the app is in the foreground
   // (e.g., user taps on a notification, dismisses it, etc.)
   // ------------------------------------------------------------

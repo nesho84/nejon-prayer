@@ -90,11 +90,7 @@ export default function SettingsScreen() {
         try {
             // Update languageStore
             useLanguageStore.getState().setLanguage(value);
-
             console.log("🌐 Language changed to:", value);
-
-            // Reschedule notifications
-            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Language change error:", err);
             Alert.alert(tr.labels.error, tr.labels.languageError);
@@ -195,9 +191,6 @@ export default function SettingsScreen() {
 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 console.log("🌐 Sound Volume changed to:", Number(value.toFixed(1)));
-
-                // Reschedule notifications
-                await useNotificationsStore.getState().syncNotifications();
             } catch (err) {
                 console.error("Sound volume change error:", err);
                 Alert.alert(tr.labels.error, tr.labels.volumeError);
@@ -218,9 +211,6 @@ export default function SettingsScreen() {
 
             console.log("📳 Vibration changed to:", value ? 'on' : 'off');
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-            // Reschedule notifications
-            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Vibration change error:", err);
             Alert.alert(tr.labels.error, tr.labels.vibrationError);
@@ -242,9 +232,6 @@ export default function SettingsScreen() {
 
             console.log(`⏳ Snooze timeout changed to: ${value}min`);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-            // Reschedule notifications
-            await useNotificationsStore.getState().syncNotifications();
         } catch (err) {
             console.error("Snooze timeout change error:", err);
             Alert.alert(tr.labels.error, tr.labels.snoozeError);

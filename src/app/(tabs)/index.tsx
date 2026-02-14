@@ -39,6 +39,7 @@ export default function HomeScreen() {
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const notifLoading = useNotificationsStore((state) => state.isLoading);
+    const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
 
@@ -238,13 +239,15 @@ export default function HomeScreen() {
     return (
         <AppTabScreen>
             {/* Notifications Test utility */}
-            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }}
+            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             {/* Notifications Debug utility */}
-            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.border }} onPress={debugChannelsAndScheduled}>
+            <TouchableOpacity
+                style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
+                onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
             </TouchableOpacity>
 
