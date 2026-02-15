@@ -7,10 +7,8 @@ import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 
 export function useNotificationsSync() {
-  // Check isReady - needs initialization
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
   const notificationsReady = useNotificationsStore((state) => state.isReady);
-  // Direct values - null/default check is enough
   const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
   const prayerTimes = usePrayersStore((state) => state.prayerTimes);
   const language = useLanguageStore((state) => state.language);
@@ -20,7 +18,7 @@ export function useNotificationsSync() {
 
   // ------------------------------------------------------------
   // AUTO-SCHEDULE notifications when prayer times are ready and notifications are enabled
-  // This runs on initial load and whenever prayer times change
+  // This runs on initial load and whenever something change
   // ------------------------------------------------------------
   useEffect(() => {
     if (!deviceSettingsReady || !notificationsReady || !prayerTimes || !notificationPermission) {

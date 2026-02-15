@@ -1,4 +1,8 @@
+import { TRANSLATIONS } from "@/constants/translations";
+
 export type Language = "en" | "de" | "sq" | "tr" | "ar";
+
+export type Translations = typeof TRANSLATIONS.en;
 
 export const LANGUAGES = [
   { value: 'en' as Language, label: 'English', icon: '🇬🇧' },

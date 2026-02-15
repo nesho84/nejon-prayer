@@ -1,17 +1,19 @@
 import { useMemo } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Alert, Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { router } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useNotificationsStore } from "@/store/notificationsStore";
 import { PrayerName } from "@/types/prayer.types";
-import { PrayerSettings, EventSettings } from "@/types/notification.types";
+import { SOUNDS } from "@/constants/sounds";
+import { PrayerSettings, EventSettings, PrayerType, PrayerEventType } from "@/types/notification.types";
 
 interface Props {
     visible: boolean;
-    setVisible: (visible: boolean) => void;
-    header: PrayerName;
-    selectedValue: PrayerSettings | EventSettings;
-    onSelect: (value: PrayerSettings | EventSettings) => void;
+    onClose: () => void;
+    prayerName: PrayerName | null;
 }
 
 interface OptionType {
@@ -20,17 +22,68 @@ interface OptionType {
     icon: any;
 }
 
-export default function PrayerModal({ visible, setVisible, header, selectedValue, onSelect }: Props) {
+export default function PrayerModal({ visible, onClose, prayerName }: Props) {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+    const prayers = useNotificationsStore((state) => state.prayers);
+    const events = useNotificationsStore((state) => state.events);
+
+    // ------------------------------------------------------------
+    // Get current settings for the prayer
+    // ------------------------------------------------------------
+    const selectedPrayer = useMemo(() => {
+        if (!prayerName) {
+            return { enabled: false, offset: 0, sound: SOUNDS.azan1 };
+        }
+
+        const prayerSettings = prayers?.[prayerName as PrayerType];
+        const eventSettings = events?.[prayerName as PrayerEventType];
+
+        return prayerSettings || eventSettings || { enabled: false, offset: 0, sound: SOUNDS.azan1 };
+    }, [prayerName, prayers, events]);
 
     // ------------------------------------------------------------
     // Handle Option Select
     // ------------------------------------------------------------
-    const handleSelect = (value: PrayerSettings | EventSettings) => {
-        setVisible(false);
-        onSelect(value);
+    const handleSelectedPrayer = (value: PrayerSettings | EventSettings) => {
+        if (!prayerName) return;
+
+        // Check system notifications first
+        if (!notificationPermission) {
+            Alert.alert(
+                tr.labels.notificationsDisabled,
+                tr.labels.notificationsDisabledMessage,
+                [
+                    { text: tr.buttons.cancel, style: "cancel" },
+                    {
+                        text: tr.labels.goToSettings,
+                        onPress: () => {
+                            onClose();
+                            router.navigate("/(tabs)/settings");
+                        }
+                    },
+                ],
+                { cancelable: true }
+            );
+            return;
+        }
+
+        // Determine if this is a prayer or event
+        const isPrayer = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayerName);
+        const isEvent = ['Imsak', 'Sunrise'].includes(prayerName);
+
+        // Save to appropriate store method with destructured values
+        if (isPrayer) {
+            const { enabled, offset, sound } = value as PrayerSettings;
+            useNotificationsStore.getState().setPrayer(prayerName as PrayerType, enabled, offset, sound);
+        } else if (isEvent) {
+            const { enabled, offset, sound } = value as EventSettings;
+            useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, enabled, offset, sound);
+        }
+
+        onClose();
     };
 
     // ------------------------------------------------------------
@@ -50,8 +103,8 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
         ];
     }, [tr]);
 
-    // Dont render if not visible
-    if (!visible) return null;
+    // Dont render if not visible or no prayer selected
+    if (!visible || !prayerName) return null;
 
     // Main Content
     return (
@@ -59,7 +112,7 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
             visible={visible}
             transparent={true}
             animationType="fade"
-            onRequestClose={() => setVisible(false)}
+            onRequestClose={onClose}
         >
 
             <View style={styles.overlay}>
@@ -67,7 +120,7 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
 
                     {/* Header */}
                     <Text style={[styles.headerText, { color: theme.accent }]}>
-                        {tr.prayers[header]}
+                        {tr.prayers[prayerName]}
                     </Text>
                     <View style={[styles.divider, { backgroundColor: theme.divider }]} />
 
@@ -75,15 +128,15 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
                     <View style={styles.optionList}>
                         {options.map((option, index) => {
                             const isSelected =
-                                selectedValue.enabled === option.value.enabled &&
-                                selectedValue.offset === option.value.offset;
+                                selectedPrayer.enabled === option.value.enabled &&
+                                selectedPrayer.offset === option.value.offset;
 
                             return (
                                 <TouchableOpacity
                                     key={index}
                                     style={[styles.optionRow, isSelected && { backgroundColor: theme.accentLight }]}
                                     activeOpacity={0.3}
-                                    onPress={() => handleSelect(option.value)}
+                                    onPress={() => handleSelectedPrayer(option.value)}
                                 >
                                     <View style={styles.optionLabel}>
                                         {/* Icon */}
@@ -113,7 +166,7 @@ export default function PrayerModal({ visible, setVisible, header, selectedValue
 
                     {/* Footer */}
                     <View style={[styles.divider, { backgroundColor: theme.divider }]} />
-                    <TouchableOpacity style={styles.cancelBtn} onPress={() => setVisible(false)}>
+                    <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
                         <Text style={[styles.cancelText, { color: theme.accent }]}>{tr.buttons.cancel}</Text>
                     </TouchableOpacity>
 

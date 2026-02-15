@@ -1,12 +1,12 @@
 import { TRANSLATIONS } from "@/constants/translations";
-import { Language } from "@/types/language.types";
+import { Language, Translations } from "@/types/language.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "@/store/storage";
 
 interface LanguageState {
   language: Language;
-  tr: typeof TRANSLATIONS.en;
+  tr: Translations;
   isReady: boolean;
   setLanguage: (language: Language) => void;
 }

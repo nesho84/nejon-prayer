@@ -28,6 +28,7 @@ import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
+import { SpecialType } from "@/types/notification.types";
 
 export default function SettingsScreen() {
     // Stores
@@ -52,6 +53,7 @@ export default function SettingsScreen() {
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const notifLoading = useNotificationsStore((state) => state.isLoading);
+    const special = useNotificationsStore((state) => state.special);
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -201,7 +203,7 @@ export default function SettingsScreen() {
     };
 
     // ------------------------------------------------------------
-    // Change Notification Vibration
+    // Toggle Notification Vibration
     // ------------------------------------------------------------
     const handleVibration = async (value: boolean) => {
         setLocalLoading(true);
@@ -214,6 +216,25 @@ export default function SettingsScreen() {
         } catch (err) {
             console.error("Vibration change error:", err);
             Alert.alert(tr.labels.error, tr.labels.vibrationError);
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Toggle Special Notification (Friday, DailyQuote, etc.)
+    // ------------------------------------------------------------
+    const handleSpecialNotification = async (type: SpecialType, value: boolean) => {
+        setLocalLoading(true);
+        try {
+            // Save special notification settings
+            useNotificationsStore.getState().setSpecial(type, value);
+
+            console.log(`📳 ${type} Reminder changed to: ${value ? 'enabled' : 'disabled'}`);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } catch (err) {
+            console.error("Friday Reminder change error:", err);
+            Alert.alert(tr.labels.error, tr.labels.specialNotificationError);
         } finally {
             setLocalLoading(false);
         }
@@ -529,6 +550,40 @@ export default function SettingsScreen() {
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
+                            </View>
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* ------ Friday Reminder ------ */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr.labels.fridayReminder}
+                                </Text>
+                                <Switch
+                                    value={special.Friday.enabled}
+                                    onValueChange={(value) => handleSpecialNotification('Friday', value)}
+                                    disabled={localLoading}
+                                    trackColor={{ false: theme.overlay, true: theme.primary }}
+                                    thumbColor={special.Friday.enabled ? theme.border : theme.border}
+                                />
+                            </View>
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* ------ Daily Reminder (Quotes)  ------ */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr.labels.dailyReminders}
+                                </Text>
+                                <Switch
+                                    value={special.DailyQuote.enabled}
+                                    onValueChange={(value) => handleSpecialNotification('DailyQuote', value)}
+                                    disabled={localLoading}
+                                    trackColor={{ false: theme.overlay, true: theme.primary }}
+                                    thumbColor={special.DailyQuote.enabled ? theme.border : theme.border}
+                                />
                             </View>
 
                             {/* Divider */}

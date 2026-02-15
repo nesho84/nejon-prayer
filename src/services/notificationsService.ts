@@ -20,6 +20,9 @@ import {
   SpecialSettings
 } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
+import { Language, Translations } from '@/types/language.types';
+import { QUOTES } from "@/constants/quotes";
+import { SOUNDS } from "@/constants/sounds";
 
 interface ServiceSettings {
   notifSettings: NotifSettings;
@@ -31,8 +34,8 @@ interface ServiceSettings {
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
   config: ServiceSettings;
-  language: string;
-  tr: Record<string, any>;
+  language: Language;
+  tr: Translations;
 }
 
 // Notification collections
@@ -147,9 +150,7 @@ function getTriggerTime(timeStringRaw: string, offsetMinutes: number = 0): Date 
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
-  const { prayerTimes, config, tr } = params;
-
-  let count = 0;
+  const { config, prayerTimes, language, tr } = params;
 
   // Check if exact alarm permission is granted (Android 12+)
   const nf = await notifee.getNotificationSettings();
@@ -171,7 +172,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
     // Prepare notification content
     const title = `» ${tr.prayers?.[prayer] || prayer} «`;
     const body = `${tr.labels?.prayerNotifBody || 'Time for Prayer'} (${timeString})`;
-    const sound = config.prayers[prayer]?.sound || 'azan1.mp3';
+    const sound = config.prayers[prayer]?.sound || SOUNDS.azan1;
 
     // Create prayer notification
     await notifee.createTriggerNotification(
@@ -222,22 +223,17 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
       }
     );
 
-    count++;
     const formatted = triggerTime.toLocaleString('en-GB');
     const offsetInfo = offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset} min)` : '';
     console.log(`⏰ Scheduled ${prayer} at ${formatted}${offsetInfo}`);
   }
-
-  console.log(`✅ Scheduled ${count} prayer notification(s)`);
 }
 
 // ------------------------------------------------------------
 // PRAYER-EVENT SCHEDULE: All Prayer Event Notifications
 // ------------------------------------------------------------
 async function schedulePrayerEventNotifications(params: ScheduleParams) {
-  const { prayerTimes, config, tr } = params;
-
-  let count = 0;
+  const { config, prayerTimes, language, tr } = params;
 
   // Check if exact alarm permission is granted (Android 12+)
   const nf = await notifee.getNotificationSettings();
@@ -258,8 +254,8 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
 
     // Prepare notification content
     const title = `» ${tr.prayers?.[event] || event} «`;
-    const body = `${tr.labels?.eventNotifBody || 'Event Time'} (${timeString})`;
-    const sound = config.events[event]?.sound || 'azan1.mp3';
+    const body = `${tr.labels?.eventNotifBody || 'It is now time for'} (${tr.prayers?.[event] || event}) ${timeString}`;
+    const sound = config.events[event]?.sound || SOUNDS.azan1;
 
     // Create event notification
     await notifee.createTriggerNotification(
@@ -287,8 +283,8 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
             type: AndroidStyle.INBOX,
             lines: [body],
           },
-          autoCancel: true,
-          ongoing: false,
+          autoCancel: false,
+          ongoing: true,
         },
         ios: {
           categoryId: 'event-category',
@@ -304,22 +300,17 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
       }
     );
 
-    count++;
     const formatted = triggerTime.toLocaleString('en-GB');
     const offsetInfo = offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset} min)` : '';
     console.log(`⏰ Scheduled ${event} at ${formatted}${offsetInfo}`);
   }
-
-  console.log(`✅ Scheduled ${count} event notification(s)`);
 }
 
 // ------------------------------------------------------------
 // SPECIAL SCHEDULE: Special Notifications (Friday, Ramadan, etc.)
 // ------------------------------------------------------------
 async function scheduleSpecialNotifications(params: ScheduleParams) {
-  const { prayerTimes, config, tr } = params;
-
-  let count = 0;
+  const { config, prayerTimes, language, tr } = params;
 
   // Check if exact alarm permission is granted (Android 12+)
   const nf = await notifee.getNotificationSettings();
@@ -341,10 +332,9 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         triggerTime.setDate(nextFriday.getDate());
 
         // Prepare notification content
-        const title = tr.special?.fridayTitle || 'Jumu\'ah Reminder';
-        const body = tr.special?.fridayBody || 'Friday prayer is in 1 hour';
+        const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
+        const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
 
-        // Create special notification
         await notifee.createTriggerNotification(
           {
             id: `special-friday`,
@@ -365,8 +355,8 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
                 type: AndroidStyle.INBOX,
                 lines: [body],
               },
-              autoCancel: true,
-              ongoing: false,
+              autoCancel: false,
+              ongoing: true,
             },
             ios: {
               categoryId: 'special-category',
@@ -382,20 +372,77 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           }
         );
 
-        count++;
         console.log(`🕌 Scheduled Friday reminder at ${triggerTime.toLocaleString('en-GB')}`);
       }
     }
   }
 
-  // Add more special notifications here (DailyQuotes, Ramadan, Eid, etc.)
-  // Example:
-  // if (settings.special.quotes?.enabled) {
-  //   // Create DailyQuote notification
-  // }
+  // Special 2: Daily Quote at random time (if enabled)
+  if (config.special.DailyQuote?.enabled) {
+    const quotes = QUOTES[language] || QUOTES.en;
 
-  if (count > 0) {
-    console.log(`✅ Scheduled ${count} special notification(s)`);
+    // Shuffle quotes for variety
+    const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < shuffledQuotes.length; i++) {
+      // Example: Day 1: Quote A at 2:37 PM (repeats every 19 days at 2:37 PM)
+      const quoteDate = new Date();
+      quoteDate.setDate(quoteDate.getDate() + i); // Day 0, 1, 2, 3...
+      const randomHour = Math.floor(Math.random() * 12) + 8;
+      const randomMinute = Math.floor(Math.random() * 60);
+      quoteDate.setHours(randomHour, randomMinute, 0, 0);
+
+      // Skip if time is in the past
+      const now = new Date();
+      if (quoteDate <= now) {
+        // Move to tomorrow if this time has passed today
+        quoteDate.setDate(quoteDate.getDate() + 1);
+      }
+
+      // Prepare notification content
+      const title = tr.labels?.dailyQuoteTitle || 'Daily Quote';
+      const body = shuffledQuotes[i];
+
+      await notifee.createTriggerNotification(
+        {
+          id: `special-daily-quote-${i}`,
+          title,
+          body,
+          data: {
+            type: 'special',
+            specialType: 'DailyQuote',
+            quoteIndex: i,
+          },
+          android: {
+            channelId: `general-vib-${config.notifSettings.vibration}`,
+            showTimestamp: true,
+            smallIcon: 'ic_stat_event',
+            color: AndroidColor.GREEN,
+            pressAction: { id: 'default', launchActivity: 'default' },
+            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+            style: {
+              type: AndroidStyle.INBOX,
+              lines: [body],
+            },
+            autoCancel: false,
+            ongoing: true,
+          },
+          ios: {
+            categoryId: 'special-category',
+            critical: false,
+            interruptionLevel: 'active',
+          },
+        },
+        {
+          type: TriggerType.TIMESTAMP,
+          timestamp: quoteDate.getTime(),
+          alarmManager: hasAlarm,
+          repeatFrequency: RepeatFrequency.DAILY,
+        }
+      );
+    }
+
+    console.log(`📜 Scheduled ${quotes.length} daily quotes at random times`);
   }
 }
 
@@ -430,6 +477,10 @@ export async function schedulePrayerReminder(params: {
         color: AndroidColor.RED,
         pressAction: { id: 'default', launchActivity: 'default' },
         actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+        style: {
+          type: AndroidStyle.INBOX,
+          lines: [body],
+        },
         autoCancel: false,
         ongoing: true,
       },
@@ -448,7 +499,7 @@ export async function schedulePrayerReminder(params: {
 }
 
 // ------------------------------------------------------------
-// MAIN: Schedule All Notifications
+// SCHEDULE ALL: Schedule All Notifications
 // ------------------------------------------------------------
 export async function scheduleNotificationsService(params: ScheduleParams) {
   const { config, prayerTimes, language } = params;
@@ -456,20 +507,14 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
   try {
     // 1: Cancel all existing
     await cancelAllNotifications();
-
     // 2: Create channels
     await createChannels(config.notifSettings.vibration);
-
     // 3: Schedule prayers
     await schedulePrayerNotifications(params);
-
     // 4: Schedule events
     await schedulePrayerEventNotifications(params);
-
     // 5: Schedule special
     await scheduleSpecialNotifications(params);
-
-    console.log('🔔 [notificationsService] All notifications scheduled successfully.');;
   } catch (err) {
     console.error('❌ Failed to schedule notifications:', err);
     throw err;
@@ -484,7 +529,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
   const nf = await notifee.getNotificationSettings();
   const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
 
-  // Early exit: do not play sound or handle anything
+  // Early exit: do not play sound or handle anything if notifications are disabled on device
   if (nf.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
     console.log(`[${source}] Notifications are disabled on device — ignoring event`);
     return;
@@ -502,7 +547,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
   const vibration = notification?.data?.vibration ?? 'on';
   const snooze = Number(notification?.data?.snooze ?? 5);
   const offset = Number(notification?.data?.offset ?? 0);
-  const sound = notification?.data?.sound || 'azan1.mp3';
+  const sound = notification?.data?.sound || SOUNDS.azan1;
 
   switch (type) {
     case EventType.DELIVERED:
@@ -515,7 +560,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
       }
       // For prayer-reminder notification
       else if (notifType === "prayer-reminder") {
-        await startSound('beep1.mp3', volume); // 25sec - Beep
+        await startSound(SOUNDS.beep1, volume); // 25sec - Beep
       }
       else if (notifType === "special") {
         // No sound for specials for now

@@ -15,6 +15,7 @@ import {
 import { PrayerTimes } from '@/types/prayer.types';
 import { usePrayersStore } from './prayersStore';
 import { useDeviceSettingsStore } from './deviceSettingsStore';
+import { SOUNDS } from '@/constants/sounds';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -32,29 +33,29 @@ interface NotificationsState {
 }
 
 const DEFAULT_NOTIF_SETTINGS: NotifSettings = {
-  volume: 1.0,
+  volume: 0.5,
   vibration: 'on',
   snooze: 5,
 };
 
 const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
-  Fajr: { enabled: true, offset: -15, sound: 'azan1.mp3' },
-  Dhuhr: { enabled: true, offset: 0, sound: 'azan1.mp3' },
-  Asr: { enabled: true, offset: 0, sound: 'azan1.mp3' },
-  Maghrib: { enabled: true, offset: 0, sound: 'azan1.mp3' },
-  Isha: { enabled: true, offset: 0, sound: 'azan1.mp3' },
+  Fajr: { enabled: true, offset: -15, sound: SOUNDS.azan1 },
+  Dhuhr: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
+  Asr: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
+  Maghrib: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
+  Isha: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
 };
 
 const DEFAULT_EVENTS: Record<PrayerEventType, EventSettings> = {
-  Imsak: { enabled: false, offset: 0 },
-  Sunrise: { enabled: false, offset: 0 },
+  Imsak: { enabled: false, offset: 0, sound: SOUNDS.azan1 },
+  Sunrise: { enabled: false, offset: 0, sound: SOUNDS.azan1 },
 };
 
 const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
   Ramadan: { enabled: false },
   Eid: { enabled: false },
-  DailyQuote: { enabled: false },
+  DailyQuote: { enabled: true },
 };
 
 export const useNotificationsStore = create<NotificationsState>()(
@@ -73,7 +74,6 @@ export const useNotificationsStore = create<NotificationsState>()(
         set((state) => ({
           notifSettings: { ...state.notifSettings, ...updates },
         }));
-
         get().syncNotifications();
       },
 
@@ -89,7 +89,6 @@ export const useNotificationsStore = create<NotificationsState>()(
             },
           },
         }));
-
         get().syncNotifications();
       },
 
@@ -105,7 +104,6 @@ export const useNotificationsStore = create<NotificationsState>()(
             },
           },
         }));
-
         get().syncNotifications();
       },
 
@@ -117,7 +115,6 @@ export const useNotificationsStore = create<NotificationsState>()(
             [special]: { enabled },
           },
         }));
-
         get().syncNotifications();
       },
 

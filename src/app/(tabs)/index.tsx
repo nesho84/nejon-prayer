@@ -16,7 +16,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { PrayerCountdown, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
-import { PrayerType, PrayerSettings, PrayerEventType, EventSettings } from "@/types/notification.types";
+import { PrayerType, PrayerEventType } from "@/types/notification.types";
 import { IconProps } from "@/types/types";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { usePrayersStore } from "@/store/prayersStore";
@@ -107,11 +107,16 @@ export default function HomeScreen() {
     };
 
     // ------------------------------------------------------------
-    // Handle Prayers Modal
+    // Handle prayer row press to open modal annd close modal
     // ------------------------------------------------------------
     const openPrayersModal = (prayerName: PrayerName) => {
-        setPrayerModalVisible(true);
         setSelectedPrayerName(prayerName);
+        setPrayerModalVisible(true);
+    };
+    const closePrayersModal = () => {
+        setPrayerModalVisible(false);
+        // Reset selected prayer
+        setSelectedPrayerName(null);
     };
 
     // ------------------------------------------------------------
@@ -139,7 +144,7 @@ export default function HomeScreen() {
         const prayerSettings = prayers?.[prayerName as PrayerType];
         const eventSettings = events?.[prayerName as PrayerEventType];
 
-        // Use whichever exists
+        // Use whichever is available (prayer or event), or default to disabled
         const settings = prayerSettings || eventSettings;
         const enabled = notificationPermission && settings?.enabled;
 
@@ -151,41 +156,6 @@ export default function HomeScreen() {
             return (props: IconProps) => <MaterialCommunityIcons name="bell-cog-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
 
         return (props: IconProps) => <Ionicons name="notifications-outline" {...props} />;
-    };
-
-    // ------------------------------------------------------------
-    // Toggle prayer notification
-    // ------------------------------------------------------------
-    const handlePrayerSettingsModal = (prayerName: PrayerName, settings: PrayerSettings | EventSettings) => {
-        // Check system notifications first
-        if (!notificationPermission) {
-            Alert.alert(
-                tr.labels.notificationsDisabled,
-                tr.labels.notificationsDisabledMessage,
-                [
-                    { text: tr.buttons.cancel, style: "cancel" },
-                    {
-                        text: tr.labels.goToSettings,
-                        onPress: () => router.navigate("/(tabs)/settings")
-                    },
-                ],
-                { cancelable: true }
-            );
-            return;
-        }
-
-        // Determine if this is a prayer or event
-        const isPrayer = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayerName);
-        const isEvent = ['Imsak', 'Sunrise'].includes(prayerName);
-
-        // Save to appropriate store method with destructured values
-        if (isPrayer) {
-            const { enabled, offset, sound } = settings as PrayerSettings;
-            useNotificationsStore.getState().setPrayer(prayerName as PrayerType, enabled, offset, sound);
-        } else if (isEvent) {
-            const { enabled, offset, sound } = settings as EventSettings;
-            useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, enabled, offset, sound);
-        }
     };
 
     // Loading state
@@ -239,17 +209,17 @@ export default function HomeScreen() {
     return (
         <AppTabScreen>
             {/* Notifications Test utility */}
-            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
+            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* Notifications Debug utility */}
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -367,19 +337,11 @@ export default function HomeScreen() {
                     </View>
 
                     {/* Prayer Notifications settings Modal */}
-                    {selectedPrayerName && (
-                        <PrayerModal
-                            visible={prayerModalVisible}
-                            setVisible={setPrayerModalVisible}
-                            header={selectedPrayerName}
-                            selectedValue={
-                                prayers[selectedPrayerName as PrayerType] ||
-                                events[selectedPrayerName as PrayerEventType] ||
-                                { enabled: false, offset: 0, sound: '' }
-                            }
-                            onSelect={(selectedSettings) => handlePrayerSettingsModal(selectedPrayerName, selectedSettings)}
-                        />
-                    )}
+                    <PrayerModal
+                        visible={prayerModalVisible}
+                        onClose={closePrayersModal}
+                        prayerName={selectedPrayerName}
+                    />
                 </AppCard>
 
             </ScrollView>
