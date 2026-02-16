@@ -11,7 +11,7 @@ import AppCard from "@/components/AppCard";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuoteCarousel from "@/components/QuoteCarousel";
 import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
-import PrayerModal from "@/components/PrayerModal";
+import PrayerSettingsModal from "@/components/PrayerSettingsModal";
 import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -38,21 +38,15 @@ export default function HomeScreen() {
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
-    const notifLoading = useNotificationsStore((state) => state.isLoading);
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
 
     // Next prayer countdown
-    const {
-        nextPrayerName,
-        prayerCountdown,
-        remainingSeconds,
-        totalSeconds
-    } = useNextPrayer(prayerTimes);
+    const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
 
     // Local State
-    const [prayerModalVisible, setPrayerModalVisible] = useState(false);
+    const [prayerSettingsModalVisible, setPrayerSettingsModalVisible] = useState(false);
     const [selectedPrayerName, setSelectedPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
@@ -61,7 +55,6 @@ export default function HomeScreen() {
     useEffect(() => {
         if (!deviceSettingsReady || !locationReady) return;
 
-        // Load prayer times
         usePrayersStore.getState().loadPrayerTimes();
 
     }, [deviceSettingsReady, locationReady, location]);
@@ -109,12 +102,12 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     // Handle prayer row press to open modal annd close modal
     // ------------------------------------------------------------
-    const openPrayersModal = (prayerName: PrayerName) => {
+    const openPrayersSettingsModal = (prayerName: PrayerName) => {
         setSelectedPrayerName(prayerName);
-        setPrayerModalVisible(true);
+        setPrayerSettingsModalVisible(true);
     };
-    const closePrayersModal = () => {
-        setPrayerModalVisible(false);
+    const closePrayersSettingsModal = () => {
+        setPrayerSettingsModalVisible(false);
         // Reset selected prayer
         setSelectedPrayerName(null);
     };
@@ -159,7 +152,7 @@ export default function HomeScreen() {
     };
 
     // Loading state
-    if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady || notifLoading) {
+    if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady) {
         return <AppLoading text={tr.labels.loading} />;
     }
 
@@ -209,17 +202,17 @@ export default function HomeScreen() {
     return (
         <AppTabScreen>
             {/* Notifications Test utility */}
-            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
+            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             {/* Notifications Debug utility */}
-            {/* <TouchableOpacity
+            <TouchableOpacity
                 style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -297,7 +290,7 @@ export default function HomeScreen() {
                             return (
                                 <View key={prayerName}>
                                     {/* Prayer row */}
-                                    <TouchableOpacity activeOpacity={0.3} onPress={() => openPrayersModal(prayerName)}>
+                                    <TouchableOpacity activeOpacity={0.3} onPress={() => openPrayersSettingsModal(prayerName)}>
                                         <View
                                             style={[
                                                 styles.prayerRow,
@@ -337,10 +330,10 @@ export default function HomeScreen() {
                     </View>
 
                     {/* Prayer Notifications settings Modal */}
-                    <PrayerModal
-                        visible={prayerModalVisible}
-                        onClose={closePrayersModal}
+                    <PrayerSettingsModal
+                        visible={prayerSettingsModalVisible}
                         prayerName={selectedPrayerName}
+                        closePrayerSettingsModal={closePrayersSettingsModal}
                     />
                 </AppCard>
 

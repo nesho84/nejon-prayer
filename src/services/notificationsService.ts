@@ -48,8 +48,8 @@ const SPECIAL: SpecialType[] = ['Friday', 'Ramadan', 'Eid', 'DailyQuote'];
 // ------------------------------------------------------------
 async function createChannels(vibration: 'on' | 'off') {
   const isVibrationEnabled = vibration === 'on';
-  // Vibration pattern: 30 seconds total, 15 cycles of 1s on / 300ms off
-  const vibrationPattern = Array(30).fill([1000, 300]).flat();
+  // = 1000 + (21 × 1300) = 28,300ms = 28.3 seconds
+  const vibrationPattern = Array(21).fill([1000, 300]).flat();
 
   const channelConfig = {
     importance: AndroidImportance.HIGH,
@@ -556,7 +556,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
 
       // For prayer and prayer-event notification
       if (notifType === "prayer" || notifType === "prayer-event") {
-        await startSound(sound, volume); // 29sec - Azan
+        await startSound(sound, volume); // Play configured sound (default to azan1)
       }
       // For prayer-reminder notification
       else if (notifType === "prayer-reminder") {

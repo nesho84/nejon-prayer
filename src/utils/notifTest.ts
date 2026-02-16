@@ -1,3 +1,4 @@
+import { SOUNDS } from "@/constants/sounds";
 import notifee, {
     AndroidColor,
     AndroidStyle,
@@ -54,6 +55,7 @@ export async function testNotification({
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
+                    sound: SOUNDS.azan1, // Default sound for test
                 },
                 android: {
                     // (is created in notificationsService.js)

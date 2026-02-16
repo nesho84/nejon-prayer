@@ -52,7 +52,6 @@ export default function SettingsScreen() {
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
-    const notifLoading = useNotificationsStore((state) => state.isLoading);
     const special = useNotificationsStore((state) => state.special);
 
     // Local state
@@ -228,7 +227,7 @@ export default function SettingsScreen() {
         setLocalLoading(true);
         try {
             // Save special notification settings
-            useNotificationsStore.getState().setSpecial(type, value);
+            useNotificationsStore.getState().setSpecial(type, { enabled: value });
 
             console.log(`📳 ${type} Reminder changed to: ${value ? 'enabled' : 'disabled'}`);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -295,7 +294,7 @@ export default function SettingsScreen() {
     };
 
     // Loading state
-    if (!deviceSettingsReady || !locationReady || !notifReady || notifLoading) {
+    if (!deviceSettingsReady || !locationReady || !notifReady) {
         // prayersLoading is not used, because it covers the entire screen!
         return <AppLoading text={tr.labels.loadingSettings} />
     }

@@ -26,9 +26,9 @@ interface NotificationsState {
   isLoading: boolean;
   isReady: boolean;
   setSettings: (updates: Partial<NotifSettings>) => void;
-  setPrayer: (prayer: PrayerType, enabled: boolean, offset?: number, sound?: string) => void;
-  setEvent: (event: PrayerEventType, enabled: boolean, offset?: number, sound?: string) => void;
-  setSpecial: (special: SpecialType, enabled: boolean) => void;
+  setPrayer: (prayer: PrayerType, updates: Partial<PrayerSettings>) => void;
+  setEvent: (event: PrayerEventType, updates: Partial<EventSettings>) => void;
+  setSpecial: (special: SpecialType, updates: Partial<SpecialSettings>) => void;
   syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
 }
 
@@ -78,14 +78,13 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       // Update individual prayer settings
-      setPrayer: (prayer, enabled, offset, sound) => {
+      setPrayer: (prayer, updates) => {
         set((state) => ({
           prayers: {
             ...state.prayers,
             [prayer]: {
-              enabled,
-              offset: offset ?? state.prayers[prayer].offset,
-              sound: sound ?? state.prayers[prayer].sound,
+              ...state.prayers[prayer],
+              ...updates,
             },
           },
         }));
@@ -93,14 +92,13 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       // Update individual event settings
-      setEvent: (event, enabled, offset, sound) => {
+      setEvent: (event, updates) => {
         set((state) => ({
           events: {
             ...state.events,
             [event]: {
-              enabled,
-              offset: offset ?? state.events[event].offset,
-              sound: sound ?? state.events[event].sound,
+              ...state.events[event],
+              ...updates,
             },
           },
         }));
@@ -108,11 +106,14 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
 
       // Update individual special notification settings
-      setSpecial: (special, enabled) => {
+      setSpecial: (special, updates) => {
         set((state) => ({
           special: {
             ...state.special,
-            [special]: { enabled },
+            [special]: {
+              ...state.special[special],
+              ...updates,
+            },
           },
         }));
         get().syncNotifications();
