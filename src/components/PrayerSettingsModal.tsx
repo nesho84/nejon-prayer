@@ -158,7 +158,7 @@ export default function PrayerSettingsModal({ visible, closePrayerSettingsModal,
     // ------------------------------------------------------------
     // Handle Selected Prayer/Event notification option (on/off/offset)
     // ------------------------------------------------------------
-    const handleSelectedPrayer = (value: PrayerSettings | EventSettings) => {
+    const handleSelectedOption = (value: PrayerSettings | EventSettings) => {
         if (!prayerName) return;
 
         // Check system notifications first
@@ -223,6 +223,7 @@ export default function PrayerSettingsModal({ visible, closePrayerSettingsModal,
                 animationType="fade"
                 onRequestClose={closeSoundsModal}
             >
+
                 <View style={styles.overlay}>
                     <View style={[styles.modalBox, { backgroundColor: theme.bg }]}>
 
@@ -302,6 +303,7 @@ export default function PrayerSettingsModal({ visible, closePrayerSettingsModal,
 
                     </View>
                 </View>
+
             </Modal >
         );
     }
@@ -336,7 +338,7 @@ export default function PrayerSettingsModal({ visible, closePrayerSettingsModal,
                                     key={index}
                                     style={[styles.optionRow, isSelected && { backgroundColor: theme.accentLight }]}
                                     activeOpacity={0.3}
-                                    onPress={() => handleSelectedPrayer(option.value)}
+                                    onPress={() => handleSelectedOption(option.value)}
                                 >
                                     <View style={styles.optionLabel}>
                                         {/* Icon */}
@@ -371,7 +373,7 @@ export default function PrayerSettingsModal({ visible, closePrayerSettingsModal,
                         >
                             <View style={styles.optionLabel}>
                                 <MaterialCommunityIcons
-                                    name="music-note"
+                                    name="timer-music-outline"
                                     size={20}
                                     color={theme.text2}
                                     style={{ marginRight: 10, opacity: 0.6 }}
@@ -403,11 +405,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0,0,0,0.3)",
-        padding: 25,
+        padding: 16,
     },
     modalBox: {
         width: "85%",
-        borderRadius: 14,
+        borderRadius: 16,
         overflow: "hidden",
         elevation: 6,
     },

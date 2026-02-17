@@ -19,7 +19,7 @@ export default function AbdesiScreen() {
     // ------------------------------------------------------------
     // Steps data
     // ------------------------------------------------------------
-    const steps: StepType[] = useMemo(() => {
+    const STEPS: StepType[] = useMemo(() => {
         return [
             { id: 1, text: tr.abdesi.step1 },
             { id: 2, text: tr.abdesi.step2, image: require("../../../assets/images/abdesi/step2.png") },
@@ -54,7 +54,7 @@ export default function AbdesiScreen() {
                 </AppCard>
 
                 {/* STEPS */}
-                {steps.map((step) => (
+                {STEPS.map((step) => (
                     <AppCard key={step.id} style={[styles.stepCard, { backgroundColor: theme.card }]}>
                         <View style={styles.stepHeader}>
                             <View style={[styles.stepNumberCircle, { backgroundColor: theme.secondary }]}>

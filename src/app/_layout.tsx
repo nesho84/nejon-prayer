@@ -19,10 +19,20 @@ const RootStack = () => {
         <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
       </Stack.Protected>
 
-      {/* Main app (tabs) and (extras) only after onboarding */}
+      {/* Main app only after onboarding */}
       <Stack.Protected guard={onboardingComplete}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
         <Stack.Screen name="(extras)" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen
+          name="(modals)"
+          options={{
+            presentation: 'formSheet',
+            sheetGrabberVisible: true,
+            sheetAllowedDetents: [0.9],
+            sheetInitialDetentIndex: 0,
+            sheetCornerRadius: 24,
+          }}
+        />
       </Stack.Protected>
     </Stack>
   );

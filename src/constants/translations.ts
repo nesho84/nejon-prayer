@@ -137,6 +137,10 @@ export const TRANSLATIONS = {
             fridayTitle: "Jumu\'ah Reminder",
             fridayBody: "Today is Jumu‘ah. Make time for prayer",
             dailyQuoteTitle: "Daily Reminder",
+            notificationSettings: "Notification Settings",
+            enableNotification: "Enable Notification",
+            notificationTime: "Notification Time",
+            notificationSound: "Notification Sound",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
             // Notifications settings
@@ -192,6 +196,7 @@ export const TRANSLATIONS = {
         },
         buttons: {
             cancel: "Cancel",
+            save: "Save Changes",
             later: "Later",
             openSettings: "Open Settings",
             retry: "Retry",
@@ -345,6 +350,10 @@ export const TRANSLATIONS = {
             fridayTitle: "Jumu\'ah-Erinnerung",
             fridayBody: "Heute ist Jumu‘ah. Nimm dir Zeit für das Gebet",
             dailyQuoteTitle: "Tägliche Erinnerung",
+            notificationSettings: "Benachrichtigungseinstellungen",
+            enableNotification: "Benachrichtigung Aktivieren",
+            notificationTime: "Benachrichtigungszeit",
+            notificationSound: "Benachrichtigungston",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
             // Notifications settings
@@ -400,6 +409,7 @@ export const TRANSLATIONS = {
         },
         buttons: {
             cancel: "Abbrechen",
+            save: "Änderungen speichern",
             later: "Später",
             openSettings: "Einstellungen Öffnen",
             retry: "Wiederholen",
@@ -553,6 +563,10 @@ export const TRANSLATIONS = {
             fridayTitle: "Kujtesë për Xhuma",
             fridayBody: "Sot është e xhuma. Gjej kohë për namaz.",
             dailyQuoteTitle: "Përkujtues ditor",
+            notificationSettings: "Cilësimet e njoftimeve",
+            enableNotification: "Aktivizo njoftimin",
+            notificationTime: "Koha e njoftimit",
+            notificationSound: "Zëri i njoftimit",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
             // Notifications settings
@@ -608,6 +622,7 @@ export const TRANSLATIONS = {
         },
         buttons: {
             cancel: "Anulo",
+            save: "Ruaj ndryshimet",
             later: "Më vonë",
             openSettings: "Hap Cilësimet",
             retry: "Riprovo",
@@ -761,6 +776,10 @@ export const TRANSLATIONS = {
             fridayTitle: "Cuma Hatırlatıcısı",
             fridayBody: "Bugün Cuma. Namaz için vakit ayır.",
             dailyQuoteTitle: "Günlük Hatırlatma",
+            notificationSettings: "Bildirim Ayarları",
+            enableNotification: "Bildirimleri Etkinleştir",
+            notificationTime: "Bildirim Zamanı",
+            notificationSound: "Bildirim Sesi",
             notificationsDisabled: "Bildirimler Devre Dışı",
             notificationsDisabledMessage: "Namaz hatırlatmaları almak için lütfen sistem ayarlarından bildirimleri etkinleştirin.",
             // Notifications settings
@@ -816,6 +835,7 @@ export const TRANSLATIONS = {
         },
         buttons: {
             cancel: "İptal",
+            save: "Değişiklikleri Kaydet",
             later: "Daha sonra",
             openSettings: "Ayarları Aç",
             retry: "Tekrar dene",
@@ -967,6 +987,10 @@ export const TRANSLATIONS = {
             fridayTitle: "تذكير الجمعة",
             fridayBody: "اليوم الجمعة. خصص وقتًا للصلاة.",
             dailyQuoteTitle: "تذكير يومي",
+            notificationSettings: "إعدادات الإشعارات",
+            enableNotification: "تفعيل الإشعارات",
+            notificationTime: "وقت الإشعار",
+            notificationSound: "صوت الإشعار",
             notificationsDisabled: "الإشعارات معطلة",
             notificationsDisabledMessage: "لتلقي تذكيرات الصلاة، يرجى تفعيل الإشعارات من إعدادات النظام.",
             // Notifications settings
@@ -1022,6 +1046,7 @@ export const TRANSLATIONS = {
         },
         buttons: {
             cancel: "إلغاء",
+            save: "حفظ التغييرات",
             later: "لاحقًا",
             openSettings: "فتح الإعدادات",
             retry: "إعادة المحاولة",

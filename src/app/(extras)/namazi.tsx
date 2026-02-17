@@ -34,7 +34,7 @@ export default function NamaziScreen() {
     ]);
 
     // Prayer tab data
-    const steps: StepType[] = useMemo(() => {
+    const STEPS: StepType[] = useMemo(() => {
         return [
             { id: 1, text: tr.namazi.step1, image: require("../../../assets/images/namazi/step1.png") },
             { id: 2, text: tr.namazi.step2, image: require("../../../assets/images/namazi/step2.png") },
@@ -72,7 +72,7 @@ export default function NamaziScreen() {
             </AppCard>
 
             {/* STEPS */}
-            {steps.map((step) => (
+            {STEPS.map((step) => (
                 <AppCard key={step.id} style={[styles.stepCard, { backgroundColor: theme.card }]}>
                     <View style={styles.stepHeader}>
                         <View style={[styles.stepNumberCircle, { backgroundColor: theme.success }]}>

@@ -23,7 +23,7 @@ export default function RamadanScreen() {
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [sharedId, setSharedId] = useState<number | null>(null);
 
-    const sections: SectionType[] = useMemo(() => {
+    const SECTIONS: SectionType[] = useMemo(() => {
         return [
             { id: 1, icon: "⭐", title: tr.ramazani.title1, desc: tr.ramazani.desc1, },
             { id: 2, icon: "⚠️", title: tr.ramazani.title2, desc: tr.ramazani.desc2, },
@@ -111,7 +111,7 @@ export default function RamadanScreen() {
                 </AppCard>
 
                 {/* SECTIONS */}
-                {sections.map((item) => (
+                {SECTIONS.map((item) => (
                     <AppCard key={item.id} style={[styles.sectionCard, { backgroundColor: theme.card }]}>
                         <View style={styles.sectionHeader}>
                             <Text style={styles.iconText}>{item.icon}</Text>

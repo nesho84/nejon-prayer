@@ -202,17 +202,17 @@ export default function HomeScreen() {
     return (
         <AppTabScreen>
             {/* Notifications Test utility */}
-            <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
+            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* Notifications Debug utility */}
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
                 onPress={debugChannelsAndScheduled}>
                 <Text style={{ color: theme.text }}>Debug Notifications</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -290,7 +290,13 @@ export default function HomeScreen() {
                             return (
                                 <View key={prayerName}>
                                     {/* Prayer row */}
-                                    <TouchableOpacity activeOpacity={0.3} onPress={() => openPrayersSettingsModal(prayerName)}>
+                                    <TouchableOpacity
+                                        activeOpacity={0.3}
+                                        // onPress={() => openPrayersSettingsModal(prayerName)}
+                                        onPress={() => {
+                                            router.push(`/(modals)/prayerNotification?prayer=${prayerName}`);
+                                        }}
+                                    >
                                         <View
                                             style={[
                                                 styles.prayerRow,
@@ -328,13 +334,6 @@ export default function HomeScreen() {
                             );
                         })}
                     </View>
-
-                    {/* Prayer Notifications settings Modal */}
-                    <PrayerSettingsModal
-                        visible={prayerSettingsModalVisible}
-                        prayerName={selectedPrayerName}
-                        closePrayerSettingsModal={closePrayersSettingsModal}
-                    />
                 </AppCard>
 
             </ScrollView>

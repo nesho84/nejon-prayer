@@ -132,7 +132,7 @@ export const useNotificationsStore = create<NotificationsState>()(
 
         // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
-          console.warn('⚠️ Cannot schedule notifications: Missing notification permission or prayer times');
+          console.warn('⚠️  Cannot schedule notifications: Missing notification permission or prayer times');
           return;
         }
 
