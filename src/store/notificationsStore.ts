@@ -1,21 +1,21 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import { mmkvStorage } from '@/store/storage';
+import { SOUNDS } from '@/constants/sounds';
 import { scheduleNotificationsService } from '@/services/notificationsService';
 import { useLanguageStore } from '@/store/languageStore';
+import { mmkvStorage } from '@/store/storage';
 import {
-  PrayerType,
-  PrayerEventType,
-  SpecialType,
-  NotifSettings,
-  PrayerSettings,
   EventSettings,
-  SpecialSettings
+  NotifSettings,
+  PrayerEventType,
+  PrayerSettings,
+  PrayerType,
+  SpecialSettings,
+  SpecialType
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
-import { usePrayersStore } from './prayersStore';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { useDeviceSettingsStore } from './deviceSettingsStore';
-import { SOUNDS } from '@/constants/sounds';
+import { usePrayersStore } from './prayersStore';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -47,8 +47,8 @@ const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
 };
 
 const DEFAULT_EVENTS: Record<PrayerEventType, EventSettings> = {
-  Imsak: { enabled: false, offset: 0, sound: SOUNDS.azan1 },
-  Sunrise: { enabled: false, offset: 0, sound: SOUNDS.azan1 },
+  Imsak: { enabled: false, offset: 0, sound: SOUNDS.beep1 },
+  Sunrise: { enabled: false, offset: 0, sound: SOUNDS.beep1 },
 };
 
 const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
@@ -167,8 +167,8 @@ export const useNotificationsStore = create<NotificationsState>()(
 
           // 4. Save hash after successful scheduling
           set({ lastScheduledHash: currentHash });
-        } catch (error) {
-          console.error('❌ Failed to schedule notifications:', error);
+        } catch (err) {
+          console.error('❌ Failed to schedule notifications:', err);
         } finally {
           set({ isLoading: false });
         }

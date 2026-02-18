@@ -13,6 +13,7 @@ export const LIGHT_COLORS = {
     primary: "#2563eb",
     secondary: "#0ea5e9",
     accent: "#d97706",
+    accent2: "#e0ac2abd",
     accentLight: '#f59e0b26', // 15% opacity
     highlight: "#22c55e",
 
@@ -60,6 +61,7 @@ export const DARK_COLORS = {
     primary: "#3b82f6",
     secondary: "#38bdf8",
     accent: "#fbbe24e1",
+    accent2: "#e0ac2abd",
     accentLight: '#f59e0b26', // 15% opacity
     highlight: "#22c55e",
 

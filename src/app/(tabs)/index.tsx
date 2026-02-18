@@ -1,26 +1,24 @@
-import { useState, useEffect } from "react";
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
-import * as Updates from "expo-updates";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import useNextPrayer from "@/hooks/useNextPrayer";
-import AppTabScreen from "@/components/AppTabScreen";
-import AppLoading from "@/components/AppLoading";
-import AppError from "@/components/AppError";
 import AppCard from "@/components/AppCard";
+import AppError from "@/components/AppError";
+import AppLoading from "@/components/AppLoading";
+import AppTabScreen from "@/components/AppTabScreen";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuoteCarousel from "@/components/QuoteCarousel";
-import { testNotification, debugChannelsAndScheduled } from "@/utils/notifTest";
-import PrayerSettingsModal from "@/components/PrayerSettingsModal";
-import { useThemeStore } from "@/store/themeStore";
+import useNextPrayer from "@/hooks/useNextPrayer";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
-import { PrayerCountdown, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
-import { PrayerType, PrayerEventType } from "@/types/notification.types";
-import { IconProps } from "@/types/types";
-import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
-import { usePrayersStore } from "@/store/prayersStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
+import { usePrayersStore } from "@/store/prayersStore";
+import { useThemeStore } from "@/store/themeStore";
+import { PrayerEventType, PrayerType } from "@/types/notification.types";
+import { PrayerCountdown, PrayerTimeEntry } from "@/types/prayer.types";
+import { IconProps } from "@/types/types";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import * as Updates from "expo-updates";
+import { useEffect } from "react";
+import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
     // Stores
@@ -38,16 +36,12 @@ export default function HomeScreen() {
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
-    const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
+    const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
     // Next prayer countdown
     const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
-
-    // Local State
-    const [prayerSettingsModalVisible, setPrayerSettingsModalVisible] = useState(false);
-    const [selectedPrayerName, setSelectedPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -97,19 +91,6 @@ export default function HomeScreen() {
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }
-    };
-
-    // ------------------------------------------------------------
-    // Handle prayer row press to open modal annd close modal
-    // ------------------------------------------------------------
-    const openPrayersSettingsModal = (prayerName: PrayerName) => {
-        setSelectedPrayerName(prayerName);
-        setPrayerSettingsModalVisible(true);
-    };
-    const closePrayersSettingsModal = () => {
-        setPrayerSettingsModalVisible(false);
-        // Reset selected prayer
-        setSelectedPrayerName(null);
     };
 
     // ------------------------------------------------------------
@@ -203,7 +184,7 @@ export default function HomeScreen() {
         <AppTabScreen>
             {/* Notifications Test utility */}
             {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
-                onPress={() => testNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
+                onPress={() => testFridayNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
                 <Text style={{ color: theme.text }}>Test Notifications</Text>
             </TouchableOpacity> */}
 
@@ -262,19 +243,34 @@ export default function HomeScreen() {
                 {/* 4. PRAYERS CARD */}
                 <AppCard style={styles.prayersCard}>
                     {/* Prayers Date Header */}
-                    <View style={styles.prayersDateHeader}>
-                        <Text style={[styles.dateHeaderText, { color: theme.text }]}>
-                            {new Date().toLocaleDateString(tr.labels.localeDate, {
-                                weekday: "long",
-                                day: "2-digit",
-                                month: "long",
-                                year: "numeric",
-                            }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
-                        </Text>
-                        <Text style={[styles.prayersTimezoneInfo, { color: theme.text2 }]}>
-                            {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
-                        </Text>
-                    </View>
+                    <TouchableOpacity
+                        activeOpacity={0.6}
+                        onPress={() => router.push('/(modals)/prayerTimings')}
+                        style={styles.prayersDateHeader}
+                    >
+                        {/* Calendar left icon */}
+                        <View style={styles.calendarLeftIcon}>
+                            <Ionicons name="calendar-outline" size={22} color={theme.text} style={{ opacity: 0.6 }} />
+                        </View>
+                        {/* Date & Timezone Container */}
+                        <View style={styles.dateContainer}>
+                            <Text style={[styles.dateHeaderText, { color: theme.text }]}>
+                                {new Date().toLocaleDateString(tr.labels.localeDate, {
+                                    weekday: "long",
+                                    day: "2-digit",
+                                    month: "long",
+                                    year: "numeric",
+                                }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
+                            </Text>
+                            <Text style={[styles.prayersTimezoneInfo, { color: theme.text2 }]}>
+                                {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
+                            </Text>
+                        </View>
+                        {/* Chevron right icon */}
+                        <View style={styles.chevronRightIcon}>
+                            <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.6 }} />
+                        </View>
+                    </TouchableOpacity>
 
                     {/* Divider */}
                     <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
@@ -292,7 +288,6 @@ export default function HomeScreen() {
                                     {/* Prayer row */}
                                     <TouchableOpacity
                                         activeOpacity={0.3}
-                                        // onPress={() => openPrayersSettingsModal(prayerName)}
                                         onPress={() => {
                                             router.push(`/(modals)/prayerNotification?prayer=${prayerName}`);
                                         }}
@@ -347,10 +342,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 24,
-        gap: 16,
+        paddingHorizontal: 8,
+        gap: 12,
     },
 
     // Location Row
@@ -390,9 +385,16 @@ const styles = StyleSheet.create({
     },
     // Prayer Card - Date Header
     prayersDateHeader: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingVertical: 12,
         paddingHorizontal: 12,
+    },
+    dateContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     dateHeaderText: {
         fontSize: 16,
@@ -402,6 +404,18 @@ const styles = StyleSheet.create({
     prayersTimezoneInfo: {
         fontSize: 12,
         opacity: 0.7,
+    },
+    calendarLeftIcon: {
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    chevronRightIcon: {
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     fullDivider: {
         height: 1,

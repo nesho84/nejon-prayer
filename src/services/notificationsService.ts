@@ -1,28 +1,28 @@
-import { startSound, stopSound } from "@/utils/notifSound";
-import notifee, {
-  EventType,
-  AndroidNotificationSetting,
-  AndroidImportance,
-  AndroidVisibility,
-  TriggerType,
-  RepeatFrequency,
-  AndroidColor,
-  AndroidStyle,
-  AuthorizationStatus
-} from '@notifee/react-native';
-import {
-  PrayerType,
-  PrayerEventType,
-  SpecialType,
-  NotifSettings,
-  PrayerSettings,
-  EventSettings,
-  SpecialSettings
-} from '@/types/notification.types';
-import { PrayerTimes } from "@/types/prayer.types";
-import { Language, Translations } from '@/types/language.types';
 import { QUOTES } from "@/constants/quotes";
 import { SOUNDS } from "@/constants/sounds";
+import { startSound, stopSound } from "@/services/soundService";
+import { Language, Translations } from '@/types/language.types';
+import {
+  EventSettings,
+  NotifSettings,
+  PrayerEventType,
+  PrayerSettings,
+  PrayerType,
+  SpecialSettings,
+  SpecialType
+} from '@/types/notification.types';
+import { PrayerTimes } from "@/types/prayer.types";
+import notifee, {
+  AndroidColor,
+  AndroidImportance,
+  AndroidNotificationSetting,
+  AndroidStyle,
+  AndroidVisibility,
+  AuthorizationStatus,
+  EventType,
+  RepeatFrequency,
+  TriggerType
+} from '@notifee/react-native';
 
 interface ServiceSettings {
   notifSettings: NotifSettings;
@@ -265,7 +265,7 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
         body,
         data: {
           type: 'prayer-event',
-          event,
+          event: event,
           volume: config.notifSettings.volume,
           vibration: config.notifSettings.vibration,
           snooze: config.notifSettings.snooze,
@@ -347,7 +347,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             android: {
               channelId: `general-vib-${config.notifSettings.vibration}`,
               showTimestamp: true,
-              smallIcon: 'ic_stat_event',
+              smallIcon: 'ic_stat_prayer',
               color: AndroidColor.GREEN,
               pressAction: { id: 'default', launchActivity: 'default' },
               actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
@@ -400,7 +400,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       }
 
       // Prepare notification content
-      const title = tr.labels?.dailyQuoteTitle || 'Daily Quote';
+      const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
       const body = shuffledQuotes[i];
 
       await notifee.createTriggerNotification(
@@ -416,13 +416,13 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           android: {
             channelId: `general-vib-${config.notifSettings.vibration}`,
             showTimestamp: true,
-            smallIcon: 'ic_stat_event',
+            smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             pressAction: { id: 'default', launchActivity: 'default' },
             actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
             style: {
-              type: AndroidStyle.INBOX,
-              lines: [body],
+              type: AndroidStyle.BIGTEXT,
+              text: body,
             },
             autoCancel: false,
             ongoing: true,
@@ -539,7 +539,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
   const prefix = source === 'background' ? '[Background]' : '[Foreground]';
 
   const notifType = notification?.data?.type;
-  const prayer = notification?.data?.prayer;
+  const prayer = notification?.data?.prayer || 'unknown';
   const reminderTitle = notification?.data?.reminderTitle;
   const reminderBody = notification?.data?.reminderBody;
   const language = notification?.data?.language ?? 'en';

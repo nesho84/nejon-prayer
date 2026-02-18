@@ -1,18 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Switch, Alert, Platform } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useThemeStore } from "@/store/themeStore";
-import { useLanguageStore } from "@/store/languageStore";
-import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
-import { useNotificationsStore } from "@/store/notificationsStore";
-import { PrayerName } from "@/types/prayer.types";
-import { SOUNDS } from "@/constants/sounds";
-import { PrayerSettings, EventSettings, PrayerType, PrayerEventType } from "@/types/notification.types";
-import { startSound, stopSound } from "@/utils/notifSound";
-import Sound from "react-native-sound";
 import AppCard from "@/components/AppCard";
+import { SOUNDS } from "@/constants/sounds";
+import { startSound, stopSound } from "@/services/soundService";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useLanguageStore } from "@/store/languageStore";
+import { useNotificationsStore } from "@/store/notificationsStore";
+import { useThemeStore } from "@/store/themeStore";
+import { PrayerEventType, PrayerType } from "@/types/notification.types";
+import { PrayerName } from "@/types/prayer.types";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Sound from "react-native-sound";
 
 interface SoundsOptionType {
     id: string;

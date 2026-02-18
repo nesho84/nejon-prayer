@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 24,
-        gap: 16,
+        paddingHorizontal: 8,
+        gap: 12,
     },
 
     // Header Hero Section

@@ -1,7 +1,7 @@
-import { Alert, Linking } from 'react-native';
-import * as Location from 'expo-location';
+import { Cords, LocationData, TimeZone } from '@/types/location.types';
 import NetInfo from '@react-native-community/netinfo';
-import { Cords, TimeZone, LocationData } from '@/types/location.types';
+import * as Location from 'expo-location';
+import { Alert, Linking } from 'react-native';
 
 type Translations = Record<string, any> | null;
 
@@ -65,8 +65,8 @@ export async function getUserLocation(tr: Translations): Promise<LocationData | 
         let loc;
         try {
             loc = await Location.getCurrentPositionAsync(locationOptions);
-        } catch (error) {
-            console.log('First location attempt failed, requesting permission again...', error);
+        } catch (err) {
+            console.log('First location attempt failed, requesting permission again...', err);
 
             // Request permission again...
             const retryPermission = await Location.requestForegroundPermissionsAsync();

@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Share } from "react-native";
-import { useThemeStore } from "@/store/themeStore";
-import { useLanguageStore } from "@/store/languageStore";
-import * as Clipboard from "expo-clipboard";
-import { Feather } from "@expo/vector-icons";
-import AppFullScreen from "@/components/AppFullScreen";
 import AppCard from "@/components/AppCard";
+import AppFullScreen from "@/components/AppFullScreen";
+import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Feather } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import { useMemo, useState } from "react";
+import { ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface SectionType {
     id: number;
@@ -67,8 +67,8 @@ export default function RamadanScreen() {
                     setSharedId(null);
                 }, 10000);
             }
-        } catch (error) {
-            console.error("Share failed:", error);
+        } catch (err) {
+            console.error("Share failed:", err);
         }
     };
 
@@ -86,8 +86,8 @@ export default function RamadanScreen() {
             setTimeout(() => {
                 setCopiedId(null);
             }, 2000);
-        } catch (error) {
-            console.error("❌ Copy failed:", error);
+        } catch (err) {
+            console.error("❌ Copy failed:", err);
         }
     };
 
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 16,
-        paddingTop: 16,
+        paddingTop: 12,
         paddingBottom: 24,
-        gap: 16,
+        paddingHorizontal: 8,
+        gap: 12,
     },
 
     // Header card

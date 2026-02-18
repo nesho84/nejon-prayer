@@ -3,7 +3,7 @@
     "name": "Nejon Prayer",
     "slug": "nejon-prayer",
     "version": "2.2.1",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
     "userInterfaceStyle": "automatic",
@@ -115,7 +115,8 @@
             "deploymentTarget": "15.1"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

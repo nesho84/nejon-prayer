@@ -89,9 +89,9 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 24,
+        paddingHorizontal: 16,
         gap: 16,
     },
 

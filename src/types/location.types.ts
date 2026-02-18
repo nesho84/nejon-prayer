@@ -1,3 +1,8 @@
+export interface AppLocation {
+  latitude: number;
+  longitude: number;
+}
+
 export interface Cords {
   latitude: number;
   longitude: number;

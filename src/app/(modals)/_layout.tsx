@@ -1,6 +1,6 @@
-import { Stack } from 'expo-router';
-import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Stack } from 'expo-router';
 
 export default function ModalsLayout() {
   // Stores
@@ -17,6 +17,10 @@ export default function ModalsLayout() {
       <Stack.Screen
         name="prayerNotification"
         options={{ title: tr.labels.notificationSettings }}
+      />
+      <Stack.Screen
+        name="prayerTimings"
+        options={{ title: "Prayer Timings" }}
       />
     </Stack>
   );
