@@ -4,6 +4,7 @@ import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 
 const RootStack = () => {
@@ -23,14 +24,13 @@ const RootStack = () => {
       <Stack.Protected guard={onboardingComplete}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
         <Stack.Screen name="(extras)" options={{ animation: "slide_from_right" }} />
+        {/* Bottom Sheet Screens */}
         <Stack.Screen
-          name="(modals)"
+          name="(sheets)"
           options={{
-            presentation: 'formSheet',
-            sheetGrabberVisible: true,
-            sheetAllowedDetents: [0.9],
-            sheetInitialDetentIndex: 0,
-            sheetCornerRadius: 24,
+            presentation: "transparentModal",
+            headerShown: false,
+            animation: "none",
           }}
         />
       </Stack.Protected>
@@ -46,7 +46,9 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <RootStack />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <RootStack />
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }

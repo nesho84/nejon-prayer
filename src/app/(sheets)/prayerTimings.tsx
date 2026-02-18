@@ -8,15 +8,13 @@ import { AppLocation } from "@/types/location.types";
 import { PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { BottomSheetScrollView, useBottomSheet } from "@gorhom/bottom-sheet";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrayersSettingsScreen() {
-    // Safe area insets for padding
-    const insets = useSafeAreaInsets();
+    const { close, expand, snapToIndex } = useBottomSheet();
 
     // Stores
     const theme = useThemeStore((state) => state.theme);
@@ -131,15 +129,8 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <View style={[styles.container, { backgroundColor: theme.bg2, paddingBottom: insets.bottom }]}>
-            {/* Custom drag handle */}
-            {Platform.OS === 'android' && (
-                <View style={styles.dragHandleContainer}>
-                    <View style={[styles.dragHandle, { backgroundColor: theme.divider }]} />
-                </View>
-            )}
-
-            <ScrollView
+        <>
+            <BottomSheetScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -278,13 +269,13 @@ export default function PrayersSettingsScreen() {
                     </View>
                 </AppCard>
 
-            </ScrollView>
+            </BottomSheetScrollView>
 
             {/* Footer with Close/Today buttons */}
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
                 <TouchableOpacity
                     style={[styles.button, styles.closeButton]}
-                    onPress={() => router.back()}
+                    onPress={() => close()}
                 >
                     <Ionicons name="close" size={20} color={theme.text2} />
                     <Text style={[styles.buttonText, { color: theme.text2 }]}>
@@ -308,7 +299,7 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </View>
+        </>
     );
 }
 
@@ -325,18 +316,6 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 14,
-    },
-
-    // Drag handle (android only)
-    dragHandleContainer: {
-        alignItems: 'center',
-        paddingTop: 12,
-    },
-    dragHandle: {
-        width: 36,
-        height: 4,
-        borderRadius: 2,
-        opacity: 0.4,
     },
 
     // Prayer Header styles

@@ -8,9 +8,10 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Sound from "react-native-sound";
 
@@ -204,15 +205,8 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <View style={[styles.container, { backgroundColor: theme.bg2, paddingBottom: insets.bottom }]}>
-            {/* Custom drag handle */}
-            {Platform.OS === 'android' && (
-                <View style={styles.dragHandleContainer}>
-                    <View style={[styles.dragHandle, { backgroundColor: theme.divider }]} />
-                </View>
-            )}
-
-            <ScrollView
+        <>
+            <BottomSheetScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
@@ -365,7 +359,7 @@ export default function PrayersSettingsScreen() {
                     </View>
                 </AppCard>
 
-            </ScrollView>
+            </BottomSheetScrollView>
 
             {/* Footer with Save/Cancel */}
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
@@ -388,7 +382,7 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </View>
+        </>
     );
 }
 
@@ -401,22 +395,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 8,
         paddingTop: 12,
         paddingBottom: 24,
+        paddingHorizontal: 8,
         gap: 8,
-    },
-
-    // Drag handle (android only)
-    dragHandleContainer: {
-        alignItems: 'center',
-        paddingTop: 12,
-    },
-    dragHandle: {
-        width: 36,
-        height: 4,
-        borderRadius: 2,
-        opacity: 0.4,
     },
 
     // Prayer Header styles
@@ -506,6 +488,7 @@ const styles = StyleSheet.create({
     },
     button: {
         flex: 1,
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,
