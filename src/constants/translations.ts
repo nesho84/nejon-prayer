@@ -135,12 +135,13 @@ export const TRANSLATIONS = {
             prayerRemindBody: "Prayer Reminder",
             eventNotifBody: "Reminder for",
             fridayTitle: "Jumu\'ah Reminder",
-            fridayBody: "Today is Jumu‘ah. Make time for prayer",
+            fridayBody: "Today is Jumu'ah. Make time for prayer",
             dailyQuoteTitle: "Daily Reminder",
             notificationSettings: "Notification Settings",
             enableNotification: "Enable Notification",
             notificationTime: "Notification Time",
             notificationSound: "Notification Sound",
+            noSound: "🔇 Silent",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
             // Notifications settings
@@ -353,12 +354,13 @@ export const TRANSLATIONS = {
             prayerRemindBody: "Gebetserinnerung",
             eventNotifBody: "Erinnerung für",
             fridayTitle: "Jumu\'ah-Erinnerung",
-            fridayBody: "Heute ist Jumu‘ah. Nimm dir Zeit für das Gebet",
+            fridayBody: "Heute ist Jumu'ah. Nimm dir Zeit für das Gebet",
             dailyQuoteTitle: "Tägliche Erinnerung",
             notificationSettings: "Benachrichtigungseinstellungen",
             enableNotification: "Benachrichtigung Aktivieren",
             notificationTime: "Benachrichtigungszeit",
             notificationSound: "Benachrichtigungston",
+            noSound: "🔇 Stumm",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
             // Notifications settings
@@ -577,6 +579,7 @@ export const TRANSLATIONS = {
             enableNotification: "Aktivizo njoftimin",
             notificationTime: "Koha e njoftimit",
             notificationSound: "Zëri i njoftimit",
+            noSound: "🔇 Pa zë",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
             // Notifications settings
@@ -795,6 +798,7 @@ export const TRANSLATIONS = {
             enableNotification: "Bildirimleri Etkinleştir",
             notificationTime: "Bildirim Zamanı",
             notificationSound: "Bildirim Sesi",
+            noSound: "🔇 Sessiz",
             notificationsDisabled: "Bildirimler Devre Dışı",
             notificationsDisabledMessage: "Namaz hatırlatmaları almak için lütfen sistem ayarlarından bildirimleri etkinleştirin.",
             // Notifications settings
@@ -1011,6 +1015,7 @@ export const TRANSLATIONS = {
             enableNotification: "تفعيل الإشعارات",
             notificationTime: "وقت الإشعار",
             notificationSound: "صوت الإشعار",
+            noSound: "🔇 صامت",
             notificationsDisabled: "الإشعارات معطلة",
             notificationsDisabledMessage: "لتلقي تذكيرات الصلاة، يرجى تفعيل الإشعارات من إعدادات النظام.",
             // Notifications settings

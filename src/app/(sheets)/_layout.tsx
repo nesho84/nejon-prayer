@@ -11,7 +11,7 @@ type SheetParams = {
   enablePanDownToClose?: string;
 };
 
-const DEFAULT_SNAP_POINTS = ['50%', '75%', '100%'];
+const DEFAULT_SNAP_POINTS = ['100%'];
 
 export default function SheetLayout() {
   const router = useRouter();
@@ -20,8 +20,13 @@ export default function SheetLayout() {
   const insets = useSafeAreaInsets();
   const theme = useThemeStore((state) => state.theme);
 
-  const { height } = useWindowDimensions();
+  // Get window height for dynamic snap point calculations
+  const { height: windowHeight } = useWindowDimensions();
+  const HANDLE_HEIGHT = 24;
 
+  // ------------------------------------------------------------
+  // Parse snap points from params or use default
+  // ------------------------------------------------------------
   const snapPoints = useMemo(() => {
     if (!params.snapPoints) return DEFAULT_SNAP_POINTS;
     try {
@@ -31,21 +36,49 @@ export default function SheetLayout() {
     }
   }, [params.snapPoints]);
 
-  const largestSnapPoint = parseFloat(snapPoints[snapPoints.length - 1]) / 100;
-  const sheetHandleHeight = 24; // gorhom's default handle height
+  // ------------------------------------------------------------
+  // Compute the inner content height based on the largest snap point.
+  // gorhom uses (containerHeight - topInset) as the available space for percentage snap points.
+  // For pixel snap points, the raw value is used (clamped to available space).
+  // ------------------------------------------------------------
+  const innerHeight = useMemo(() => {
+    const lastSnap = String(snapPoints[snapPoints.length - 1]);
+    const availableHeight = windowHeight - insets.top;
+    let sheetHeight: number;
 
+    if (lastSnap.endsWith('%')) {
+      sheetHeight = availableHeight * (parseFloat(lastSnap) / 100);
+    } else {
+      sheetHeight = Math.min(parseFloat(lastSnap), availableHeight);
+    }
+
+    return sheetHeight - HANDLE_HEIGHT;
+  }, [snapPoints, windowHeight, insets.top]);
+
+  // ------------------------------------------------------------
+  // Parse initial index
+  // ------------------------------------------------------------
   const initialIndex = useMemo(() => {
     return params.initialIndex ? Number(params.initialIndex) : 0;
   }, [params.initialIndex]);
 
+  // ------------------------------------------------------------
+  // Parse enablePanDownToClose (default true)
+  // ------------------------------------------------------------
   const enablePanDownToClose = useMemo(() => {
     return params.enablePanDownToClose === "false" ? false : true;
   }, [params.enablePanDownToClose]);
 
+  // ------------------------------------------------------------
+  // Snap to initial index on mount or when snap points change
+  // ------------------------------------------------------------
   useEffect(() => {
     sheetRef.current?.snapToIndex(initialIndex);
   }, [initialIndex, snapPoints]);
 
+  // ------------------------------------------------------------
+  // Backdrop component with custom opacity and close on press
+  // ------------------------------------------------------------
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -75,7 +108,7 @@ export default function SheetLayout() {
       handleIndicatorStyle={{ backgroundColor: theme.placeholder }}
     >
       <View style={{
-        height: (height * largestSnapPoint) - insets.top - sheetHandleHeight,
+        height: innerHeight,
         paddingBottom: insets.bottom || 8,
       }}>
         <Slot />

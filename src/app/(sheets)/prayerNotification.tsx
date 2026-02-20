@@ -8,21 +8,21 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView, useBottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Sound from "react-native-sound";
 
 interface SoundsOptionType {
-    id: string;
+    id: number;
     name: string;
     file: string;
 }
 
 interface TimeOptionType {
     label: string;
+    prefix: string;
     offset: number;
 }
 
@@ -31,8 +31,8 @@ export default function PrayersSettingsScreen() {
     const params = useLocalSearchParams<{ prayer: PrayerName }>();
     const prayerName = params.prayer;
 
-    // Safe area insets for padding
-    const insets = useSafeAreaInsets();
+    // Bottom Sheet controls hook
+    const { close, expand, snapToIndex } = useBottomSheet();
 
     // Stores
     const theme = useThemeStore((state) => state.theme);
@@ -47,7 +47,7 @@ export default function PrayersSettingsScreen() {
     const [selectedSound, setSelectedSound] = useState(SOUNDS.azan1_short);
 
     // Sound preview state
-    const [playingId, setPlayingId] = useState<string | null>(null);
+    const [playingId, setPlayingId] = useState<number | null>(null);
     const [soundDurations, setSoundDurations] = useState<Record<string, number>>({});
 
     // Refs
@@ -55,28 +55,29 @@ export default function PrayersSettingsScreen() {
 
     const TIME_OPTIONS: TimeOptionType[] = useMemo(() => {
         return [
-            { label: tr.labels.offsetOnTime, offset: 0 },
-            { label: `5 ${tr.labels.offsetMinutes}`, offset: -5 },
-            { label: `10 ${tr.labels.offsetMinutes}`, offset: -10 },
-            { label: `15 ${tr.labels.offsetMinutes}`, offset: -15 },
-            { label: `30 ${tr.labels.offsetMinutes}`, offset: -30 },
-            { label: `45 ${tr.labels.offsetMinutes}`, offset: -45 },
-            { label: `60 ${tr.labels.offsetMinutes}`, offset: -60 },
+            { prefix: '', label: tr.labels.offsetOnTime, offset: 0 },
+            { prefix: '5', label: tr.labels.offsetMinutes, offset: -5 },
+            { prefix: '10', label: tr.labels.offsetMinutes, offset: -10 },
+            { prefix: '15', label: tr.labels.offsetMinutes, offset: -15 },
+            { prefix: '30', label: tr.labels.offsetMinutes, offset: -30 },
+            { prefix: '45', label: tr.labels.offsetMinutes, offset: -45 },
+            { prefix: '60', label: tr.labels.offsetMinutes, offset: -60 },
         ];
     }, [tr]);
 
     const SOUND_OPTIONS: SoundsOptionType[] = useMemo(() => {
         return [
-            { id: 'azan1', name: `Azan 1 (${tr.labels.short})`, file: SOUNDS.azan1_short },
-            { id: 'azan2', name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
-            { id: 'azan3', name: 'Azan 3', file: SOUNDS.azan3 },
-            { id: 'azan4', name: 'Azan 4', file: SOUNDS.azan4 },
-            { id: 'azan5', name: 'Azan 5', file: SOUNDS.azan5 },
-            { id: 'alarm1', name: 'Alarm 1', file: SOUNDS.alarm1 },
-            { id: 'alarm2', name: 'Alarm 2', file: SOUNDS.alarm2 },
-            { id: 'alarm3', name: 'Alarm 3', file: SOUNDS.alarm3 },
+            { id: 1, name: tr.labels.noSound, file: '' },
+            { id: 2, name: `Azan 1 (${tr.labels.short})`, file: SOUNDS.azan1_short },
+            { id: 3, name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
+            { id: 4, name: 'Azan 3', file: SOUNDS.azan3 },
+            { id: 5, name: 'Azan 4', file: SOUNDS.azan4 },
+            { id: 6, name: 'Azan 5', file: SOUNDS.azan5 },
+            { id: 7, name: 'Alarm 1', file: SOUNDS.alarm1 },
+            { id: 8, name: 'Alarm 2', file: SOUNDS.alarm2 },
+            { id: 9, name: 'Alarm 3', file: SOUNDS.alarm3 },
         ];
-    }, []);
+    }, [tr]);
 
     // ------------------------------------------------------------
     // Load current settings from store
@@ -120,7 +121,7 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Play preview of selected sound
     // ------------------------------------------------------------
-    const playPreview = async (soundFile: string, soundId: string) => {
+    const playPreview = async (soundFile: string, soundId: number) => {
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
         }
@@ -188,7 +189,7 @@ export default function PrayersSettingsScreen() {
             useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, settings);
         }
 
-        router.back();
+        close();
     };
 
     // ------------------------------------------------------------
@@ -199,7 +200,7 @@ export default function PrayersSettingsScreen() {
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
         }
-        router.back();
+        close();
     };
 
     // Dont render if no valid prayer name in params
@@ -280,6 +281,10 @@ export default function PrayersSettingsScreen() {
                                         }
                                     ]}
                                 >
+                                    {/* Prefix of the Label (5,15,30...) */}
+                                    {option.prefix && (
+                                        <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
+                                    )}
                                     {option.label}
                                 </Text>
                                 {/* Checkmark - like sound section */}
@@ -314,7 +319,7 @@ export default function PrayersSettingsScreen() {
                                     }
                                 ]}
                             >
-                                {/* Left: Selectable Area */}
+                                {/* Selectable Area */}
                                 <TouchableOpacity
                                     style={styles.soundLeft}
                                     onPress={() => setSelectedSound(sound.file)}
@@ -322,43 +327,49 @@ export default function PrayersSettingsScreen() {
                                     {selectedSound === sound.file && (
                                         <Ionicons name="checkmark" size={16} color={theme.accent} />
                                     )}
+                                    {/* Left: Sound name */}
                                     <Text
                                         style={[
                                             styles.soundName,
-                                            { color: theme.text2 },
+                                            { color: sound.file ? theme.text : theme.text2 },
                                             selectedSound === sound.file && {
                                                 color: theme.accent,
-                                                fontWeight: '500'
+                                                fontWeight: '600'
                                             }
                                         ]}
                                     >
                                         {sound.name}
                                     </Text>
-                                    <Text style={[styles.soundDuration, { color: theme.text2 }]}>
-                                        {soundDurations[sound.id] && soundDurations[sound.id] >= 60
-                                            ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
-                                            : `${soundDurations[sound.id]?.toFixed(0)}s`
-                                        }
-                                    </Text>
+                                    {/* Right: Sound duration */}
+                                    {sound.file && (
+                                        <Text style={[styles.soundDuration, { color: theme.text2 }]}>
+                                            {soundDurations[sound.id] && soundDurations[sound.id] >= 60
+                                                ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
+                                                : `${soundDurations[sound.id]?.toFixed(0)}s`
+                                            }
+                                        </Text>
+                                    )}
                                 </TouchableOpacity>
 
                                 {/* Right: Play Button */}
-                                <TouchableOpacity
-                                    style={styles.soundPlay}
-                                    onPress={() => {
-                                        if (playingId === sound.id) {
-                                            handleStopPreview();
-                                        } else {
-                                            playPreview(sound.file, sound.id);
-                                        }
-                                    }}
-                                >
-                                    <Ionicons
-                                        name={playingId === sound.id ? "stop-circle" : "play-circle"}
-                                        size={26}
-                                        color={theme.accent}
-                                    />
-                                </TouchableOpacity>
+                                {sound.file && (
+                                    <TouchableOpacity
+                                        style={styles.soundPlay}
+                                        onPress={() => {
+                                            if (playingId === sound.id) {
+                                                handleStopPreview();
+                                            } else {
+                                                playPreview(sound.file, sound.id);
+                                            }
+                                        }}
+                                    >
+                                        <Ionicons
+                                            name={playingId === sound.id ? "stop-circle" : "play-circle"}
+                                            size={26}
+                                            color={theme.accent}
+                                        />
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         ))}
                     </View>
@@ -457,7 +468,7 @@ const styles = StyleSheet.create({
     soundRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 0,
+        minHeight: 48,
         borderRadius: 12,
         borderWidth: 1.5,
         overflow: 'hidden',

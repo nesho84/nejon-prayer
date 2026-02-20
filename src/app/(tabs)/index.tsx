@@ -239,7 +239,7 @@ export default function HomeScreen() {
                             router.push({
                                 pathname: "/(sheets)/prayerTimings",
                                 params: {
-                                    snapPoints: JSON.stringify(["90%"]),
+                                    snapPoints: JSON.stringify([760]),
                                 }
                             });
                         }}
@@ -290,7 +290,7 @@ export default function HomeScreen() {
                                                 pathname: "/(sheets)/prayerNotification",
                                                 params: {
                                                     prayer: prayerName,
-                                                    snapPoints: JSON.stringify(["100%"]),
+                                                    snapPoints: JSON.stringify(["99%"]),
                                                 }
                                             });
                                         }}

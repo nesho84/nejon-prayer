@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrayersSettingsScreen() {
+    // Bottom Sheet controls hook
     const { close, expand, snapToIndex } = useBottomSheet();
 
     // Stores
