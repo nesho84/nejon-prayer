@@ -26,11 +26,27 @@ const RootStack = () => {
         <Stack.Screen name="(extras)" options={{ animation: "slide_from_right" }} />
         {/* Bottom Sheet Screens */}
         <Stack.Screen
-          name="(sheets)"
+          name="(sheets)/prayerTimings"
           options={{
-            presentation: "transparentModal",
+            presentation: "formSheet",
             headerShown: false,
-            animation: "none",
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 16,
+            sheetAllowedDetents: [0.85],
+            sheetExpandsWhenScrolledToEdge: false,
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
+        <Stack.Screen
+          name="(sheets)/prayerNotification"
+          options={{
+            presentation: "formSheet",
+            headerShown: false,
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 16,
+            sheetAllowedDetents: [0.95],
+            sheetExpandsWhenScrolledToEdge: false,
+            contentStyle: { backgroundColor: "transparent" },
           }}
         />
       </Stack.Protected>

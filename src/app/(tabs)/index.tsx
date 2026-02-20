@@ -235,14 +235,7 @@ export default function HomeScreen() {
                     {/* Prayers Date Header */}
                     <TouchableOpacity
                         activeOpacity={0.6}
-                        onPress={() => {
-                            router.push({
-                                pathname: '/(sheets)/prayerTimings',
-                                params: {
-                                    snapPoints: JSON.stringify(['88%']),
-                                }
-                            });
-                        }}
+                        onPress={() => router.push('/prayerTimings')}
                         style={styles.prayersDateHeader}
                     >
                         {/* Calendar left icon */}
@@ -286,13 +279,7 @@ export default function HomeScreen() {
                                     <TouchableOpacity
                                         activeOpacity={0.3}
                                         onPress={() => {
-                                            router.push({
-                                                pathname: '/(sheets)/prayerNotification',
-                                                params: {
-                                                    prayer: prayerName,
-                                                    snapPoints: JSON.stringify(['98%']),
-                                                }
-                                            });
+                                            router.push(`/prayerNotification?prayer=${prayerName}`);
                                         }}
                                     >
                                         <View

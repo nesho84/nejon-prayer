@@ -8,10 +8,10 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { BottomSheetScrollView, useBottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Sound from "react-native-sound";
 
 interface SoundsOptionType {
@@ -31,8 +31,8 @@ export default function PrayersSettingsScreen() {
     const params = useLocalSearchParams<{ prayer: PrayerName }>();
     const prayerName = params.prayer;
 
-    // Bottom Sheet controls hook
-    const { close, expand, snapToIndex } = useBottomSheet();
+    // Safe area insets for padding
+    const insets = useSafeAreaInsets();
 
     // Stores
     const theme = useThemeStore((state) => state.theme);
@@ -189,7 +189,7 @@ export default function PrayersSettingsScreen() {
             useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, settings);
         }
 
-        close();
+        router.back();
     };
 
     // ------------------------------------------------------------
@@ -200,7 +200,7 @@ export default function PrayersSettingsScreen() {
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
         }
-        close();
+        router.back();
     };
 
     // Dont render if no valid prayer name in params
@@ -208,12 +208,18 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <>
-            <BottomSheetScrollView
+        <View style={[styles.container, { backgroundColor: theme.bg2, paddingBottom: Math.max(insets.bottom, 6) }]}>
+            {/* Custom drag handle */}
+            {Platform.OS === 'android' && (
+                <View style={styles.dragHandleContainer}>
+                    <View style={[styles.dragHandle, { backgroundColor: theme.placeholder }]} />
+                </View>
+            )}
+
+            <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
-                nestedScrollEnabled={true}
             >
 
                 {/* Prayer Name Header */}
@@ -375,7 +381,7 @@ export default function PrayersSettingsScreen() {
                     </View>
                 </AppCard>
 
-            </BottomSheetScrollView>
+            </ScrollView>
 
             {/* Footer with Save/Cancel */}
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
@@ -398,19 +404,34 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     scrollContainer: {
         flex: 1,
     },
     scrollContent: {
-        paddingTop: 12,
+        flexGrow: 1,
         paddingBottom: 24,
         paddingHorizontal: 8,
-        gap: 8,
+        gap: 14,
+    },
+
+    // Drag handle (android only)
+    dragHandleContainer: {
+        alignItems: 'center',
+        paddingVertical: 12,
+    },
+    dragHandle: {
+        width: 36,
+        height: 4,
+        borderRadius: 2,
+        opacity: 0.4,
     },
 
     // Prayer Header styles
