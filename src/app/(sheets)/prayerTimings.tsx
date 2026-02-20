@@ -50,7 +50,7 @@ export default function PrayersSettingsScreen() {
             const times = await getPrayerTimes(location as AppLocation, timestamp);
             setPrayerTimesByDate(times);
         } catch (err) {
-            console.warn("⚠️ Failed to fetch prayer times from API:", err);
+            console.warn("⚠️ [prayerTimings] Failed to fetch prayer times from API:", err);
             setPrayerTimesByDate(null);
         } finally {
             setIsLoadingDatePrayers(false);
@@ -265,6 +265,15 @@ export default function PrayersSettingsScreen() {
                                 <Text style={[styles.noDataText, { color: theme.text2 }]}>
                                     {tr.labels.prayersError}
                                 </Text>
+                                <TouchableOpacity
+                                    style={[styles.button, { backgroundColor: theme.overlay, marginTop: 8 }]}
+                                    onPress={() => fetchPrayerTimesForDate(selectedDate)}
+                                >
+                                    <Ionicons name="refresh" size={18} color={theme.text} />
+                                    <Text style={[styles.buttonText, { color: theme.text }]}>
+                                        {tr.buttons.retry || "Retry"}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                     </View>
@@ -309,7 +318,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        flexGrow: 1,
         paddingTop: 12,
         paddingBottom: 24,
         paddingHorizontal: 8,

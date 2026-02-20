@@ -109,7 +109,7 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
 
         return filtered as PrayerTimes; // { Fajr: "06:00", Dhuhr: "12:50", ... }
     } catch (err) {
-        console.warn("❌ API fetch error: ", err);
+        console.warn("❌ [prayersService] API fetch error: ", err);
         throw err;
     }
 }

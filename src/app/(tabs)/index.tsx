@@ -237,9 +237,9 @@ export default function HomeScreen() {
                         activeOpacity={0.6}
                         onPress={() => {
                             router.push({
-                                pathname: "/(sheets)/prayerTimings",
+                                pathname: '/(sheets)/prayerTimings',
                                 params: {
-                                    snapPoints: JSON.stringify([760]),
+                                    snapPoints: JSON.stringify(['88%']),
                                 }
                             });
                         }}
@@ -287,10 +287,10 @@ export default function HomeScreen() {
                                         activeOpacity={0.3}
                                         onPress={() => {
                                             router.push({
-                                                pathname: "/(sheets)/prayerNotification",
+                                                pathname: '/(sheets)/prayerNotification',
                                                 params: {
                                                     prayer: prayerName,
-                                                    snapPoints: JSON.stringify(["99%"]),
+                                                    snapPoints: JSON.stringify(['98%']),
                                                 }
                                             });
                                         }}
