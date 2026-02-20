@@ -55,7 +55,7 @@ export async function testPrayerNotification({
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
-                    sound: SOUNDS.azan1, // Default sound for test
+                    sound: SOUNDS.azan1_short, // Default sound for test
                 },
                 android: {
                     // (is created in notificationsService.js)
@@ -137,7 +137,7 @@ export async function testPrayerEventNotification({
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
-                    sound: SOUNDS.azan1,
+                    sound: SOUNDS.alarm2,
                 },
                 android: {
                     channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
@@ -209,7 +209,7 @@ export async function testPrayerReminderNotification({
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
                     offset: "0",
-                    sound: SOUNDS.beep1,
+                    sound: SOUNDS.alarm1,
                 },
                 android: {
                     channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
@@ -353,7 +353,6 @@ export async function testDailyQuoteNotification({
                     vibration: notifSettings?.vibration ?? 'on',
                     snooze: String(notifSettings?.snooze ?? 5),
                     offset: "0",
-                    sound: SOUNDS.beep1,
                 },
                 android: {
                     channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,

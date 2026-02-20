@@ -41,7 +41,7 @@ interface ScheduleParams {
 // Notification collections
 const PRAYERS: PrayerType[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const PRAYER_EVENTS: PrayerEventType[] = ['Imsak', 'Sunrise'];
-const SPECIAL: SpecialType[] = ['Friday', 'Ramadan', 'Eid', 'DailyQuote'];
+const SPECIAL: SpecialType[] = ['Friday', 'DailyQuote'];
 
 // ------------------------------------------------------------
 // Create notification channels once (Android only)
@@ -172,22 +172,22 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
     // Prepare notification content
     const title = `» ${tr.prayers?.[prayer] || prayer} «`;
     const body = `${tr.labels?.prayerNotifBody || 'Time for Prayer'} (${timeString})`;
-    const sound = config.prayers[prayer]?.sound || SOUNDS.azan1;
+    const sound = config.prayers[prayer]?.sound || SOUNDS.azan1_short;
 
     // Create prayer notification
     await notifee.createTriggerNotification(
       {
         id: `prayer-${prayer.toLowerCase()}`,
-        title,
-        body,
+        title: title,
+        body: body,
         data: {
           type: 'prayer',
-          prayer,
+          prayer: prayer,
           volume: config.notifSettings.volume,
           vibration: config.notifSettings.vibration,
           snooze: config.notifSettings.snooze,
-          offset,
-          sound,
+          offset: offset,
+          sound: sound,
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
@@ -255,22 +255,22 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
     // Prepare notification content
     const title = `» ${tr.prayers?.[event] || event} «`;
     const body = `${tr.labels?.eventNotifBody || 'It is now time for'} (${tr.prayers?.[event] || event}) ${timeString}`;
-    const sound = config.events[event]?.sound || SOUNDS.azan1;
+    const sound = config.events[event]?.sound || SOUNDS.azan1_short;
 
     // Create event notification
     await notifee.createTriggerNotification(
       {
         id: `event-${event.toLowerCase()}`,
-        title,
-        body,
+        title: title,
+        body: body,
         data: {
           type: 'prayer-event',
           event: event,
           volume: config.notifSettings.volume,
           vibration: config.notifSettings.vibration,
           snooze: config.notifSettings.snooze,
-          offset,
-          sound,
+          offset: offset,
+          sound: sound,
         },
         android: {
           channelId: `general-vib-${config.notifSettings.vibration}`,
@@ -338,11 +338,14 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         await notifee.createTriggerNotification(
           {
             id: `special-friday`,
-            title,
-            body,
+            title: title,
+            body: body,
             data: {
               type: 'special',
               specialType: 'Friday',
+              volume: config.notifSettings.volume,
+              vibration: config.notifSettings.vibration,
+              snooze: config.notifSettings.snooze,
             },
             android: {
               channelId: `general-vib-${config.notifSettings.vibration}`,
@@ -406,12 +409,15 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       await notifee.createTriggerNotification(
         {
           id: `special-daily-quote-${i}`,
-          title,
-          body,
+          title: title,
+          body: body,
           data: {
             type: 'special',
             specialType: 'DailyQuote',
             quoteIndex: i,
+            volume: config.notifSettings.volume,
+            vibration: config.notifSettings.vibration,
+            snooze: config.notifSettings.snooze,
           },
           android: {
             channelId: `general-vib-${config.notifSettings.vibration}`,
@@ -547,7 +553,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
   const vibration = notification?.data?.vibration ?? 'on';
   const snooze = Number(notification?.data?.snooze ?? 5);
   const offset = Number(notification?.data?.offset ?? 0);
-  const sound = notification?.data?.sound || SOUNDS.azan1;
+  const sound = notification?.data?.sound || SOUNDS.azan1_short;
 
   switch (type) {
     case EventType.DELIVERED:
@@ -560,7 +566,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
       }
       // For prayer-reminder notification
       else if (notifType === "prayer-reminder") {
-        await startSound(SOUNDS.beep1, volume); // 25sec - Beep
+        await startSound(SOUNDS.alarm1, volume);
       }
       else if (notifType === "special") {
         // No sound for specials for now
@@ -594,8 +600,8 @@ export async function handleNotificationEvent(type: EventType, notification: any
               snooze: String(snooze),
               offset: String(offset),
             },
-            vibration,
-            hasAlarm,
+            vibration: vibration,
+            hasAlarm: hasAlarm,
           });
 
           // Cancel the current notification

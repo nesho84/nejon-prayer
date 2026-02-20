@@ -190,9 +190,10 @@ export const TRANSLATIONS = {
             snoozeError: "Failed to update notifications snooze timeout.",
             deviceSettingsError: "Failed to load settings.",
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
-            // Prayer times Calendar
+            // Prayer times Settings
             calendarTitle: "Prayer Times Calendar",
             calendarSubtitle: "View prayer times for selected date",
+            short: "Short",
             // About
             aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times based on your location. Designed to be simple, reliable and help you maintain your prayer routine.",
@@ -407,9 +408,10 @@ export const TRANSLATIONS = {
             snoozeError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             deviceSettingsError: "Einstellungen konnten nicht geladen werden.",
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
-            // Prayer times Calendar
+            // Prayer times Settings
             calendarTitle: "Gebetszeiten-Kalender",
             calendarSubtitle: "Gebetszeiten für ausgewähltes Datum anzeigen",
+            short: "Kurz",
             // About
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie ist so konzipiert, dass sie einfach, zuverlässig ist und Ihnen hilft, Ihre Gebetsroutine einzuhalten.",
@@ -624,9 +626,10 @@ export const TRANSLATIONS = {
             snoozeError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
             deviceSettingsError: "Cilësimet nuk mund të ngarkohen.",
             prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
-            // Prayer times Calendar
+            // Prayer times Settings
             calendarTitle: "Kalendari i kohëve të Namazit",
             calendarSubtitle: "Kohët e Namazit sipas datës së caktuar",
+            short: "Shkurt",
             // About
             aboutText1: "Rreth këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
@@ -841,9 +844,10 @@ export const TRANSLATIONS = {
             snoozeError: "Bildirim erteleme süresi güncellenemedi.",
             deviceSettingsError: "Ayarlar yüklenemedi.",
             prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
-            // Prayer times Calendar
+            // Prayer times Settings
             calendarTitle: "Namaz Vakitleri Takvimi",
             calendarSubtitle: "Belirli bir tarihe göre namaz vakitleri",
+            short: "Kısa",
             // About
             aboutText1: "Bu Uygulama Hakkında",
             aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri sağlar. Basit, güvenilir ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
@@ -1056,9 +1060,10 @@ export const TRANSLATIONS = {
             snoozeError: "فشل في تحديث مدة تأجيل الإشعارات.",
             deviceSettingsError: "فشل في تحميل الإعدادات.",
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
-            // Prayer times Calendar
+            // Prayer times Settings
             calendarTitle: "تقويم أوقات الصلاة",
             calendarSubtitle: "أوقات الصلاة لتاريخ معين",
+            short: "قصير",
             // About
             aboutText1: "حول هذا التطبيق",
             aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة بناءً على موقعك. تم تصميمه ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",

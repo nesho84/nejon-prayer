@@ -39,22 +39,20 @@ const DEFAULT_NOTIF_SETTINGS: NotifSettings = {
 };
 
 const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
-  Fajr: { enabled: true, offset: -15, sound: SOUNDS.azan1 },
-  Dhuhr: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
-  Asr: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
-  Maghrib: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
-  Isha: { enabled: true, offset: 0, sound: SOUNDS.azan1 },
+  Fajr: { enabled: true, offset: -15, sound: SOUNDS.azan1_short },
+  Dhuhr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
+  Asr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
+  Maghrib: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
+  Isha: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
 };
 
 const DEFAULT_EVENTS: Record<PrayerEventType, EventSettings> = {
-  Imsak: { enabled: false, offset: 0, sound: SOUNDS.beep1 },
-  Sunrise: { enabled: false, offset: 0, sound: SOUNDS.beep1 },
+  Imsak: { enabled: false, offset: 0, sound: SOUNDS.alarm1 },
+  Sunrise: { enabled: false, offset: 0, sound: SOUNDS.alarm1 },
 };
 
 const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
-  Ramadan: { enabled: false },
-  Eid: { enabled: false },
   DailyQuote: { enabled: true },
 };
 

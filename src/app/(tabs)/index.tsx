@@ -182,18 +182,8 @@ export default function HomeScreen() {
     // Main Content
     return (
         <AppTabScreen>
-            {/* Notifications Test utility */}
-            {/* <TouchableOpacity style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
-                onPress={() => testFridayNotification({ options: { language, location }, notifSettings, seconds: 10 })}>
-                <Text style={{ color: theme.text }}>Test Notifications</Text>
-            </TouchableOpacity> */}
-
-            {/* Notifications Debug utility */}
-            {/* <TouchableOpacity
-                style={{ borderWidth: 1, borderColor: theme.danger, padding: 6, marginBottom: 8 }}
-                onPress={debugChannelsAndScheduled}>
-                <Text style={{ color: theme.text }}>Debug Notifications</Text>
-            </TouchableOpacity> */}
+            {/* Notifications Test */}
+            {/* {__DEV__ && <NotificationTester seconds={5} />} */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -249,8 +239,7 @@ export default function HomeScreen() {
                             router.push({
                                 pathname: "/(sheets)/prayerTimings",
                                 params: {
-                                    snapPoints: JSON.stringify(["50%", "75%", "100%"]),
-                                    initialIndex: "2",
+                                    snapPoints: JSON.stringify(["90%"]),
                                 }
                             });
                         }}
@@ -301,8 +290,7 @@ export default function HomeScreen() {
                                                 pathname: "/(sheets)/prayerNotification",
                                                 params: {
                                                     prayer: prayerName,
-                                                    snapPoints: JSON.stringify(["50%", "75%", "100%"]),
-                                                    initialIndex: "2",
+                                                    snapPoints: JSON.stringify(["100%"]),
                                                 }
                                             });
                                         }}

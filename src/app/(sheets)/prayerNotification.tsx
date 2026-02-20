@@ -44,7 +44,7 @@ export default function PrayersSettingsScreen() {
     // Local state for editing (not saved until user presses Save)
     const [enabled, setEnabled] = useState(false);
     const [selectedOffset, setSelectedOffset] = useState(0);
-    const [selectedSound, setSelectedSound] = useState(SOUNDS.azan1);
+    const [selectedSound, setSelectedSound] = useState(SOUNDS.azan1_short);
 
     // Sound preview state
     const [playingId, setPlayingId] = useState<string | null>(null);
@@ -67,12 +67,14 @@ export default function PrayersSettingsScreen() {
 
     const SOUND_OPTIONS: SoundsOptionType[] = useMemo(() => {
         return [
-            { id: 'azan1', name: 'Azan 1', file: SOUNDS.azan1 },
-            { id: 'azan2', name: 'Azan 2', file: SOUNDS.azan2 },
-            { id: 'azan3', name: 'Azan 3', file: SOUNDS.azan2 },
-            { id: 'azan4', name: 'Azan 4', file: SOUNDS.azan3 },
-            { id: 'azan5', name: 'Azan 5', file: SOUNDS.azan4 },
-            { id: 'beep1', name: 'Beep 1', file: SOUNDS.beep1 },
+            { id: 'azan1', name: `Azan 1 (${tr.labels.short})`, file: SOUNDS.azan1_short },
+            { id: 'azan2', name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
+            { id: 'azan3', name: 'Azan 3', file: SOUNDS.azan3 },
+            { id: 'azan4', name: 'Azan 4', file: SOUNDS.azan4 },
+            { id: 'azan5', name: 'Azan 5', file: SOUNDS.azan5 },
+            { id: 'alarm1', name: 'Alarm 1', file: SOUNDS.alarm1 },
+            { id: 'alarm2', name: 'Alarm 2', file: SOUNDS.alarm2 },
+            { id: 'alarm3', name: 'Alarm 3', file: SOUNDS.alarm3 },
         ];
     }, []);
 
@@ -84,11 +86,11 @@ export default function PrayersSettingsScreen() {
 
         const prayerSettings = prayers?.[prayerName as PrayerType];
         const eventSettings = events?.[prayerName as PrayerEventType];
-        const current = prayerSettings || eventSettings || { enabled: false, offset: 0, sound: SOUNDS.azan1 };
+        const current = prayerSettings || eventSettings || { enabled: false, offset: 0, sound: SOUNDS.azan1_short };
 
         setEnabled(current.enabled);
         setSelectedOffset(current.offset);
-        setSelectedSound(current.sound ?? SOUNDS.azan1);
+        setSelectedSound(current.sound ?? SOUNDS.azan1_short);
     }, [prayerName, prayers, events]);
 
     // ------------------------------------------------------------
@@ -253,7 +255,7 @@ export default function PrayersSettingsScreen() {
                         </Text>
                     </View>
 
-                    {/* Wrapped Chips */}
+                    {/* Wrapped time Chips */}
                     <View style={styles.timesContainer}>
                         {TIME_OPTIONS.map((option) => (
                             <TouchableOpacity
@@ -298,7 +300,7 @@ export default function PrayersSettingsScreen() {
                         </Text>
                     </View>
 
-                    {/* Compact Rows */}
+                    {/* Compact sound Rows */}
                     <View style={styles.soundsContainer}>
                         {SOUND_OPTIONS.map((sound) => (
                             <View
@@ -333,7 +335,10 @@ export default function PrayersSettingsScreen() {
                                         {sound.name}
                                     </Text>
                                     <Text style={[styles.soundDuration, { color: theme.text2 }]}>
-                                        {soundDurations[sound.id]?.toFixed(0)}s
+                                        {soundDurations[sound.id] && soundDurations[sound.id] >= 60
+                                            ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
+                                            : `${soundDurations[sound.id]?.toFixed(0)}s`
+                                        }
                                     </Text>
                                 </TouchableOpacity>
 
@@ -387,9 +392,6 @@ export default function PrayersSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     scrollContainer: {
         flex: 1,
     },
@@ -455,6 +457,7 @@ const styles = StyleSheet.create({
     soundRow: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingVertical: 0,
         borderRadius: 12,
         borderWidth: 1.5,
         overflow: 'hidden',
@@ -463,9 +466,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 6,
-        paddingLeft: 12,
-        gap: 8,
+        paddingLeft: 10,
+        gap: 6,
     },
     soundName: {
         fontSize: 15,
