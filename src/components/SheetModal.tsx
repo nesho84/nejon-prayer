@@ -1,8 +1,16 @@
 import { useThemeStore } from '@/store/themeStore';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import { Animated, PanResponder, StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { useRouter } from 'expo-router';
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
+import { StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scheduleOnRN } from 'react-native-worklets';
 
 interface Props {
   children: React.ReactNode;
@@ -24,94 +32,85 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
-  // Refs
-  const screenHeightRef = useRef(height);
-  const translateY = useRef(new Animated.Value(0)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useSharedValue(0);
+  const backdropOpacity = useSharedValue(0);
+  const context = useSharedValue({ y: 0 });
 
   // ------------------------------------------------------------
   // Expose close method to parent via ref
   // ------------------------------------------------------------
   useImperativeHandle(ref, () => ({
     close: () => {
-      handleClose();
+      backdropOpacity.value = withTiming(0, { duration: 200 }, () => {
+        scheduleOnRN(handleClose);
+      });
     },
   }));
 
   // ------------------------------------------------------------
-  // Fade in on mount after slide animation completes
-  // ------------------------------------------------------------
-  useFocusEffect(
-    useCallback(() => {
-      Animated.timing(backdropOpacity, {
-        toValue: 1,
-        duration: 200,
-        delay: 450,
-        useNativeDriver: true,
-      }).start();
-    }, [])
-  );
-
-  // ------------------------------------------------------------
   // Handle close with animation
   // ------------------------------------------------------------
-  const handleClose = () => {
-    Animated.timing(backdropOpacity, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => {
-      onClose?.();
-      router.back();
-    });
-  };
+  const handleClose = useCallback(() => {
+    onClose?.();
+    router.back();
+  }, [onClose]);
 
   // ------------------------------------------------------------
-  // Update screen height on dimension change
+  // small delay to let slide animation finish
   // ------------------------------------------------------------
   useEffect(() => {
-    screenHeightRef.current = height;
-  }, [height]);
+    const t = setTimeout(() => {
+      backdropOpacity.value = withTiming(1, { duration: 200 });
+    }, 500);
+    return () => clearTimeout(t);
+  }, []);
 
   // ------------------------------------------------------------
   // PanResponder for drag-down to close
   // ------------------------------------------------------------
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, { dy }) => !staticMode && dy > 10,
-      onPanResponderMove: (_, { dy }) => {
-        if (dy > 0 && !staticMode) translateY.setValue(dy);
-      },
-      onPanResponderRelease: (_, { dy, vy }) => {
-        if (staticMode) {
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-          return;
-        }
-        if (dy > screenHeightRef.current / 3 || vy > 1) {
-          Animated.parallel([
-            Animated.timing(translateY, {
-              toValue: screenHeightRef.current,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-            Animated.timing(backdropOpacity, {
-              toValue: 0,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-          ]).start(() => {
-            onClose?.();
-            router.back();
-          });
-        } else {
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
+  const gesture = Gesture.Pan()
+    .onStart(() => {
+      context.value = { y: translateY.value };
     })
-  ).current;
+    .onUpdate((event) => {
+      if (staticMode) return;
+      const newY = event.translationY + context.value.y;
+      // only allow dragging down
+      if (newY > 0) translateY.value = newY;
+    })
+    .onEnd((event) => {
+      if (staticMode) {
+        translateY.value = withSpring(0);
+        return;
+      }
+      if (event.translationY > height / 3 || event.velocityY > 1000) {
+        // close
+        translateY.value = withTiming(height, { duration: 200 });
+        backdropOpacity.value = withTiming(0, { duration: 200 }, () => {
+          scheduleOnRN(handleClose);
+        });
+      } else {
+        // snap back
+        translateY.value = withSpring(0, { damping: 100 });
+      }
+    });
+
+  // ------------------------------------------------------------
+  // Animated styles
+  // ------------------------------------------------------------
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  // ------------------------------------------------------------
+  // Backdrop animated style
+  // ------------------------------------------------------------
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
 
   return (
-    <View style={[
+    <Animated.View style={[
       styles.container,
       {
         paddingTop: insets.top,
@@ -121,43 +120,43 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       }
     ]}
     >
-      {/* Backdrop fades in separately */}
+      {/* Backdrop */}
       <Animated.View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropOpacity }
-        ]}
+        style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
         pointerEvents="none"
       />
-
-      {/* Tap backdrop to close */}
+      {/* Tap Backdrop to close */}
       <TouchableOpacity
         style={StyleSheet.absoluteFillObject}
         onPress={staticMode ? undefined : handleClose}
         activeOpacity={1}
       />
 
+      {/* Sheet */}
       <Animated.View
         style={[
-          styles.contentContainer,
+          styles.content,
           {
             backgroundColor: theme.bg2,
-            transform: [{ translateY: translateY }],
             maxHeight: modalHeight || DEFAULT_MODAL_HEIGHT,
           },
+          animatedStyle,
           style,
         ]}
       >
+
         {/* Drag Handle */}
-        <View style={styles.header} {...panResponder.panHandlers}>
-          <View style={[styles.handle, { backgroundColor: theme.placeholder }]} />
-        </View>
+        <GestureDetector gesture={gesture}>
+          <View style={styles.header}>
+            <View style={[styles.handle, { backgroundColor: theme.placeholder }]} />
+          </View>
+        </GestureDetector>
 
         {/* Content */}
         {children}
-
       </Animated.View>
-    </View>
+
+    </Animated.View>
   );
 });
 
@@ -168,21 +167,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
   },
-  contentContainer: {
+  content: {
     flex: 1,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     overflow: 'hidden',
   },
-
   header: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   handle: {
-    width: 36,
+    width: 75,
     height: 4,
+    alignSelf: 'center',
     borderRadius: 2,
-    opacity: 0.4,
   },
 });
