@@ -1,9 +1,9 @@
-import { Image, StyleSheet, Text, View, Linking, TouchableOpacity, ScrollView } from "react-native";
-import Constants from "expo-constants";
-import AppFullScreen from "@/components/AppFullScreen";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useThemeStore } from "@/store/themeStore";
+import AppScreen from "@/components/AppScreen";
 import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Constants from "expo-constants";
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function AboutScreen() {
     // Stores
@@ -22,7 +22,7 @@ export default function AboutScreen() {
     };
 
     return (
-        <AppFullScreen>
+        <AppScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[styles.scrollContent]}
@@ -77,7 +77,7 @@ export default function AboutScreen() {
                 </Text>
 
             </ScrollView>
-        </AppFullScreen>
+        </AppScreen>
     );
 }
 

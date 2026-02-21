@@ -1,7 +1,7 @@
+import { useThemeStore } from '@/store/themeStore';
+import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
-import { useThemeStore } from '@/store/themeStore';
 
 interface Props {
     children: React.ReactNode;
@@ -24,7 +24,13 @@ export default function AppTabScreen({ children }: Props) {
         <>
             <StatusBar style={barStyle} />
             <SafeAreaView
-                style={[styles.container, { backgroundColor: theme.bg, paddingTop: topInset, }]}
+                style={[
+                    styles.container,
+                    {
+                        backgroundColor: theme.bg,
+                        paddingTop: topInset
+                    }
+                ]}
                 edges={['left', 'right']}
             >
                 {children}

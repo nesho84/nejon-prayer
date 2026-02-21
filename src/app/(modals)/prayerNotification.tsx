@@ -205,7 +205,7 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal modalHeight="95%">
+        <SheetModal modalHeight="98%">
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
@@ -214,7 +214,7 @@ export default function PrayersSettingsScreen() {
 
                 {/* Prayer Name Header */}
                 <View style={styles.headerContainer}>
-                    <Text style={[styles.prayerName, { color: theme.accent }]}>
+                    <Text style={[styles.headerTitle, { color: theme.accent }]}>
                         {tr.prayers[prayerName]}
                     </Text>
                     <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 10,
     },
-    prayerName: {
+    headerTitle: {
         fontSize: 28,
         fontWeight: '700',
         marginBottom: 4,

@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, AppState, Vibration } from "react-native";
-import { useFocusEffect } from '@react-navigation/native';
-import { storage } from "@/store/storage";
-import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
-import { useLanguageStore } from "@/store/languageStore";
-import AppFullScreen from "@/components/AppFullScreen";
+import AppScreen from "@/components/AppScreen";
 import CounterCircle from "@/components/CounterCircle";
+import { useLanguageStore } from "@/store/languageStore";
+import { storage } from "@/store/storage";
 import { useThemeStore } from "@/store/themeStore";
+import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from "react";
+import { AppState, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
 
 // MMKV storage key
 const TESBIH_KEY = '@tesbih_key';
@@ -137,7 +137,7 @@ export default function QiblaScreen() {
     };
 
     return (
-        <AppFullScreen>
+        <AppScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[styles.scrollContent]}
@@ -236,7 +236,7 @@ export default function QiblaScreen() {
                 </View>
 
             </ScrollView>
-        </AppFullScreen>
+        </AppScreen>
     );
 }
 

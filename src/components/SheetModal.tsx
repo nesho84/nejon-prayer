@@ -1,6 +1,6 @@
 import { useThemeStore } from '@/store/themeStore';
-import { useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -12,7 +12,7 @@ type SheetModalProps = {
   style?: ViewStyle;
 };
 
-const DEFAULT_MODAL_HEIGHT = '95%';
+const DEFAULT_MODAL_HEIGHT = '99%';
 
 export default function SheetModal({ children, modalHeight, onClose, disableClose, style }: SheetModalProps) {
   const router = useRouter();
@@ -20,29 +20,37 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
   const screenHeightRef = useRef(height);
   const translateY = useRef(new Animated.Value(0)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  // ------------------------------------------------------------
+  // Fade in on mount after slide animation completes
+  // ------------------------------------------------------------
+  useFocusEffect(
+    useCallback(() => {
+      Animated.timing(backdropOpacity, {
+        toValue: 1,
+        duration: 200,
+        delay: 450,
+        useNativeDriver: true,
+      }).start();
+    }, [])
+  );
 
   // ------------------------------------------------------------
   // Handle close with animation
   // ------------------------------------------------------------
   const handleClose = () => {
-    onClose?.();
-    router.back();
-  };
-
-  // ------------------------------------------------------------
-  // Animate backdrop in on mount
-  // ------------------------------------------------------------
-  useEffect(() => {
     Animated.timing(backdropOpacity, {
-      toValue: 1,
-      duration: 200,
-      delay: 500,
+      toValue: 0,
+      duration: 150,
       useNativeDriver: true,
-    }).start();
-  }, []);
+    }).start(() => {
+      onClose?.();
+      router.back();
+    });
+  };
 
   // ------------------------------------------------------------
   // Update screen height on dimension change
@@ -74,10 +82,13 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
             }),
             Animated.timing(backdropOpacity, {
               toValue: 0,
-              duration: 200,
+              duration: 150,
               useNativeDriver: true,
             }),
-          ]).start(() => handleClose());
+          ]).start(() => {
+            onClose?.();
+            router.back();
+          });
         } else {
           Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
         }
@@ -86,7 +97,16 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
   ).current;
 
   return (
-    <View style={styles.modalOverlay}>
+    <View style={[
+      styles.container,
+      {
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }
+    ]}
+    >
       {/* Backdrop fades in separately */}
       <Animated.View
         style={[
@@ -96,7 +116,7 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
         pointerEvents="none"
       />
 
-      {/* Backdrop - tap to close */}
+      {/* Tap backdrop to close */}
       <TouchableOpacity
         style={StyleSheet.absoluteFillObject}
         onPress={disableClose ? undefined : handleClose}
@@ -105,10 +125,9 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
 
       <Animated.View
         style={[
-          styles.container,
+          styles.contentContainer,
           {
             backgroundColor: theme.bg2,
-            paddingBottom: insets.bottom || 8,
             transform: [{ translateY: translateY }],
             maxHeight: modalHeight || DEFAULT_MODAL_HEIGHT,
           },
@@ -129,11 +148,11 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
+  container: {
     flex: 1,
     justifyContent: 'flex-end',
   },
-  container: {
+  contentContainer: {
     flex: 1,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,

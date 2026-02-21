@@ -1,11 +1,13 @@
 import { Stack } from 'expo-router';
 
-export default function SheetsLayout() {
+export default function ModalsLayout() {
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: "transparent" },
+        contentStyle: {
+          backgroundColor: 'transparent'
+        },
       }}
     >
       <Stack.Screen name="prayerNotification" />

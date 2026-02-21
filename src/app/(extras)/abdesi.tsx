@@ -1,9 +1,9 @@
-import { ScrollView, View, Text, Image, StyleSheet } from "react-native";
-import { useThemeStore } from "@/store/themeStore";
-import { useLanguageStore } from "@/store/languageStore";
-import AppFullScreen from "@/components/AppFullScreen";
 import AppCard from "@/components/AppCard";
+import AppScreen from "@/components/AppScreen";
+import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
 import { useMemo } from "react";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface StepType {
     id: number;
@@ -35,7 +35,7 @@ export default function AbdesiScreen() {
     }, [tr]);
 
     return (
-        <AppFullScreen>
+        <AppScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -72,7 +72,7 @@ export default function AbdesiScreen() {
                 ))}
 
             </ScrollView>
-        </AppFullScreen>
+        </AppScreen>
     );
 }
 

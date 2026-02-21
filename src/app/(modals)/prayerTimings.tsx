@@ -128,7 +128,7 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal modalHeight="82%">
+        <SheetModal modalHeight="88%">
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}

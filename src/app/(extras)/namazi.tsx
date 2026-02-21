@@ -1,10 +1,10 @@
-import { ScrollView, View, Text, Image, StyleSheet, useWindowDimensions } from "react-native";
-import { TabView, TabBar } from 'react-native-tab-view';
-import AppFullScreen from "@/components/AppFullScreen";
 import AppCard from "@/components/AppCard";
-import { useMemo, useState } from "react";
-import { useThemeStore } from "@/store/themeStore";
+import AppScreen from "@/components/AppScreen";
 import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
+import { useMemo, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { TabBar, TabView } from 'react-native-tab-view';
 
 interface StepType {
     id: number;
@@ -223,7 +223,7 @@ export default function NamaziScreen() {
     };
 
     return (
-        <AppFullScreen>
+        <AppScreen>
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}
@@ -248,7 +248,7 @@ export default function NamaziScreen() {
                     />
                 )}
             />
-        </AppFullScreen>
+        </AppScreen>
     );
 }
 

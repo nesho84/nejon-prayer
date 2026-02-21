@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import AppFullScreen from "@/components/AppFullScreen";
+import AppScreen from "@/components/AppScreen";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
@@ -92,7 +92,7 @@ export default function RamadanScreen() {
     };
 
     return (
-        <AppFullScreen>
+        <AppScreen>
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
@@ -165,7 +165,7 @@ export default function RamadanScreen() {
                 ))}
 
             </ScrollView>
-        </AppFullScreen>
+        </AppScreen>
     );
 }
 

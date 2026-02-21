@@ -1,14 +1,14 @@
-import { View, StyleSheet, Platform } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useThemeStore } from '@/store/themeStore';
 import { useHeaderHeight } from "@react-navigation/elements";
 import { StatusBar } from "expo-status-bar";
-import { useThemeStore } from '@/store/themeStore';
+import { Platform, StyleSheet } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
     children: React.ReactNode;
 }
 
-export default function AppFullScreen({ children }: Props) {
+export default function AppScreen({ children }: Props) {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
@@ -18,7 +18,6 @@ export default function AppFullScreen({ children }: Props) {
     const barStyle = resolvedTheme === "dark" ? "light" : "dark";
 
     // Fix for Android 14+ safe area regression
-    // Top inset: only for screens without a header
     let topInset = 0;
     if (headerHeight === 0) {
         if (Platform.OS === "android") {
@@ -28,23 +27,22 @@ export default function AppFullScreen({ children }: Props) {
         }
     }
 
-    // Bottom inset for Android soft nav bar / gestures
-    const bottomInset = Platform.OS === "android"
-        ? insets.bottom // will be 0 on some gesture nav devices, but best effort
-        : insets.bottom;
-
     return (
         <>
             <StatusBar style={barStyle} />
-            <View
-                style={[styles.container, {
-                    backgroundColor: theme.bg,
-                    paddingTop: topInset,
-                    paddingBottom: bottomInset
-                }]}
+            <SafeAreaView
+                style={[
+                    styles.container,
+                    {
+                        backgroundColor: theme.bg,
+                        paddingTop: topInset,
+                        paddingBottom: insets.bottom,
+                    }
+                ]}
+                edges={['left', 'right']}
             >
                 {children}
-            </View>
+            </SafeAreaView>
         </>
     );
 }
