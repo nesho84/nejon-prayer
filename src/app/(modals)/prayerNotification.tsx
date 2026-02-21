@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import SheetModal from "@/components/SheetModal";
+import SheetModal, { SheetModalRef } from "@/components/SheetModal";
 import { SOUNDS } from "@/constants/sounds";
 import { startSound, stopSound } from "@/services/soundService";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -49,6 +49,7 @@ export default function PrayersSettingsScreen() {
 
     // Refs
     const playTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const sheetModalRef = useRef<SheetModalRef>(null);
 
     const TIME_OPTIONS: TimeOptionType[] = useMemo(() => {
         return [
@@ -186,7 +187,7 @@ export default function PrayersSettingsScreen() {
             useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, settings);
         }
 
-        router.back();
+        sheetModalRef.current?.close();
     };
 
     // ------------------------------------------------------------
@@ -197,7 +198,7 @@ export default function PrayersSettingsScreen() {
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
         }
-        router.back();
+        sheetModalRef.current?.close();
     };
 
     // Dont render if no valid prayer name in params
@@ -205,7 +206,7 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal modalHeight="98%">
+        <SheetModal ref={sheetModalRef} modalHeight="98%">
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}

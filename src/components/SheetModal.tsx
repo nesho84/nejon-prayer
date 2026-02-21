@@ -1,28 +1,42 @@
 import { useThemeStore } from '@/store/themeStore';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { Animated, PanResponder, StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type SheetModalProps = {
+interface Props {
   children: React.ReactNode;
   modalHeight?: `${number}%`;
   onClose?: () => void;
-  disableClose?: boolean;
+  staticMode?: boolean;
   style?: ViewStyle;
+};
+
+export type SheetModalRef = {
+  close: () => void;
 };
 
 const DEFAULT_MODAL_HEIGHT = '99%';
 
-export default function SheetModal({ children, modalHeight, onClose, disableClose, style }: SheetModalProps) {
+const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, onClose, staticMode, style }, ref) => {
   const router = useRouter();
   const theme = useThemeStore((state) => state.theme);
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
+  // Refs
   const screenHeightRef = useRef(height);
   const translateY = useRef(new Animated.Value(0)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  // ------------------------------------------------------------
+  // Expose close method to parent via ref
+  // ------------------------------------------------------------
+  useImperativeHandle(ref, () => ({
+    close: () => {
+      handleClose();
+    },
+  }));
 
   // ------------------------------------------------------------
   // Fade in on mount after slide animation completes
@@ -44,7 +58,7 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
   const handleClose = () => {
     Animated.timing(backdropOpacity, {
       toValue: 0,
-      duration: 150,
+      duration: 100,
       useNativeDriver: true,
     }).start(() => {
       onClose?.();
@@ -64,12 +78,12 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
   // ------------------------------------------------------------
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, { dy }) => !disableClose && dy > 10,
+      onMoveShouldSetPanResponder: (_, { dy }) => !staticMode && dy > 10,
       onPanResponderMove: (_, { dy }) => {
-        if (dy > 0 && !disableClose) translateY.setValue(dy);
+        if (dy > 0 && !staticMode) translateY.setValue(dy);
       },
       onPanResponderRelease: (_, { dy, vy }) => {
-        if (disableClose) {
+        if (staticMode) {
           Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
           return;
         }
@@ -82,7 +96,7 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
             }),
             Animated.timing(backdropOpacity, {
               toValue: 0,
-              duration: 150,
+              duration: 100,
               useNativeDriver: true,
             }),
           ]).start(() => {
@@ -119,7 +133,7 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
       {/* Tap backdrop to close */}
       <TouchableOpacity
         style={StyleSheet.absoluteFillObject}
-        onPress={disableClose ? undefined : handleClose}
+        onPress={staticMode ? undefined : handleClose}
         activeOpacity={1}
       />
 
@@ -145,7 +159,9 @@ export default function SheetModal({ children, modalHeight, onClose, disableClos
       </Animated.View>
     </View>
   );
-}
+});
+
+export default SheetModal;
 
 const styles = StyleSheet.create({
   container: {

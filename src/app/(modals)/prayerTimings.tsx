@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
-import SheetModal from "@/components/SheetModal";
+import SheetModal, { SheetModalRef } from "@/components/SheetModal";
 import { getPrayerTimes } from "@/services/prayersService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -10,8 +10,7 @@ import { PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrayersSettingsScreen() {
@@ -26,6 +25,9 @@ export default function PrayersSettingsScreen() {
     const [prayerTimesByDate, setPrayerTimesByDate] = useState<PrayerTimes | null>(null);
     const [isLoadingDatePrayers, setIsLoadingDatePrayers] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
+
+    // Refs
+    const sheetModalRef = useRef<SheetModalRef>(null);
 
     // ------------------------------------------------------------
     // When date changes (arrows or picker)
@@ -103,6 +105,13 @@ export default function PrayersSettingsScreen() {
     };
 
     // ------------------------------------------------------------
+    // Handle close
+    // ------------------------------------------------------------
+    const handleClose = () => {
+        sheetModalRef.current?.close();
+    }
+
+    // ------------------------------------------------------------
     // Prayer name icon
     // ------------------------------------------------------------
     const handlePrayerNameIcon = (prayerName: string) => {
@@ -128,7 +137,7 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal modalHeight="88%">
+        <SheetModal ref={sheetModalRef} modalHeight="88%">
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
@@ -282,7 +291,7 @@ export default function PrayersSettingsScreen() {
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
                 <TouchableOpacity
                     style={[styles.button, styles.closeButton]}
-                    onPress={() => router.back()}
+                    onPress={handleClose}
                 >
                     <Ionicons name="close" size={20} color={theme.text2} />
                     <Text style={[styles.buttonText, { color: theme.text2 }]}>
