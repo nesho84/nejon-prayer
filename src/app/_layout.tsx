@@ -24,29 +24,12 @@ const RootStack = () => {
       <Stack.Protected guard={onboardingComplete}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
         <Stack.Screen name="(extras)" options={{ animation: "slide_from_right" }} />
-        {/* Bottom Sheet Screens */}
+        {/* Modal Screens */}
         <Stack.Screen
-          name="(sheets)/prayerTimings"
+          name="(modals)"
           options={{
-            presentation: "formSheet",
-            headerShown: false,
-            sheetGrabberVisible: true,
-            sheetCornerRadius: 16,
-            sheetAllowedDetents: [0.85],
-            sheetExpandsWhenScrolledToEdge: false,
-            contentStyle: { backgroundColor: "transparent" },
-          }}
-        />
-        <Stack.Screen
-          name="(sheets)/prayerNotification"
-          options={{
-            presentation: "formSheet",
-            headerShown: false,
-            sheetGrabberVisible: true,
-            sheetCornerRadius: 16,
-            sheetAllowedDetents: [0.95],
-            sheetExpandsWhenScrolledToEdge: false,
-            contentStyle: { backgroundColor: "transparent" },
+            presentation: "transparentModal",
+            animation: "slide_from_bottom",
           }}
         />
       </Stack.Protected>

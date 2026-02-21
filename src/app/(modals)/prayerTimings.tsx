@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
+import SheetModal from "@/components/SheetModal";
 import { getPrayerTimes } from "@/services/prayersService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -12,12 +13,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PrayersSettingsScreen() {
-    // Safe area insets for padding
-    const insets = useSafeAreaInsets();
-
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
@@ -131,16 +128,7 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <View style={[styles.container, { backgroundColor: theme.bg2, paddingBottom: Math.max(insets.bottom, 6) }]}>
-            {/* Custom drag handle */}
-            {
-                Platform.OS === 'android' && (
-                    <View style={styles.dragHandleContainer}>
-                        <View style={[styles.dragHandle, { backgroundColor: theme.placeholder }]} />
-                    </View>
-                )
-            }
-
+        <SheetModal modalHeight="82%">
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
                 contentContainerStyle={styles.scrollContent}
@@ -318,14 +306,11 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </View >
+        </SheetModal>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     scrollContainer: {
         flex: 1,
     },
@@ -334,18 +319,6 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 14,
-    },
-
-    // Drag handle (android only)
-    dragHandleContainer: {
-        alignItems: 'center',
-        paddingVertical: 12,
-    },
-    dragHandle: {
-        width: 36,
-        height: 4,
-        borderRadius: 2,
-        opacity: 0.4,
     },
 
     // Prayer Header styles
@@ -465,9 +438,6 @@ const styles = StyleSheet.create({
         paddingVertical: 60,
         alignItems: 'center',
         gap: 12,
-    },
-    loadingText: {
-        fontSize: 14,
     },
 
     // No Data State
