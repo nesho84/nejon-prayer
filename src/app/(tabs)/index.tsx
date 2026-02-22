@@ -234,7 +234,7 @@ export default function HomeScreen() {
                 <AppCard style={styles.prayersCard}>
                     {/* Prayers Date Header */}
                     <TouchableOpacity
-                        activeOpacity={0.6}
+                        activeOpacity={0.3}
                         onPress={() => router.push('/prayerTimings')}
                         style={styles.prayersDateHeader}
                     >

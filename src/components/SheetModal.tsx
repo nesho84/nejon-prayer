@@ -1,7 +1,7 @@
 import { useThemeStore } from '@/store/themeStore';
 import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
-import { StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { BackHandler, StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -24,7 +24,9 @@ export type SheetModalRef = {
   close: () => void;
 };
 
-const DEFAULT_MODAL_HEIGHT = '99%';
+const DEFAULT_HEIGHT = '99%';
+const DEFAULT_DURATION = 200;
+const DEFAULT_DAMPING = 200;
 
 const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, onClose, staticMode, style }, ref) => {
   const router = useRouter();
@@ -37,36 +39,60 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
   const context = useSharedValue({ y: 0 });
 
   // ------------------------------------------------------------
-  // Expose close method to parent via ref
-  // ------------------------------------------------------------
-  useImperativeHandle(ref, () => ({
-    close: () => {
-      backdropOpacity.value = withTiming(0, { duration: 200 }, () => {
-        scheduleOnRN(handleClose);
-      });
-    },
-  }));
-
-  // ------------------------------------------------------------
-  // Handle close with animation
+  // Navigates back in the stack and runs any cleanup logic
   // ------------------------------------------------------------
   const handleClose = useCallback(() => {
     onClose?.();
     router.back();
-  }, [onClose]);
+  }, [onClose, router]);
 
   // ------------------------------------------------------------
-  // small delay to let slide animation finish
+  // Slides the sheet off screen and fades the backdrop before closing
+  // ------------------------------------------------------------
+  const animatedClose = useCallback(() => {
+    if (staticMode) return;
+
+    translateY.value = withTiming(height, { duration: DEFAULT_DURATION });
+    backdropOpacity.value = withTiming(0, { duration: DEFAULT_DURATION }, (finished) => {
+      if (finished) {
+        scheduleOnRN(handleClose);
+      }
+    });
+  }, [height, staticMode, handleClose]);
+
+  // ------------------------------------------------------------
+  // Allows parent components to trigger close via ref
+  // ------------------------------------------------------------
+  useImperativeHandle(ref, () => ({
+    close: animatedClose,
+  }));
+
+  // ------------------------------------------------------------
+  // Delays backdrop fade-in to sync with the navigator slide animation
   // ------------------------------------------------------------
   useEffect(() => {
     const t = setTimeout(() => {
-      backdropOpacity.value = withTiming(1, { duration: 200 });
-    }, 500);
+      backdropOpacity.value = withTiming(1, { duration: DEFAULT_DURATION });
+    }, 600); // 600ms to match the slide_from_bottom animation
     return () => clearTimeout(t);
   }, []);
 
   // ------------------------------------------------------------
-  // PanResponder for drag-down to close
+  // Overrides the Android hardware back button with animated close
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const onBackPress = () => {
+      animatedClose();
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () => subscription.remove();
+  }, [animatedClose]);
+
+  // ------------------------------------------------------------
+  // Tracks drag position and closes or snaps back based on threshold
   // ------------------------------------------------------------
   const gesture = Gesture.Pan()
     .onStart(() => {
@@ -85,30 +111,32 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       }
       if (event.translationY > height / 3 || event.velocityY > 1000) {
         // close
-        translateY.value = withTiming(height, { duration: 200 });
-        backdropOpacity.value = withTiming(0, { duration: 200 }, () => {
-          scheduleOnRN(handleClose);
+        translateY.value = withTiming(height, { duration: DEFAULT_DURATION });
+        backdropOpacity.value = withTiming(0, { duration: DEFAULT_DURATION }, (finished) => {
+          if (finished) scheduleOnRN(handleClose);
         });
       } else {
         // snap back
-        translateY.value = withSpring(0, { damping: 100 });
+        translateY.value = withSpring(0, { damping: DEFAULT_DAMPING });
       }
     });
 
   // ------------------------------------------------------------
-  // Animated styles
+  // Drives the sheet vertical position on the UI thread
   // ------------------------------------------------------------
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
   // ------------------------------------------------------------
-  // Backdrop animated style
+  // Drives the backdrop opacity on the UI thread
   // ------------------------------------------------------------
-  const backdropStyle = useAnimatedStyle(() => ({
-    opacity: backdropOpacity.value,
-  }));
+  const backdropStyle = useAnimatedStyle(() => {
+    const progress = backdropOpacity.value;
+    return { opacity: progress };
+  });
 
+  // Main Content
   return (
     <Animated.View style={[
       styles.container,
@@ -120,6 +148,7 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       }
     ]}
     >
+
       {/* Backdrop */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
@@ -128,8 +157,8 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       {/* Tap Backdrop to close */}
       <TouchableOpacity
         style={StyleSheet.absoluteFillObject}
-        onPress={staticMode ? undefined : handleClose}
-        activeOpacity={1}
+        onPress={animatedClose}
+        activeOpacity={0}
       />
 
       {/* Sheet */}
@@ -138,7 +167,7 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
           styles.content,
           {
             backgroundColor: theme.bg2,
-            maxHeight: modalHeight || DEFAULT_MODAL_HEIGHT,
+            maxHeight: modalHeight || DEFAULT_HEIGHT,
           },
           animatedStyle,
           style,
@@ -176,7 +205,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingTop: 12,
-    paddingBottom: 16,
+    paddingBottom: 18,
   },
   handle: {
     width: 75,

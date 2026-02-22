@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     headerContainer: {
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingBottom: 10,
     },
     headerTitle: {
         fontSize: 26,
