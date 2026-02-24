@@ -18,10 +18,12 @@ import { scheduleOnRN } from 'react-native-worklets';
 interface Props {
   children: React.ReactNode;
   modalHeight?: number | `${number}%`;
+  style?: ViewStyle;
   staticMode?: boolean;
   scrolling?: boolean;
   onClose?: () => void;
-  style?: ViewStyle;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
 };
 
 export type ModalSheetRef = {
@@ -35,10 +37,12 @@ const HANDLE_COLOR = '#80868b';
 const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   children,
   modalHeight,
+  style,
   staticMode,
-  scrolling,
+  scrolling = true,
   onClose,
-  style
+  header,
+  footer,
 }, ref) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -219,16 +223,26 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
             <View style={[styles.handle, { backgroundColor: HANDLE_COLOR }]} />
           </View>
 
+          {/* Header (fixed) */}
+          {header && <View>{header}</View>}
+
           {/* Content */}
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            scrollEnabled={scrolling ?? true}
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            {children}
-          </ScrollView>
+          {scrolling ? (
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled={true}
+            >
+              {children}
+            </ScrollView>
+          ) : (
+            children
+          )}
+
+          {/* Footer (fixed) */}
+          {footer && <View>{footer}</View>}
 
         </Animated.View>
       </GestureDetector>

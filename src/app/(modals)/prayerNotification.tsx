@@ -204,9 +204,39 @@ export default function PrayersSettingsScreen() {
     // Dont render if no valid prayer name in params
     if (!prayerName) return null;
 
+    // Fixed Footer with Cancel/Save buttons
+    const FixedFooter = () => {
+        return (
+            <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+                <TouchableOpacity
+                    style={[styles.button, styles.cancelButton]}
+                    onPress={handleCancel}
+                >
+                    <Text style={[styles.buttonText, { color: theme.text2 }]}>
+                        {tr.buttons.cancel}
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.button, styles.saveButton, { backgroundColor: theme.overlay }]}
+                    onPress={handleSave}
+                >
+                    <Text style={[styles.buttonText, { color: theme.accent }]}>
+                        {tr.buttons.save}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     // Main Content
     return (
-        <ModalSheet style={{ backgroundColor: theme.bg2 }} ref={ModalSheetRef} modalHeight="98%">
+        <ModalSheet
+            style={{ backgroundColor: theme.bg2 }}
+            ref={ModalSheetRef}
+            modalHeight="98%"
+            footer={<FixedFooter />}
+        >
 
             <View style={styles.container}>
                 {/* Prayer Name Header */}
@@ -369,43 +399,22 @@ export default function PrayersSettingsScreen() {
                 </AppCard>
             </View>
 
-            {/* Footer with Cancel/Save buttons */}
-            <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-                <TouchableOpacity
-                    style={[styles.button, styles.cancelButton]}
-                    onPress={handleCancel}
-                >
-                    <Text style={[styles.buttonText, { color: theme.text2 }]}>
-                        {tr.buttons.cancel}
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[styles.button, styles.saveButton, { backgroundColor: theme.overlay }]}
-                    onPress={handleSave}
-                >
-                    <Text style={[styles.buttonText, { color: theme.accent }]}>
-                        {tr.buttons.save}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
         </ModalSheet>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1, // Push footer to bottom
-        paddingBottom: 24,
+        flexGrow: 1,
         paddingHorizontal: 8,
+        paddingBottom: 14,
         gap: 14,
     },
 
-    // Prayer Header styles
+    // Header styles
     headerContainer: {
         paddingHorizontal: 16,
-        paddingBottom: 10,
+        paddingBottom: 6,
     },
     headerTitle: {
         fontSize: 28,

@@ -135,9 +135,45 @@ export default function PrayersSettingsScreen() {
         ? (Object.entries(prayerTimesByDate) as PrayerTimeEntry[])
         : [];
 
+    // Fixed Footer with Close/Today buttons
+    const FixedFooter = () => {
+        return (
+            <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+                <TouchableOpacity
+                    style={[styles.button, styles.cancelButton]}
+                    onPress={handleClose}
+                >
+                    <Text style={[styles.buttonText, { color: theme.text2 }]}>
+                        {tr.buttons.cancel}
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[
+                        styles.button,
+                        styles.todayButton,
+                        { backgroundColor: isToday() ? theme.overlay : theme.accent2 }
+                    ]}
+                    onPress={() => setSelectedDate(new Date())}
+                    disabled={isToday()}
+                >
+                    <Ionicons name="today" size={20} color={isToday() ? theme.placeholder : theme.text} />
+                    <Text style={[styles.buttonText, { color: isToday() ? theme.placeholder : theme.text }]}>
+                        {tr.buttons.today}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     // Main Content
     return (
-        <ModalSheet style={{ backgroundColor: theme.bg2 }} ref={ModalSheetRef} modalHeight="78%">
+        <ModalSheet
+            style={{ backgroundColor: theme.bg2 }}
+            ref={ModalSheetRef}
+            modalHeight="78%"
+            footer={<FixedFooter />}
+        >
 
             <View style={styles.container}>
                 {/* Prayer Times Header */}
@@ -282,55 +318,28 @@ export default function PrayersSettingsScreen() {
                 </AppCard>
             </View>
 
-            {/* Footer with Close/Today buttons */}
-            <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-                <TouchableOpacity
-                    style={[styles.button, styles.cancelButton]}
-                    onPress={handleClose}
-                >
-                    <Text style={[styles.buttonText, { color: theme.text2 }]}>
-                        {tr.buttons.cancel}
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[
-                        styles.button,
-                        styles.todayButton,
-                        { backgroundColor: isToday() ? theme.overlay : theme.accent2 }
-                    ]}
-                    onPress={() => setSelectedDate(new Date())}
-                    disabled={isToday()}
-                >
-                    <Ionicons name="today" size={20} color={isToday() ? theme.placeholder : theme.text} />
-                    <Text style={[styles.buttonText, { color: isToday() ? theme.placeholder : theme.text }]}>
-                        {tr.buttons.today}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
         </ModalSheet>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1, // Push footer to bottom
-        paddingBottom: 24,
+        flexGrow: 1,
         paddingHorizontal: 8,
+        paddingBottom: 14,
         gap: 14,
     },
 
-    // Prayer Header styles
+    // Header styles
     headerContainer: {
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingBottom: 10,
+        paddingBottom: 6,
     },
     headerTitle: {
         fontSize: 26,
         fontWeight: '700',
-        marginBottom: 6,
+        marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 15,
