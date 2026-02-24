@@ -1,42 +1,53 @@
-import { useThemeStore } from '@/store/themeStore';
 import { useRouter } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
-import { BackHandler, StyleSheet, TouchableOpacity, useWindowDimensions, View, ViewStyle } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import {
+  BackHandler,
+  Keyboard,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  ViewStyle
+} from 'react-native';
+import { Gesture, GestureDetector, ScrollView } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
 interface Props {
   children: React.ReactNode;
-  modalHeight?: `${number}%`;
-  onClose?: () => void;
+  modalHeight?: number | `${number}%`;
   staticMode?: boolean;
+  scrolling?: boolean;
+  onClose?: () => void;
   style?: ViewStyle;
 };
 
-export type SheetModalRef = {
+export type ModalSheetRef = {
   close: () => void;
 };
 
-const DEFAULT_HEIGHT = '99%';
-const DEFAULT_DURATION = 200;
-const DEFAULT_DAMPING = 200;
+const ANIMATION_DURATION = 200;
+const SNAP_BACK_DURATION = 100;
+const HANDLE_COLOR = '#80868b';
 
-const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, onClose, staticMode, style }, ref) => {
+const ModalSheet = forwardRef<ModalSheetRef, Props>(({
+  children,
+  modalHeight,
+  staticMode,
+  scrolling,
+  onClose,
+  style
+}, ref) => {
   const router = useRouter();
-  const theme = useThemeStore((state) => state.theme);
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 
   const translateY = useSharedValue(0);
   const backdropOpacity = useSharedValue(0);
   const context = useSharedValue({ y: 0 });
+  const keyboardHeight = useSharedValue(0);
 
   // ------------------------------------------------------------
   // Navigates back in the stack and runs any cleanup logic
@@ -52,8 +63,8 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
   const animatedClose = useCallback(() => {
     if (staticMode) return;
 
-    translateY.value = withTiming(height, { duration: DEFAULT_DURATION });
-    backdropOpacity.value = withTiming(0, { duration: DEFAULT_DURATION }, (finished) => {
+    translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
+    backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
       if (finished) {
         scheduleOnRN(handleClose);
       }
@@ -64,15 +75,21 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
   // Allows parent components to trigger close via ref
   // ------------------------------------------------------------
   useImperativeHandle(ref, () => ({
-    close: animatedClose,
-  }));
+    close: () => {
+      if (staticMode) {
+        console.warn('ModalSheet: close() called in staticMode');
+        return;
+      }
+      animatedClose();
+    }
+  }), [animatedClose]);
 
   // ------------------------------------------------------------
   // Delays backdrop fade-in to sync with the navigator slide animation
   // ------------------------------------------------------------
   useEffect(() => {
     const t = setTimeout(() => {
-      backdropOpacity.value = withTiming(1, { duration: DEFAULT_DURATION });
+      backdropOpacity.value = withTiming(1, { duration: ANIMATION_DURATION });
     }, 600); // 600ms to match the slide_from_bottom animation
     return () => clearTimeout(t);
   }, []);
@@ -85,11 +102,32 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       animatedClose();
       return true;
     };
-
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
     return () => subscription.remove();
   }, [animatedClose]);
+
+  // ------------------------------------------------------------
+  // Listens to keyboard show/hide events to adjust the sheet position
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const onShow = (e: any) => {
+      const kbHeight = e.endCoordinates.height;
+      keyboardHeight.value = withTiming(kbHeight, { duration: 350 });
+    };
+    const onHide = (e: any) => {
+      keyboardHeight.value = withTiming(0, { duration: 250 });
+    };
+    const subShow = Keyboard.addListener(showEvent, onShow);
+    const subHide = Keyboard.addListener(hideEvent, onHide);
+
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+  }, []);
 
   // ------------------------------------------------------------
   // Tracks drag position and closes or snaps back based on threshold
@@ -111,32 +149,43 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       }
       if (event.translationY > height / 3 || event.velocityY > 1000) {
         // close
-        translateY.value = withTiming(height, { duration: DEFAULT_DURATION });
-        backdropOpacity.value = withTiming(0, { duration: DEFAULT_DURATION }, (finished) => {
+        translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
+        backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
           if (finished) scheduleOnRN(handleClose);
         });
       } else {
         // snap back
-        translateY.value = withSpring(0, { damping: DEFAULT_DAMPING });
+        translateY.value = withTiming(0, { duration: SNAP_BACK_DURATION });
       }
     });
 
   // ------------------------------------------------------------
-  // Drives the sheet vertical position on the UI thread
+  // Calculates the animated style for the sheet based on keyboard and drag position
   // ------------------------------------------------------------
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
+  const animatedStyle = useAnimatedStyle(() => {
+    const resolvedMaxHeight =
+      typeof modalHeight === 'string'
+        ? (parseFloat(modalHeight) / 100) * height
+        : modalHeight ?? height * 0.99;
+
+    const safeHeight = height - insets.top - insets.bottom;
+    const spaceAboveSheet = safeHeight - resolvedMaxHeight;
+    const upward = Math.min(keyboardHeight.value, Math.max(spaceAboveSheet, 0));
+    const heightReduction = keyboardHeight.value - upward;
+
+    return {
+      transform: [{ translateY: translateY.value - upward }],
+      maxHeight: resolvedMaxHeight - heightReduction,
+    };
+  });
 
   // ------------------------------------------------------------
   // Drives the backdrop opacity on the UI thread
   // ------------------------------------------------------------
-  const backdropStyle = useAnimatedStyle(() => {
-    const progress = backdropOpacity.value;
-    return { opacity: progress };
-  });
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
 
-  // Main Content
   return (
     <Animated.View style={[
       styles.container,
@@ -154,6 +203,7 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
         style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
         pointerEvents="none"
       />
+
       {/* Tap Backdrop to close */}
       <TouchableOpacity
         style={StyleSheet.absoluteFillObject}
@@ -162,34 +212,32 @@ const SheetModal = forwardRef<SheetModalRef, Props>(({ children, modalHeight, on
       />
 
       {/* Sheet */}
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            backgroundColor: theme.bg2,
-            maxHeight: modalHeight || DEFAULT_HEIGHT,
-          },
-          animatedStyle,
-          style,
-        ]}
-      >
-
-        {/* Drag Handle */}
-        <GestureDetector gesture={gesture}>
+      <GestureDetector gesture={gesture}>
+        <Animated.View style={[styles.content, animatedStyle, style]}>
+          {/* Drag Handle */}
           <View style={styles.header}>
-            <View style={[styles.handle, { backgroundColor: theme.placeholder }]} />
+            <View style={[styles.handle, { backgroundColor: HANDLE_COLOR }]} />
           </View>
-        </GestureDetector>
 
-        {/* Content */}
-        {children}
-      </Animated.View>
+          {/* Content */}
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            scrollEnabled={scrolling ?? true}
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {children}
+          </ScrollView>
+
+        </Animated.View>
+      </GestureDetector>
 
     </Animated.View>
   );
 });
 
-export default SheetModal;
+export default ModalSheet;
 
 const styles = StyleSheet.create({
   container: {
@@ -205,7 +253,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingTop: 12,
-    paddingBottom: 18,
+    paddingBottom: 22,
   },
   handle: {
     width: 75,

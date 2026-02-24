@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import SheetModal, { SheetModalRef } from "@/components/SheetModal";
+import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
 import { SOUNDS } from "@/constants/sounds";
 import { startSound, stopSound } from "@/services/soundService";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -11,7 +11,7 @@ import { PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import Sound from "react-native-sound";
 
 interface SoundsOptionType {
@@ -49,7 +49,7 @@ export default function PrayersSettingsScreen() {
 
     // Refs
     const playTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const sheetModalRef = useRef<SheetModalRef>(null);
+    const ModalSheetRef = useRef<ModalSheetRef>(null);
 
     const TIME_OPTIONS: TimeOptionType[] = useMemo(() => {
         return [
@@ -187,7 +187,7 @@ export default function PrayersSettingsScreen() {
             useNotificationsStore.getState().setEvent(prayerName as PrayerEventType, settings);
         }
 
-        sheetModalRef.current?.close();
+        ModalSheetRef.current?.close();
     };
 
     // ------------------------------------------------------------
@@ -198,7 +198,7 @@ export default function PrayersSettingsScreen() {
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
         }
-        sheetModalRef.current?.close();
+        ModalSheetRef.current?.close();
     };
 
     // Dont render if no valid prayer name in params
@@ -206,13 +206,9 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal ref={sheetModalRef} modalHeight="98%">
-            <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
+        <ModalSheet style={{ backgroundColor: theme.bg2 }} ref={ModalSheetRef} modalHeight="98%">
 
+            <View style={styles.container}>
                 {/* Prayer Name Header */}
                 <View style={styles.headerContainer}>
                     <Text style={[styles.headerTitle, { color: theme.accent }]}>
@@ -371,10 +367,9 @@ export default function PrayersSettingsScreen() {
                         ))}
                     </View>
                 </AppCard>
+            </View>
 
-            </ScrollView>
-
-            {/* Footer with Save/Cancel */}
+            {/* Footer with Cancel/Save buttons */}
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
                 <TouchableOpacity
                     style={[styles.button, styles.cancelButton]}
@@ -395,16 +390,13 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </SheetModal>
+        </ModalSheet>
     );
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
+    container: {
+        flexGrow: 1, // Push footer to bottom
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 14,
@@ -507,7 +499,6 @@ const styles = StyleSheet.create({
     cancelButton: {
         backgroundColor: 'transparent',
         borderWidth: StyleSheet.hairlineWidth,
-
     },
     saveButton: {},
     buttonText: {

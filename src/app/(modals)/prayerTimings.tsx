@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
-import SheetModal, { SheetModalRef } from "@/components/SheetModal";
+import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
 import { getPrayerTimes } from "@/services/prayersService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -11,7 +11,7 @@ import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useEffect, useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrayersSettingsScreen() {
     // Stores
@@ -27,7 +27,7 @@ export default function PrayersSettingsScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     // Refs
-    const sheetModalRef = useRef<SheetModalRef>(null);
+    const ModalSheetRef = useRef<ModalSheetRef>(null);
 
     // ------------------------------------------------------------
     // When date changes (arrows or picker)
@@ -108,7 +108,7 @@ export default function PrayersSettingsScreen() {
     // Handle close
     // ------------------------------------------------------------
     const handleClose = () => {
-        sheetModalRef.current?.close();
+        ModalSheetRef.current?.close();
     }
 
     // ------------------------------------------------------------
@@ -137,13 +137,9 @@ export default function PrayersSettingsScreen() {
 
     // Main Content
     return (
-        <SheetModal ref={sheetModalRef} modalHeight="88%">
-            <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg2 }]}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
+        <ModalSheet style={{ backgroundColor: theme.bg2 }} ref={ModalSheetRef} modalHeight="78%">
 
+            <View style={styles.container}>
                 {/* Prayer Times Header */}
                 <View style={styles.headerContainer}>
                     <Text style={[styles.headerTitle, { color: theme.accent }]}>
@@ -284,16 +280,14 @@ export default function PrayersSettingsScreen() {
                         )}
                     </View>
                 </AppCard>
-
-            </ScrollView>
+            </View>
 
             {/* Footer with Close/Today buttons */}
             <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
                 <TouchableOpacity
-                    style={[styles.button, styles.closeButton]}
+                    style={[styles.button, styles.cancelButton]}
                     onPress={handleClose}
                 >
-                    <Ionicons name="close" size={20} color={theme.text2} />
                     <Text style={[styles.buttonText, { color: theme.text2 }]}>
                         {tr.buttons.cancel}
                     </Text>
@@ -315,16 +309,13 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-        </SheetModal>
+        </ModalSheet>
     );
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
+    container: {
+        flexGrow: 1, // Push footer to bottom
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 14,
@@ -462,6 +453,7 @@ const styles = StyleSheet.create({
 
     // Footer styles
     footer: {
+        alignSelf: 'flex-end',
         flexDirection: 'row',
         borderTopWidth: StyleSheet.hairlineWidth,
         padding: 6,
@@ -476,7 +468,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         gap: 6,
     },
-    closeButton: {
+    cancelButton: {
         backgroundColor: 'transparent',
         borderWidth: StyleSheet.hairlineWidth,
     },
