@@ -1,5 +1,5 @@
-import { useThemeStore } from "@/store/themeStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
 import { Stack } from "expo-router";
 
 export default function ExtrasLayout() {
@@ -32,6 +32,13 @@ export default function ExtrasLayout() {
                 name="tesbih"
                 options={{
                     title: tr.labels.tesbih,
+                    headerShown: true
+                }}
+            />
+            <Stack.Screen
+                name="quran"
+                options={{
+                    title: tr.labels.quran,
                     headerShown: true
                 }}
             />

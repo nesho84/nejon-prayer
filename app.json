@@ -101,6 +101,12 @@
         }
       ],
       [
+        "expo-audio",
+        {
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {

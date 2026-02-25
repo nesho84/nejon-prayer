@@ -1,10 +1,10 @@
-import { StyleSheet, View, Text, ScrollView, Pressable, Linking } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link, RelativePathString } from "expo-router";
-import AppTabScreen from "@/components/AppTabScreen";
 import AppCard from "@/components/AppCard";
-import { useThemeStore } from "@/store/themeStore";
+import AppTabScreen from "@/components/AppTabScreen";
 import { useLanguageStore } from "@/store/languageStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface MenuItem {
     id: number;
@@ -25,8 +25,8 @@ export default function ExtrasScreen() {
     const features: MenuItem[] = [
         {
             id: 1,
-            type: 'internal',
             href: "(extras)/abdesi",
+            type: 'internal',
             label: tr.labels.abdes,
             description: tr.labels.abdesDesc || "Step by step ablution guide",
             color: "#06b6d4",
@@ -35,8 +35,8 @@ export default function ExtrasScreen() {
         },
         {
             id: 2,
-            type: 'internal',
             href: "(extras)/namazi",
+            type: 'internal',
             label: tr.labels.namaz,
             description: tr.labels.namazDesc || "Learn how to perform Salah",
             color: "#3b82f6",
@@ -45,8 +45,8 @@ export default function ExtrasScreen() {
         },
         {
             id: 3,
-            type: 'internal',
             href: "(extras)/tesbih",
+            type: 'internal',
             label: tr.labels.tesbih,
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
             color: "#8b5cf6",
@@ -55,8 +55,25 @@ export default function ExtrasScreen() {
         },
         {
             id: 4,
+            href: "(extras)/quran",
             type: 'internal',
+            label: tr.labels.quran,
+            description: tr.labels.quranDesc || "Read and explore the Quran",
+            color: "#d1a127",
+            bg: "#d1a12726",
+            icon: (
+                <>
+                    <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 6 }} size={32} color="#d1a127" />
+                    <View style={{ position: 'absolute', top: 4 }}>
+                        <Ionicons name="volume-medium" size={14} color="#d1a127" />
+                    </View>
+                </>
+            ),
+        },
+        {
+            id: 5,
             href: "(extras)/ramazani",
+            type: 'internal',
             label: tr.labels.ramadan,
             description: tr.labels.ramadanDesc || "Digital prayer beads counter",
             color: "#06b6d4",
@@ -64,14 +81,14 @@ export default function ExtrasScreen() {
             icon: <Ionicons name="moon-outline" size={32} color="#06b6d4" />
         },
         {
-            id: 5,
-            type: 'internal',
+            id: 6,
             href: "(extras)/about",
+            type: 'internal',
             label: tr.labels.about,
             description: tr.labels.aboutDesc || "App information & credits",
-            color: "#f59e0b",
-            bg: "#f59e0b26",
-            icon: <MaterialCommunityIcons name="information-outline" size={32} color="#f59e0b" />
+            color: "#2563eb",
+            bg: "#2563eb26",
+            icon: <MaterialCommunityIcons name="information-outline" size={32} color="#2563eb" />
         },
     ];
 

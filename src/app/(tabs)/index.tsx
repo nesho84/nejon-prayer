@@ -38,7 +38,6 @@ export default function HomeScreen() {
     const notifReady = useNotificationsStore((state) => state.isReady);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
-    const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
     // Next prayer countdown
     const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);

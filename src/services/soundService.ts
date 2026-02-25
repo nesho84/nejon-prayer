@@ -6,6 +6,13 @@ import Sound from 'react-native-sound';
 let currentSound: Sound | null = null;
 
 // ------------------------------------------------------------
+// Detect if a file path is a remote URL
+// ------------------------------------------------------------
+function isRemoteUrl(file: string): boolean {
+    return file.startsWith('http://') || file.startsWith('https://');
+}
+
+// ------------------------------------------------------------
 // Start Sound
 // ------------------------------------------------------------
 export async function startSound(file: string, volume: number): Promise<void> {
@@ -14,9 +21,14 @@ export async function startSound(file: string, volume: number): Promise<void> {
     try {
         await stopSound();
 
-        currentSound = new Sound(file, Sound.MAIN_BUNDLE, (err: Error | null) => {
+        // Local bundle files use Sound.MAIN_BUNDLE
+        // Remote URLs use undefined as the base path
+        const basePath = isRemoteUrl(file) ? undefined : Sound.MAIN_BUNDLE;
+
+
+        currentSound = new Sound(file, basePath, (err: Error | null) => {
             if (err) {
-                console.error('❌ [Sound] Failed to load:', err);
+                console.error('❌ [soundService] Failed to load:', err);
                 return;
             }
 
@@ -25,19 +37,19 @@ export async function startSound(file: string, volume: number): Promise<void> {
 
             const duration = currentSound!.getDuration();
 
-            console.log(`🔊 [Sound] Playing "${file} ${duration.toFixed(2)}sec" at volume ${volume}`);
+            console.log(`🔊 [soundService] Playing "${file} ${duration.toFixed(2)}sec" at volume ${volume}`);
 
             currentSound!.play((success: boolean) => {
                 if (success) {
-                    console.log('✅ [Sound] Finished playback');
+                    console.log('✅ [soundService] Finished playback');
                 } else {
-                    console.error('❌ [Sound] Playback failed');
+                    console.error('❌ [soundService] Playback failed');
                 }
                 stopSound();
             });
         });
     } catch (err) {
-        console.error('❌ [Sound] Error starting:', err);
+        console.error('❌ [soundService] Error starting:', err);
     }
 }
 
@@ -50,7 +62,7 @@ export async function stopSound(): Promise<void> {
             currentSound.stop(() => {
                 currentSound!.release();
                 currentSound = null;
-                console.log('🔇 [Sound] Stopped & released');
+                console.log('🔇 [soundService] Stopped & released');
                 resolve();
             });
         } else {
