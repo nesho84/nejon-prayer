@@ -1,12 +1,12 @@
 import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
-import SurahRow from "@/components/SurahRow";
-import { fetchAllSurahs, getSurahAudioUrl, Surah } from "@/services/quranService";
+import QuranRow from "@/components/QuranRow";
+import { useQuranPlayer } from "@/hooks/useQuranPlayer";
+import { fetchAllSurahs, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -17,23 +17,23 @@ export default function QuranScreen() {
 
     // Local state
     const [surahs, setSurahs] = useState<Surah[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
-    const [activeSurah, setActiveSurah] = useState<number | null>(null);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
-    // Audio player
-    const player = useAudioPlayer(null, {
-        // updateInterval: 1000,
-        downloadFirst: true,
-    });
-
-    // Track buffering state and playback status
-    const status = useAudioPlayerStatus(player);
-    const isBuffering = status.isBuffering ?? false;
+    // Audio player hook
+    const {
+        activeSound,
+        isPlaying,
+        isBuffering,
+        hasFinished,
+        currentTime,
+        duration,
+        handlePlayPause
+    } = useQuranPlayer();
 
     // Create a ref for the TextInput
+    const isFetchMountedRef = useRef(true);
     const textInputRef = useRef<TextInput>(null);
 
     // ------------------------------------------------------------
@@ -41,81 +41,33 @@ export default function QuranScreen() {
     // ------------------------------------------------------------
     useEffect(() => {
         fetchSurahs();
+
+        return () => {
+            isFetchMountedRef.current = false;
+        };
     }, []);
 
     // ------------------------------------------------------------
     // Load surahs from API
     // ------------------------------------------------------------
     const fetchSurahs = async () => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
             setError(null);
             const data = await fetchAllSurahs();
-            setSurahs(data);
+
+            if (isFetchMountedRef.current) {
+                setSurahs(data);
+            }
         } catch (err) {
             console.error("❌ Failed to load surahs:", err);
-            setError(tr.labels.quranSurahsError ?? "Failed to load surahs. Please try again.");
+            if (isFetchMountedRef.current) {
+                setError(tr.labels.quranSurahsError);
+            }
         } finally {
             setIsLoading(false);
         }
     };
-
-    // ------------------------------------------------------------
-    // reset active surah when playback finishes
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (status.didJustFinish) {
-            setActiveSurah(null);
-        }
-    }, [status.didJustFinish]);
-
-    // ------------------------------------------------------------
-    // Auto-play when new audio source is loaded
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (!audioUrl) return;
-
-        let mounted = true;
-
-        const loadAndPlay = async () => {
-            try {
-                player.replace({ uri: audioUrl });
-                if (mounted) {
-                    player.play();
-                }
-            } catch (e) {
-                console.error("Audio load error:", e);
-            }
-        };
-
-        loadAndPlay();
-
-        return () => {
-            mounted = false;
-        };
-    }, [audioUrl, player]);
-
-    // ------------------------------------------------------------
-    // Play/Pause handler
-    // ------------------------------------------------------------
-    const handlePlayPause = useCallback((surahNumber: number) => {
-        // Same surah → toggle
-        if (activeSurah === surahNumber) {
-            if (status.playing) {
-                player.pause();
-            } else {
-                player.play();
-            }
-            return;
-        }
-
-        // Different surah → stop & load new
-        player.pause();
-
-        const newAudioUrl = getSurahAudioUrl(surahNumber);
-        setActiveSurah(surahNumber);
-        setAudioUrl(newAudioUrl);
-    }, [activeSurah, status.playing, player]);
 
     // ------------------------------------------------------------
     // Filter surahs locally — no extra API call
@@ -125,11 +77,10 @@ export default function QuranScreen() {
 
         const q = searchQuery.toLowerCase().trim();
 
-        return surahs.filter(
-            (s) =>
-                s.englishName.toLowerCase().includes(q) ||
-                s.name.includes(q) ||
-                String(s.number).includes(q)
+        return surahs.filter((s) =>
+            s.englishName.toLowerCase().includes(q) ||
+            s.name.includes(q) ||
+            String(s.number).includes(q)
         );
     }, [surahs, searchQuery]);
 
@@ -137,24 +88,23 @@ export default function QuranScreen() {
     // Render each surah row
     // ------------------------------------------------------------
     const renderSurah = useCallback(({ item }: { item: Surah }) => {
+        const isThisActive = activeSound === item.number;
+
         return (
-            <SurahRow
+            <QuranRow
                 item={item}
-                activeSurah={activeSurah}
-                isPlaying={status.playing}
-                isBuffering={isBuffering}
                 theme={theme}
+                activeSound={activeSound}
+                // Only active row receives changing values (Important optimization for FlatList)
+                isPlaying={isThisActive && isPlaying}
+                isBuffering={isThisActive && isBuffering}
+                hasFinished={isThisActive && hasFinished}
+                currentProgress={isThisActive ? currentTime : 0}
+                totalDuration={isThisActive ? duration : 0}
                 onPlayPause={handlePlayPause}
             />
         );
-    }, [activeSurah, status.playing, isBuffering, theme, handlePlayPause]);
-
-    // Function to unfocus the TextInput
-    const unfocusTextInput = () => {
-        if (textInputRef.current) {
-            textInputRef.current.blur(); // Call blur() to unfocus
-        }
-    };
+    }, [activeSound, isPlaying, isBuffering, hasFinished, currentTime, duration, theme, handlePlayPause]);
 
     // Loading state
     if (isLoading) {
@@ -205,8 +155,11 @@ export default function QuranScreen() {
                     renderItem={renderSurah}
                     contentContainerStyle={styles.surahList}
                     showsVerticalScrollIndicator={false}
+                    initialNumToRender={15}
+                    maxToRenderPerBatch={10}
+                    windowSize={7}
                     removeClippedSubviews={true}
-                    onScrollBeginDrag={unfocusTextInput}
+                    onScrollBeginDrag={() => textInputRef.current?.blur()}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Text style={[styles.emptyText, { color: theme.placeholder }]}>
@@ -224,8 +177,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-
-    // Search
     searchContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -244,15 +195,12 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         padding: 0,
     },
-
-    // Surah List
     surahList: {
         paddingHorizontal: 16,
         paddingTop: 8,
         paddingBottom: 24,
         gap: 10,
     },
-
     emptyContainer: {
         paddingTop: 60,
         alignItems: "center",

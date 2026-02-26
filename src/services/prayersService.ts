@@ -65,7 +65,7 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
             url += `&tune=${encodeURIComponent(tune)}`;
         }
 
-        // Fetch Fetch prayer times with AbortController (10s timeout)
+        // Fetch prayer times with AbortController (10s timeout)
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
 
@@ -108,6 +108,7 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
         });
 
         return filtered as PrayerTimes; // { Fajr: "06:00", Dhuhr: "12:50", ... }
+
     } catch (err) {
         console.warn("❌ [prayersService] API fetch error: ", err);
         throw err;

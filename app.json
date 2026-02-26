@@ -36,6 +36,9 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
+        "android.permission.WAKE_LOCK",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.USE_EXACT_ALARM",
         "android.permission.SCHEDULE_EXACT_ALARM",
@@ -74,6 +77,7 @@
     },
     "plugins": [
       "./src/plugins/resBuild.js",
+      "@react-native-community/datetimepicker",
       "expo-router",
       [
         "expo-splash-screen",
@@ -103,7 +107,12 @@
       [
         "expo-audio",
         {
-          "microphonePermission": false
+          "android": {
+            "supportsBackgroundPlayback": true
+          },
+          "ios": {
+            "supportsBackgroundPlayback": true
+          }
         }
       ],
       [
@@ -121,8 +130,7 @@
             "deploymentTarget": "15.1"
           }
         }
-      ],
-      "@react-native-community/datetimepicker"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

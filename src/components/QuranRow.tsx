@@ -4,32 +4,42 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface SurahRowProps {
+interface QuranRowProps {
   item: Surah;
-  activeSurah: number | null;
+  theme: any;
+  activeSound: number | null;
   isPlaying: boolean;
   isBuffering: boolean;
-  theme: any;
+  hasFinished: boolean;
+  currentProgress: number;
+  totalDuration: number;
   onPlayPause: (num: number) => void;
 }
 
-const SurahRow = React.memo(({
+// Main Conponent (memoized for FlatList performance)
+const QuranRow = React.memo(({
   item,
-  activeSurah,
+  theme,
+  activeSound,
   isPlaying,
   isBuffering,
-  theme,
+  hasFinished,
+  currentProgress,
+  totalDuration,
   onPlayPause
-}: SurahRowProps) => {
-  const isActive = activeSurah === item.number;
-  const isThisPlaying = isActive && isPlaying;
-  const isThisBuffering = isActive && isBuffering;
+}: QuranRowProps) => {
+  // Button and progress bar states
+  const isThisActive = activeSound === item.number;
+  const isThisPlaying = isThisActive && isPlaying;
+  const isThisBuffering = isThisActive && isBuffering;
+  const showReplay = isThisActive && hasFinished;
+  const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
   return (
     <AppCard style={[styles.surahCard, { backgroundColor: theme.card }]}>
       <View style={styles.surahRow}>
         {/* Left: Number badge */}
-        <View style={[styles.numberBadge, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isActive ? 2 : 1 }]}>
+        <View style={[styles.numberBadge, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 1 }]}>
           <Text style={[styles.numberText, { color: theme.accent }]}>
             {item.number}
           </Text>
@@ -39,19 +49,25 @@ const SurahRow = React.memo(({
         <View style={styles.surahInfo}>
           <Text style={[styles.surahTitle, { color: theme.text }]}>
             {item.englishName}{" "}
+
             <Text style={[styles.surahArabicInline, { color: theme.text2 }]}>
               ({item.name})
             </Text>
           </Text>
-          <Text
-            style={[styles.firstAyahPreview, { color: theme.placeholder }]}
-            numberOfLines={1}
-          >
+
+          <Text style={[styles.firstAyahPreview, { color: theme.placeholder }]} numberOfLines={1}>
             {item.firstAyah}
           </Text>
+
+          {/* Progress bar */}
+          {isThisActive && totalDuration > 0 && (
+            <View style={[styles.progressBar, { backgroundColor: theme.divider }]}>
+              <View style={[styles.progressFill, { width: `${widthPercent}%`, backgroundColor: theme.accent }]} />
+            </View>
+          )}
         </View>
 
-        {/* Right: Play/Stop button */}
+        {/* Right: Play/Stop/Replay button */}
         <TouchableOpacity
           style={styles.playButton}
           onPress={() => onPlayPause(item.number)}
@@ -61,9 +77,9 @@ const SurahRow = React.memo(({
             <ActivityIndicator size="small" color={theme.accent} />
           ) : (
             <Ionicons
-              name={isThisPlaying ? "stop-circle" : "play-circle"}
+              name={showReplay ? "reload-circle" : (isThisPlaying ? "stop-circle" : "play-circle")}
               size={34}
-              color={isActive ? theme.accent : theme.text2}
+              color={isThisActive ? theme.accent : theme.text2}
             />
           )}
         </TouchableOpacity>
@@ -72,7 +88,7 @@ const SurahRow = React.memo(({
   );
 });
 
-export default SurahRow;
+export default QuranRow;
 
 const styles = StyleSheet.create({
   surahCard: {
@@ -111,6 +127,16 @@ const styles = StyleSheet.create({
     textAlign: "right",
     writingDirection: "rtl",
     lineHeight: 20,
+  },
+  progressBar: {
+    height: 3,
+    width: '100%',
+    borderRadius: 1,
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  progressFill: {
+    height: '100%',
   },
   playButton: {
     width: 40,
