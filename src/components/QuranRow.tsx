@@ -36,8 +36,8 @@ const QuranRow = React.memo(({
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
   return (
-    <AppCard style={[styles.surahCard, { backgroundColor: theme.card }]}>
-      <View style={styles.surahRow}>
+    <AppCard style={[styles.quranCard, { backgroundColor: theme.card }]}>
+      <View style={styles.quranRow}>
         {/* Left: Number badge */}
         <View style={[styles.numberBadge, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 1 }]}>
           <Text style={[styles.numberText, { color: theme.accent }]}>
@@ -91,10 +91,10 @@ const QuranRow = React.memo(({
 export default QuranRow;
 
 const styles = StyleSheet.create({
-  surahCard: {
+  quranCard: {
     padding: 12,
   },
-  surahRow: {
+  quranRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,

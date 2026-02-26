@@ -1,20 +1,16 @@
 import { getSurahAudioUrl } from "@/services/quranService";
-import notifee, { AndroidImportance } from '@notifee/react-native';
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import { useCallback, useEffect, useState } from "react";
+import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 
 export function useQuranPlayer() {
-  // Local state
-  const [activeSound, setActiveSound] = useState<number | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isSwitching, setIsSwitching] = useState<boolean>(false);
-
   // Audio player
   const player = useAudioPlayer(null, {
-    updateInterval: 1000, // Update status every 500ms for smoother progress
     downloadFirst: true,
+    updateInterval: 1000,
   });
 
+  // Audio status
   const status = useAudioPlayerStatus(player);
 
   // Derived states
@@ -23,6 +19,33 @@ export function useQuranPlayer() {
   const hasFinished = status.didJustFinish ?? false;
   const currentTime = status.currentTime ?? 0;
   const duration = status.duration ?? 0;
+
+  // Local state
+  const [activeSound, setActiveSound] = useState<number | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isSwitching, setIsSwitching] = useState<boolean>(false);
+
+  // Refs
+  const appStateRef = useRef(AppState.currentState);
+
+  // ------------------------------------------------------------
+  // Configure expo-audio mode on mount (plays in silent mode, background playback)
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const setupAudio = async () => {
+      try {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionMode: "doNotMix",
+        });
+        console.log('✅ [qranPlayer] Audio mode configured for background playback');
+      } catch (e) {
+        console.warn('❌ [qranPlayer] Failed to set audio mode:', e);
+      }
+    };
+    setupAudio();
+  }, []);
 
   // ------------------------------------------------------------
   // Auto-play when new audio source is loaded
@@ -36,6 +59,7 @@ export function useQuranPlayer() {
       try {
 
         player.replace({ uri: audioUrl });
+
         if (mounted) {
           player.play();
         }
@@ -52,6 +76,25 @@ export function useQuranPlayer() {
   }, [audioUrl, player]);
 
   // ------------------------------------------------------------
+  // Sync lock screen controls with app state
+  // ------------------------------------------------------------
+  useEffect(() => {
+    // Sync when app comes to foreground
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (appStateRef.current.match(/inactive|background/) && state === 'active') {
+        player.setActiveForLockScreen(false);
+      } else {
+        // Set lock screen when app goes to background and audio is playing
+        player.setActiveForLockScreen(true);
+      }
+
+      appStateRef.current = state;
+    });
+
+    return () => subscription.remove();
+  }, [player]);
+
+  // ------------------------------------------------------------
   // Clear switching flag when new audio starts
   // ------------------------------------------------------------
   useEffect(() => {
@@ -59,45 +102,6 @@ export function useQuranPlayer() {
       setIsSwitching(false);
     }
   }, [isPlaying]);
-
-  // ------------------------------------------------------------
-  // Create notifee notification when audio starts playing
-  // ------------------------------------------------------------
-  useEffect(() => {
-    if (isPlaying) {
-      console.log(audioUrl);
-
-      async function showNotification() {
-        try {
-          // Create a channel (required for Android)
-          const channelId = await notifee.createChannel({
-            id: 'quran-playback',
-            name: 'Quran Playback',
-            importance: AndroidImportance.HIGH,
-          });
-          // Create notification
-          notifee.displayNotification({
-            title: 'Playing Surah',
-            body: `Surah (${activeSound})`, // @TODO: Add surah name here...
-            data: { type: 'quran-play' },
-            android: {
-              channelId: channelId,
-              asForegroundService: true,
-              ongoing: true,
-              smallIcon: 'ic_stat_prayer',
-              pressAction: { id: 'default', launchActivity: 'default' },
-            },
-          });
-        } catch (error) {
-          console.error("Error displaying audio notification:", error);
-        }
-      }
-      showNotification();
-    } else {
-      // Stop foreground service when not playing
-      notifee.stopForegroundService();
-    }
-  }, [isPlaying, activeSound]);
 
   // ------------------------------------------------------------
   // Play/Pause/Replay handler

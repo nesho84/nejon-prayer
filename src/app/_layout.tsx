@@ -3,9 +3,7 @@ import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
-import { setAudioModeAsync } from "expo-audio";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 
@@ -44,23 +42,6 @@ export default function RootLayout() {
   useSystemThemeSync();
   useDeviceSettingsSync();
   useNotificationsSync();
-
-  // Quran: Set up expo-audio (silent mode and background)
-  useEffect(() => {
-    const setupAudio = async () => {
-      try {
-        await setAudioModeAsync({
-          playsInSilentMode: true,
-          shouldPlayInBackground: true,
-          interruptionMode: "doNotMix",
-        });
-        console.log('✅ [expo-audio] Audio mode configured for background playback');
-      } catch (e) {
-        console.warn('❌ [expo-audio] Failed to set audio mode:', e);
-      }
-    };
-    setupAudio();
-  }, []);
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
