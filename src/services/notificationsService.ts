@@ -332,46 +332,46 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
         const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
 
-        await notifee.createTriggerNotification(
-          {
-            id: `special-friday`,
-            title: title,
-            body: body,
-            data: {
-              type: 'special',
-              specialType: 'Friday',
-              volume: config.notifSettings.volume,
-              vibration: config.notifSettings.vibration,
-            },
-            android: {
-              channelId: `general-vib-${config.notifSettings.vibration}`,
-              showTimestamp: true,
-              smallIcon: 'ic_stat_prayer',
-              color: AndroidColor.GREEN,
-              pressAction: { id: 'default', launchActivity: 'default' },
-              actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-              style: {
-                type: AndroidStyle.INBOX,
-                lines: [body],
-              },
-              autoCancel: false,
-              ongoing: true,
-            },
-            ios: {
-              categoryId: 'special-category',
-              critical: false,
-              interruptionLevel: 'active',
-            },
-          },
-          {
-            type: TriggerType.TIMESTAMP,
-            timestamp: triggerTime.getTime(),
-            alarmManager: hasAlarm,
-            repeatFrequency: RepeatFrequency.WEEKLY,
-          }
-        );
+        // await notifee.createTriggerNotification(
+        //   {
+        //     id: `special-friday`,
+        //     title: title,
+        //     body: body,
+        //     data: {
+        //       type: 'special',
+        //       specialType: 'Friday',
+        //       volume: config.notifSettings.volume,
+        //       vibration: config.notifSettings.vibration,
+        //     },
+        //     android: {
+        //       channelId: `general-vib-${config.notifSettings.vibration}`,
+        //       showTimestamp: true,
+        //       smallIcon: 'ic_stat_prayer',
+        //       color: AndroidColor.GREEN,
+        //       pressAction: { id: 'default', launchActivity: 'default' },
+        //       actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+        //       style: {
+        //         type: AndroidStyle.INBOX,
+        //         lines: [body],
+        //       },
+        //       autoCancel: false,
+        //       ongoing: true,
+        //     },
+        //     ios: {
+        //       categoryId: 'special-category',
+        //       critical: false,
+        //       interruptionLevel: 'active',
+        //     },
+        //   },
+        //   {
+        //     type: TriggerType.TIMESTAMP,
+        //     timestamp: triggerTime.getTime(),
+        //     alarmManager: hasAlarm,
+        //     repeatFrequency: RepeatFrequency.WEEKLY,
+        //   }
+        // );
 
-        console.log(`🕌 Scheduled Friday reminder at ${triggerTime.toLocaleString('en-GB')}`);
+        // console.log(`🕌 Scheduled Friday reminder at ${triggerTime.toLocaleString('en-GB')}`);
       }
     }
   }

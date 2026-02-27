@@ -2,13 +2,14 @@ import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
 import QuranRow from "@/components/QuranRow";
-import { useQuranPlayer } from "@/hooks/useQuranPlayer";
-import { fetchAllSurahs, Surah } from "@/services/quranService";
+import { EDITION1, fetchAllSurahs, getSurahAudioUrl, Surah } from "@/services/quranService";
+import { setupTrackPlayer } from "@/services/trackPlayerSetup";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import TrackPlayer, { State, usePlaybackState, useProgress } from "react-native-track-player";
 
 export default function QuranScreen() {
     // Stores
@@ -21,23 +22,27 @@ export default function QuranScreen() {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Audio player hook
-    const {
-        activeSound,
-        isPlaying,
-        isBuffering,
-        hasFinished,
-        currentTime,
-        duration,
-        handlePlayPause
-    } = useQuranPlayer();
+    // Sound preview state
+    const [activeSound, setActiveSound] = useState<number | null>(null);
+    const [isSwitching, setIsSwitching] = useState<boolean>(false);
+
+    // TrackPlayer hooks
+    const { state } = usePlaybackState();
+    const progress = useProgress(1000);
+
+    // Derived states
+    const isPlaying = state === State.Playing;
+    const isBuffering = isSwitching || state === State.Buffering;
+    const hasFinished = state === State.Ended;
+    const currentTime = isSwitching ? 0 : (progress.position ?? 0);
+    const duration = isSwitching ? 0 : (progress.duration ?? 0);
 
     // Create a ref for the TextInput
     const isFetchMountedRef = useRef(true);
     const textInputRef = useRef<TextInput>(null);
 
     // ------------------------------------------------------------
-    // Fetch all surahs on mount (one time, cached in state)
+    // Fetch all surahs on mount
     // ------------------------------------------------------------
     useEffect(() => {
         fetchSurahs();
@@ -68,6 +73,79 @@ export default function QuranScreen() {
             setIsLoading(false);
         }
     };
+
+    // ------------------------------------------------------------
+    // Setup TrackPlayer once on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        setupTrackPlayer();
+    }, []);
+
+    // ------------------------------------------------------------
+    // Sync active track (handles case when user starts audio, leaves app, then comes back)
+    // ------------------------------------------------------------
+    useEffect(() => {
+        const syncActiveTrack = async () => {
+            try {
+                const currentTrack = await TrackPlayer.getActiveTrack();
+                if (currentTrack) {
+                    const surahNumber = parseInt(currentTrack.id.replace('surah-', ''));
+                    setActiveSound(surahNumber);
+                }
+            } catch (error) {
+                // Ignoring Error:
+                // [Error: Uncaught (in promise, id: 0) Error: The player is not initialized. Call setupPlayer first.]
+            }
+        };
+        syncActiveTrack();
+    }, []);
+
+    // ------------------------------------------------------------
+    // Clear switching flag when new audio starts
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (isPlaying) {
+            setIsSwitching(false);
+        }
+    }, [isPlaying]);
+
+    // ------------------------------------------------------------
+    // Play/Pause/Replay handler
+    // ------------------------------------------------------------
+    const handlePlayPause = useCallback(async (surahNumber: number) => {
+        // @TODO: when user goes back to the app from backgound, sometimes play does not work! (happens when app is reloaded in dev)
+
+        const currentTrack = await TrackPlayer.getActiveTrack();
+
+        if (currentTrack && activeSound === surahNumber) {
+            if (hasFinished) {
+                // replay from start
+                await TrackPlayer.seekTo(0);
+                await TrackPlayer.play();
+            } else if (isPlaying) {
+                await TrackPlayer.pause();
+            } else {
+                await TrackPlayer.play();
+            }
+            return;
+        }
+
+        // Different surah → stop & load new
+        setActiveSound(surahNumber);
+        setIsSwitching(true);
+
+        await TrackPlayer.reset();
+
+        const audioUrl = getSurahAudioUrl(surahNumber);
+        await TrackPlayer.add({
+            id: `surah-${surahNumber}`,
+            url: audioUrl,
+            title: `Surah ${surahNumber}`,
+            artist: EDITION1,
+            isLiveStream: false,
+        });
+        await TrackPlayer.play();
+    }, [activeSound, isPlaying]);
 
     // ------------------------------------------------------------
     // Filter surahs locally — no extra API call

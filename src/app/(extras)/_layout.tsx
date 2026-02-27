@@ -56,6 +56,14 @@ export default function ExtrasLayout() {
                     headerShown: true,
                 }}
             />
+            {/* // This page is just a placeholder for handling 'react-native-track-player' playback notification press. */}
+            <Stack.Screen
+                name="notification.click"
+                options={{
+                    title: 'Playback Notification',
+                    headerShown: false,
+                }}
+            />
         </Stack>
     );
 }

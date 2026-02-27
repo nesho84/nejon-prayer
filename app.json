@@ -105,17 +105,6 @@
         }
       ],
       [
-        "expo-audio",
-        {
-          "android": {
-            "supportsBackgroundPlayback": true
-          },
-          "ios": {
-            "supportsBackgroundPlayback": true
-          }
-        }
-      ],
-      [
         "expo-build-properties",
         {
           "android": {

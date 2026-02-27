@@ -38,7 +38,7 @@ export default function PrayersSettingsScreen() {
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
 
-    // Local state for editing (not saved until user presses Save)
+    // Local state
     const [enabled, setEnabled] = useState(false);
     const [selectedOffset, setSelectedOffset] = useState(0);
     const [selectedSound, setSelectedSound] = useState(SOUNDS.azan1_short);

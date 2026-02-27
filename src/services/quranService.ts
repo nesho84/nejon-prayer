@@ -28,11 +28,11 @@ interface SurahListResponse {
 const BASE_URL = "https://api.alquran.cloud/v1";
 const AUDIO_CDN = "https://cdn.islamic.network/quran/audio-surah";
 const BITRATE = "128"; // 128kbps quality
-const EDITION1 = "ar.alafasy"; // Mishary Alafasy
-const EDITION2 = "ar.abdulazizazzahrani"; // Abdulaziz Al-Zahrani
-const EDITION3 = "ar.abdulbariaththubaity"; // Abdul Bari Thubaity
-const EDITION4 = "ar.abdulbarimohammed"; // Abdul Bari Mohammed
-const EDITION5 = "ar.abdulbasitmurattal"; // Abdul Basit Murattal
+export const EDITION1 = "ar.alafasy"; // Mishary Alafasy
+export const EDITION2 = "ar.abdulazizazzahrani"; // Abdulaziz Al-Zahrani
+export const EDITION3 = "ar.abdulbariaththubaity"; // Abdul Bari Thubaity
+export const EDITION4 = "ar.abdulbarimohammed"; // Abdul Bari Mohammed
+export const EDITION5 = "ar.abdulbasitmurattal"; // Abdul Basit Murattal
 
 // ------------------------------------------------------------
 // Fetch all 114 surahs from api.alquran.cloud + first ayah Arabic preview

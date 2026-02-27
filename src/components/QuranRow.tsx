@@ -77,7 +77,7 @@ const QuranRow = React.memo(({
             <ActivityIndicator size="small" color={theme.accent} />
           ) : (
             <Ionicons
-              name={showReplay ? "reload-circle" : (isThisPlaying ? "stop-circle" : "play-circle")}
+              name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
               size={34}
               color={isThisActive ? theme.accent : theme.text2}
             />
