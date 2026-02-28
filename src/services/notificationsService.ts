@@ -23,39 +23,72 @@ import notifee, {
   RepeatFrequency,
   TriggerType
 } from '@notifee/react-native';
-
-interface ServiceSettings {
-  notifSettings: NotifSettings;
-  prayers: Record<PrayerType, PrayerSettings>;
-  events: Record<PrayerEventType, EventSettings>;
-  special: Record<SpecialType, SpecialSettings>;
-}
+import { Platform } from "react-native";
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
-  config: ServiceSettings;
+  config: {
+    notifSettings: NotifSettings;
+    prayers: Record<PrayerType, PrayerSettings>;
+    events: Record<PrayerEventType, EventSettings>;
+    specials: Record<SpecialType, SpecialSettings>;
+  };
   language: Language;
   tr: Translations;
+  hasAlarm?: boolean;
 }
 
-// Notification collections
+interface PrayerReminderScheduleParams {
+  prayer: PrayerType;
+  title: string;
+  body: string;
+  triggerTime: Date;
+  data: Record<string, any>;
+  vibration: 'on' | 'off';
+  hasAlarm?: boolean;
+}
+
 const PRAYERS: PrayerType[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const PRAYER_EVENTS: PrayerEventType[] = ['Imsak', 'Sunrise'];
 
 // ------------------------------------------------------------
-// Create notification channels once (Android only)
+// MAIN SCHEDULE: Called in notificationsStore when prayer times or settings change
 // ------------------------------------------------------------
-async function createChannels(vibration: 'on' | 'off') {
-  const isVibrationEnabled = vibration === 'on';
+export async function scheduleNotificationsService(params: ScheduleParams) {
+  // Channels will be created on app load in useNotificationsSync hook
+  try {
+    // Cancel all existing notifications
+    await cancelAllNotifications();
+
+    // Get current notification settings and set exact alarm permission (Android 12+)
+    const ns = await notifee.getNotificationSettings();
+    params.hasAlarm = ns.android.alarm === AndroidNotificationSetting.ENABLED;
+
+    // Schedule all notification types
+    await schedulePrayerNotifications(params);
+    await schedulePrayerEventNotifications(params);
+    await scheduleSpecialNotifications(params);
+
+  } catch (err) {
+    console.error('❌ [notificationsService] Failed to schedule notifications:', err);
+    throw err;
+  }
+}
+
+// ------------------------------------------------------------
+// Create channels: Called in useNotificationsSync on app load
+// ------------------------------------------------------------
+export async function createNotificationsChannels() {
+  if (Platform.OS !== 'android') return;
+
   // = 1000 + (21 × 1300) = 28,300ms = 28.3 seconds
   const vibrationPattern = Array(21).fill([1000, 300]).flat();
 
+  // Base channel config for all channels
   const channelConfig = {
     importance: AndroidImportance.HIGH,
     visibility: AndroidVisibility.PUBLIC,
     sound: undefined, // Sound is handled manually in the app
-    vibration: isVibrationEnabled,
-    vibrationPattern: isVibrationEnabled ? vibrationPattern : undefined,
     lights: true,
     lightColor: AndroidColor.WHITE,
     badge: true,
@@ -64,17 +97,39 @@ async function createChannels(vibration: 'on' | 'off') {
     bypassDnd: true,
   };
 
+  // Prayer only channels
   await notifee.createChannel({
-    id: `prayer-vib-${vibration}`,
-    name: 'Prayer Channel',
-    description: 'Daily prayer time notifications',
+    id: 'prayer-vib-on',
+    name: 'Prayer Channel (Vibration On)',
+    description: 'Daily prayer time channel with vibration',
+    vibration: true,
+    vibrationPattern: vibrationPattern,
+    ...channelConfig,
+  });
+  await notifee.createChannel({
+    id: 'prayer-vib-off',
+    name: 'Prayer Channel (Vibration Off)',
+    description: 'Daily prayer time channel without vibration',
+    vibration: false,
+    vibrationPattern: undefined,
     ...channelConfig,
   });
 
+  // General channels
   await notifee.createChannel({
-    id: `general-vib-${vibration}`,
+    id: 'general-vib-on',
     name: 'General Channel',
-    description: 'Reminders, events and special notifications',
+    description: 'Reminders, events and specials channel with vibration',
+    vibration: true,
+    vibrationPattern: vibrationPattern,
+    ...channelConfig,
+  });
+  await notifee.createChannel({
+    id: `general-vib-off`,
+    name: 'General Channel',
+    description: 'Reminders, events and specials channel without vibration',
+    vibration: false,
+    vibrationPattern: undefined,
     ...channelConfig,
   });
 }
@@ -82,7 +137,7 @@ async function createChannels(vibration: 'on' | 'off') {
 // ------------------------------------------------------------
 // Cancel all scheduled notifications
 // ------------------------------------------------------------
-const cancelAllNotifications = async () => {
+async function cancelAllNotifications() {
   try {
     const scheduled = await notifee.getTriggerNotifications();
     const validTypes = ['prayer', 'prayer-event', 'prayer-reminder', 'special'];
@@ -98,7 +153,7 @@ const cancelAllNotifications = async () => {
   } catch (err) {
     console.error("❌ Failed to cancel notifications", err);
   }
-};
+}
 
 // ------------------------------------------------------------
 // Cancel displayed notification and stop sound
@@ -149,11 +204,7 @@ function getTriggerTime(timeStringRaw: string, offsetMinutes: number = 0): Date 
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr } = params;
-
-  // Check if exact alarm permission is granted (Android 12+)
-  const nf = await notifee.getNotificationSettings();
-  const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
+  const { config, prayerTimes, language, tr, hasAlarm } = params;
 
   for (const prayer of PRAYERS) {
     // Skip disabled prayers
@@ -228,14 +279,54 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 }
 
 // ------------------------------------------------------------
+// PRAYER-REMINDER SCHEDULE: Prayer Reminder (one-time, from snooze action)
+// ------------------------------------------------------------
+export async function schedulePrayerReminder(params: PrayerReminderScheduleParams) {
+  const { prayer, title, body, triggerTime, data, vibration, hasAlarm } = params;
+
+  // Create prayer reminder notification
+  await notifee.createTriggerNotification(
+    {
+      id: `reminder-${prayer}-${triggerTime.getTime()}`,
+      title: title,
+      body: body,
+      data: {
+        type: 'prayer-reminder',
+        ...data,
+      },
+      android: {
+        channelId: `general-vib-${vibration}`,
+        showTimestamp: true,
+        smallIcon: 'ic_stat_prayer',
+        color: AndroidColor.RED,
+        pressAction: { id: 'default', launchActivity: 'default' },
+        actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+        style: {
+          type: AndroidStyle.INBOX,
+          lines: [body],
+        },
+        autoCancel: false,
+        ongoing: true,
+      },
+      ios: {
+        categoryId: 'prayer-reminder-category',
+        critical: false,
+        interruptionLevel: 'active',
+      },
+    },
+    {
+      type: TriggerType.TIMESTAMP,
+      timestamp: triggerTime.getTime(),
+      alarmManager: hasAlarm,
+    }
+  );
+}
+
+// ------------------------------------------------------------
 // PRAYER-EVENT SCHEDULE: All Prayer Event Notifications
 // ------------------------------------------------------------
 async function schedulePrayerEventNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr } = params;
-
-  // Check if exact alarm permission is granted (Android 12+)
-  const nf = await notifee.getNotificationSettings();
-  const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
+  const { config, prayerTimes, language, tr, hasAlarm } = params;
 
   for (const event of PRAYER_EVENTS) {
     // Skip disabled events
@@ -307,77 +398,94 @@ async function schedulePrayerEventNotifications(params: ScheduleParams) {
 // SPECIAL SCHEDULE: Special Notifications (Friday, Ramadan, etc.)
 // ------------------------------------------------------------
 async function scheduleSpecialNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr } = params;
+  const { config, prayerTimes, language, tr, hasAlarm } = params;
 
-  // Check if exact alarm permission is granted (Android 12+)
-  const nf = await notifee.getNotificationSettings();
-  const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
+  // --- Special 1: Friday reminder (1 hour before Dhuhr)
+  if (config.specials.Friday?.enabled) {
+    const dhuhrTime = prayerTimes?.Dhuhr;
 
-  // Special 1: Friday reminder (1 hour before Dhuhr)
-  if (config.special.Friday?.enabled) {
-    const dhuhrTime = prayerTimes['Dhuhr'];
-    if (dhuhrTime) {
-      // Calculate next Friday
-      const now = new Date();
-      const daysUntilFriday = (5 - now.getDay() + 7) % 7 || 7;
-      const nextFriday = new Date(now);
-      nextFriday.setDate(now.getDate() + daysUntilFriday);
-
-      // Set to 1 hour before Dhuhr
-      const triggerTime = getTriggerTime(dhuhrTime, -60);
-      if (triggerTime) {
-        triggerTime.setDate(nextFriday.getDate());
-
-        // Prepare notification content
-        const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
-        const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
-
-        // await notifee.createTriggerNotification(
-        //   {
-        //     id: `special-friday`,
-        //     title: title,
-        //     body: body,
-        //     data: {
-        //       type: 'special',
-        //       specialType: 'Friday',
-        //       volume: config.notifSettings.volume,
-        //       vibration: config.notifSettings.vibration,
-        //     },
-        //     android: {
-        //       channelId: `general-vib-${config.notifSettings.vibration}`,
-        //       showTimestamp: true,
-        //       smallIcon: 'ic_stat_prayer',
-        //       color: AndroidColor.GREEN,
-        //       pressAction: { id: 'default', launchActivity: 'default' },
-        //       actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-        //       style: {
-        //         type: AndroidStyle.INBOX,
-        //         lines: [body],
-        //       },
-        //       autoCancel: false,
-        //       ongoing: true,
-        //     },
-        //     ios: {
-        //       categoryId: 'special-category',
-        //       critical: false,
-        //       interruptionLevel: 'active',
-        //     },
-        //   },
-        //   {
-        //     type: TriggerType.TIMESTAMP,
-        //     timestamp: triggerTime.getTime(),
-        //     alarmManager: hasAlarm,
-        //     repeatFrequency: RepeatFrequency.WEEKLY,
-        //   }
-        // );
-
-        // console.log(`🕌 Scheduled Friday reminder at ${triggerTime.toLocaleString('en-GB')}`);
-      }
+    if (!dhuhrTime) {
+      console.warn('[FridayReminder] Dhuhr time not available');
+      return;
     }
+
+    // Strict HH:mm validation
+    const match = dhuhrTime.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+    if (!match) {
+      console.warn('[FridayReminder] Invalid Dhuhr format:', dhuhrTime);
+      return;
+    }
+
+    const hour = Number(match[1]);
+    const minute = Number(match[2]);
+    const now = new Date();
+    const currentDay = now.getDay(); // 0=Sun ... 5=Fri
+
+    // Calculate upcoming Friday ----
+    const triggerTime = new Date(now);
+    const daysUntilFriday = currentDay === 5 ? 0 : (5 - currentDay + 7) % 7;
+    triggerTime.setDate(now.getDate() + daysUntilFriday);
+    triggerTime.setHours(hour, minute, 0, 0);
+
+    // Subtract 1 hour safely ----
+    triggerTime.setTime(triggerTime.getTime() - 60 * 60 * 1000);
+    // Handle "already passed today" case with grace window
+    const GRACE_MS = 60 * 1000; // 1 minute tolerance
+
+    if (daysUntilFriday === 0 && triggerTime.getTime() < now.getTime() - GRACE_MS) {
+      // Too far in the past → schedule next week
+      triggerTime.setDate(triggerTime.getDate() + 7);
+    }
+
+    // Prepare notification content
+    const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
+    const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
+
+    // Create Friday reminder notification
+    await notifee.createTriggerNotification(
+      {
+        id: `special-friday`,
+        title: title,
+        body: body,
+        data: {
+          type: 'special',
+          specialType: 'Friday',
+          volume: config.notifSettings.volume,
+          vibration: config.notifSettings.vibration,
+        },
+        android: {
+          channelId: `general-vib-${config.notifSettings.vibration}`,
+          showTimestamp: true,
+          smallIcon: 'ic_stat_prayer',
+          color: AndroidColor.GREEN,
+          pressAction: { id: 'default', launchActivity: 'default' },
+          actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+          style: {
+            type: AndroidStyle.INBOX,
+            lines: [body],
+          },
+          autoCancel: false,
+          ongoing: true,
+        },
+        ios: {
+          categoryId: 'special-category',
+          critical: false,
+          interruptionLevel: 'active',
+        },
+      },
+      {
+        type: TriggerType.TIMESTAMP,
+        timestamp: triggerTime.getTime(),
+        alarmManager: hasAlarm,
+        repeatFrequency: RepeatFrequency.WEEKLY,
+      }
+    );
+
+    console.log(`🕌 Scheduled Friday reminder at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
-  // Special 2: Daily Quote at random time (random time between 8 AM - 8 PM)
-  if (config.special.DailyQuote?.enabled) {
+  // --- Special 2: Daily Quote at random times (between 8 AM - 8 PM)
+  if (config.specials.DailyQuote?.enabled) {
     const quotes = QUOTES[language] || QUOTES.en;
 
     // Shuffle quotes for variety
@@ -401,6 +509,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
       const body = shuffledQuotes[i];
 
+      // Create daily quote notification
       await notifee.createTriggerNotification(
         {
           id: `special-daily-quote-${i}`,
@@ -442,107 +551,30 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       );
     }
 
-    console.log(`📜 Scheduled ${quotes.length} daily quotes at random times`);
+    console.log(`📜 Scheduled ${quotes.length} daily quotes at random dates and times`);
   }
 }
 
 // ------------------------------------------------------------
-// PRAYER-REMINDER CREATE: Prayer Reminder (one-time, from snooze action)
+// EVENT HANDLER: Handle notifee notification event (used for foreground and background)
 // ------------------------------------------------------------
-export async function schedulePrayerReminder(params: {
-  prayer: PrayerType;
-  title: string;
-  body: string;
-  triggerTime: Date;
-  data: Record<string, any>;
-  vibration: 'on' | 'off';
-  hasAlarm?: boolean;
-}) {
-  const { prayer, title, body, triggerTime, data, vibration, hasAlarm } = params;
-
-  // Create prayer reminder notification
-  await notifee.createTriggerNotification(
-    {
-      id: `reminder-${prayer.toLowerCase()}-${Date.now()}`,
-      title: title,
-      body: body,
-      data: {
-        type: 'prayer-reminder',
-        ...data
-      },
-      android: {
-        channelId: `general-vib-${vibration}`,
-        showTimestamp: true,
-        smallIcon: 'ic_stat_prayer',
-        color: AndroidColor.RED,
-        pressAction: { id: 'default', launchActivity: 'default' },
-        actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-        style: {
-          type: AndroidStyle.INBOX,
-          lines: [body],
-        },
-        autoCancel: false,
-        ongoing: true,
-      },
-      ios: {
-        categoryId: 'prayer-reminder-category',
-        critical: false,
-        interruptionLevel: 'active',
-      },
-    },
-    {
-      type: TriggerType.TIMESTAMP,
-      timestamp: triggerTime.getTime(),
-      alarmManager: hasAlarm,
-    }
-  );
-}
-
-// ------------------------------------------------------------
-// SCHEDULE ALL: Schedule All Notifications
-// ------------------------------------------------------------
-export async function scheduleNotificationsService(params: ScheduleParams) {
-  const { config, prayerTimes, language } = params;
-
-  try {
-    // 1: Cancel all existing
-    await cancelAllNotifications();
-
-    // 2: Create channels
-    await createChannels(config.notifSettings.vibration);
-
-    // Step 3: Schedule all notification types
-    await schedulePrayerNotifications(params);
-    await schedulePrayerEventNotifications(params);
-    await scheduleSpecialNotifications(params);
-
-  } catch (err) {
-    console.error('❌ [notificationsService] Failed to schedule notifications:', err);
-    throw err;
-  }
-}
-
-// ------------------------------------------------------------
-// EVENT HANDLER: Handle NotifY notification interactions
-// ------------------------------------------------------------
-export async function handleNotificationEvent(
-  type: EventType,
-  notification: any,
-  pressAction: any,
-  source: string = 'unknown'
-) {
-  // Check if exact alarm permission is granted (Android 12+)
-  const nf = await notifee.getNotificationSettings();
+export async function handleNotificationEvent(type: EventType, notification: any, pressAction: any, source: string = 'unknown') {
+  // Get current notification settings
+  const ns = await notifee.getNotificationSettings();
 
   // Early exit: do not play sound or handle anything if notifications are disabled on device
-  if (nf.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
+  if (ns.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
     console.log(`[${source}] Notifications are disabled on device — ignoring event`);
     return;
   }
 
-  const hasAlarm = nf.android.alarm === AndroidNotificationSetting.ENABLED;
+  // Check if exact alarm permission is granted (Android 12+)
+  const hasAlarm = ns.android.alarm === AndroidNotificationSetting.ENABLED;
+
+  // Log the event with source context
   const prefix = source === 'background' ? '[Background]' : '[Foreground]';
 
+  // Extract data from notification
   const notifType = notification?.data?.type;
   const prayer = notification?.data?.prayer || 'unknown';
   const reminderTitle = notification?.data?.reminderTitle;

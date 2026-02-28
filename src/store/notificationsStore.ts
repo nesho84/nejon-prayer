@@ -21,24 +21,24 @@ interface NotificationsState {
   notifSettings: NotifSettings;
   prayers: Record<PrayerType, PrayerSettings>;
   events: Record<PrayerEventType, EventSettings>;
-  special: Record<SpecialType, SpecialSettings>;
+  specials: Record<SpecialType, SpecialSettings>;
   lastScheduledHash: string | null;
   isLoading: boolean;
   isReady: boolean;
+  syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
   setSettings: (updates: Partial<NotifSettings>) => void;
   setPrayer: (prayer: PrayerType, updates: Partial<PrayerSettings>) => void;
   setEvent: (event: PrayerEventType, updates: Partial<EventSettings>) => void;
   setSpecial: (special: SpecialType, updates: Partial<SpecialSettings>) => void;
-  syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
 }
 
-const DEFAULT_NOTIF_SETTINGS: NotifSettings = {
+const DEFAULT_NOTIFICATIONS_SETTINGS: NotifSettings = {
   volume: 0.5,
   vibration: 'on',
   snooze: 5,
 };
 
-const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
+const DEFAULT_PRAYER_SETTINGS: Record<PrayerType, PrayerSettings> = {
   Fajr: { enabled: true, offset: -15, sound: SOUNDS.azan1_short },
   Dhuhr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
   Asr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
@@ -46,12 +46,12 @@ const DEFAULT_PRAYERS: Record<PrayerType, PrayerSettings> = {
   Isha: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
 };
 
-const DEFAULT_EVENTS: Record<PrayerEventType, EventSettings> = {
+const DEFAULT_EVENT_SETTINGS: Record<PrayerEventType, EventSettings> = {
   Imsak: { enabled: false, offset: 0, sound: SOUNDS.alarm1 },
   Sunrise: { enabled: false, offset: 0, sound: SOUNDS.alarm1 },
 };
 
-const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
+const DEFAULT_SPECIAL_SETTINGS: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
   DailyQuote: { enabled: true },
 };
@@ -59,65 +59,15 @@ const DEFAULT_SPECIAL: Record<SpecialType, SpecialSettings> = {
 export const useNotificationsStore = create<NotificationsState>()(
   persist(
     (set, get) => ({
-      notifSettings: DEFAULT_NOTIF_SETTINGS,
-      prayers: DEFAULT_PRAYERS,
-      events: DEFAULT_EVENTS,
-      special: DEFAULT_SPECIAL,
+      notifSettings: DEFAULT_NOTIFICATIONS_SETTINGS,
+      prayers: DEFAULT_PRAYER_SETTINGS,
+      events: DEFAULT_EVENT_SETTINGS,
+      specials: DEFAULT_SPECIAL_SETTINGS,
       lastScheduledHash: null,
       isLoading: false,
       isReady: false,
 
-      // Update notifications settings (volume, vibration, snooze)
-      setSettings: (updates) => {
-        set((state) => ({
-          notifSettings: { ...state.notifSettings, ...updates },
-        }));
-        get().syncNotifications();
-      },
-
-      // Update individual prayer settings
-      setPrayer: (prayer, updates) => {
-        set((state) => ({
-          prayers: {
-            ...state.prayers,
-            [prayer]: {
-              ...state.prayers[prayer],
-              ...updates,
-            },
-          },
-        }));
-        get().syncNotifications();
-      },
-
-      // Update individual event settings
-      setEvent: (event, updates) => {
-        set((state) => ({
-          events: {
-            ...state.events,
-            [event]: {
-              ...state.events[event],
-              ...updates,
-            },
-          },
-        }));
-        get().syncNotifications();
-      },
-
-      // Update individual special notification settings
-      setSpecial: (special, updates) => {
-        set((state) => ({
-          special: {
-            ...state.special,
-            [special]: {
-              ...state.special[special],
-              ...updates,
-            },
-          },
-        }));
-        get().syncNotifications();
-      },
-
-      // Main scheduling function
+      // Main scheduling function in the store
       syncNotifications: async () => {
         // Pull fresh data from other stores using getState()
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
@@ -126,7 +76,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         const tr = useLanguageStore.getState().tr;
 
         // Extract current notification settings
-        const { notifSettings, prayers, events, special } = get();
+        const { notifSettings, prayers, events, specials } = get();
 
         // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
@@ -139,7 +89,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           prayerTimes,
           prayers,
           events,
-          special,
+          specials,
           language,
           volume: notifSettings.volume,
           vibration: notifSettings.vibration,
@@ -158,7 +108,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           // 3. Call service to schedule notifications with current settings and prayer times
           await scheduleNotificationsService({
             prayerTimes,
-            config: { notifSettings, prayers, events, special },
+            config: { notifSettings, prayers, events, specials },
             language,
             tr
           });
@@ -171,6 +121,56 @@ export const useNotificationsStore = create<NotificationsState>()(
           set({ isLoading: false });
         }
       },
+
+      // Update notifications settings (volume, vibration, snooze)
+      setSettings: (updates) => {
+        set((state) => ({
+          notifSettings: { ...state.notifSettings, ...updates },
+        }));
+        get().syncNotifications();
+      },
+
+      // Update prayers notification settings
+      setPrayer: (prayer, updates) => {
+        set((state) => ({
+          prayers: {
+            ...state.prayers,
+            [prayer]: {
+              ...state.prayers[prayer],
+              ...updates,
+            },
+          },
+        }));
+        get().syncNotifications();
+      },
+
+      // Update events notification settings
+      setEvent: (event, updates) => {
+        set((state) => ({
+          events: {
+            ...state.events,
+            [event]: {
+              ...state.events[event],
+              ...updates,
+            },
+          },
+        }));
+        get().syncNotifications();
+      },
+
+      // Update specials notification settings
+      setSpecial: (special, updates) => {
+        set((state) => ({
+          specials: {
+            ...state.specials,
+            [special]: {
+              ...state.specials[special],
+              ...updates,
+            },
+          },
+        }));
+        get().syncNotifications();
+      },
     }),
     {
       name: 'notifications-storage',
@@ -179,7 +179,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         notifSettings: state.notifSettings,
         prayers: state.prayers,
         events: state.events,
-        special: state.special,
+        specials: state.specials,
         lastScheduledHash: state.lastScheduledHash,
       }),
       onRehydrateStorage: () => (state) => {

@@ -4,7 +4,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { storage } from "@/store/storage";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { AppState, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
 
@@ -20,6 +20,23 @@ export default function QiblaScreen() {
     const [count, setCount] = useState<number>(0);
     const [totalCount, setTotalCount] = useState<number>(10);
     const [laps, setLaps] = useState<number>(0);
+
+    // ------------------------------------------------------------
+    // Load state from MMKV storage
+    // ------------------------------------------------------------
+    const loadState = () => {
+        try {
+            const saved = storage.getString(TESBIH_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                setCount(data.count || 0);
+                setTotalCount(data.totalCount || 10);
+                setLaps(data.laps || 0);
+            }
+        } catch (err) {
+            console.warn("⚠️ Failed to load tesbih state", err);
+        }
+    };
 
     // ------------------------------------------------------------
     // Load state on mount
@@ -49,23 +66,6 @@ export default function QiblaScreen() {
 
         return () => subscription.remove();
     }, [count, totalCount, laps]);
-
-    // ------------------------------------------------------------
-    // Load state from MMKV storage
-    // ------------------------------------------------------------
-    const loadState = () => {
-        try {
-            const saved = storage.getString(TESBIH_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                setCount(data.count || 0);
-                setTotalCount(data.totalCount || 10);
-                setLaps(data.laps || 0);
-            }
-        } catch (err) {
-            console.warn("⚠️ Failed to load tesbih state", err);
-        }
-    };
 
     // ------------------------------------------------------------
     //  Save state to MMKV storage

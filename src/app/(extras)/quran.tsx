@@ -37,28 +37,21 @@ export default function QuranScreen() {
     const currentTime = isSwitching ? 0 : (progress.position ?? 0);
     const duration = isSwitching ? 0 : (progress.duration ?? 0);
 
-    // Create a ref for the TextInput
+    // Refs
     const isFetchMountedRef = useRef(true);
     const textInputRef = useRef<TextInput>(null);
 
     // ------------------------------------------------------------
-    // Fetch all surahs on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        fetchSurahs();
-
-        return () => {
-            isFetchMountedRef.current = false;
-        };
-    }, []);
-
-    // ------------------------------------------------------------
     // Load surahs from API
+    // Can be called on mount or manually (retry button)
     // ------------------------------------------------------------
     const fetchSurahs = async () => {
+        if (!isFetchMountedRef.current) return;
+
         setIsLoading(true);
+        setError(null);
+
         try {
-            setError(null);
             const data = await fetchAllSurahs();
 
             if (isFetchMountedRef.current) {
@@ -70,34 +63,41 @@ export default function QuranScreen() {
                 setError(tr.labels.quranSurahsError);
             }
         } finally {
-            setIsLoading(false);
+            if (isFetchMountedRef.current) {
+                setIsLoading(false);
+            }
         }
     };
 
     // ------------------------------------------------------------
-    // Setup TrackPlayer once on mount
+    // Fetch all surahs on mount
     // ------------------------------------------------------------
     useEffect(() => {
-        setupTrackPlayer();
+        isFetchMountedRef.current = true;
+
+        fetchSurahs();
+
+        return () => {
+            isFetchMountedRef.current = false;
+        };
     }, []);
 
     // ------------------------------------------------------------
-    // Sync active track (handles case when user starts audio, leaves app, then comes back)
+    // Setup and Sync TrackPlayer
     // ------------------------------------------------------------
     useEffect(() => {
-        const syncActiveTrack = async () => {
-            try {
-                const currentTrack = await TrackPlayer.getActiveTrack();
-                if (currentTrack) {
-                    const surahNumber = parseInt(currentTrack.id.replace('surah-', ''));
-                    setActiveSound(surahNumber);
-                }
-            } catch (error) {
-                // Ignoring Error:
-                // [Error: Uncaught (in promise, id: 0) Error: The player is not initialized. Call setupPlayer first.]
+        const setupAndSync = async () => {
+            // Setup TrackPlayer once on mount
+            await setupTrackPlayer();
+
+            // Sync active track (handles case when user starts audio, leaves app, then comes back)
+            const currentTrack = await TrackPlayer.getActiveTrack();
+            if (currentTrack) {
+                const surahNumber = parseInt(currentTrack.id.replace('surah-', ''));
+                setActiveSound(surahNumber);
             }
         };
-        syncActiveTrack();
+        setupAndSync();
     }, []);
 
     // ------------------------------------------------------------

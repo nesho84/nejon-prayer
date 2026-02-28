@@ -7,7 +7,6 @@ export async function setupTrackPlayer() {
 
   try {
     await TrackPlayer.setupPlayer();
-
     await TrackPlayer.updateOptions({
       capabilities: [
         Capability.Play,
@@ -21,8 +20,12 @@ export async function setupTrackPlayer() {
     });
 
     isSetup = true;
-  } catch (error) {
-    // Ignoring Error:
-    // Error: The player has already been initialized via setupPlayer.
+  } catch (err: any) {
+    // Ignore "already initialized" error
+    if (err?.message?.includes('already been initialized')) {
+      isSetup = true;
+      return;
+    }
+    console.error('❌ TrackPlayer setup failed:', err);
   }
 }

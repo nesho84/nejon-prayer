@@ -1,3 +1,20 @@
+import AppCard from "@/components/AppCard";
+import AppLoading from "@/components/AppLoading";
+import AppTabScreen from "@/components/AppTabScreen";
+import CustomPicker from "@/components/CustomPicker";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useLanguageStore } from "@/store/languageStore";
+import { useLocationStore } from "@/store/locationStore";
+import { useNotificationsStore } from "@/store/notificationsStore";
+import { usePrayersStore } from "@/store/prayersStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Language, LANGUAGES } from "@/types/language.types";
+import { SpecialType } from "@/types/notification.types";
+import { Theme, THEMES } from "@/types/theme.types";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import notifee, { AuthorizationStatus } from "@notifee/react-native";
+import Slider from '@react-native-community/slider';
+import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -12,23 +29,6 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import Slider from '@react-native-community/slider';
-import * as Haptics from "expo-haptics";
-import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import AppTabScreen from "@/components/AppTabScreen";
-import AppLoading from "@/components/AppLoading";
-import AppCard from "@/components/AppCard";
-import CustomPicker from "@/components/CustomPicker";
-import { Theme, THEMES } from "@/types/theme.types";
-import { Language, LANGUAGES } from "@/types/language.types";
-import { useThemeStore } from "@/store/themeStore";
-import { useLanguageStore } from "@/store/languageStore";
-import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
-import { useLocationStore } from "@/store/locationStore";
-import { usePrayersStore } from "@/store/prayersStore";
-import { useNotificationsStore } from "@/store/notificationsStore";
-import { SpecialType } from "@/types/notification.types";
 
 export default function SettingsScreen() {
     // Stores
@@ -52,7 +52,7 @@ export default function SettingsScreen() {
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
-    const special = useNotificationsStore((state) => state.special);
+    const specials = useNotificationsStore((state) => state.specials);
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -560,11 +560,11 @@ export default function SettingsScreen() {
                                     {tr.labels.fridayReminder}
                                 </Text>
                                 <Switch
-                                    value={special.Friday.enabled}
+                                    value={specials.Friday.enabled}
                                     onValueChange={(value) => handleSpecialNotification('Friday', value)}
                                     disabled={localLoading}
                                     trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={special.Friday.enabled ? theme.border : theme.border}
+                                    thumbColor={specials.Friday.enabled ? theme.border : theme.border}
                                 />
                             </View>
 
@@ -577,11 +577,11 @@ export default function SettingsScreen() {
                                     {tr.labels.dailyReminders}
                                 </Text>
                                 <Switch
-                                    value={special.DailyQuote.enabled}
+                                    value={specials.DailyQuote.enabled}
                                     onValueChange={(value) => handleSpecialNotification('DailyQuote', value)}
                                     disabled={localLoading}
                                     trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={special.DailyQuote.enabled ? theme.border : theme.border}
+                                    thumbColor={specials.DailyQuote.enabled ? theme.border : theme.border}
                                 />
                             </View>
 

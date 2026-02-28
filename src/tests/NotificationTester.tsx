@@ -13,27 +13,27 @@ import {
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const TESTS = [
-  { label: "Prayer", fn: testPrayerNotification },
-  { label: "Prayer Event", fn: testPrayerEventNotification },
-  { label: "Prayer Reminder", fn: testPrayerReminderNotification },
-  { label: "Friday", fn: testFridayNotification },
-  { label: "Daily Quote", fn: testDailyQuoteNotification },
+const TEST_FUNCTIONS = [
+  { label: "Prayer", func: testPrayerNotification },
+  { label: "Prayer Event", func: testPrayerEventNotification },
+  { label: "Prayer Reminder", func: testPrayerReminderNotification },
+  { label: "Friday", func: testFridayNotification },
+  { label: "Daily Quote", func: testDailyQuoteNotification },
 ] as const;
 
-interface NotificationTesterProps {
+interface Props {
   seconds?: number;
 }
 
-export default function NotificationTester({ seconds = 10 }: NotificationTesterProps) {
+export default function NotificationTester({ seconds = 10 }: Props) {
   const theme = useThemeStore((s) => s.theme);
   const language = useLanguageStore((s) => s.language);
   const location = useLocationStore((s) => s.location);
   const notifSettings = useNotificationsStore((s) => s.notifSettings);
 
-  const [expanded, setExpanded] = useState(false);
+  const options = { language, location, hasAlarm: true };
 
-  const options = { language, location };
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <View style={[styles.container, { borderColor: theme.danger }]}>
@@ -51,12 +51,12 @@ export default function NotificationTester({ seconds = 10 }: NotificationTesterP
       {expanded && (
         <View style={styles.body}>
           {/* Test buttons */}
-          {TESTS.map(({ label, fn }) => (
+          {TEST_FUNCTIONS.map(({ label, func }) => (
             <TouchableOpacity
               key={label}
               style={[styles.button, { borderColor: theme.border }]}
               activeOpacity={0.6}
-              onPress={() => fn({ options, notifSettings, seconds })}
+              onPress={() => func({ options, notifSettings, seconds })}
             >
               <Text style={[styles.buttonText, { color: theme.text }]}>
                 Test {label}
@@ -69,11 +69,11 @@ export default function NotificationTester({ seconds = 10 }: NotificationTesterP
 
           {/* Debug button */}
           <TouchableOpacity
-            style={[styles.button, { borderColor: theme.accent }]}
+            style={[styles.button, { borderColor: theme.border }]}
             activeOpacity={0.6}
             onPress={debugChannelsAndScheduled}
           >
-            <Text style={[styles.buttonText, { color: theme.accent }]}>
+            <Text style={[styles.buttonText, { color: theme.placeholder }]}>
               Debug Channels & Scheduled
             </Text>
           </TouchableOpacity>

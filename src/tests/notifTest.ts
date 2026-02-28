@@ -1,44 +1,31 @@
 import { SOUNDS } from "@/constants/sounds";
+import { NotifSettings } from "@/types/notification.types";
 import notifee, {
     AndroidColor,
-    AndroidNotificationSetting,
     AndroidStyle,
     TimestampTrigger,
-    TriggerType,
+    TriggerType
 } from "@notifee/react-native";
 
-interface Options {
-    language: string;
-    location?: any;
-    fullAddress?: string | null;
-    timeZone?: string | null;
-}
-
-interface NotifSettings {
-    volume: number; // 0.0 to 1.0
-    vibration: 'on' | 'off';
-    snooze: number; // Minutes
+interface TestParams {
+    options: {
+        language: string;
+        location?: any;
+        fullAddress?: string | null;
+        timeZone?: string | null;
+        hasAlarm?: boolean;
+    },
+    notifSettings?: NotifSettings | null;
+    seconds?: number;
 }
 
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer notification
 // ------------------------------------------------------------
-export async function testPrayerNotification({
-    options = null,
-    notifSettings = null,
-    seconds = 10
-}: {
-    options?: Options | null;
-    notifSettings?: NotifSettings | null;
-    seconds?: number;
-} = {}): Promise<void> {
+export async function testPrayerNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         // Default to 10 seconds later if no timestamp passed
         const triggerTime = Date.now() + seconds * 1000;
-
-        // Check alarm permission
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
         // Schedule the notification
         await notifee.createTriggerNotification(
@@ -85,7 +72,7 @@ export async function testPrayerNotification({
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: hasAlarm,
+                alarmManager: options.hasAlarm,
             }
         );
 
@@ -94,7 +81,7 @@ export async function testPrayerNotification({
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
             channelId: ${`prayer-notif-channel-vib-${notifSettings?.vibration}`}
             language: ${options?.language},
-            alarm: ${hasAlarm},
+            alarm: ${options.hasAlarm},
             volume: ${notifSettings?.volume},
             vibration: ${notifSettings?.vibration},
             snooze: ${notifSettings?.snooze}
@@ -108,20 +95,9 @@ export async function testPrayerNotification({
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer-event notification (Imsak/Sunrise)
 // ------------------------------------------------------------
-export async function testPrayerEventNotification({
-    options = null,
-    notifSettings = null,
-    seconds = 10
-}: {
-    options?: Options | null;
-    notifSettings?: NotifSettings | null;
-    seconds?: number;
-} = {}): Promise<void> {
+export async function testPrayerEventNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
         const eventName = 'Imsak';
         const body = `It is now time for (${eventName}) 04:52`;
@@ -164,7 +140,7 @@ export async function testPrayerEventNotification({
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: hasAlarm,
+                alarmManager: options.hasAlarm,
             }
         );
 
@@ -178,20 +154,9 @@ export async function testPrayerEventNotification({
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer-reminder notification
 // ------------------------------------------------------------
-export async function testPrayerReminderNotification({
-    options = null,
-    notifSettings = null,
-    seconds = 10
-}: {
-    options?: Options | null;
-    notifSettings?: NotifSettings | null;
-    seconds?: number;
-} = {}): Promise<void> {
+export async function testPrayerReminderNotification({ options, notifSettings = null, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
         const title = "» Sabahu «";
         const body = "Kujtesë Lutjeje";
@@ -236,7 +201,7 @@ export async function testPrayerReminderNotification({
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: hasAlarm,
+                alarmManager: options.hasAlarm,
             }
         );
 
@@ -250,20 +215,9 @@ export async function testPrayerReminderNotification({
 // ------------------------------------------------------------
 // Debug utility: schedule a test Friday special notification
 // ------------------------------------------------------------
-export async function testFridayNotification({
-    options = null,
-    notifSettings = null,
-    seconds = 10
-}: {
-    options?: Options | null;
-    notifSettings?: NotifSettings | null;
-    seconds?: number;
-} = {}): Promise<void> {
+export async function testFridayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
         const title = "Jumu'ah Reminder";
         const body = "Today is Jumu‘ah. Make time for prayer.";
@@ -307,7 +261,7 @@ export async function testFridayNotification({
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: hasAlarm,
+                alarmManager: options.hasAlarm,
             }
         );
 
@@ -321,20 +275,9 @@ export async function testFridayNotification({
 // ------------------------------------------------------------
 // Debug utility: schedule a test Daily Quote special notification
 // ------------------------------------------------------------
-export async function testDailyQuoteNotification({
-    options = null,
-    notifSettings = null,
-    seconds = 10
-}: {
-    options?: Options | null;
-    notifSettings?: NotifSettings | null;
-    seconds?: number;
-} = {}): Promise<void> {
+export async function testDailyQuoteNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
-        const settings = await notifee.getNotificationSettings();
-        const hasAlarm = settings.android.alarm === AndroidNotificationSetting.ENABLED;
 
         const title = "Daily Reminder";
         const body = "Verily, in the remembrance of Allah do hearts find rest 💚 (Ar-Ra'd 13:28)";
@@ -379,7 +322,7 @@ export async function testDailyQuoteNotification({
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: hasAlarm,
+                alarmManager: options.hasAlarm,
             }
         );
 
@@ -393,7 +336,7 @@ export async function testDailyQuoteNotification({
 // ------------------------------------------------------------
 // Debug utility: log all channels and scheduled notifications
 // ------------------------------------------------------------
-export async function debugChannelsAndScheduled(): Promise<void> {
+export async function debugChannelsAndScheduled() {
     try {
         const channels = await notifee.getChannels();
         const channelsObj = channels.map(c => ({
