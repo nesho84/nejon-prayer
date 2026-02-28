@@ -1,8 +1,8 @@
 export interface Surah {
-  number: number;
+  number: number;          // Surah number (1-114)
   name: string;            // Arabic name: الفاتحة
   englishName: string;     // International: Al-Fatiha
-  numberOfAyahs: number;
+  numberOfAyahs: number;   // Total ayahs in the surah
   revelationType: string;  // Meccan / Medinan
   firstAyah: string;       // Arabic text of first ayah (preview)
 }
@@ -28,6 +28,7 @@ interface SurahListResponse {
 const BASE_URL = "https://api.alquran.cloud/v1";
 const AUDIO_CDN = "https://cdn.islamic.network/quran/audio-surah";
 const BITRATE = "128"; // 128kbps quality
+
 export const EDITION1 = "ar.alafasy"; // Mishary Alafasy
 export const EDITION2 = "ar.abdulazizazzahrani"; // Abdulaziz Al-Zahrani
 export const EDITION3 = "ar.abdulbariaththubaity"; // Abdul Bari Thubaity

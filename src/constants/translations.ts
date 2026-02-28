@@ -142,7 +142,7 @@ export const TRANSLATIONS = {
             enableNotification: "Enable Notification",
             notificationTime: "Notification Time",
             notificationSound: "Notification Sound",
-            noSound: "🔇 Silent",
+            noSound: "🔇  Silent",
             notificationsDisabled: "Notifications Disabled",
             notificationsDisabledMessage: "To receive prayer reminders, please enable notifications in system settings.",
             // Notifications settings
@@ -194,8 +194,8 @@ export const TRANSLATIONS = {
             snoozeError: "Failed to update notifications snooze timeout.",
             deviceSettingsError: "Failed to load settings.",
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
-            quranSurahsError: "Failed to load surahs. Please try again.",
-            noSurahsFound: "No surahs found.",
+            quranSurahsError: "Failed to load surahs. Please check your internet connection.",
+            noSurahsFound: "No surah found.",
             // Prayer times Settings
             calendarTitle: "Prayer Times Calendar",
             calendarSubtitle: "View prayer times for selected date",
@@ -366,7 +366,7 @@ export const TRANSLATIONS = {
             enableNotification: "Benachrichtigung Aktivieren",
             notificationTime: "Benachrichtigungszeit",
             notificationSound: "Benachrichtigungston",
-            noSound: "🔇 Stumm",
+            noSound: "🔇  Stumm",
             notificationsDisabled: "Benachrichtigungen Deaktiviert",
             notificationsDisabledMessage: "Um Gebetserinnerungen zu erhalten, aktivieren Sie bitte Benachrichtigungen in den Systemeinstellungen.",
             // Notifications settings
@@ -418,8 +418,8 @@ export const TRANSLATIONS = {
             snoozeError: "Das Aktualisieren des Schlummerzeitlimits für Benachrichtigungen ist fehlgeschlagen.",
             deviceSettingsError: "Einstellungen konnten nicht geladen werden.",
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
-            quranSurahsError: "Surahs konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-            noSurahsFound: "Keine Surahs gefunden.",
+            quranSurahsError: "Surahs konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
+            noSurahsFound: "Keine Surah gefunden.",
             // Prayer times Settings
             calendarTitle: "Gebetszeiten-Kalender",
             calendarSubtitle: "Gebetszeiten für ausgewähltes Datum anzeigen",
@@ -590,7 +590,7 @@ export const TRANSLATIONS = {
             enableNotification: "Aktivizo njoftimin",
             notificationTime: "Koha e njoftimit",
             notificationSound: "Zëri i njoftimit",
-            noSound: "🔇 Pa zë",
+            noSound: "🔇  Pa zë",
             notificationsDisabled: "Njoftimet janë Çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
             // Notifications settings
@@ -642,8 +642,8 @@ export const TRANSLATIONS = {
             snoozeError: "Dështoi përditësimi i kohëzgjatjes të kujtesës së njoftimeve.",
             deviceSettingsError: "Cilësimet nuk mund të ngarkohen.",
             prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
-            quranSurahsError: "Suret nuk mund të ngarkohen. Ju lutemi provoni përsëri.",
-            noSurahsFound: "Suret nuk u gjetën.",
+            quranSurahsError: "Suret nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
+            noSurahsFound: "Nuk u gjet asnjë Sure.",
             // Prayer times Settings
             calendarTitle: "Kalendari i kohëve të Namazit",
             calendarSubtitle: "Kohët e Namazit sipas datës së caktuar",
@@ -814,7 +814,7 @@ export const TRANSLATIONS = {
             enableNotification: "Bildirimleri Etkinleştir",
             notificationTime: "Bildirim Zamanı",
             notificationSound: "Bildirim Sesi",
-            noSound: "🔇 Sessiz",
+            noSound: "🔇  Sessiz",
             notificationsDisabled: "Bildirimler Devre Dışı",
             notificationsDisabledMessage: "Namaz hatırlatmaları almak için lütfen sistem ayarlarından bildirimleri etkinleştirin.",
             // Notifications settings
@@ -866,8 +866,8 @@ export const TRANSLATIONS = {
             snoozeError: "Bildirim erteleme süresi güncellenemedi.",
             deviceSettingsError: "Ayarlar yüklenemedi.",
             prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
-            quranSurahsError: "Sureler yüklenemedi. Lütfen tekrar deneyin.",
-            noSurahsFound: "Sureler bulunamadı.",
+            quranSurahsError: "Sureler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
+            noSurahsFound: "Hiç sure bulunamadı.",
             // Prayer times Settings
             calendarTitle: "Namaz Vakitleri Takvimi",
             calendarSubtitle: "Belirli bir tarihe göre namaz vakitleri",
@@ -1036,7 +1036,7 @@ export const TRANSLATIONS = {
             enableNotification: "تفعيل الإشعارات",
             notificationTime: "وقت الإشعار",
             notificationSound: "صوت الإشعار",
-            noSound: "🔇 صامت",
+            noSound: "🔇  صامت",
             notificationsDisabled: "الإشعارات معطلة",
             notificationsDisabledMessage: "لتلقي تذكيرات الصلاة، يرجى تفعيل الإشعارات من إعدادات النظام.",
             // Notifications settings
@@ -1088,8 +1088,8 @@ export const TRANSLATIONS = {
             snoozeError: "فشل في تحديث مدة تأجيل الإشعارات.",
             deviceSettingsError: "فشل في تحميل الإعدادات.",
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
-            quranSurahsError: "تعذر تحميل السور. يرجى المحاولة مرة أخرى.",
-            noSurahsFound: "لم يتم العثور على سور.",
+            quranSurahsError: "تعذر تحميل السور. يرجى التحقق من اتصال الإنترنت.",
+            noSurahsFound: "لم يتم العثور على أي سور.",
             // Prayer times Settings
             calendarTitle: "تقويم أوقات الصلاة",
             calendarSubtitle: "أوقات الصلاة لتاريخ معين",

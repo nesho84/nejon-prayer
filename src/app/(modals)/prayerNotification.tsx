@@ -42,7 +42,6 @@ export default function PrayersSettingsScreen() {
     const [enabled, setEnabled] = useState(false);
     const [selectedOffset, setSelectedOffset] = useState(0);
     const [selectedSound, setSelectedSound] = useState(SOUNDS.azan1_short);
-
     // Sound preview state
     const [playingId, setPlayingId] = useState<number | null>(null);
     const [soundDurations, setSoundDurations] = useState<Record<string, number>>({});
@@ -65,7 +64,7 @@ export default function PrayersSettingsScreen() {
 
     const SOUND_OPTIONS: SoundsOptionType[] = useMemo(() => {
         return [
-            { id: 1, name: tr.labels.noSound, file: '' },
+            { id: 1, name: tr.labels.noSound, file: '' }, // icon in the translations
             { id: 2, name: `Azan 1 (${tr.labels.short})`, file: SOUNDS.azan1_short },
             { id: 3, name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
             { id: 4, name: 'Azan 3', file: SOUNDS.azan3 },
@@ -298,19 +297,16 @@ export default function PrayersSettingsScreen() {
                                     style={[
                                         styles.timeChipText,
                                         { color: theme.text2 },
-                                        selectedOffset === option.offset && {
-                                            color: theme.accent,
-                                            fontWeight: '500'
-                                        }
                                     ]}
                                 >
-                                    {/* Prefix of the Label (5,15,30...) */}
+                                    {/* Left: Prefix of the Label (5,15,30...) */}
                                     {option.prefix && (
                                         <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
                                     )}
+                                    {/* Center: Label */}
                                     {option.label}
                                 </Text>
-                                {/* Checkmark - like sound section */}
+                                {/* Right: Checkmark */}
                                 {selectedOffset === option.offset && (
                                     <Ionicons name="checkmark" size={16} color={theme.accent} />
                                 )}
@@ -342,11 +338,12 @@ export default function PrayersSettingsScreen() {
                                     }
                                 ]}
                             >
-                                {/* Selectable Area */}
+                                {/* Left: selectable area */}
                                 <TouchableOpacity
                                     style={styles.soundLeft}
                                     onPress={() => setSelectedSound(sound.file)}
                                 >
+                                    {/* Left: Checkmark */}
                                     {selectedSound === sound.file && (
                                         <Ionicons name="checkmark" size={16} color={theme.accent} />
                                     )}
@@ -355,10 +352,6 @@ export default function PrayersSettingsScreen() {
                                         style={[
                                             styles.soundName,
                                             { color: sound.file ? theme.text : theme.text2 },
-                                            selectedSound === sound.file && {
-                                                color: theme.accent,
-                                                fontWeight: '600'
-                                            }
                                         ]}
                                     >
                                         {sound.name}
@@ -387,9 +380,9 @@ export default function PrayersSettingsScreen() {
                                         }}
                                     >
                                         <Ionicons
-                                            name={playingId === sound.id ? "stop-circle" : "play-circle"}
+                                            name={(playingId === sound.id) ? "stop-circle" : "play-circle"}
                                             size={26}
-                                            color={theme.accent}
+                                            color={(playingId === sound.id) ? theme.accent : theme.text2}
                                         />
                                     </TouchableOpacity>
                                 )}

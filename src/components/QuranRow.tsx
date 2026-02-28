@@ -5,7 +5,7 @@ import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface QuranRowProps {
-  item: Surah;
+  surah: Surah;
   theme: any;
   activeSound: number | null;
   isPlaying: boolean;
@@ -13,12 +13,12 @@ interface QuranRowProps {
   hasFinished: boolean;
   currentProgress: number;
   totalDuration: number;
-  onPlayPause: (num: number) => void;
+  onPlayPause: (surah: Surah) => void;
 }
 
 // Main Conponent (memoized for FlatList performance)
 const QuranRow = React.memo(({
-  item,
+  surah,
   theme,
   activeSound,
   isPlaying,
@@ -29,7 +29,7 @@ const QuranRow = React.memo(({
   onPlayPause
 }: QuranRowProps) => {
   // Button and progress bar states
-  const isThisActive = activeSound === item.number;
+  const isThisActive = activeSound === surah.number;
   const isThisPlaying = isThisActive && isPlaying;
   const isThisBuffering = isThisActive && isBuffering;
   const showReplay = isThisActive && hasFinished;
@@ -41,22 +41,22 @@ const QuranRow = React.memo(({
         {/* Left: Number badge */}
         <View style={[styles.numberBadge, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 1 }]}>
           <Text style={[styles.numberText, { color: theme.accent }]}>
-            {item.number}
+            {surah.number}
           </Text>
         </View>
 
         {/* Center: Surah info */}
         <View style={styles.surahInfo}>
           <Text style={[styles.surahTitle, { color: theme.text }]}>
-            {item.englishName}{" "}
+            {surah.englishName}{" "}
 
             <Text style={[styles.surahArabicInline, { color: theme.text2 }]}>
-              ({item.name})
+              ({surah.name})
             </Text>
           </Text>
 
           <Text style={[styles.firstAyahPreview, { color: theme.placeholder }]} numberOfLines={1}>
-            {item.firstAyah}
+            {surah.firstAyah}
           </Text>
 
           {/* Progress bar */}
@@ -70,7 +70,7 @@ const QuranRow = React.memo(({
         {/* Right: Play/Stop/Replay button */}
         <TouchableOpacity
           style={styles.playButton}
-          onPress={() => onPlayPause(item.number)}
+          onPress={() => onPlayPause(surah)}
           disabled={isThisBuffering}
         >
           {isThisBuffering ? (
