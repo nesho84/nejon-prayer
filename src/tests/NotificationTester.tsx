@@ -5,8 +5,8 @@ import { useThemeStore } from "@/store/themeStore";
 import {
   debugChannelsAndScheduled,
   testDailyQuoteNotification,
+  testEventNotification,
   testFridayNotification,
-  testPrayerEventNotification,
   testPrayerNotification,
   testPrayerReminderNotification,
 } from "@/tests/notifTest";
@@ -15,7 +15,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const TEST_FUNCTIONS = [
   { label: "Prayer", func: testPrayerNotification },
-  { label: "Prayer Event", func: testPrayerEventNotification },
+  { label: "Prayer Event", func: testEventNotification },
   { label: "Prayer Reminder", func: testPrayerReminderNotification },
   { label: "Friday", func: testFridayNotification },
   { label: "Daily Quote", func: testDailyQuoteNotification },

@@ -22,6 +22,5 @@ export interface EventSettings {
 
 export interface SpecialSettings {
   enabled: boolean;
-  offset?: number;
   // Add more fields if needed (e.g., custom times for Ramadan start/end)
 }

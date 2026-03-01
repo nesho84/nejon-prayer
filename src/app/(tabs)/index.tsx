@@ -29,7 +29,6 @@ export default function HomeScreen() {
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
-    const deviceSettingsError = useDeviceSettingsStore((state) => state.deviceSettingsError);
     const location = useLocationStore((state) => state.location);
     const timeZone = useLocationStore((state) => state.timeZone);
     const locationReady = useLocationStore.getState().isReady;
@@ -137,22 +136,8 @@ export default function HomeScreen() {
         return <AppLoading text={tr.labels.loading} />;
     }
 
-    // Device Settings error
-    if (deviceSettingsError) {
-        return (
-            <AppError
-                icon="alert-circle-outline"
-                iconColor={theme.danger}
-                message={deviceSettingsError || tr.labels.deviceSettingsError}
-                buttonText={tr.labels.goToSettings}
-                buttonColor={theme.primary}
-                onPress={() => router.navigate("/(tabs)/settings")}
-            />
-        );
-    }
-
     // No location set
-    if (!locationPermission || !location) {
+    if (!locationPermission && !location) {
         return (
             <AppError
                 icon="location-outline"

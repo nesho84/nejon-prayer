@@ -318,7 +318,7 @@ export default function PrayersSettingsScreen() {
                 {/* SECTION 3: Sound Selection */}
                 <AppCard style={styles.sectionCard}>
                     <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                        <Ionicons name="musical-notes-outline" size={20} color={theme.accent} />
+                        <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
                         <Text style={[styles.sectionTitle, { color: theme.text }]}>
                             {tr.labels.notificationSound}
                         </Text>
