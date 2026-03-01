@@ -5,15 +5,14 @@ import TrackPlayer from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { TrackPlayerService } from './src/services/trackPlayerService';
 
+// ------------------------------------------------------------
 // Initialize react-native-track-player playback service
+// ------------------------------------------------------------
 TrackPlayer.registerPlaybackService(() => TrackPlayerService);
 
 // ------------------------------------------------------------
-// "@notifee/react-native" Background handler. This works when:
-// The device is locked.
-// The application is running (minimized).
-// The application is killed/quit.
-// Notification action is pressed
+// Notifee - BACKGROUND event handler
+// Listens for notification events while the app is in the background or killed
 // ------------------------------------------------------------
 notifee.onBackgroundEvent(async ({ type, detail }) => {
     const { notification, pressAction } = detail;

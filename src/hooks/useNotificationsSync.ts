@@ -23,7 +23,7 @@ export function useNotificationsSync() {
     const initChannels = async () => {
       try {
         await createNotificationsChannels();
-        console.log('✅ Notification channels created or already exist');
+        // console.log('✅ Notification channels created or already exist');
       } catch (err) {
         console.error('Failed to create notification channels:', err);
       }
@@ -57,7 +57,7 @@ export function useNotificationsSync() {
   }, [deviceSettingsReady, notificationsReady, prayerTimes, notificationPermission, language]);
 
   // ------------------------------------------------------------
-  // FOREGROUND event handler - Notifee
+  // Notifee - FOREGROUND event handler
   // Listens for notification events while the app is in the foreground
   // ------------------------------------------------------------
   useEffect(() => {

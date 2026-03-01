@@ -67,7 +67,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       isLoading: false,
       isReady: false,
 
-      // Main scheduling function in the store
+      // Main scheduling function in the store (called in useNotificationsSync)
       syncNotifications: async () => {
         // Pull fresh data from other stores using getState()
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;

@@ -41,12 +41,13 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
-                    snooze: String(notifSettings?.snooze ?? 5),
+                    // snooze: String(notifSettings?.snooze ?? 5),
+                    snooze: '1',
                     sound: SOUNDS.azan1_short, // Default sound for test
                 },
                 android: {
                     // (is created in notificationsService.js)
-                    channelId: `prayer-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
@@ -79,7 +80,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
         const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
-            channelId: ${`prayer-notif-channel-vib-${notifSettings?.vibration}`}
+            channelId: ${`nejonprayer-vib-${notifSettings?.vibration}`}
             language: ${options?.language},
             alarm: ${options.hasAlarm},
             volume: ${notifSettings?.volume},
@@ -95,7 +96,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer-event notification (Imsak/Sunrise)
 // ------------------------------------------------------------
-export async function testPrayerEventNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function testEventNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
 
@@ -116,7 +117,7 @@ export async function testPrayerEventNotification({ options, notifSettings, seco
                     sound: SOUNDS.alarm2,
                 },
                 android: {
-                    channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
@@ -177,7 +178,7 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
                     sound: SOUNDS.alarm1,
                 },
                 android: {
-                    channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
@@ -237,7 +238,7 @@ export async function testFridayNotification({ options, notifSettings, seconds =
                     offset: "0",
                 },
                 android: {
-                    channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
@@ -298,7 +299,7 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
                     offset: "0",
                 },
                 android: {
-                    channelId: `general-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
                     showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
