@@ -1,140 +1,74 @@
+import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
-import CounterCircle from "@/components/CounterCircle";
 import { useLanguageStore } from "@/store/languageStore";
-import { storage } from "@/store/storage";
+import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import { AppState, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
-// MMKV storage key
-const TESBIH_KEY = '@tesbih_key';
-
-export default function QiblaScreen() {
+export default function TesbihScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const isReady = useTesbihStore((s) => s.isReady);
+    const count = useTesbihStore((s) => s.count);
+    const totalCount = useTesbihStore((s) => s.totalCount);
+    const laps = useTesbihStore((s) => s.laps);
 
-    // Local state
-    const [count, setCount] = useState<number>(0);
-    const [totalCount, setTotalCount] = useState<number>(10);
-    const [laps, setLaps] = useState<number>(0);
+    // Calculate circle parameters
+    const size = 260;
+    const strokeWidth = 10;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
 
-    // ------------------------------------------------------------
-    // Load state from MMKV storage
-    // ------------------------------------------------------------
-    const loadState = () => {
-        try {
-            const saved = storage.getString(TESBIH_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                setCount(data.count || 0);
-                setTotalCount(data.totalCount || 10);
-                setLaps(data.laps || 0);
-            }
-        } catch (err) {
-            console.warn("⚠️ Failed to load tesbih state", err);
-        }
-    };
-
-    // ------------------------------------------------------------
-    // Load state on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        loadState();
-    }, []);
-
-    // ------------------------------------------------------------
-    // Save state when screen loses focus
-    // ------------------------------------------------------------
-    useFocusEffect(
-        useCallback(() => {
-            return () => saveState();
-        }, [count, totalCount, laps])
-    );
-
-    // ------------------------------------------------------------
-    // Save state when app goes to background
-    // ------------------------------------------------------------
-    useEffect(() => {
-        const subscription = AppState.addEventListener('change', (nextAppState) => {
-            if (nextAppState === 'background' || nextAppState === 'inactive') {
-                saveState();
-            }
-        });
-
-        return () => subscription.remove();
-    }, [count, totalCount, laps]);
-
-    // ------------------------------------------------------------
-    //  Save state to MMKV storage
-    // ------------------------------------------------------------
-    const saveState = () => {
-        try {
-            const data = {
-                count: count,
-                totalCount: totalCount,
-                laps: laps
-            };
-            storage.set(TESBIH_KEY, JSON.stringify(data));
-        } catch (err) {
-            console.warn("⚠️ Failed to save tesbih state", err);
-        }
-    };
+    // Progress goes from 0 → 1 as count increases
+    const progress = count / totalCount;
+    const strokeDashoffset = circumference * (1 - progress);
 
     // ------------------------------------------------------------
     // Handle press
     // ------------------------------------------------------------
     const handleCount = () => {
-        setCount(count + 1);
-    };
-
-    // ------------------------------------------------------------
-    // Auto-restart when reaching total
-    // ------------------------------------------------------------
-    const setCountReached = () => {
-        setLaps(prev => prev + 1)
-        setCount(0);
+        const countReachedTotal = useTesbihStore.getState().setCount();
+        if (countReachedTotal) {
+            Vibration.vibrate(300);
+        }
     };
 
     // ------------------------------------------------------------
     // Reset count to 0
     // ------------------------------------------------------------
     const handleReset = () => {
-        setCount(0);
-        setLaps(0);
         Vibration.vibrate(100);
+        useTesbihStore.getState().reset();
     };
 
     // ------------------------------------------------------------
     // Increment total count
     // ------------------------------------------------------------
     const incrementTotal = () => {
-        setTotalCount(prev => prev + 1);
-        setCount(0);
-        setLaps(0);
+        useTesbihStore.getState().incrementTotal();
     };
 
     // ------------------------------------------------------------
     // Decrement total count
     // ------------------------------------------------------------
     const decrementTotal = () => {
-        if (totalCount > 1) {
-            setTotalCount(prev => prev - 1);
-            setCount(0);
-            setLaps(0);
-        }
+        useTesbihStore.getState().decrementTotal();
     };
 
     // ------------------------------------------------------------
     // Set preset value
     // ------------------------------------------------------------
     const setPreset = (value: number) => {
-        setTotalCount(value);
-        setCount(0);
-        setLaps(0);
+        useTesbihStore.getState().setPreset(value);
     };
+
+    // Loading state
+    if (!isReady) {
+        return <AppLoading text={tr.labels.loading} />;
+    }
 
     return (
         <AppScreen>
@@ -182,17 +116,42 @@ export default function QiblaScreen() {
                     activeOpacity={0.6}
                     onPress={handleCount}
                 >
-                    <CounterCircle
-                        currentCount={count}
-                        totalCount={totalCount}
-                        onCountReached={setCountReached}
-                        size={260}
-                        strokeWidth={10}
-                        strokeColor={theme.divider}
-                        color={theme.primary}
-                        textColor={theme.text}
-                        vibrationDuration={500}
-                    />
+                    <View style={[styles.circleInnerContainer, { width: size, height: size }]}>
+                        <Svg width={size} height={size}>
+                            {/* Background Circle */}
+                            <Circle
+                                stroke={theme.divider}
+                                cx={size / 2}
+                                cy={size / 2}
+                                r={radius}
+                                strokeWidth={strokeWidth}
+                                fill="transparent"
+                            />
+                            {/* Progress Circle */}
+                            <Circle
+                                stroke={theme.primary}
+                                cx={size / 2}
+                                cy={size / 2}
+                                r={radius}
+                                strokeWidth={strokeWidth}
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
+                                strokeLinecap="round"
+                                transform={`rotate(-90 ${size / 2} ${size / 2})`}
+                                fill="transparent"
+                            />
+                        </Svg>
+
+                        {/* Counter Text */}
+                        <View style={styles.circleInnerSection}>
+                            <Text style={[styles.counterText, { color: theme.text }]}>
+                                <Text style={[styles.currentCount, { color: theme.primary }]}>
+                                    {count}
+                                </Text>
+                                /{totalCount}
+                            </Text>
+                        </View>
+                    </View>
                 </TouchableOpacity>
 
                 {/* Bottom Info Cards - Current and Limit */}
@@ -298,6 +257,26 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    circleInnerContainer: {
+        position: "relative",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 260,
+        borderRadius: 130,
+        backgroundColor: 'rgba(0,0,0,0.05)',
+    },
+    circleInnerSection: {
+        position: "absolute",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    counterText: {
+        fontSize: 48,
+        fontWeight: "300",
+    },
+    currentCount: {
+        fontWeight: "400",
     },
 
     // Bottom Info Bar (LAP + LIMIT)

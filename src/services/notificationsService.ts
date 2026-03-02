@@ -356,7 +356,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           type: 'special',
         },
         android: {
-          channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+          channelId: `nejonprayer-vib-off`,
           showTimestamp: true,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
@@ -427,7 +427,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             quoteIndex: i,
           },
           android: {
-            channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+            channelId: `nejonprayer-vib-off`,
             showTimestamp: true,
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,

@@ -180,7 +180,7 @@ export const TRANSLATIONS = {
             support: "Support Me",
             supportDesc: "Support the development",
             // Tesbih
-            tInstruction: "Tap the circle to count your Tasbeeh.",
+            tInstruction: "Tap the circle to count your Tasbeeh",
             tLap: "LAP",
             tLimit: "LIMIT",
             // Errors
@@ -404,7 +404,7 @@ export const TRANSLATIONS = {
             support: "Unterstützung",
             supportDesc: "Unterstütze die App-Entwicklung",
             // Tesbih
-            tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen.",
+            tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen",
             tLap: "RUNDE",
             tLimit: "LIMIT",
             // Errors
@@ -628,7 +628,7 @@ export const TRANSLATIONS = {
             support: "Mbështetje",
             supportDesc: "Ndihmo zhvillimin e aplikacionit",
             // Tesbih
-            tInstruction: "Shtyp rrethin për të numëruar tesbihen.",
+            tInstruction: "Shtyp rrethin për të numëruar tesbihen",
             tLap: "RAUNDI",
             tLimit: "LIMIT",
             // Errors
@@ -852,7 +852,7 @@ export const TRANSLATIONS = {
             support: "Destek",
             supportDesc: "Uygulama geliştirmeye yardım edin",
             // Tesbih
-            tInstruction: "Tesbih saymak için daireye dokunun.",
+            tInstruction: "Tesbih saymak için daireye dokunun",
             tLap: "TUR",
             tLimit: "LİMİT",
             // Errors
@@ -1074,7 +1074,7 @@ export const TRANSLATIONS = {
             support: "ادعمني",
             supportDesc: "ادعم تطوير التطبيق",
             // Tesbih
-            tInstruction: "اضغط على الدائرة لعدّ التسبيح.",
+            tInstruction: "اضغط على الدائرة لعدّ التسبيح",
             tLap: "دورة",
             tLimit: "الحد",
             // Errors

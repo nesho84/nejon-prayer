@@ -3,7 +3,7 @@ import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
 import QuranRow from "@/components/QuranRow";
 import { EDITION1, fetchAllSurahs, getSurahAudioUrl, Surah } from "@/services/quranService";
-import { setupTrackPlayer } from "@/services/trackPlayerSetup";
+import { setupTrackPlayer } from "@/services/trackPlayerService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +16,10 @@ export default function QuranScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
 
+    // TrackPlayer hooks
+    const { state } = usePlaybackState();
+    const progress = useProgress(1000);
+
     // Local state
     const [surahs, setSurahs] = useState<Surah[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -23,12 +27,9 @@ export default function QuranScreen() {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Sound preview state
-    const [activeSound, setActiveSound] = useState<number | null>(null);
+    const [activeSurahNumber, setActiveSurahNumber] = useState<number | null>(null);
+    const [activeSurahName, setActiveSurahName] = useState<string | null>(null);
     const [isSwitching, setIsSwitching] = useState<boolean>(false);
-
-    // TrackPlayer hooks
-    const { state } = usePlaybackState();
-    const progress = useProgress(1000);
 
     // Derived states
     const isPlaying = state === State.Playing;
@@ -43,7 +44,6 @@ export default function QuranScreen() {
 
     // ------------------------------------------------------------
     // Load surahs from API
-    // Can be called on mount or manually (retry button)
     // ------------------------------------------------------------
     const fetchSurahs = async () => {
         if (!isFetchMountedRef.current) return;
@@ -90,18 +90,19 @@ export default function QuranScreen() {
             // Setup TrackPlayer once on mount
             await setupTrackPlayer();
 
-            // Sync active track (handles case when user starts audio, leaves app, then comes back)
+            // Sync active track (case: start audio, leave app, then comes back)
             const currentTrack = await TrackPlayer.getActiveTrack();
             if (currentTrack) {
                 const surahNumber = parseInt(currentTrack.id.replace('surah-', ''));
-                setActiveSound(surahNumber);
+                setActiveSurahNumber(surahNumber);
+                setActiveSurahName(currentTrack.title ?? null);
             }
         };
         setupAndSync();
     }, []);
 
     // ------------------------------------------------------------
-    // Clear switching flag when new audio starts
+    // Set switching state to false once playback starts or buffers
     // ------------------------------------------------------------
     useEffect(() => {
         if (isPlaying) {
@@ -112,11 +113,11 @@ export default function QuranScreen() {
     // ------------------------------------------------------------
     // Play/Pause/Replay handler
     // ------------------------------------------------------------
-    const handlePlayPause = useCallback(async (surah: Surah) => {
+    const handlePlayPauseReplay = useCallback(async (surah: Surah) => {
         const currentTrack = await TrackPlayer.getActiveTrack();
-        if (currentTrack && activeSound === surah.number) {
+        if (currentTrack && activeSurahNumber === surah.number) {
             if (hasFinished) {
-                // replay from start
+                // replay
                 await TrackPlayer.seekTo(0);
                 await TrackPlayer.play();
             } else if (isPlaying) {
@@ -128,10 +129,11 @@ export default function QuranScreen() {
         }
 
         // New Surah → stop and load new track
-        setActiveSound(surah.number);
+        setActiveSurahNumber(surah.number);
+        setActiveSurahName(surah.englishName);
         setIsSwitching(true);
 
-        // reset before adding new track
+        // Reset/Clear the foreground/live notification
         await TrackPlayer.reset();
 
         // Add new track and play
@@ -144,7 +146,23 @@ export default function QuranScreen() {
             isLiveStream: false,
         });
         await TrackPlayer.play();
-    }, [activeSound, isPlaying]);
+    }, [activeSurahNumber, isPlaying]);
+
+    // ------------------------------------------------------------
+    // Stop handler
+    // ------------------------------------------------------------
+    const handleStop = useCallback(async (surah: Surah) => {
+        if (activeSurahNumber === surah.number) {
+            await TrackPlayer.stop();
+
+            setActiveSurahNumber(null);
+            setActiveSurahName(null);
+            setIsSwitching(false);
+
+            // Reset/Clear the foreground/live notification
+            await TrackPlayer.reset();
+        }
+    }, [activeSurahNumber]);
 
     // ------------------------------------------------------------
     // Filter surahs locally — no extra API call
@@ -163,22 +181,33 @@ export default function QuranScreen() {
     // Render each surah row
     // ------------------------------------------------------------
     const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
-        const isThisActive = activeSound === item.number;
+        const isThisActive = activeSurahNumber === item.number;
         return (
             <QuranRow
                 surah={item}
                 theme={theme}
-                activeSound={activeSound}
-                // Only active row receives changing values (Important optimization for FlatList)
+                activeSurahNumber={activeSurahNumber}
+                // Only active row receives changed values
                 isPlaying={isThisActive && isPlaying}
                 isBuffering={isThisActive && isBuffering}
                 hasFinished={isThisActive && hasFinished}
                 currentProgress={isThisActive ? currentTime : 0}
                 totalDuration={isThisActive ? duration : 0}
-                onPlayPause={(surah) => handlePlayPause(surah)}
+                onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
+                onStop={(surah) => handleStop(surah)}
             />
         );
-    }, [activeSound, isPlaying, isBuffering, hasFinished, currentTime, duration, theme, handlePlayPause]);
+    }, [
+        activeSurahNumber,
+        isPlaying,
+        isBuffering,
+        hasFinished,
+        currentTime,
+        duration,
+        theme,
+        handlePlayPauseReplay,
+        handleStop
+    ]);
 
     // Loading state
     if (isLoading) {
@@ -233,7 +262,7 @@ export default function QuranScreen() {
                     maxToRenderPerBatch={10}
                     windowSize={7}
                     removeClippedSubviews={true}
-                    onScrollBeginDrag={() => textInputRef.current?.blur()}
+                    onMomentumScrollBegin={() => textInputRef.current?.blur()}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Text style={[styles.emptyText, { color: theme.placeholder }]}>

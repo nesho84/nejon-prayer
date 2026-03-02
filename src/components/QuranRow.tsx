@@ -7,40 +7,43 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 interface QuranRowProps {
   surah: Surah;
   theme: any;
-  activeSound: number | null;
+  activeSurahNumber: number | null;
   isPlaying: boolean;
   isBuffering: boolean;
   hasFinished: boolean;
   currentProgress: number;
   totalDuration: number;
-  onPlayPause: (surah: Surah) => void;
+  onPlayPauseReplay: (surah: Surah) => void;
+  onStop: (surah: Surah) => void;
 }
 
 // Main Conponent (memoized for FlatList performance)
 const QuranRow = React.memo(({
   surah,
   theme,
-  activeSound,
+  activeSurahNumber,
   isPlaying,
   isBuffering,
   hasFinished,
   currentProgress,
   totalDuration,
-  onPlayPause
+  onPlayPauseReplay,
+  onStop,
 }: QuranRowProps) => {
-  // Button and progress bar states
-  const isThisActive = activeSound === surah.number;
+  // Local state
+  const isThisActive = activeSurahNumber === surah.number;
   const isThisPlaying = isThisActive && isPlaying;
   const isThisBuffering = isThisActive && isBuffering;
   const showReplay = isThisActive && hasFinished;
+  const showStop = isThisActive && !isBuffering;
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
   return (
     <AppCard style={[styles.quranCard, { backgroundColor: theme.card }]}>
-      <View style={styles.quranRow}>
+      <View style={styles.innerContainer}>
         {/* Left: Number badge */}
-        <View style={[styles.numberBadge, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 1 }]}>
-          <Text style={[styles.numberText, { color: theme.accent }]}>
+        <View style={[styles.badgeNumber, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 0 }]}>
+          <Text style={[styles.badgeNumberText, { color: theme.accent }]}>
             {surah.number}
           </Text>
         </View>
@@ -67,24 +70,43 @@ const QuranRow = React.memo(({
           )}
         </View>
 
-        {/* Right: Play/Stop/Replay button */}
-        <TouchableOpacity
-          style={styles.playButton}
-          onPress={() => onPlayPause(surah)}
-          disabled={isThisBuffering}
-        >
-          {isThisBuffering ? (
-            <ActivityIndicator size="small" color={theme.accent} />
-          ) : (
-            <Ionicons
-              name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
-              size={34}
-              color={isThisActive ? theme.accent : theme.text2}
-            />
+        {/* Right: player buttons */}
+        <View style={styles.playerButtonsContainer}>
+          {/* Stop button */}
+          {showStop && (
+            <TouchableOpacity
+              style={styles.playerButton}
+              onPress={() => onStop(surah)}
+              disabled={isThisBuffering}
+            >
+              <Ionicons
+                name={"stop-circle"}
+                size={34}
+                color={isThisActive ? theme.danger : theme.text2}
+              />
+            </TouchableOpacity>
           )}
-        </TouchableOpacity>
+
+          {/* Play/Pause/Replay buttons */}
+          <TouchableOpacity
+            style={[styles.playerButton, { marginRight: -5 }]}
+            onPress={() => onPlayPauseReplay(surah)}
+            disabled={isThisBuffering}
+          >
+            {isThisBuffering ? (
+              <ActivityIndicator size="small" color={theme.accent} />
+            ) : (
+              <Ionicons
+                name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
+                size={34}
+                color={isThisActive ? theme.accent : theme.text2}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+
       </View>
-    </AppCard>
+    </AppCard >
   );
 });
 
@@ -94,19 +116,19 @@ const styles = StyleSheet.create({
   quranCard: {
     padding: 12,
   },
-  quranRow: {
+  innerContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  numberBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+  badgeNumber: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
   },
-  numberText: {
+  badgeNumberText: {
     fontSize: 13,
     fontWeight: "700",
   },
@@ -138,7 +160,12 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
   },
-  playButton: {
+  playerButtonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  playerButton: {
     width: 40,
     height: 40,
     alignItems: "center",

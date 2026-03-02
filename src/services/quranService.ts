@@ -15,12 +15,6 @@ interface RawSurah {
   revelationType: string;
 }
 
-interface AyahResponse {
-  data: {
-    ayahs: Array<{ text: string }>;
-  };
-}
-
 interface SurahListResponse {
   data: RawSurah[];
 }

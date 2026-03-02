@@ -2,6 +2,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
@@ -21,6 +22,8 @@ export default function TabLayout() {
                 tabBarInactiveTintColor: theme.tabInactive,
                 tabBarStyle: {
                     backgroundColor: theme.bg,
+                    borderTopWidth: StyleSheet.hairlineWidth,
+                    borderTopColor: theme.border,
                     height: insets.bottom + 55,
                     elevation: 0,
                 },
