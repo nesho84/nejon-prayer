@@ -5,7 +5,6 @@ import { getPrayerTimes } from "@/services/prayersService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useThemeStore } from "@/store/themeStore";
-import { AppLocation } from "@/types/location.types";
 import { PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -23,11 +22,34 @@ export default function PrayersSettingsScreen() {
     // Local state
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [prayerTimesByDate, setPrayerTimesByDate] = useState<PrayerTimes | null>(null);
-    const [isLoadingDatePrayers, setIsLoadingDatePrayers] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     // Refs
     const ModalSheetRef = useRef<ModalSheetRef>(null);
+
+    // ------------------------------------------------------------
+    // Fetch prayer times by date
+    // ------------------------------------------------------------
+    const fetchPrayerTimesForDate = async (date: Date) => {
+        if (!location) return;
+
+        setIsLoading(true);
+        try {
+            // Compute today's timestamp in user's local timezone
+            const localDate = new Date(date);
+            localDate.setHours(0, 0, 0, 0);
+            const timestamp = Math.floor(localDate.getTime() / 1000);
+
+            const times = await getPrayerTimes(location, timestamp);
+            setPrayerTimesByDate(times);
+        } catch (err) {
+            console.warn("⚠️ [prayerTimings] Failed to fetch prayer times from API:", err);
+            setPrayerTimesByDate(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // ------------------------------------------------------------
     // When date changes (arrows or picker)
@@ -37,25 +59,6 @@ export default function PrayersSettingsScreen() {
             fetchPrayerTimesForDate(selectedDate);
         }
     }, [selectedDate, location]);
-
-    // ------------------------------------------------------------
-    // Fetch prayer times by date
-    // ------------------------------------------------------------
-    const fetchPrayerTimesForDate = async (date: Date) => {
-        if (!location) return;
-
-        setIsLoadingDatePrayers(true);
-        try {
-            const timestamp = Math.floor(date.getTime() / 1000);
-            const times = await getPrayerTimes(location as AppLocation, timestamp);
-            setPrayerTimesByDate(times);
-        } catch (err) {
-            console.warn("⚠️ [prayerTimings] Failed to fetch prayer times from API:", err);
-            setPrayerTimesByDate(null);
-        } finally {
-            setIsLoadingDatePrayers(false);
-        }
-    };
 
     // ------------------------------------------------------------
     // Change date by offset
@@ -261,7 +264,7 @@ export default function PrayersSettingsScreen() {
 
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
-                        {isLoadingDatePrayers ? (
+                        {isLoading ? (
                             <View style={styles.loadingContainer}>
                                 <AppLoading inline={true} text={tr.labels.loading} style={{ backgroundColor: 'transparent' }} />
                             </View>

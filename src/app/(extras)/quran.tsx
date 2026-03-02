@@ -146,7 +146,7 @@ export default function QuranScreen() {
             isLiveStream: false,
         });
         await TrackPlayer.play();
-    }, [activeSurahNumber, isPlaying]);
+    }, [activeSurahNumber, isPlaying, hasFinished]);
 
     // ------------------------------------------------------------
     // Stop handler

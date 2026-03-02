@@ -11,6 +11,10 @@ interface AladhanResponse {
     };
 }
 
+/**
+ * @param customTimestamp - Unix timestamp in seconds, normalized to local midnight
+ *                          in the user's timezone. Use Math.floor(localDate.getTime() / 1000).
+ */
 // ------------------------------------------------------------
 // Fetch prayer times from aladhan.com API
 // ------------------------------------------------------------
@@ -24,19 +28,16 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
     }
 
     try {
-        // Use custom timestamp if provided, otherwise compute today's
         let timestamp: number;
 
-        if (customTimestamp) {
+        // Use provided customTimestamp
+        if (customTimestamp !== undefined) {
             timestamp = customTimestamp;
         } else {
             // Compute today's timestamp in user's local timezone
-            const now = new Date();
-            // Determine timezone dynamically
-            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const localToday = new Date(now.toLocaleString("en-US", { timeZone: tz }));
-            localToday.setHours(0, 0, 0, 0);
-            timestamp = Math.floor(localToday.getTime() / 1000);
+            const localDate = new Date();
+            localDate.setHours(0, 0, 0, 0);
+            timestamp = Math.floor(localDate.getTime() / 1000);
         }
 
         // Dynamically choose calculation method based on latitude
