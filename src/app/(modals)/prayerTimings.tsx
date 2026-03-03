@@ -172,9 +172,8 @@ export default function PrayersSettingsScreen() {
     // Main Content
     return (
         <ModalSheet
-            style={{ backgroundColor: theme.bg2 }}
             ref={ModalSheetRef}
-            modalHeight="78%"
+            colors={{ sheetBackgroundColor: theme.bg2 }}
             footer={<FixedFooter />}
         >
 
@@ -329,6 +328,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         paddingHorizontal: 8,
+        paddingTop: 12,
         paddingBottom: 14,
         gap: 14,
     },

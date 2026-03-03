@@ -1,7 +1,7 @@
 export const LIGHT_COLORS = {
     // Background layers
     bg: "#ffffff",
-    bg2: "#f9fafb",
+    bg2: "#d6dadd",
     bg3: "#f3f4f6",
 
     // Text colors
