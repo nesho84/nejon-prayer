@@ -1,7 +1,7 @@
 export const LIGHT_COLORS = {
     // Background layers
-    bg: "#ffffff",
-    bg2: "#d6dadd",
+    bg: "#fafafa",
+    bg2: "#f8faf8",
     bg3: "#f3f4f6",
 
     // Text colors
@@ -28,6 +28,8 @@ export const LIGHT_COLORS = {
     border: "#e5e7eb",
     divider: "#d1d5db",
     divider2: "#dde0e6ff",
+    handle: "#c6c6c6",
+    statusbar: "#e6e6e6",
     placeholder: "#9ca3af",
 
     // Tabs
@@ -49,7 +51,7 @@ export const LIGHT_COLORS = {
 export const DARK_COLORS = {
     // Background layers
     bg: "#121212",
-    bg2: "#1e1e1e",
+    bg2: "#1d1d1d",
     bg3: "#2a2a2a",
 
     // Text colors
@@ -76,6 +78,8 @@ export const DARK_COLORS = {
     border: "#374151",
     divider: "#4b5563",
     divider2: "#2f3d50ff",
+    handle: "#5d5d5d",
+    statusbar: "transparent",
     placeholder: "#6b7280",
 
     // Tabs

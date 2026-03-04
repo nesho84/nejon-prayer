@@ -219,9 +219,11 @@ export default function HomeScreen() {
                 <AppCard style={styles.prayersCard}>
                     {/* Prayers Date Header */}
                     <TouchableOpacity
+                        style={styles.prayersDateHeader}
+                        delayPressIn={0}
+                        delayPressOut={0}
                         activeOpacity={0.3}
                         onPress={() => router.push('/prayerTimings')}
-                        style={styles.prayersDateHeader}
                     >
                         {/* Calendar left icon */}
                         <View style={styles.calendarLeftIcon}>
@@ -262,6 +264,8 @@ export default function HomeScreen() {
                                 <View key={prayerName}>
                                     {/* Prayer row */}
                                     <TouchableOpacity
+                                        delayPressIn={0}
+                                        delayPressOut={0}
                                         activeOpacity={0.3}
                                         onPress={() => {
                                             router.push(`/prayerNotification?prayer=${prayerName}`);

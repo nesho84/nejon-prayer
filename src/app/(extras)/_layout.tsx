@@ -18,7 +18,7 @@ export default function ExtrasLayout() {
                 name="abdesi"
                 options={{
                     title: tr.labels.abdes,
-                    headerShown: true
+                    headerShown: true,
                 }}
             />
             <Stack.Screen
@@ -32,21 +32,21 @@ export default function ExtrasLayout() {
                 name="tesbih"
                 options={{
                     title: tr.labels.tesbih,
-                    headerShown: true
+                    headerShown: true,
                 }}
             />
             <Stack.Screen
                 name="quran"
                 options={{
                     title: tr.labels.quran,
-                    headerShown: true
+                    headerShown: true,
                 }}
             />
             <Stack.Screen
                 name="ramazani"
                 options={{
                     title: tr.labels.ramadan,
-                    headerShown: true
+                    headerShown: true,
                 }}
             />
             <Stack.Screen

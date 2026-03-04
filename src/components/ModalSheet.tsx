@@ -43,17 +43,17 @@ const ANIMATION_DURATION = 250;
 const SNAP_BACK_DURATION = 150;
 
 const SHEET_BACKGROUND = '#fafafa';
-const HEADER_BAR_BORDER_COLOR = '#37383a';
-const HANDLE_COLOR = '#80868b';
-const CLOSE_ICON_COLOR = '#80868b';
+const HEADER_BAR_BORDER_COLOR = 'transparent';
+const HANDLE_COLOR = '#5D5D5D';
+const CLOSE_ICON_COLOR = '#5D5D5D';
 
 const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   children,
   style,
-  colors = {},
+  colors,
   staticMode,
   scrolling = true,
-  closeIcon = false,
+  closeIcon,
   header,
   footer,
   onClose
@@ -63,7 +63,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   const { height } = useWindowDimensions();
 
   const translateY = useSharedValue(0);
-  const context = useSharedValue({ y: 0 });
+  const backdropOpacity = useSharedValue(0);
   const keyboardHeight = useSharedValue(0);
 
   // ------------------------------------------------------------
@@ -78,8 +78,11 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   // Animate sheet off screen then close
   // ------------------------------------------------------------
   const animatedClose = useCallback(() => {
-    translateY.value = withTiming(height, { duration: ANIMATION_DURATION }, (finished) => {
-      if (finished) scheduleOnRN(handleClose);
+    translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
+    backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
+      if (finished) {
+        scheduleOnRN(handleClose);
+      }
     });
   }, [height, handleClose]);
 
@@ -95,6 +98,16 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
       animatedClose();
     }
   }), [animatedClose, staticMode]);
+
+  // ------------------------------------------------------------
+  // Delays backdrop fade-in to sync with the navigator slide animation
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const t = setTimeout(() => {
+      backdropOpacity.value = withTiming(1, { duration: ANIMATION_DURATION });
+    }, 550); // Delay to match the slide_from_bottom animation
+    return () => clearTimeout(t);
+  }, []);
 
   // ------------------------------------------------------------
   // Android hardware back button — blocked silently in staticMode
@@ -134,17 +147,15 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   // ------------------------------------------------------------
   const gesture = Gesture.Pan()
     .enabled(!staticMode)
-    .onStart(() => {
-      context.value = { y: translateY.value };
-    })
     .onUpdate((event) => {
-      const newY = event.translationY + context.value.y;
-      if (newY > 0) translateY.value = newY; // only allow dragging down
+      // only allow dragging down
+      if (event.translationY > 0) translateY.value = event.translationY;
     })
     .onEnd((event) => {
       if (event.translationY > height / 2 || event.velocityY > 1000) {
         // Past midpoint or fast flick → close
-        translateY.value = withTiming(height, { duration: ANIMATION_DURATION }, (finished) => {
+        translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
+        backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
           if (finished) scheduleOnRN(handleClose);
         });
       } else {
@@ -158,6 +169,11 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
     transform: [{ translateY: translateY.value }],
   }));
 
+  // Drives the backdrop opacity on the UI thread
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: backdropOpacity.value,
+  }));
+
   // Keyboard offset applied to content area only, not the whole modal
   const keyboardStyle = useAnimatedStyle(() => ({
     // insets.bottom is added to content padding, subtract it here to avoid double-padding when keyboard is open
@@ -165,82 +181,101 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   }));
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + 12, // easier to grab the handle
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
-        },
-        animatedStyle,
-      ]}
-    >
-      {/* Sheet — rounded top corners + overflow clipping */}
-      <View style={[styles.innerContainer, style, { backgroundColor: colors.sheetBackgroundColor ?? SHEET_BACKGROUND }]}>
+    <View style={styles.root}>
 
-        {/* Draggable header: handle pill + title/close row */}
-        <GestureDetector gesture={gesture}>
-          <View style={[styles.headerBarContainer, { borderBottomColor: colors.headerBarBorderColor ?? HEADER_BAR_BORDER_COLOR }]}>
-            {/* Drag handle pill */}
-            <View style={[styles.handleIcon, { backgroundColor: colors.handleColor ?? HANDLE_COLOR }]} />
+      {/* Backdrop */}
+      <Animated.View
+        style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
+        pointerEvents="none"
+      />
 
-            {/* Close icon/button */}
-            {!staticMode && closeIcon && (
-              <Pressable onPress={animatedClose} style={styles.closeIcon} hitSlop={12}>
-                <Ionicons name='close' size={22} color={colors.closeIconColor ?? CLOSE_ICON_COLOR} />
-              </Pressable>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top + 12, // easier to grab the handle
+            paddingBottom: insets.bottom,
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+          },
+          animatedStyle,
+        ]}
+      >
+
+        {/* Inner: clips content to rounded corners */}
+        <View style={[styles.innerContainer, { backgroundColor: colors?.sheetBackgroundColor ?? SHEET_BACKGROUND }]}>
+
+          {/* Draggable header: handle pill + title/close row */}
+          <GestureDetector gesture={gesture}>
+            <View style={[styles.headerBarContainer, { borderBottomColor: colors?.headerBarBorderColor ?? HEADER_BAR_BORDER_COLOR }]}>
+              {/* Drag handle pill */}
+              <View style={[styles.handleIcon, { backgroundColor: colors?.handleColor ?? HANDLE_COLOR }]} />
+
+              {/* Optional: Close icon/button */}
+              {!staticMode && closeIcon && (
+                <Pressable onPress={animatedClose} style={styles.closeIcon} hitSlop={12}>
+                  <Ionicons name='close' size={24} color={colors?.closeIconColor ?? CLOSE_ICON_COLOR} />
+                </Pressable>
+              )}
+            </View>
+          </GestureDetector>
+
+          {/* Optional fixed header slot (unchanged from original) */}
+          {header && <View>{header}</View>}
+
+          {/* Scrollable/static content — keyboard padding lives here */}
+          <Animated.View style={[styles.content, style, keyboardStyle]}>
+            {scrolling ? (
+              <ScrollView
+                contentContainerStyle={{ flexGrow: 1 }}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled={true}
+              >
+                {children}
+              </ScrollView>
+            ) : (
+              children
             )}
-          </View>
-        </GestureDetector>
+          </Animated.View>
 
-        {/* Optional fixed header slot (unchanged from original) */}
-        {header && <View>{header}</View>}
+          {/* Optional fixed footer slot (unchanged from original) */}
+          {footer && <View>{footer}</View>}
 
-        {/* Scrollable/static content — keyboard padding lives here */}
-        <Animated.View style={[styles.content, keyboardStyle]}>
-          {scrolling ? (
-            <ScrollView
-              contentContainerStyle={{ flexGrow: 1 }}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              keyboardShouldPersistTaps="handled"
-              nestedScrollEnabled={true}
-            >
-              {children}
-            </ScrollView>
-          ) : (
-            children
-          )}
-        </Animated.View>
+        </View>
+      </Animated.View>
 
-        {/* Optional fixed footer slot (unchanged from original) */}
-        {footer && <View>{footer}</View>}
-
-      </View>
-    </Animated.View>
+    </View>
   );
 });
 
 export default ModalSheet;
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
   innerContainer: {
     flex: 1,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
     overflow: 'hidden',
+    shadowColor: '#121212',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 12,
   },
 
   headerBarContainer: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
-    paddingTop: 12,
-    paddingBottom: 22,
+    paddingTop: 10,
+    paddingBottom: 16,
   },
   handleIcon: {
     width: 40,
@@ -249,7 +284,7 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     position: 'absolute',
-    top: 8,
+    top: 2,
     right: 16,
   },
 
