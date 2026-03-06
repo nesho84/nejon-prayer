@@ -9,7 +9,7 @@ interface QuranRowProps {
   theme: any;
   activeSurahNumber: number | null;
   isPlaying: boolean;
-  isBuffering: boolean;
+  isBufferingActive: boolean;
   hasFinished: boolean;
   currentProgress: number;
   totalDuration: number;
@@ -23,7 +23,7 @@ const QuranRow = React.memo(({
   theme,
   activeSurahNumber,
   isPlaying,
-  isBuffering,
+  isBufferingActive,
   hasFinished,
   currentProgress,
   totalDuration,
@@ -33,9 +33,9 @@ const QuranRow = React.memo(({
   // Local state
   const isThisActive = activeSurahNumber === surah.number;
   const isThisPlaying = isThisActive && isPlaying;
-  const isThisBuffering = isThisActive && isBuffering;
+  const isThisBuffering = isThisActive && isBufferingActive;
   const showReplay = isThisActive && hasFinished;
-  const showStop = isThisActive && !isBuffering;
+  const showStop = isThisActive && !isBufferingActive;
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
   return (

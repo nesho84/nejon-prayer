@@ -17,7 +17,7 @@ export default function TesbihScreen() {
     const laps = useTesbihStore((s) => s.laps);
 
     // Calculate circle parameters
-    const size = 260;
+    const size = 315;
     const strokeWidth = 10;
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
@@ -257,12 +257,12 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
     },
     circleInnerContainer: {
         position: "relative",
         alignItems: "center",
         justifyContent: "center",
-        width: 260,
         borderRadius: 130,
         backgroundColor: 'rgba(0,0,0,0.05)',
     },

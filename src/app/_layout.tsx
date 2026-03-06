@@ -1,6 +1,7 @@
 import AppLoading from "@/components/AppLoading";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
+import { useQuranPlayer } from "@/hooks/useQuranPlayer";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { Stack } from "expo-router";
@@ -38,10 +39,11 @@ const RootStack = () => {
 }
 
 export default function RootLayout() {
-  // Sync system theme, device settings, and notifications
+  // Initialization and global sync hooks
   useSystemThemeSync();
   useDeviceSettingsSync();
   useNotificationsSync();
+  useQuranPlayer();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

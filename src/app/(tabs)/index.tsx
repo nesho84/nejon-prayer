@@ -3,7 +3,8 @@ import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CountdownCircle from "@/components/CountdownCircle";
-import QuoteCarousel from "@/components/QuoteCarousel";
+import QuotesCarousel from "@/components/QuotesCarousel";
+import QuranPlayer from "@/components/QuranPlayer";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -210,9 +211,12 @@ export default function HomeScreen() {
                     )}
                 </AppCard>
 
+                {/* @TODO: still working.... */}
+                <QuranPlayer />
+
                 {/* 3. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
-                    <QuoteCarousel language={language} />
+                    <QuotesCarousel language={language} />
                 </AppCard>
 
                 {/* 4. PRAYERS CARD */}
@@ -223,13 +227,14 @@ export default function HomeScreen() {
                         delayPressIn={0}
                         delayPressOut={0}
                         activeOpacity={0.3}
-                        onPress={() => router.push('/prayerTimings')}
+                        disabled={!prayerTimes}
+                        onPress={() => router.navigate('/prayerTimings')}
                     >
-                        {/* Calendar left icon */}
+                        {/* Left: Calendar icon */}
                         <View style={styles.calendarLeftIcon}>
                             <Ionicons name="calendar-outline" size={22} color={theme.text} style={{ opacity: 0.6 }} />
                         </View>
-                        {/* Date & Timezone Container */}
+                        {/* Center: Date & Timezone Container */}
                         <View style={styles.dateContainer}>
                             <Text style={[styles.dateHeaderText, { color: theme.text }]}>
                                 {new Date().toLocaleDateString(tr.labels.localeDate, {
@@ -243,7 +248,7 @@ export default function HomeScreen() {
                                 {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
                             </Text>
                         </View>
-                        {/* Chevron right icon */}
+                        {/* Right: Chevron icon */}
                         <View style={styles.chevronRightIcon}>
                             <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.6 }} />
                         </View>
@@ -268,7 +273,7 @@ export default function HomeScreen() {
                                         delayPressOut={0}
                                         activeOpacity={0.3}
                                         onPress={() => {
-                                            router.push(`/prayerNotification?prayer=${prayerName}`);
+                                            router.navigate(`/prayerNotification?prayer=${prayerName}`);
                                         }}
                                     >
                                         <View

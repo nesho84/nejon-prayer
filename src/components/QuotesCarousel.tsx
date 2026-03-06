@@ -1,9 +1,9 @@
-import { useState, useMemo, useRef } from "react";
-import { FlatList, Text, View, StyleSheet, NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { QUOTES } from "@/constants/quotes";
-import { Language } from "@/types/language.types";
 import { useThemeStore } from "@/store/themeStore";
+import { Language } from "@/types/language.types";
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useRef, useState } from "react";
+import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 
 interface Props {
     language: Language;
@@ -13,7 +13,7 @@ const MAX_QUOTES = 5;
 const PEEK = 12; // small visible edge of next/previous card
 const SPACING = 8; // space between cards
 
-export default function QuoteCarousel({ language }: Props) {
+export default function QuotesCarousel({ language }: Props) {
     // Stores
     const theme = useThemeStore((state) => state.theme);
 
