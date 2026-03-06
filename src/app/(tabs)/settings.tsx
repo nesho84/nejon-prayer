@@ -36,8 +36,8 @@ export default function SettingsScreen() {
     const themeMode = useThemeStore((state) => state.themeMode);
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
-    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
+    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
     const batteryOptimization = useDeviceSettingsStore((state) => state.batteryOptimization);
     const alarmPermission = useDeviceSettingsStore((state) => state.alarmPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
@@ -272,22 +272,22 @@ export default function SettingsScreen() {
     };
 
     // ------------------------------------------------------------
-    // Open Alarm & reminders settings
+    // Open Battery settings
     // ------------------------------------------------------------
-    const openAlarmPermissionSettings = async () => {
+    const openBatteryOptimizationSettings = async () => {
         if (Platform.OS === "android") {
-            await notifee.openAlarmPermissionSettings();
+            await notifee.openBatteryOptimizationSettings();
         } else {
             Linking.openSettings();
         }
     };
 
     // ------------------------------------------------------------
-    // Open Battery settings
+    // Open Alarm & reminders settings
     // ------------------------------------------------------------
-    const openBatteryOptimizationSettings = async () => {
+    const openAlarmPermissionSettings = async () => {
         if (Platform.OS === "android") {
-            await notifee.openBatteryOptimizationSettings();
+            await notifee.openAlarmPermissionSettings();
         } else {
             Linking.openSettings();
         }
@@ -600,7 +600,8 @@ export default function SettingsScreen() {
                             {batteryOptimization &&
                                 <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
                                     {tr.labels.batteryOptBody}
-                                </Text>}
+                                </Text>
+                            }
 
                             {/* ------ Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) ------ */}
                             {(!alarmPermission && batteryOptimization) &&

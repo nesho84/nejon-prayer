@@ -46,27 +46,25 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     sound: SOUNDS.azan1_short, // Default sound for test
                 },
                 android: {
-                    // (is created in notificationsService.js)
+                    // (Channel is created in notificationsService.js)
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
-                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
                     color: AndroidColor.OLIVE,
-                    pressAction: { id: "default", launchActivity: "default" },
+                    style: { type: AndroidStyle.INBOX, lines: ["Koha për namaz. (06:15)"] },
                     actions: [
                         { title: "Në rregull", pressAction: { id: "dismiss" } },
                         { title: "Më kujto më vonë", pressAction: { id: "snooze" } },
                     ],
-                    style: {
-                        type: AndroidStyle.INBOX,
-                        lines: ["Koha për namaz. (06:15)"],
-                    },
+                    pressAction: { id: "default", launchActivity: "default" },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
                     categoryId: "prayer-category",
-                    critical: false,
                     interruptionLevel: "active",
                 },
             },
@@ -74,6 +72,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
                 alarmManager: options.hasAlarm,
+                // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
 
@@ -99,7 +98,6 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
 export async function testEventNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
         const eventName = 'Imsak';
         const body = `It is now time for (${eventName}) 04:52`;
 
@@ -107,34 +105,27 @@ export async function testEventNotification({ options, notifSettings, seconds = 
             {
                 id: "event-test",
                 title: `» ${eventName} «`,
-                body,
+                body: body,
                 data: {
                     type: "prayer-event",
-                    event: eventName,
                     volume: String(notifSettings?.volume ?? 1.0),
-                    vibration: notifSettings?.vibration ?? 'on',
-                    snooze: String(notifSettings?.snooze ?? 5),
                     sound: SOUNDS.alarm2,
                 },
                 android: {
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
-                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
+                    style: { type: AndroidStyle.INBOX, lines: [body] },
+                    actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    actions: [
-                        { title: "OK", pressAction: { id: "OK" } },
-                    ],
-                    style: {
-                        type: AndroidStyle.INBOX,
-                        lines: [body],
-                    },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
                     categoryId: "event-category",
-                    critical: false,
                     interruptionLevel: "active",
                 },
             },
@@ -142,6 +133,7 @@ export async function testEventNotification({ options, notifSettings, seconds = 
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
                 alarmManager: options.hasAlarm,
+                // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
 
@@ -158,44 +150,34 @@ export async function testEventNotification({ options, notifSettings, seconds = 
 export async function testPrayerReminderNotification({ options, notifSettings = null, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
         const title = "» Sabahu «";
         const body = "Kujtesë Lutjeje";
 
         await notifee.createTriggerNotification(
             {
                 id: `reminder-test-${Date.now()}`,
-                title,
-                body,
+                title: title,
+                body: body,
                 data: {
                     type: "prayer-reminder",
-                    prayer: "Fajr",
-                    language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
-                    vibration: notifSettings?.vibration ?? 'on',
-                    snooze: String(notifSettings?.snooze ?? 5),
-                    offset: "0",
                     sound: SOUNDS.alarm1,
                 },
                 android: {
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
-                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
+                    style: { type: AndroidStyle.INBOX, lines: [body] },
+                    actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    actions: [
-                        { title: "OK", pressAction: { id: "OK" } },
-                    ],
-                    style: {
-                        type: AndroidStyle.INBOX,
-                        lines: [body],
-                    },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
                     categoryId: "prayer-reminder-category",
-                    critical: false,
                     interruptionLevel: "active",
                 },
             },
@@ -219,42 +201,32 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
 export async function testFridayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
-
         const title = "Jumu'ah Reminder";
         const body = "Today is Jumu‘ah. Make time for prayer.";
 
         await notifee.createTriggerNotification(
             {
                 id: `special-friday-test-${Date.now()}`,
-                title,
-                body,
+                title: title,
+                body: body,
                 data: {
                     type: "special",
-                    specialType: "Friday",
-                    language: options?.language ?? 'en',
-                    volume: String(notifSettings?.volume ?? 1.0),
-                    snooze: String(notifSettings?.snooze ?? 5),
-                    offset: "0",
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,
-                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
+                    style: { type: AndroidStyle.INBOX, lines: [body] },
+                    actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    actions: [
-                        { title: "OK", pressAction: { id: "OK" } },
-                    ],
-                    style: {
-                        type: AndroidStyle.INBOX,
-                        lines: [body],
-                    },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
                     categoryId: "special-category",
-                    critical: false,
                     interruptionLevel: "active",
                 },
             },
@@ -262,6 +234,7 @@ export async function testFridayNotification({ options, notifSettings, seconds =
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
                 alarmManager: options.hasAlarm,
+                // repeatFrequency: RepeatFrequency.WEEKLY,
             }
         );
 
@@ -285,36 +258,27 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
         await notifee.createTriggerNotification(
             {
                 id: "special-daily-quote-test",
-                title,
-                body,
+                title: title,
+                body: body,
                 data: {
                     type: "special",
-                    specialType: "DailyQuote",
                     quoteIndex: 0,
-                    language: options?.language ?? 'en',
-                    volume: String(notifSettings?.volume ?? 1.0),
-                    snooze: String(notifSettings?.snooze ?? 5),
-                    offset: "0",
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,
-                    showTimestamp: true,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
+                    style: { type: AndroidStyle.BIGTEXT, text: body },
+                    actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    actions: [
-                        { title: "OK", pressAction: { id: "OK" } },
-                    ],
-                    style: {
-                        type: AndroidStyle.BIGTEXT,
-                        text: body,
-                    },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
                     categoryId: "special-category",
-                    critical: false,
                     interruptionLevel: "active",
                 },
             },
@@ -322,6 +286,7 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
                 alarmManager: options.hasAlarm,
+                // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
 

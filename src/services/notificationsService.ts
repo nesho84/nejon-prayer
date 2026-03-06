@@ -60,12 +60,9 @@ export async function createNotificationsChannels() {
   const defaults = {
     importance: AndroidImportance.HIGH,
     visibility: AndroidVisibility.PUBLIC,
-    sound: undefined, // Sound is handled manually in the app
     lights: true,
     lightColor: AndroidColor.WHITE,
     badge: true,
-    autoCancel: false,
-    ongoing: true,
     bypassDnd: true,
   };
 
@@ -184,35 +181,33 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
         body: body,
         data: {
           type: 'prayer',
-          prayerName: prayer,
           volume: config.notifSettings.volume,
-          vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
-          snooze: config.notifSettings.snooze, // for the reminder to set the right time
           sound: sound ?? '',
+          vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
+          snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
+          prayerName: prayer, // for the reminder to know which prayer to remind for
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
         android: {
           channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
-          showTimestamp: true,
           smallIcon: 'ic_stat_prayer',
           largeIcon: require('../../assets/images/moon-islam.png'),
           color: AndroidColor.OLIVE,
-          pressAction: { id: 'default', launchActivity: 'default' },
+          style: { type: AndroidStyle.INBOX, lines: [body] },
           actions: [
             { title: tr.actions?.dismiss || 'Dismiss', pressAction: { id: 'dismiss' } },
             { title: tr.actions?.snooze || 'Snooze', pressAction: { id: 'snooze' } },
           ],
-          style: {
-            type: AndroidStyle.INBOX,
-            lines: [body],
-          },
+          pressAction: { id: 'default', launchActivity: 'default' },
+          fullScreenAction: { id: "default" },
+          lightUpScreen: true,
+          showTimestamp: true,
           autoCancel: false,
           ongoing: true,
         },
         ios: {
           categoryId: 'prayer-category',
-          critical: false,
           interruptionLevel: 'active',
         },
       },
@@ -267,21 +262,19 @@ async function scheduleEventNotifications(params: ScheduleParams) {
         },
         android: {
           channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
-          showTimestamp: true,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.BLUE,
-          pressAction: { id: 'default', launchActivity: 'default' },
+          style: { type: AndroidStyle.INBOX, lines: [body] },
           actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-          style: {
-            type: AndroidStyle.INBOX,
-            lines: [body],
-          },
+          pressAction: { id: 'default', launchActivity: 'default' },
+          fullScreenAction: { id: "default" },
+          lightUpScreen: true,
+          showTimestamp: true,
           autoCancel: false,
           ongoing: true,
         },
         ios: {
           categoryId: 'prayer-event-category',
-          critical: false,
           interruptionLevel: 'active',
         },
       },
@@ -357,21 +350,19 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         },
         android: {
           channelId: `nejonprayer-vib-off`,
-          showTimestamp: true,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
-          pressAction: { id: 'default', launchActivity: 'default' },
+          style: { type: AndroidStyle.INBOX, lines: [body] },
           actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-          style: {
-            type: AndroidStyle.INBOX,
-            lines: [body],
-          },
+          pressAction: { id: 'default', launchActivity: 'default' },
+          fullScreenAction: { id: "default" },
+          lightUpScreen: true,
+          showTimestamp: true,
           autoCancel: false,
           ongoing: true,
         },
         ios: {
           categoryId: 'special-category',
-          critical: false,
           interruptionLevel: 'active',
         },
       },
@@ -393,9 +384,8 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     // Shuffle quotes
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
 
-    const now = new Date();
-
     // Start from today if before 8 PM, otherwise start from tomorrow
+    const now = new Date();
     const startDayOffset = now.getHours() >= 20 ? 1 : 0;
 
     let scheduled = 0;
@@ -428,21 +418,19 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           },
           android: {
             channelId: `nejonprayer-vib-off`,
-            showTimestamp: true,
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
-            pressAction: { id: 'default', launchActivity: 'default' },
+            style: { type: AndroidStyle.BIGTEXT, text: body },
             actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-            style: {
-              type: AndroidStyle.BIGTEXT,
-              text: body,
-            },
+            pressAction: { id: 'default', launchActivity: 'default' },
+            fullScreenAction: { id: "default" },
+            lightUpScreen: true,
+            showTimestamp: true,
             autoCancel: false,
             ongoing: true,
           },
           ios: {
             categoryId: 'special-category',
-            critical: false,
             interruptionLevel: 'active',
           },
         },
@@ -524,17 +512,19 @@ export async function handleNotificationEvent(type: EventType, notification: any
               },
               android: {
                 channelId: `nejonprayer-vib-${vibration}`,
-                showTimestamp: true,
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,
-                pressAction: { id: 'default', launchActivity: 'default' },
+                style: { type: AndroidStyle.INBOX, lines: [reminderBody] },
                 actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+                pressAction: { id: 'default', launchActivity: 'default' },
+                fullScreenAction: { id: "default" },
+                lightUpScreen: true,
+                showTimestamp: true,
                 autoCancel: false,
                 ongoing: true,
               },
               ios: {
                 categoryId: 'prayer-reminder-category',
-                critical: false,
                 interruptionLevel: 'active',
               },
             },

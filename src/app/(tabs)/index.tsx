@@ -4,7 +4,7 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuotesCarousel from "@/components/QuotesCarousel";
-import QuranPlayer from "@/components/QuranPlayer";
+import QuranActive from "@/components/QuranActive";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -169,7 +169,7 @@ export default function HomeScreen() {
         <AppTabScreen>
 
             {/* Notifications Test */}
-            {/* {__DEV__ && <NotificationTester seconds={5} />} */}
+            {/* {__DEV__ && <NotificationTester seconds={60} />} */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -211,13 +211,13 @@ export default function HomeScreen() {
                     )}
                 </AppCard>
 
-                {/* @TODO: still working.... */}
-                <QuranPlayer />
-
                 {/* 3. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
                     <QuotesCarousel language={language} />
                 </AppCard>
+
+                {/* @TODO: still working.... */}
+                <QuranActive />
 
                 {/* 4. PRAYERS CARD */}
                 <AppCard style={styles.prayersCard}>
