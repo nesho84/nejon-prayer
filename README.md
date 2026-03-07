@@ -17,6 +17,7 @@
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [development build bonus](https://dev.to/cathylai/run-your-expo-app-on-a-physical-phone-with-a-development-build-expo-53-expo-router-h17)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
@@ -110,7 +111,7 @@ npx expo run:android
 
 3. **Start Metro**
 ```bash
-npx expo start
+npx expo start --dev-client
 ```
 4. **Switch to Development Build**
 - In Metro terminal, press:

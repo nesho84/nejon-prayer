@@ -1,5 +1,5 @@
-import { View, StyleSheet, ViewStyle, ViewProps } from 'react-native';
 import { useThemeStore } from '@/store/themeStore';
+import { StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
 
 interface Props extends ViewProps {
     children: React.ReactNode;
@@ -12,11 +12,7 @@ export default function AppCard({ children, style, ...otherProps }: Props) {
 
     return (
         <View
-            style={[
-                styles.card,
-                { backgroundColor: theme.card },
-                style
-            ]}
+            style={[styles.card, { backgroundColor: theme.card }, style]}
             {...otherProps}
         >
             {children}

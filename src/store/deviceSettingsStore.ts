@@ -69,7 +69,7 @@ export const useDeviceSettingsStore = create<DeviceSettingsState>((set, get) => 
 
       if (hasChanged) {
         set(newSettings);
-        console.log('📱 Device settings synced:', JSON.stringify(newSettings, null, 2));
+        // console.log('📱 Device settings synced:', JSON.stringify(newSettings, null, 2));
       }
     } catch (err: any) {
       console.warn('❌ Failed to sync device settings:', err);

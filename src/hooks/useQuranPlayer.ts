@@ -32,13 +32,15 @@ export function useQuranPlayer() {
       // Sync active track (user started audio → left app → came back)
       const currentTrack = await TrackPlayer.getActiveTrack();
       const playerState = await TrackPlayer.getPlaybackState();
+      const active = playerState.state !== State.None;
       const playing = playerState.state === State.Playing;
+
       if (currentTrack) {
         const surahNumber = parseInt(currentTrack.id.replace("surah-", ""));
         syncPlayback({
           activeSurahNumber: surahNumber,
           activeSurahName: currentTrack.title ?? null,
-          isActive: playing,
+          isActive: active,
           isPlaying: playing,
           isBuffering: false,
           hasFinished: false,
@@ -55,38 +57,32 @@ export function useQuranPlayer() {
   // ------------------------------------------------------------
   useEffect(() => {
     const subscription = TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
-      const playing = event.state === State.Playing;
-      const stopped = event.state === State.None || event.state === State.Stopped || event.state === State.Ended;
-      const finished = event.state === State.Ended;
-      const buffering = event.state === State.Buffering;
+      switch (event.state) {
+        case State.Playing:
+          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false });
+          break;
 
-      if (stopped) {
-        syncPlayback({
-          isActive: false,
-          isPlaying: false,
-          isBuffering: false,
-          hasFinished: finished,
-        });
-        return;
+        case State.Paused:
+          syncPlayback({ isActive: true, isPlaying: false, isBuffering: false, hasFinished: false });
+          break;
+
+        case State.Buffering:
+          syncPlayback({ isActive: true, isPlaying: false, isBuffering: true, hasFinished: false });
+          break;
+
+        case State.Ended:
+          syncPlayback({ isActive: true, isPlaying: false, isBuffering: false, hasFinished: true });
+          break;
+
+        case State.Stopped:
+          // Player controller (QuranScreen) owns this.
+          // Store is already updated before this fires, so we don't need to sync anything here
+          break;
+
+        case State.None:
+          syncPlayback({ isActive: false, isPlaying: false, isBuffering: false, hasFinished: false });
+          break;
       }
-
-      if (playing) {
-        syncPlayback({
-          isActive: true,
-          isPlaying: true,
-          isBuffering: false,
-          hasFinished: false,
-        });
-        return;
-      }
-
-      // State.Paused or State.Buffering — session exists but not playing
-      syncPlayback({
-        isActive: false,
-        isPlaying: false,
-        isBuffering: buffering,
-        hasFinished: false,
-      });
     });
 
     return () => subscription.remove();

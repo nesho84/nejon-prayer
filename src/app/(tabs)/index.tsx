@@ -4,7 +4,7 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuotesCarousel from "@/components/QuotesCarousel";
-import QuranActive from "@/components/QuranActive";
+import QuranPlaying from "@/components/QuranPlaying";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -216,8 +216,8 @@ export default function HomeScreen() {
                     <QuotesCarousel language={language} />
                 </AppCard>
 
-                {/* @TODO: still working.... */}
-                <QuranActive />
+                {/* 3.1 QURAN Playing... CARD */}
+                <QuranPlaying />
 
                 {/* 4. PRAYERS CARD */}
                 <AppCard style={styles.prayersCard}>

@@ -85,7 +85,9 @@ export default function QuranScreen() {
             isLiveStream: false,
         });
         await TrackPlayer.play();
-        syncPlayback({ isSwitching: false }); // releases listener control
+
+        // Release listener control
+        syncPlayback({ isSwitching: false });
     }, [activeSurahNumber, isPlaying, hasFinished]);
 
     // ------------------------------------------------------------
