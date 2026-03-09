@@ -1,14 +1,12 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { mmkvStorage } from '@/store/storage';
-import { useLocationStore } from '@/store/locationStore';
-import { useLanguageStore } from '@/store/languageStore';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { getPrayerTimes } from '@/services/prayersService';
 import { getUserLocation, hasLocationChanged } from '@/services/locationService';
+import { getPrayerTimes } from '@/services/prayersService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { useLocationStore } from '@/store/locationStore';
+import { mmkvStorage } from '@/store/storage';
 import { PrayerTimes } from '@/types/prayer.types';
-
-const STALE_DAYS = 3;
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface PrayersState {
   prayerTimes: PrayerTimes | null;
@@ -20,6 +18,8 @@ interface PrayersState {
   loadPrayerTimes: () => Promise<void>;
   reloadPrayerTimes: () => Promise<void>;
 }
+
+const STALE_DAYS = 3;
 
 export const usePrayersStore = create<PrayersState>()(
   persist(
@@ -36,9 +36,9 @@ export const usePrayersStore = create<PrayersState>()(
         set({ isLoading: true, prayersError: null, prayersOutdated: false });
 
         try {
-          const { location } = useLocationStore.getState();
-          const { internetConnection } = useDeviceSettingsStore.getState();
-          const { tr } = useLanguageStore.getState();
+          const location = useLocationStore.getState().location;
+          const internetConnection = useDeviceSettingsStore.getState().internetConnection;
+          const tr = useLanguageStore.getState().tr;
 
           // Validate location first
           if (!location) {
@@ -110,7 +110,7 @@ export const usePrayersStore = create<PrayersState>()(
       reloadPrayerTimes: async () => {
         set({ isLoading: true });
 
-        const { tr } = useLanguageStore.getState();
+        const tr = useLanguageStore.getState().tr;
 
         try {
           // Get fresh location

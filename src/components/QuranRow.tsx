@@ -7,59 +7,85 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 interface QuranRowProps {
   surah: Surah;
   theme: any;
-  activeSurahNumber: number | null;
+  activeSurahId: number | null;
   isPlaying: boolean;
   isBufferingActive: boolean;
   hasFinished: boolean;
+  hasError: boolean;
   currentProgress: number;
   totalDuration: number;
   onPlayPauseReplay: (surah: Surah) => void;
   onStop: (surah: Surah) => void;
 }
 
-// Main Conponent (memoized for FlatList performance)
+// Main Component (memoized for FlatList performance)
 const QuranRow = React.memo(({
   surah,
   theme,
-  activeSurahNumber,
+  activeSurahId,
   isPlaying,
   isBufferingActive,
   hasFinished,
+  hasError,
   currentProgress,
   totalDuration,
   onPlayPauseReplay,
   onStop,
 }: QuranRowProps) => {
   // Local state
-  const isThisActive = activeSurahNumber === surah.number;
+  const isThisActive = activeSurahId === surah.id;
   const isThisPlaying = isThisActive && isPlaying;
   const isThisBuffering = isThisActive && isBufferingActive;
   const showReplay = isThisActive && hasFinished;
-  const showStop = isThisActive && !isBufferingActive;
+  const showStop = isThisActive && !isBufferingActive && !hasError;
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
+
+  // Play button icon — error takes priority over all other states
+  const playButtonIcon = () => {
+    if (isThisBuffering) return <ActivityIndicator size="small" color={theme.accent} />;
+    if (hasError) return <Ionicons name="alert-circle" size={34} color={theme.danger} />;
+    return (
+      <Ionicons
+        name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
+        size={34}
+        color={isThisActive ? theme.accent : theme.text2}
+      />
+    );
+  };
 
   return (
     <AppCard style={[styles.quranCard, { backgroundColor: theme.card }]}>
       <View style={styles.innerContainer}>
         {/* Left: Number badge */}
-        <View style={[styles.badgeNumber, { backgroundColor: theme.accentLight, borderColor: theme.accent, borderWidth: isThisActive ? 2 : 0 }]}>
-          <Text style={[styles.badgeNumberText, { color: theme.accent }]}>
-            {surah.number}
+        <View style={[
+          styles.badgeNumber,
+          {
+            backgroundColor: theme.accentLight,
+            borderColor: hasError ? theme.danger : theme.accent,
+            borderWidth: isThisActive ? 2 : 0
+          }
+        ]}
+        >
+          <Text style={[styles.badgeNumberText, { color: hasError ? theme.danger : theme.accent }]}>
+            {surah.id}
           </Text>
         </View>
 
         {/* Center: Surah info */}
         <View style={styles.surahInfo}>
           <Text style={[styles.surahTitle, { color: theme.text }]}>
-            {surah.englishName}{" "}
-
+            {/* International name */}
+            {surah.transliteration}{" "}
             <Text style={[styles.surahArabicInline, { color: theme.text2 }]}>
+              {/* Arabic name */}
               ({surah.name})
             </Text>
           </Text>
 
-          <Text style={[styles.firstAyahPreview, { color: theme.placeholder }]} numberOfLines={1}>
-            {surah.firstAyah}
+          {/* First N verses preview */}
+          <Text style={[styles.firstAyahPreview, { color: theme.placeholder }]} numberOfLines={2}>
+            {surah.firstVerse?.text}
+            {surah.firstVerse?.transliteration ? `\n${surah.firstVerse.transliteration}` : ""}
           </Text>
 
           {/* Progress bar */}
@@ -80,33 +106,25 @@ const QuranRow = React.memo(({
               disabled={isThisBuffering}
             >
               <Ionicons
-                name={"stop-circle"}
+                name="stop-circle"
                 size={34}
-                color={isThisActive ? theme.danger : theme.text2}
+                color={theme.danger}
               />
             </TouchableOpacity>
           )}
 
-          {/* Play/Pause/Replay buttons */}
+          {/* Play / Pause / Replay / Error button */}
           <TouchableOpacity
             style={[styles.playerButton, { marginRight: -5 }]}
             onPress={() => onPlayPauseReplay(surah)}
             disabled={isThisBuffering}
           >
-            {isThisBuffering ? (
-              <ActivityIndicator size="small" color={theme.accent} />
-            ) : (
-              <Ionicons
-                name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
-                size={34}
-                color={isThisActive ? theme.accent : theme.text2}
-              />
-            )}
+            {playButtonIcon()}
           </TouchableOpacity>
         </View>
 
       </View>
-    </AppCard >
+    </AppCard>
   );
 });
 

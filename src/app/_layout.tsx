@@ -1,7 +1,7 @@
 import AppLoading from "@/components/AppLoading";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
-import { useQuranPlayer } from "@/hooks/useQuranPlayer";
+import { useQuranSetup } from "@/hooks/useQuranSetup";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { Stack } from "expo-router";
@@ -43,7 +43,7 @@ export default function RootLayout() {
   useSystemThemeSync();
   useDeviceSettingsSync();
   useNotificationsSync();
-  useQuranPlayer();
+  useQuranSetup();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

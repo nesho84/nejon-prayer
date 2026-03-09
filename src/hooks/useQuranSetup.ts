@@ -1,12 +1,23 @@
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { useQuranStore } from "@/store/quranStore";
 import { useEffect } from "react";
 import TrackPlayer, { AppKilledPlaybackBehavior, Capability, Event, State } from "react-native-track-player";
 
-export function useQuranPlayer() {
-  const syncPlayback = useQuranPlayerStore((s) => s.syncPlayback);
+export function useQuranSetup() {
+  const loadFullQuran = useQuranStore((s) => s.loadFullQuran);
+  const syncPlayback = useQuranStore((s) => s.syncPlayback);
 
   // ------------------------------------------------------------
-  // Init: setup TrackPlayer and sync any existing session into the store
+  // Init: Load Full Quran from local JSON asset into store
+  // Saves to Zustand store, never runs require() again
+  // ------------------------------------------------------------
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      loadFullQuran();
+    });
+  }, []);
+
+  // ------------------------------------------------------------
+  // Init: Setup TrackPlayer + Sync active track on app start
   // Handles: previous session restore (user had audio, closed app, reopened)
   // ------------------------------------------------------------
   useEffect(() => {
@@ -36,9 +47,9 @@ export function useQuranPlayer() {
       const playing = playerState.state === State.Playing;
 
       if (currentTrack) {
-        const surahNumber = parseInt(currentTrack.id.replace("surah-", ""));
+        const surahId = parseInt(currentTrack.id.replace("surah-", ""));
         syncPlayback({
-          activeSurahNumber: surahNumber,
+          activeSurahId: surahId,
           activeSurahName: currentTrack.title ?? null,
           isActive: active,
           isPlaying: playing,
@@ -56,17 +67,18 @@ export function useQuranPlayer() {
   // Syncs playback state into the store for global access
   // ------------------------------------------------------------
   useEffect(() => {
-    const subscription = TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
+    const onStateChange = TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
       switch (event.state) {
         case State.Playing:
-          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false });
-          break;
+          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false, error: null });
+          break
 
         case State.Paused:
           syncPlayback({ isActive: true, isPlaying: false, isBuffering: false, hasFinished: false });
           break;
 
         case State.Buffering:
+        case State.Loading:
           syncPlayback({ isActive: true, isPlaying: false, isBuffering: true, hasFinished: false });
           break;
 
@@ -75,8 +87,7 @@ export function useQuranPlayer() {
           break;
 
         case State.Stopped:
-          // Player controller (QuranScreen) owns this.
-          // Store is already updated before this fires, so we don't need to sync anything here
+          // Player controller (QuranScreen) owns this — store already updated before this fires
           break;
 
         case State.None:
@@ -85,6 +96,15 @@ export function useQuranPlayer() {
       }
     });
 
-    return () => subscription.remove();
+    // Fires on network failure, bad audio URL, or stream interruption
+    const onError = TrackPlayer.addEventListener(Event.PlaybackError, (event) => {
+      console.error("❌ TrackPlayer playback error:", event);
+      syncPlayback({ error: event, isPlaying: false, isBuffering: false });
+    });
+
+    return () => {
+      onStateChange.remove();
+      onError.remove();
+    }
   }, []);
 }

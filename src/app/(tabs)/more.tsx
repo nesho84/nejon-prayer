@@ -3,7 +3,7 @@ import AppTabScreen from "@/components/AppTabScreen";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface MenuItem {
@@ -116,13 +116,17 @@ export default function ExtrasScreen() {
                 {/* Feature List Card */}
                 <AppCard style={styles.listCard}>
                     {features.map((item, index) => {
-                        const renderContent = (pressed: boolean) => (
-                            <View style={[styles.listItem, { opacity: pressed ? 0.3 : 1 }]}>
+
+                        // Renders each item in the list, wrapped in the appropriate Pressable/Link based on type
+                        const renderItem = () => (
+                            <View style={styles.listItem}>
+                                {/* Left: Icon */}
                                 <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
                                     {item.icon}
                                 </View>
 
-                                <View style={styles.textContent}>
+                                {/* Center: Item title and description below */}
+                                <View style={styles.itemTextContainer}>
                                     <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
                                         {item.label}
                                     </Text>
@@ -131,24 +135,33 @@ export default function ExtrasScreen() {
                                     </Text>
                                 </View>
 
+                                {/* Right: Chevron right */}
                                 <Ionicons name="chevron-forward" size={20} color={theme.text2} />
                             </View>
                         );
 
                         return (
                             <View key={item.id}>
-                                {item.type === 'external' ? (
-                                    // External Link
-                                    <Pressable onPress={() => Linking.openURL(item.href)}>
-                                        {({ pressed }) => renderContent(pressed)}
+                                {/* Internal Link */}
+                                {item.type === 'internal' && (
+                                    <Pressable
+                                        style={({ pressed }) => [{ opacity: pressed ? 0.3 : 1 }]}
+                                        android_ripple={{ color: theme.shadow, borderless: false }}
+                                        onPress={() => router.navigate(item.href)}
+                                    >
+                                        {renderItem()}
                                     </Pressable>
-                                ) : (
-                                    // Internal Link
-                                    <Link href={item.href} asChild>
-                                        <Pressable>
-                                            {({ pressed }) => renderContent(pressed)}
-                                        </Pressable>
-                                    </Link>
+                                )}
+
+                                {/* External Link */}
+                                {item.type === 'external' && (
+                                    <Pressable
+                                        style={({ pressed }) => [{ opacity: pressed ? 0.3 : 1 }]}
+                                        android_ripple={{ color: theme.shadow, borderless: false }}
+                                        onPress={() => Linking.openURL(item.href)}
+                                    >
+                                        {renderItem()}
+                                    </Pressable>
                                 )}
 
                                 {index < features.length - 1 && (
@@ -225,7 +238,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    textContent: {
+    itemTextContainer: {
         flex: 1,
         gap: 4,
     },

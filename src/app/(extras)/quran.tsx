@@ -2,12 +2,12 @@ import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
 import QuranRow from "@/components/QuranRow";
-import { EDITION1, getSurahAudioUrl, Surah } from "@/services/quranService";
+import { EDITION_ALAFASY, getSurahAudioUrl, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
@@ -16,16 +16,17 @@ export default function QuranScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
 
-    const surahs = useQuranPlayerStore((s) => s.surahs);
-    const isLoading = useQuranPlayerStore((s) => s.isLoading);
-    const error = useQuranPlayerStore((s) => s.error);
-    const activeSurahNumber = useQuranPlayerStore((s) => s.activeSurahNumber);
-    const isPlaying = useQuranPlayerStore((s) => s.isPlaying);
-    const isBuffering = useQuranPlayerStore((s) => s.isBuffering);
-    const hasFinished = useQuranPlayerStore((s) => s.hasFinished);
-    const isSwitching = useQuranPlayerStore((s) => s.isSwitching);
-    const syncPlayback = useQuranPlayerStore((s) => s.syncPlayback);
-    const fetchSurahs = useQuranPlayerStore((s) => s.fetchSurahs);
+    // Quran Store
+    const surahs = useQuranStore((s) => s.surahs);
+    const activeSurahId = useQuranStore((s) => s.activeSurahId);
+    const isQuranReady = useQuranStore((s) => s.isQuranReady);
+
+    const isPlaying = useQuranStore((s) => s.isPlaying);
+    const isBuffering = useQuranStore((s) => s.isBuffering);
+    const hasFinished = useQuranStore((s) => s.hasFinished);
+    const isSwitching = useQuranStore((s) => s.isSwitching);
+    const error = useQuranStore((s) => s.error);
+    const syncPlayback = useQuranStore((s) => s.syncPlayback);
 
     // Derived states from TrackPlayer hooks
     // Ticks every second, only needed by the active row
@@ -39,27 +40,20 @@ export default function QuranScreen() {
     const textInputRef = useRef<TextInput>(null);
 
     // ------------------------------------------------------------
-    // Init: Fetch all surahs
-    // ------------------------------------------------------------
-    useEffect(() => {
-        fetchSurahs();
-    }, []);
-
-    // ------------------------------------------------------------
     // Play / Pause / Replay handler
     // ------------------------------------------------------------
     const handlePlayPauseReplay = useCallback(async (surah: Surah) => {
         const currentTrack = await TrackPlayer.getActiveTrack();
-        if (currentTrack && activeSurahNumber === surah.number) {
+        if (currentTrack && activeSurahId === surah.id) {
             if (hasFinished) {
-                // replay from start
+                // Replay from start
                 await TrackPlayer.seekTo(0);
                 await TrackPlayer.play();
             } else if (isPlaying) {
-                // pause current
+                // Pause current
                 await TrackPlayer.pause();
             } else {
-                // play/resume current
+                // Resume current
                 await TrackPlayer.play();
             }
             return;
@@ -68,33 +62,34 @@ export default function QuranScreen() {
         // New surah → stop current, load and play new
         syncPlayback({
             isSwitching: true,
-            activeSurahNumber: surah.number,
-            activeSurahName: surah.englishName,
+            activeSurahId: surah.id,
+            activeSurahName: surah.transliteration,
+            error: null,
         });
 
         // Reset/Clear the foreground/live notification
         await TrackPlayer.reset();
 
         // Add new track and play
-        const audioUrl = getSurahAudioUrl(surah.number);
+        const audioUrl = getSurahAudioUrl(surah.id);
         await TrackPlayer.add({
-            id: `surah-${surah.number}`,
+            id: `surah-${surah.id}`,
             url: audioUrl,
-            title: surah.englishName,
-            artist: EDITION1,
+            title: surah.transliteration,
+            artist: EDITION_ALAFASY,
             isLiveStream: false,
         });
         await TrackPlayer.play();
 
-        // Release listener control
+        // Release listener lock
         syncPlayback({ isSwitching: false });
-    }, [activeSurahNumber, isPlaying, hasFinished]);
+    }, [activeSurahId, isPlaying, hasFinished]);
 
     // ------------------------------------------------------------
     // Stop handler
     // ------------------------------------------------------------
     const handleStop = useCallback(async (surah: Surah) => {
-        if (activeSurahNumber === surah.number) {
+        if (activeSurahId === surah.id) {
             await TrackPlayer.stop();
 
             // Reset all playback-related state in the store
@@ -104,26 +99,28 @@ export default function QuranScreen() {
                 isBuffering: false,
                 hasFinished: false,
                 isSwitching: false,
-                activeSurahNumber: null,
+                activeSurahId: null,
                 activeSurahName: null,
+                error: null,
             });
 
             // Reset/Clear the foreground/live notification
             await TrackPlayer.reset();
         }
-    }, [activeSurahNumber]);
+    }, [activeSurahId]);
 
     // ------------------------------------------------------------
-    // Filter surahs locally
+    // Filter surahs locally based on search query
     // ------------------------------------------------------------
     const filteredSurahs = useMemo(() => {
+        if (!surahs) return [];
         if (!searchQuery.trim()) return surahs;
 
         const q = searchQuery.toLowerCase().trim();
-        return surahs.filter((s) =>
-            s.englishName.toLowerCase().includes(q) ||
-            s.name.includes(q) ||
-            String(s.number).includes(q)
+        return surahs.filter((surah) =>
+            surah.transliteration.toLowerCase().includes(q) ||
+            surah.name.includes(q) ||
+            String(surah.id).includes(q)
         );
     }, [surahs, searchQuery]);
 
@@ -131,26 +128,27 @@ export default function QuranScreen() {
     // Render surah row
     // ------------------------------------------------------------
     const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
-        const isThisActive = activeSurahNumber === item.number;
+        const isThisActive = activeSurahId === item.id;
         return (
             <QuranRow
                 surah={item}
                 theme={theme}
-                activeSurahNumber={activeSurahNumber}
+                activeSurahId={activeSurahId}
                 // Only active row receives changed values
                 isPlaying={isThisActive && isPlaying}
                 isBufferingActive={isThisActive && isBufferingActive}
                 hasFinished={isThisActive && hasFinished}
+                hasError={isThisActive && !!error}
                 currentProgress={isThisActive ? currentTime : 0}
                 totalDuration={isThisActive ? duration : 0}
                 onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
                 onStop={(surah) => handleStop(surah)}
             />
         );
-    }, [theme, isPlaying, isBuffering, hasFinished, activeSurahNumber, currentTime, duration, handlePlayPauseReplay, handleStop]);
+    }, [theme, isPlaying, isBuffering, hasFinished, activeSurahId, currentTime, duration, error, handlePlayPauseReplay, handleStop]);
 
     // Loading state
-    if (isLoading) {
+    if (!isQuranReady) {
         return <AppLoading text={tr.labels.loading} />;
     }
 
@@ -163,7 +161,7 @@ export default function QuranScreen() {
                 message={tr.labels.quranSurahsError}
                 buttonText={tr.buttons.retry}
                 buttonColor={theme.danger}
-                onPress={fetchSurahs}
+                onPress={() => useQuranStore.getState().loadFullQuran()}
             />
         );
     }
@@ -195,7 +193,7 @@ export default function QuranScreen() {
                 {/* SURAH list */}
                 <FlatList
                     data={filteredSurahs}
-                    keyExtractor={(item) => String(item.number)}
+                    keyExtractor={(item) => String(item.id)}
                     renderItem={renderSurahItem}
                     contentContainerStyle={styles.surahList}
                     showsVerticalScrollIndicator={false}

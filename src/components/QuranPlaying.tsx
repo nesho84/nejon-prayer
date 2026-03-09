@@ -1,4 +1,4 @@
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -8,7 +8,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 const BAR_HEIGHTS = [10, 16, 22, 16, 10]; // base heights for natural shape
 const DURATIONS = [600, 900, 700, 800, 650]; // staggered speeds
 
-// Animated waveform component
+// Animated waveform Internal component
 function WaveformBars({ color, isPlaying }: { color: string; isPlaying: boolean }) {
   const anims = useRef(BAR_HEIGHTS.map(() => new Animated.Value(0))).current;
   const animRefs = useRef<Animated.CompositeAnimation[]>([]);
@@ -63,36 +63,47 @@ function WaveformBars({ color, isPlaying }: { color: string; isPlaying: boolean 
 // Main component
 export default function QuranPlaying() {
   const theme = useThemeStore((s) => s.theme);
-  const isActive = useQuranPlayerStore((s) => s.isActive);
-  const isPlaying = useQuranPlayerStore((s) => s.isPlaying);
-  const activeSurahName = useQuranPlayerStore((s) => s.activeSurahName);
+  const isActive = useQuranStore((s) => s.isActive);
+  const isPlaying = useQuranStore((s) => s.isPlaying);
+  const activeSurahName = useQuranStore((s) => s.activeSurahName);
 
   const router = useRouter();
 
-  if (!isActive) return null;
+  if (!isActive && !activeSurahName) return null;
 
   return (
-    <Pressable
-      onPress={() => router.navigate("/quran")}
-      style={[styles.container, { backgroundColor: theme.card, borderColor: theme.divider }]}
-    >
-      {/* Left */}
-      <View style={styles.leftContainer}>
-        <Ionicons name="play-circle" size={18} color={theme.accent} />
-        <Text style={[styles.surahText, { color: theme.accent }]} numberOfLines={1}>
-          {activeSurahName ?? "Quran is playing..."}
-        </Text>
-      </View>
+    <Pressable onPress={() => router.navigate("/quran")}>
+      {({ pressed }) => (
 
-      {/* Center */}
-      <View style={styles.waveformContainer}>
-        <WaveformBars color={theme.accent} isPlaying={isPlaying} />
-      </View>
+        <View style={[
+          styles.container,
+          {
+            opacity: pressed ? 0.7 : 1,
+            backgroundColor: theme.card,
+            borderColor: theme.divider
+          }
+        ]}
+        >
+          {/* Left */}
+          <View style={styles.leftContainer}>
+            <Ionicons name="play-circle" size={18} color={theme.accent} />
+            <Text style={[styles.surahText, { color: theme.accent }]} numberOfLines={1}>
+              {activeSurahName ?? "Quran is playing..."}
+            </Text>
+          </View>
 
-      {/* Right */}
-      <View style={styles.rightContainer}>
-        <Ionicons name="chevron-forward-outline" size={18} color={theme.accent} />
-      </View>
+          {/* Center */}
+          <View style={styles.waveformContainer}>
+            <WaveformBars color={theme.accent} isPlaying={isPlaying} />
+          </View>
+
+          {/* Right */}
+          <View style={styles.rightContainer}>
+            <Ionicons name="chevron-forward-outline" size={18} color={theme.accent} />
+          </View>
+        </View>
+
+      )}
     </Pressable>
   );
 }

@@ -606,7 +606,7 @@ export const TRANSLATIONS = {
             offsetOnTime: "Në kohë",
             offsetMinutes: "minuta më parë",
             fridayReminder: "🕌 Kujtesë për Xhuma",
-            dailyReminders: "📖 Kujtesa ditore (Ajete)",
+            dailyReminders: "📖 Përkujtuesi ditor (Ajete)",
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen ose mos shfaqen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
             powerManagerTitle: "Menaxhimi i energjisë",

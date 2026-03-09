@@ -19,7 +19,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { useEffect } from "react";
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
     // Stores
@@ -50,34 +50,20 @@ export default function HomeScreen() {
 
         usePrayersStore.getState().loadPrayerTimes();
 
-    }, [deviceSettingsReady, locationReady, location]);
+    }, [deviceSettingsReady, locationReady]);
 
     // ------------------------------------------------------------
     // Check for expo OTA updates on mount
     // ------------------------------------------------------------
     useEffect(() => {
         if (__DEV__) return; // Skip in dev mode
-
         const checkForUpdates = async () => {
             const update = await Updates.checkForUpdateAsync();
-
             if (update.isAvailable) {
                 await Updates.fetchUpdateAsync();
-
-                Alert.alert(
-                    "Update available",
-                    "The app was updated. Restart now?",
-                    [
-                        { text: "Later", style: "cancel" },
-                        {
-                            text: "Restart",
-                            onPress: () => Updates.reloadAsync(),
-                        },
-                    ]
-                );
+                Updates.reloadAsync();
             }
         };
-
         checkForUpdates();
     }, []);
 
@@ -86,7 +72,7 @@ export default function HomeScreen() {
     // ------------------------------------------------------------
     const handlePrayersRefresh = async () => {
         try {
-            await usePrayersStore.getState().reloadPrayerTimes();
+            await usePrayersStore.getState().loadPrayerTimes();
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }

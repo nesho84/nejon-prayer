@@ -27,6 +27,9 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
         throw new Error("Invalid location coordinates");
     }
 
+    // AbortController timeout reference
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
     try {
         let timestamp: number;
 
@@ -68,11 +71,10 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
 
         // Fetch prayer times with AbortController (10s timeout)
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
+        timeout = setTimeout(() => controller.abort(), 10000);
 
         // Fetch prayer times
         const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeout);
 
         // Check if response is ok
         if (!response.ok) {
@@ -113,5 +115,7 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
     } catch (err) {
         console.warn("❌ [prayersService] API fetch error: ", err);
         throw err;
+    } finally {
+        clearTimeout(timeout);
     }
 }
