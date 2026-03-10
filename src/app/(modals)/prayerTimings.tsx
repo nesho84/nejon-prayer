@@ -173,6 +173,7 @@ export default function PrayersSettingsScreen() {
     return (
         <ModalSheet
             ref={ModalSheetRef}
+            size="xlx"
             colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
             footer={<FixedFooter />}
         >
@@ -328,6 +329,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         paddingHorizontal: 8,
+        paddingTop: 12,
         paddingBottom: 14,
         gap: 14,
     },

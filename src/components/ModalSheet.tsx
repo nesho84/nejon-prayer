@@ -16,6 +16,9 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
+// ------------------------------------------------------------
+// Props
+// ------------------------------------------------------------
 interface Colors {
   sheetBackgroundColor?: string;
   headerBarBorderColor?: string;
@@ -28,6 +31,7 @@ interface Props {
   style?: ViewStyle;
   colors?: Colors;
   staticMode?: boolean;
+  size?: ModalSheetSize;
   scrolling?: boolean;
   closeIcon?: boolean;
   header?: React.ReactNode;
@@ -39,19 +43,44 @@ export type ModalSheetRef = {
   close: () => void;
 };
 
-const ANIMATION_DURATION = 250;
-const SNAP_BACK_DURATION = 150;
+// ------------------------------------------------------------
+// Size
+// ------------------------------------------------------------
+type ModalSheetSize = 'xs' | 'sm' | 'smd' | 'md' | 'mdl' | 'lg' | 'lgx' | 'xl' | 'xlx' | 'xxl' | 'xxlf' | 'full';
 
+const SIZES_MAP: Record<ModalSheetSize, number> = {
+  xs: 0.20,   // extra small — action strips, minimal pickers
+  sm: 0.28,   // small — quick actions, simple confirmations
+  smd: 0.36,  // small-medium — short forms, brief info cards
+  md: 0.45,   // medium — most common, forms, lists
+  mdl: 0.52,  // medium-large — longer forms, grouped settings
+  lg: 0.58,   // large — tall lists, multi-section content
+  lgx: 0.64,  // large-extra — tall forms, detailed views
+  xl: 0.70,   // extra large — complex screens, long settings
+  xlx: 0.76,  // extra large-plus — near full, heavy content
+  xxl: 0.82,  // double extra large — almost full, rich content
+  xxlf: 0.90, // double extra large-full — just below full screen
+  full: 0.99, // full screen — immersive, default
+};
+
+// ------------------------------------------------------------
+// Defaults
+// ------------------------------------------------------------
 const SHEET_BACKGROUND = '#fafafa';
-const HEADER_BAR_BORDER_COLOR = 'transparent';
+const HEADER_BAR_BORDER_COLOR = 'rgba(128, 128, 128, 0.2)';
 const HANDLE_COLOR = '#5D5D5D';
 const CLOSE_ICON_COLOR = '#5D5D5D';
+
+const ANIMATION_DURATION = 250;
+const BACKDROP_DELAY = 500;
+const SNAP_BACK_DURATION = 150;
 
 const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   children,
   style,
   colors,
   staticMode,
+  size = 'full',
   scrolling = true,
   closeIcon,
   header,
@@ -61,6 +90,8 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+
+  const sheetMaxHeight = height * SIZES_MAP[size];
 
   const translateY = useSharedValue(0);
   const backdropOpacity = useSharedValue(0);
@@ -80,9 +111,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   const animatedClose = useCallback(() => {
     translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
     backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
-      if (finished) {
-        scheduleOnRN(handleClose);
-      }
+      if (finished) scheduleOnRN(handleClose);
     });
   }, [height, handleClose]);
 
@@ -105,7 +134,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   useEffect(() => {
     const t = setTimeout(() => {
       backdropOpacity.value = withTiming(1, { duration: ANIMATION_DURATION });
-    }, 550); // Delay to match the slide_from_bottom animation
+    }, BACKDROP_DELAY);
     return () => clearTimeout(t);
   }, []);
 
@@ -114,7 +143,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   // ------------------------------------------------------------
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (staticMode) return true; // consume event, do nothing
+      if (staticMode) return true;
       animatedClose();
       return true;
     });
@@ -122,9 +151,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   }, [animatedClose, staticMode]);
 
   // ------------------------------------------------------------
-  // Keyboard handling.
-  // Add paddingBottom to the content area so inputs near
-  // the bottom aren't hidden behind the keyboard.
+  // Keyboard handling — offsets content so inputs stay visible
   // ------------------------------------------------------------
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -139,51 +166,57 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
 
     const subShow = Keyboard.addListener(showEvent, onShow);
     const subHide = Keyboard.addListener(hideEvent, onHide);
-    return () => { subShow.remove(); subHide.remove(); };
+
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
   }, []);
 
   // ------------------------------------------------------------
-  // Drag gesture — header only, completely disabled in staticMode
+  // Drag gesture — threshold relative to sheet height, not screen
   // ------------------------------------------------------------
   const gesture = Gesture.Pan()
     .enabled(!staticMode)
     .onUpdate((event) => {
-      // only allow dragging down
       if (event.translationY > 0) translateY.value = event.translationY;
     })
     .onEnd((event) => {
-      if (event.translationY > height / 2 || event.velocityY > 1000) {
-        // Past midpoint or fast flick → close
+      if (event.translationY > sheetMaxHeight / 2 || event.velocityY > 1000) {
         translateY.value = withTiming(height, { duration: ANIMATION_DURATION });
         backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
           if (finished) scheduleOnRN(handleClose);
         });
       } else {
-        // Above midpoint → snap back to top
         translateY.value = withTiming(0, { duration: SNAP_BACK_DURATION });
       }
     });
 
-  // Sheet drag translation only
+  // ------------------------------------------------------------
+  // Drives the sheet vertical position on the UI thread
+  // ------------------------------------------------------------
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
+  // ------------------------------------------------------------
   // Drives the backdrop opacity on the UI thread
+  // ------------------------------------------------------------
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: backdropOpacity.value,
   }));
 
-  // Keyboard offset applied to content area only, not the whole modal
+  // ------------------------------------------------------------
+  // Keyboard offset applied to content area only
+  // ------------------------------------------------------------
   const keyboardStyle = useAnimatedStyle(() => ({
-    // insets.bottom is added to content padding, subtract it here to avoid double-padding when keyboard is open
-    paddingBottom: Math.max(0, keyboardHeight.value - insets.bottom),
+    paddingBottom: Math.max(0, keyboardHeight.value - insets.bottom - 24),
   }));
 
   return (
     <View style={styles.root}>
 
-      {/* Backdrop */}
+      {/* Dimmed backdrop — fades in after sheet is fully visible */}
       <Animated.View
         style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
         pointerEvents="none"
@@ -193,7 +226,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
         style={[
           styles.container,
           {
-            paddingTop: insets.top + 12, // easier to grab the handle
+            paddingTop: insets.top,
             paddingBottom: insets.bottom,
             paddingLeft: insets.left,
             paddingRight: insets.right,
@@ -202,16 +235,27 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
         ]}
       >
 
-        {/* Inner: clips content to rounded corners */}
-        <View style={[styles.innerContainer, { backgroundColor: colors?.sheetBackgroundColor ?? SHEET_BACKGROUND }]}>
+        {/* Backdrop tap to dismiss */}
+        {!staticMode && (
+          <Pressable
+            style={StyleSheet.absoluteFillObject}
+            onPress={animatedClose}
+          />
+        )}
 
-          {/* Draggable header: handle pill + title/close row */}
+        {/* Clips content to rounded corners */}
+        <View style={[
+          styles.innerContainer,
+          {
+            backgroundColor: colors?.sheetBackgroundColor ?? SHEET_BACKGROUND,
+            maxHeight: sheetMaxHeight,
+          }
+        ]}>
+
+          {/* Draggable header bar — handle pill + optional close icon */}
           <GestureDetector gesture={gesture}>
-            <View style={[styles.headerBarContainer, { borderBottomColor: colors?.headerBarBorderColor ?? HEADER_BAR_BORDER_COLOR }]}>
-              {/* Drag handle pill */}
+            <View style={[styles.headerBarContainer, { borderBottomColor: HEADER_BAR_BORDER_COLOR }]}>
               <View style={[styles.handleIcon, { backgroundColor: colors?.handleColor ?? HANDLE_COLOR }]} />
-
-              {/* Optional: Close icon/button */}
               {!staticMode && closeIcon && (
                 <Pressable onPress={animatedClose} style={styles.closeIcon} hitSlop={12}>
                   <Ionicons name='close' size={24} color={colors?.closeIconColor ?? CLOSE_ICON_COLOR} />
@@ -220,10 +264,10 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
             </View>
           </GestureDetector>
 
-          {/* Optional fixed header slot (unchanged from original) */}
+          {/* Optional fixed header slot */}
           {header && <View>{header}</View>}
 
-          {/* Scrollable/static content — keyboard padding lives here */}
+          {/* Scrollable or static content — keyboard padding lives here */}
           <Animated.View style={[styles.content, style, keyboardStyle]}>
             {scrolling ? (
               <ScrollView
@@ -240,7 +284,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
             )}
           </Animated.View>
 
-          {/* Optional fixed footer slot (unchanged from original) */}
+          {/* Optional fixed footer slot */}
           {footer && <View>{footer}</View>}
 
         </View>
@@ -258,9 +302,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   innerContainer: {
     flex: 1,
+    flexShrink: 1,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     overflow: 'hidden',
@@ -270,12 +316,11 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 12,
   },
-
   headerBarContainer: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
   },
   handleIcon: {
     width: 40,
@@ -287,7 +332,6 @@ const styles = StyleSheet.create({
     top: 2,
     right: 16,
   },
-
   content: {
     flex: 1,
   },
