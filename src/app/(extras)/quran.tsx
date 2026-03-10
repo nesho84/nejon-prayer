@@ -118,6 +118,7 @@ export default function QuranScreen() {
 
         const q = searchQuery.toLowerCase().trim();
         return surahs.filter((surah) =>
+            surah.id === activeSurahId ||
             surah.transliteration.toLowerCase().includes(q) ||
             surah.name.includes(q) ||
             String(surah.id).includes(q)
