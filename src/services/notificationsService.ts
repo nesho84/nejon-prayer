@@ -381,49 +381,56 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
   if (config.specials.DailyQuote?.enabled) {
     // Get quotes for the selected language
     const quotes = QUOTES[language] || QUOTES.en;
-    // Shuffle quotes
+
+    // Shuffle quotes for variety
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
 
-    // Start from today if before 8 PM, otherwise start from tomorrow
     const now = new Date();
+
+    // If after 8 PM, start scheduling from tomorrow
+    // This prevents scheduling a quote for "today" when it's too late
     const startDayOffset = now.getHours() >= 20 ? 1 : 0;
 
     let scheduled = 0;
+    const DAYS_TO_SCHEDULE = 30; // Schedule 30 days worth
 
-    for (let i = 0; i < shuffledQuotes.length; i++) {
+    for (let i = 0; i < DAYS_TO_SCHEDULE; i++) {
       const quoteDate = new Date(now);
       quoteDate.setDate(now.getDate() + startDayOffset + i);
 
-      // Random time between 8:00 and 20:00
+      // Random time between 8:00 and 20:00 (8 AM - 8 PM)
       const randomHour = Math.floor(Math.random() * 12) + 8; // 8-19
       const randomMinute = Math.floor(Math.random() * 60); // 0-59
       quoteDate.setHours(randomHour, randomMinute, 0, 0);
 
-      // Skip if time is in the past
+      // Safety check: Skip if time is in the past
+      // (Can happen if reschedule runs multiple times in one day)
       if (quoteDate <= now) continue;
 
-      // Prepare notification content
+      // Cycle through quotes - when we run out, start from beginning
+      const quoteIndex = i % shuffledQuotes.length;
+      const body = shuffledQuotes[quoteIndex];
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
-      const body = shuffledQuotes[i];
 
-      // Create daily quote notification
+      // Create notification
       await notifee.createTriggerNotification(
         {
-          id: `special-daily-quote-${i}`,
+          id: `special-daily-quote-day${i}`, // Unique ID per day
           title: title,
           body: body,
           data: {
             type: 'special',
-            quoteIndex: i,
+            subtype: 'daily-quote',
+            dayOffset: i,
           },
           android: {
-            channelId: `nejonprayer-vib-off`,
+            channelId: 'nejonprayer-vib-off',
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.BIGTEXT, text: body },
             actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
             pressAction: { id: 'default', launchActivity: 'default' },
-            fullScreenAction: { id: "default" },
+            fullScreenAction: { id: 'default' },
             lightUpScreen: true,
             showTimestamp: true,
             autoCancel: false,
@@ -438,14 +445,14 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           type: TriggerType.TIMESTAMP,
           timestamp: quoteDate.getTime(),
           alarmManager: hasAlarm,
-          repeatFrequency: RepeatFrequency.DAILY,
+          // NO repeatFrequency - each quote fires once!
         }
       );
 
       scheduled++;
     }
 
-    console.log(`📜 Scheduled ${scheduled} '${tr.labels.dailyQuoteTitle}', one quote per day at random times`);
+    console.log(`📜 Scheduled ${scheduled} daily quotes for the next ${DAYS_TO_SCHEDULE} days`);
   }
 }
 

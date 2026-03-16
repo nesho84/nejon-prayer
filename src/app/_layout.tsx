@@ -1,4 +1,5 @@
 import AppLoading from "@/components/AppLoading";
+import ModalProvider from "@/components/ModalProvider";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
@@ -49,6 +50,7 @@ export default function RootLayout() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <RootStack />
+        <ModalProvider />
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );
