@@ -13,9 +13,8 @@ export interface Surah {
   transliteration: string; // Al-Fatihah
   translation: string;     // English: The Opener
   type: string;            // meccan | medinan
-  total_verses: number;
+  total_verses: number;    // Total verses in this surah
   verses?: Verse[];        // present in full quran, absent in surahs list
-  firstVerse?: Verse;      // present in surahs list, absent in full quran
 }
 
 export type Quran = Surah[];

@@ -153,6 +153,14 @@ export default function PrayersSettingsScreen() {
     const handleSave = () => {
         if (!prayerName) return;
 
+        // Check if any changes were made before saving
+        const stored = prayers?.[prayerName as PrayerType] || events?.[prayerName as PrayerEventType] || { enabled: false, offset: 0, sound: SOUNDS.azan1_short };
+        if (enabled === stored.enabled && selectedOffset === stored.offset && selectedSound === stored.sound) {
+            console.log("No changes detected, skipping save.");
+            ModalSheetRef.current?.close();
+            return;
+        }
+
         // Check system notifications permission first
         if (!notificationPermission) {
             Alert.alert(
@@ -176,7 +184,7 @@ export default function PrayersSettingsScreen() {
         // Determine if this is a prayer or event
         const isPrayer = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayerName);
         const isEvent = ['Imsak', 'Sunrise'].includes(prayerName);
-
+        // Prepare settings object to save
         const settings = { enabled: enabled, offset: selectedOffset, sound: selectedSound };
 
         // Update store

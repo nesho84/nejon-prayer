@@ -9,11 +9,13 @@ const BAR_HEIGHTS = [10, 16, 22, 16, 10]; // base heights for natural shape
 const DURATIONS = [600, 900, 700, 800, 650]; // staggered speeds
 
 // Animated waveform Internal component
-function WaveformBars({ color, isPlaying }: { color: string; isPlaying: boolean }) {
+function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive: boolean, isPlaying: boolean }) {
   const anims = useRef(BAR_HEIGHTS.map(() => new Animated.Value(0))).current;
   const animRefs = useRef<Animated.CompositeAnimation[]>([]);
 
   useEffect(() => {
+    if (!isActive) return;
+
     if (isPlaying) {
       animRefs.current = anims.map((anim, i) =>
         Animated.loop(
@@ -69,7 +71,7 @@ export default function QuranPlaying() {
 
   const router = useRouter();
 
-  if (!isActive && !activeSurahName) return null;
+  if (!isActive || activeSurahName === null) return null;
 
   return (
     <Pressable onPress={() => router.navigate("/quran")}>
@@ -94,7 +96,7 @@ export default function QuranPlaying() {
 
           {/* Center */}
           <View style={styles.waveformContainer}>
-            <WaveformBars color={theme.accent} isPlaying={isPlaying} />
+            <WaveformBars color={theme.accent} isActive={isActive} isPlaying={isPlaying} />
           </View>
 
           {/* Right */}

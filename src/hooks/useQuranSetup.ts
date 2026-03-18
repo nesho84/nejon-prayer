@@ -70,7 +70,7 @@ export function useQuranSetup() {
     const onStateChange = TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
       switch (event.state) {
         case State.Playing:
-          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false, error: null });
+          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false, playbackError: null });
           break
 
         case State.Paused:
@@ -99,7 +99,7 @@ export function useQuranSetup() {
     // Fires on network failure, bad audio URL, or stream interruption
     const onError = TrackPlayer.addEventListener(Event.PlaybackError, (event) => {
       console.error("❌ TrackPlayer playback error:", event);
-      syncPlayback({ error: event, isPlaying: false, isBuffering: false });
+      syncPlayback({ playbackError: event, isPlaying: false, isBuffering: false });
     });
 
     return () => {

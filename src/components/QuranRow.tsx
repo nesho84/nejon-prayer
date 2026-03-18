@@ -1,12 +1,15 @@
 import AppCard from "@/components/AppCard";
+import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Surah } from "@/services/quranService";
-import { Ionicons } from "@expo/vector-icons";
+import { Translations } from "@/types/language.types";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface QuranRowProps {
   surah: Surah;
-  theme: any;
+  theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
+  tr: Translations;
   activeSurahId: number | null;
   isPlaying: boolean;
   isBufferingActive: boolean;
@@ -14,6 +17,7 @@ interface QuranRowProps {
   hasError: boolean;
   currentProgress: number;
   totalDuration: number;
+  rowHeight: number;
   onPlayPauseReplay: (surah: Surah) => void;
   onStop: (surah: Surah) => void;
 }
@@ -22,6 +26,7 @@ interface QuranRowProps {
 const QuranRow = React.memo(({
   surah,
   theme,
+  tr,
   activeSurahId,
   isPlaying,
   isBufferingActive,
@@ -29,6 +34,7 @@ const QuranRow = React.memo(({
   hasError,
   currentProgress,
   totalDuration,
+  rowHeight,
   onPlayPauseReplay,
   onStop,
 }: QuranRowProps) => {
@@ -43,7 +49,9 @@ const QuranRow = React.memo(({
   // Play button icon — error takes priority over all other states
   const playButtonIcon = () => {
     if (isThisBuffering) return <ActivityIndicator size="small" color={theme.accent} />;
-    if (hasError) return <Ionicons name="alert-circle" size={34} color={theme.danger} />;
+
+    if (hasError) return <MaterialCommunityIcons name="reload-alert" size={34} color={theme.danger} />;
+
     return (
       <Ionicons
         name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
@@ -54,8 +62,9 @@ const QuranRow = React.memo(({
   };
 
   return (
-    <AppCard style={[styles.quranCard, { backgroundColor: theme.card }]}>
+    <AppCard style={[styles.quranCard, { backgroundColor: theme.card, height: rowHeight }]}>
       <View style={styles.innerContainer}>
+
         {/* Left: Number badge */}
         <View style={[
           styles.badgeNumber,
@@ -72,21 +81,27 @@ const QuranRow = React.memo(({
         </View>
 
         {/* Center: Surah info */}
-        <View style={styles.surahInfo}>
-          <Text style={[styles.surahTitle, { color: theme.text }]}>
-            {/* International name */}
-            {surah.transliteration}{" "}
-            <Text style={[styles.surahArabicInline, { color: theme.text2 }]}>
-              {/* Arabic name */}
-              ({surah.name})
+        <View style={styles.surahInfoContainer}>
+          {/* Surah name row */}
+          <View style={styles.surahNameRow}>
+            <Text style={[styles.surahNameEnglish, { color: theme.text }]}>
+              {surah.transliteration}{" "}
             </Text>
-          </Text>
+            <Text style={[styles.surahNameArabic, { color: theme.accent2 }]}>
+              {surah.name}
+            </Text>
+          </View>
 
-          {/* First N verses preview */}
-          <Text style={[styles.firstAyahPreview, { color: theme.placeholder }]} numberOfLines={2}>
-            {surah.firstVerse?.text}
-            {surah.firstVerse?.transliteration ? `\n${surah.firstVerse.transliteration}` : ""}
-          </Text>
+          {/* Bottom row */}
+          <View style={styles.totalVersesRow}>
+            <Text style={[{ color: theme.textMuted }]}>
+              <Text style={{ fontSize: 20, lineHeight: 18 }}>
+                {surah.type === "meccan" ? "🕋" : "🕌"}{" "}
+              </Text>
+              <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{surah.total_verses}{" "}</Text>
+              <Text style={{ fontSize: 14 }}>{tr.labels.ayahs}</Text>
+            </Text>
+          </View>
 
           {/* Progress bar */}
           {isThisActive && totalDuration > 0 && (
@@ -133,16 +148,19 @@ export default QuranRow;
 const styles = StyleSheet.create({
   quranCard: {
     padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   innerContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
+
   badgeNumber: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -150,34 +168,46 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
   },
-  surahInfo: {
+
+  surahInfoContainer: {
     flex: 1,
-    gap: 4,
+    flexDirection: "column",
+    gap: 6,
   },
-  surahTitle: {
-    fontSize: 15,
+  surahNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  surahNameEnglish: {
+    alignSelf: "flex-start",
+    fontSize: 18,
+    lineHeight: 20,
     fontWeight: "600",
   },
-  surahArabicInline: {
-    fontSize: 14,
+  surahNameArabic: {
+    alignSelf: "flex-start",
+    fontSize: 18,
+    lineHeight: 20,
     fontWeight: "400",
   },
-  firstAyahPreview: {
-    fontSize: 13,
-    textAlign: "right",
-    writingDirection: "rtl",
-    lineHeight: 20,
+
+  totalVersesRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
+
   progressBar: {
     height: 3,
     width: '100%',
     borderRadius: 1,
     overflow: 'hidden',
-    marginTop: 4,
+    marginTop: 12,
   },
   progressFill: {
     height: '100%',
   },
+
   playerButtonsContainer: {
     flexDirection: "row",
     alignItems: "center",

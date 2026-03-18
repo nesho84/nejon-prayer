@@ -7,7 +7,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
@@ -19,13 +19,14 @@ export default function QuranScreen() {
     // Quran Store
     const surahs = useQuranStore((s) => s.surahs);
     const activeSurahId = useQuranStore((s) => s.activeSurahId);
+    const quranError = useQuranStore((s) => s.quranError);
     const isQuranReady = useQuranStore((s) => s.isQuranReady);
 
     const isPlaying = useQuranStore((s) => s.isPlaying);
     const isBuffering = useQuranStore((s) => s.isBuffering);
     const hasFinished = useQuranStore((s) => s.hasFinished);
     const isSwitching = useQuranStore((s) => s.isSwitching);
-    const error = useQuranStore((s) => s.error);
+    const playbackError = useQuranStore((s) => s.playbackError);
     const syncPlayback = useQuranStore((s) => s.syncPlayback);
 
     // Derived states from TrackPlayer hooks
@@ -38,6 +39,11 @@ export default function QuranScreen() {
     // Local state / refs
     const [searchQuery, setSearchQuery] = useState("");
     const textInputRef = useRef<TextInput>(null);
+    const listRef = useRef<FlatList<Surah>>(null);
+
+    // Must match the height in QuranRow styles
+    const ROW_HEIGHT = 90;
+    const ROW_GAP = 10;
 
     // ------------------------------------------------------------
     // Play / Pause / Replay handler
@@ -64,7 +70,7 @@ export default function QuranScreen() {
             isSwitching: true,
             activeSurahId: surah.id,
             activeSurahName: surah.transliteration,
-            error: null,
+            playbackError: null,
         });
 
         // Reset/Clear the foreground/live notification
@@ -101,7 +107,7 @@ export default function QuranScreen() {
                 isSwitching: false,
                 activeSurahId: null,
                 activeSurahName: null,
-                error: null,
+                playbackError: null,
             });
 
             // Reset/Clear the foreground/live notification
@@ -126,6 +132,19 @@ export default function QuranScreen() {
     }, [surahs, searchQuery]);
 
     // ------------------------------------------------------------
+    // Scroll to active surah after unmount and search query clear
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (!activeSurahId || !surahs?.length) return;
+        if (searchQuery !== "") return;
+
+        const index = surahs.findIndex(s => s.id === activeSurahId);
+        if (index === -1) return;
+
+        listRef.current?.scrollToIndex({ index, animated: true });
+    }, [activeSurahId, searchQuery, surahs]);
+
+    // ------------------------------------------------------------
     // Render surah row
     // ------------------------------------------------------------
     const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
@@ -134,19 +153,21 @@ export default function QuranScreen() {
             <QuranRow
                 surah={item}
                 theme={theme}
+                tr={tr}
                 activeSurahId={activeSurahId}
                 // Only active row receives changed values
                 isPlaying={isThisActive && isPlaying}
                 isBufferingActive={isThisActive && isBufferingActive}
                 hasFinished={isThisActive && hasFinished}
-                hasError={isThisActive && !!error}
+                hasError={isThisActive && !!playbackError}
                 currentProgress={isThisActive ? currentTime : 0}
                 totalDuration={isThisActive ? duration : 0}
+                rowHeight={ROW_HEIGHT}
                 onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
                 onStop={(surah) => handleStop(surah)}
             />
         );
-    }, [theme, isPlaying, isBuffering, hasFinished, activeSurahId, currentTime, duration, error, handlePlayPauseReplay, handleStop]);
+    }, [theme, isPlaying, isBuffering, hasFinished, activeSurahId, currentTime, duration, playbackError, handlePlayPauseReplay, handleStop]);
 
     // Loading state
     if (!isQuranReady) {
@@ -154,7 +175,7 @@ export default function QuranScreen() {
     }
 
     // Error state
-    if (error) {
+    if (quranError) {
         return (
             <AppError
                 icon="cloud-offline-outline"
@@ -172,7 +193,7 @@ export default function QuranScreen() {
             <View style={[styles.container, { backgroundColor: theme.bg }]}>
 
                 {/* SEARCH bar */}
-                <View style={[styles.searchContainer, { backgroundColor: theme.card, borderColor: theme.divider }]}>
+                <View style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
                     <Ionicons name="search-outline" size={18} color={theme.placeholder} />
                     <TextInput
                         style={[styles.searchInput, { color: theme.text }]}
@@ -193,6 +214,7 @@ export default function QuranScreen() {
 
                 {/* SURAH list */}
                 <FlatList
+                    ref={listRef}
                     data={filteredSurahs}
                     keyExtractor={(item) => String(item.id)}
                     renderItem={renderSurahItem}
@@ -203,6 +225,16 @@ export default function QuranScreen() {
                     windowSize={7}
                     removeClippedSubviews={true}
                     onMomentumScrollBegin={() => textInputRef.current?.blur()}
+                    getItemLayout={(_, index) => ({
+                        length: ROW_HEIGHT,
+                        offset: (ROW_HEIGHT + ROW_GAP) * index,
+                        index
+                    })}
+                    onScrollToIndexFailed={(info) => {
+                        setTimeout(() => {
+                            listRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.4 });
+                        }, 200);
+                    }}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
                             <Text style={[styles.emptyText, { color: theme.placeholder }]}>
@@ -221,12 +253,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    searchContainer: {
+    searchInputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        marginHorizontal: 16,
         marginTop: 16,
-        marginBottom: 8,
+        marginBottom: 6,
+        marginHorizontal: 16,
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderRadius: 12,
@@ -242,7 +274,7 @@ const styles = StyleSheet.create({
     surahList: {
         paddingHorizontal: 16,
         paddingTop: 8,
-        paddingBottom: 24,
+        paddingBottom: 48,
         gap: 10,
     },
     emptyContainer: {
