@@ -347,6 +347,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         body: body,
         data: {
           type: 'special',
+          subType: 'friday-reminder',
         },
         android: {
           channelId: `nejonprayer-vib-off`,
@@ -377,37 +378,29 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     console.log(`🕌 Scheduled '${tr.labels.fridayTitle}' at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
-  // --- Special 2: Daily Quote at random times (between 8 AM - 8 PM)
+  // --- Special 2: Daily Quote at random times throughout the day
   if (config.specials.DailyQuote?.enabled) {
-    // Get quotes for the selected language
     const quotes = QUOTES[language] || QUOTES.en;
-
-    // Shuffle quotes for variety
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
 
     const now = new Date();
 
-    // If after 8 PM, start scheduling from tomorrow
-    // This prevents scheduling a quote for "today" when it's too late
-    const startDayOffset = now.getHours() >= 20 ? 1 : 0;
-
     let scheduled = 0;
-    const DAYS_TO_SCHEDULE = 30; // Schedule 30 days worth
+    const DAYS_TO_SCHEDULE = 30;
 
     for (let i = 0; i < DAYS_TO_SCHEDULE; i++) {
       const quoteDate = new Date(now);
-      quoteDate.setDate(now.getDate() + startDayOffset + i);
+      quoteDate.setDate(now.getDate() + i);
 
-      // Random time between 8:00 and 20:00 (8 AM - 8 PM)
-      const randomHour = Math.floor(Math.random() * 12) + 8; // 8-19
-      const randomMinute = Math.floor(Math.random() * 60); // 0-59
+      // Random time throughout the entire day (0-23 hours)
+      const randomHour = Math.floor(Math.random() * 24);
+      const randomMinute = Math.floor(Math.random() * 60);
       quoteDate.setHours(randomHour, randomMinute, 0, 0);
 
-      // Safety check: Skip if time is in the past
-      // (Can happen if reschedule runs multiple times in one day)
+      // Skip if time is in the past
       if (quoteDate <= now) continue;
 
-      // Cycle through quotes - when we run out, start from beginning
+      // Cycle through quotes
       const quoteIndex = i % shuffledQuotes.length;
       const body = shuffledQuotes[quoteIndex];
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
@@ -415,7 +408,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       // Create notification
       await notifee.createTriggerNotification(
         {
-          id: `special-daily-quote-day${i}`, // Unique ID per day
+          id: `special-daily-quote-day${i}`,
           title: title,
           body: body,
           data: {
