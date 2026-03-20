@@ -102,7 +102,7 @@ This automatically embeds the channel from your eas.json into the native binary.
 
 5️⃣ Publish OTA Updates
 Once your app build is done (local or EAS), you do NOT have to rebuild for JS changes.
-Publish updates using the EAS Update service:
+Publish updates using the EAS Update service(dont change the version number or build number, it should be the same as in the play Store):
 eas update --branch production --platform all --message "first update"
 or
 eas update --branch production --platform android --message "first update"

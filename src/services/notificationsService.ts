@@ -348,6 +348,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         data: {
           type: 'special',
           subType: 'friday-reminder',
+          scheduledFor: triggerTime.toLocaleString('en-GB'),
         },
         android: {
           channelId: `nejonprayer-vib-off`,
@@ -381,40 +382,58 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
   // --- Special 2: Daily Quote at random times throughout the day
   if (config.specials.DailyQuote?.enabled) {
     const quotes = QUOTES[language] || QUOTES.en;
+
+    // Shuffle quotes for variety on each reschedule
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
 
     const now = new Date();
+    const currentHour = now.getHours();
 
-    let scheduled = 0;
-    const DAYS_TO_SCHEDULE = 30;
+    // Predetermined time slots: Every 2 hours from 8 AM to 11 PM (9 slots)
+    const QUOTE_TIMES = [8, 10, 12, 14, 16, 18, 20, 22];
+
+    // Schedule as many days as there are quotes
+    const DAYS_TO_SCHEDULE = shuffledQuotes.length;
+
+    let scheduledCount = 0;
 
     for (let i = 0; i < DAYS_TO_SCHEDULE; i++) {
-      const quoteDate = new Date(now);
-      quoteDate.setDate(now.getDate() + i);
+      const triggerTime = new Date(now);
+      triggerTime.setDate(now.getDate() + i);
 
-      // Random time throughout the entire day (0-23 hours)
-      const randomHour = Math.floor(Math.random() * 24);
-      const randomMinute = Math.floor(Math.random() * 60);
-      quoteDate.setHours(randomHour, randomMinute, 0, 0);
+      let hour;
 
-      // Skip if time is in the past
-      if (quoteDate <= now) continue;
+      if (i === 0) {
+        // TODAY: Find next available time after current hour
+        hour = QUOTE_TIMES.find(h => h > currentHour);
+        if (!hour) {
+          // After 23:00, skip to tomorrow (scheduledCount stays 0)
+          continue;
+        }
+      } else {
+        // FUTURE DAYS: Cycle through predetermined times
+        hour = QUOTE_TIMES[scheduledCount % QUOTE_TIMES.length];
+      }
 
-      // Cycle through quotes
-      const quoteIndex = i % shuffledQuotes.length;
-      const body = shuffledQuotes[quoteIndex];
+      // Date-based ID - ensures idempotency (same date = same ID)
+      triggerTime.setHours(hour, 0, 0, 0);
+      const dateISO = triggerTime.toISOString().split('T')[0]; // "2026-03-20"
+      const notificationId = `quote-${dateISO}`;
+
+      // Use shuffled array for quote selection
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
+      const body = shuffledQuotes[i];
 
       // Create notification
       await notifee.createTriggerNotification(
         {
-          id: `special-daily-quote-day${i}`,
+          id: notificationId,
           title: title,
           body: body,
           data: {
             type: 'special',
             subtype: 'daily-quote',
-            dayOffset: i,
+            scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {
             channelId: 'nejonprayer-vib-off',
@@ -436,16 +455,16 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         },
         {
           type: TriggerType.TIMESTAMP,
-          timestamp: quoteDate.getTime(),
+          timestamp: triggerTime.getTime(),
           alarmManager: hasAlarm,
           // NO repeatFrequency - each quote fires once!
         }
       );
 
-      scheduled++;
+      scheduledCount++;
     }
 
-    console.log(`📜 Scheduled ${scheduled} daily quotes for the next ${DAYS_TO_SCHEDULE} days`);
+    console.log(`📜 Scheduled ${scheduledCount} daily quotes`);
   }
 }
 
