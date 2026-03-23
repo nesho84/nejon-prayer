@@ -36,9 +36,16 @@ export default function ExtrasLayout() {
                 }}
             />
             <Stack.Screen
-                name="quran"
+                name="quran/quran"
                 options={{
                     title: tr.labels.quran,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="quran/ayahs"
+                options={{
+                    title: tr.labels.ayahs,
                     headerShown: true,
                 }}
             />

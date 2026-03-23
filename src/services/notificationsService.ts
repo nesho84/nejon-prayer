@@ -381,18 +381,16 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
   // --- Special 2: Daily Quote at random times throughout the day
   if (config.specials.DailyQuote?.enabled) {
+    // Get and Shuffle quotes for variety on each reschedule
     const quotes = QUOTES[language] || QUOTES.en;
-
-    // Shuffle quotes for variety on each reschedule
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
+
+    // Predefined times and shuffle them to avoid same order every day
+    const QUOTE_TIMES = [8, 10, 12, 14, 16, 18, 20, 22];
+    const shuffledTimes = [...QUOTE_TIMES].sort(() => Math.random() - 0.5);
 
     const now = new Date();
     const currentHour = now.getHours();
-
-    // Predetermined time slots: Every 2 hours from 8 AM to 11 PM (9 slots)
-    const QUOTE_TIMES = [8, 10, 12, 14, 16, 18, 20, 22];
-
-    // Schedule as many days as there are quotes
     const DAYS_TO_SCHEDULE = shuffledQuotes.length;
 
     let scheduledCount = 0;
@@ -404,15 +402,20 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       let hour;
 
       if (i === 0) {
-        // TODAY: Find next available time after current hour
-        hour = QUOTE_TIMES.find(h => h > currentHour);
+        // TODAY: Try shuffled times first (for variety)
+        hour = shuffledTimes.find(h => h > currentHour);
+
         if (!hour) {
-          // After 23:00, skip to tomorrow (scheduledCount stays 0)
-          continue;
+          // Fallback: Use fixed array to guarantee a quote
+          hour = QUOTE_TIMES.find(h => h > currentHour);
+          // After 22:00, skip to tomorrow
+          if (!hour) {
+            continue;
+          }
         }
       } else {
-        // FUTURE DAYS: Cycle through predetermined times
-        hour = QUOTE_TIMES[scheduledCount % QUOTE_TIMES.length];
+        // FUTURE DAYS: Cycle through shuffled times
+        hour = shuffledTimes[scheduledCount % shuffledTimes.length];
       }
 
       // Date-based ID - ensures idempotency (same date = same ID)
@@ -420,7 +423,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const dateISO = triggerTime.toISOString().split('T')[0]; // "2026-03-20"
       const notificationId = `quote-${dateISO}`;
 
-      // Use shuffled array for quote selection
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
       const body = shuffledQuotes[i];
 

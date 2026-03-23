@@ -101,7 +101,9 @@ export const TRANSLATIONS = {
             error: "Error",
             accuracy: "Accuracy",
             searchPlaceholder: "Search...",
+            ayah: "Ayah",
             ayahs: "Ayahs",
+            continueReading: "Continue Reading",
             // Settings
             theme: "Theme",
             language: "Language",
@@ -328,7 +330,9 @@ export const TRANSLATIONS = {
             error: "Fehler",
             accuracy: "Genauigkeit",
             searchPlaceholder: "Suche...",
+            ayah: "Ayah",
             ayahs: "Ayahs",
+            continueReading: "Weiterlesen",
             // Settings
             theme: "Darstellung",
             language: "Sprache",
@@ -555,7 +559,9 @@ export const TRANSLATIONS = {
             error: "Gabim",
             accuracy: "Saktësia",
             searchPlaceholder: "Kërko...",
+            ayah: "Ajeti",
             ayahs: "Ajete",
+            continueReading: "Vazhdo Leximin",
             // Settings
             theme: "Pamja",
             language: "Gjuha",
@@ -782,7 +788,9 @@ export const TRANSLATIONS = {
             error: "Hata",
             accuracy: "Doğruluk",
             searchPlaceholder: "Ara...",
+            ayah: "Ayet",
             ayahs: "Ayetler",
+            continueReading: "Okumaya Devam Et",
             // Settings
             theme: "Tema",
             language: "Dil",
@@ -1007,7 +1015,9 @@ export const TRANSLATIONS = {
             error: "خطأ",
             accuracy: "الدقة",
             searchPlaceholder: "ابحث...",
+            ayah: "الآية",
             ayahs: "الآيات",
+            continueReading: "تابع القراءة",
             // Settings
             theme: "المظهر",
             language: "اللغة",

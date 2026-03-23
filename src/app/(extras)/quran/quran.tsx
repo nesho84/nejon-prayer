@@ -1,6 +1,8 @@
+import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
+import QuranContinueRead from "@/components/QuranContinueRead";
 import QuranRow from "@/components/QuranRow";
 import { EDITION_ALAFASY, getSurahAudioUrl, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
@@ -30,7 +32,6 @@ export default function QuranScreen() {
     const syncPlayback = useQuranStore((s) => s.syncPlayback);
 
     // Derived states from TrackPlayer hooks
-    // Ticks every second, only needed by the active row
     const progress = useProgress(1000);
     const currentTime = isSwitching ? 0 : (progress.position ?? 0);
     const duration = isSwitching ? 0 : (progress.duration ?? 0);
@@ -39,7 +40,7 @@ export default function QuranScreen() {
     // Local state / refs
     const [searchQuery, setSearchQuery] = useState("");
     const textInputRef = useRef<TextInput>(null);
-    const listRef = useRef<FlatList<Surah>>(null);
+    const flatListRef = useRef<FlatList<Surah>>(null);
 
     // Must match the height in QuranRow styles
     const ROW_HEIGHT = 90;
@@ -132,7 +133,7 @@ export default function QuranScreen() {
     }, [surahs, searchQuery]);
 
     // ------------------------------------------------------------
-    // Scroll to active surah after unmount and search query clear
+    // Scroll to active surah after unmount or search query clear
     // ------------------------------------------------------------
     useEffect(() => {
         if (!activeSurahId || !surahs?.length) return;
@@ -141,7 +142,7 @@ export default function QuranScreen() {
         const index = surahs.findIndex(s => s.id === activeSurahId);
         if (index === -1) return;
 
-        listRef.current?.scrollToIndex({ index, animated: true });
+        flatListRef.current?.scrollToIndex({ index, animated: true });
     }, [activeSurahId, searchQuery, surahs]);
 
     // ------------------------------------------------------------
@@ -191,10 +192,12 @@ export default function QuranScreen() {
     return (
         <AppScreen>
             <View style={[styles.container, { backgroundColor: theme.bg }]}>
+                {/* Continue Reading Card */}
+                <QuranContinueRead />
 
                 {/* SEARCH bar */}
-                <View style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
-                    <Ionicons name="search-outline" size={18} color={theme.placeholder} />
+                <AppCard style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
+                    <Ionicons name="search-outline" size={20} color={theme.text2} />
                     <TextInput
                         style={[styles.searchInput, { color: theme.text }]}
                         ref={textInputRef}
@@ -210,11 +213,11 @@ export default function QuranScreen() {
                             <Ionicons name="close-circle" size={18} color={theme.placeholder} />
                         </TouchableOpacity>
                     )}
-                </View>
+                </AppCard>
 
                 {/* SURAH list */}
                 <FlatList
-                    ref={listRef}
+                    ref={flatListRef}
                     data={filteredSurahs}
                     keyExtractor={(item) => String(item.id)}
                     renderItem={renderSurahItem}
@@ -232,7 +235,7 @@ export default function QuranScreen() {
                     })}
                     onScrollToIndexFailed={(info) => {
                         setTimeout(() => {
-                            listRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.4 });
+                            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.4 });
                         }, 200);
                     }}
                     ListEmptyComponent={

@@ -64,17 +64,20 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
 
 // Main component
 export default function QuranPlaying() {
+  const router = useRouter();
+
+  // Stores
   const theme = useThemeStore((s) => s.theme);
+
+  // Quran Store
   const isActive = useQuranStore((s) => s.isActive);
   const isPlaying = useQuranStore((s) => s.isPlaying);
   const activeSurahName = useQuranStore((s) => s.activeSurahName);
 
-  const router = useRouter();
-
   if (!isActive || activeSurahName === null) return null;
 
   return (
-    <Pressable onPress={() => router.navigate("/quran")}>
+    <Pressable onPress={() => router.navigate("/(extras)/quran/quran")}>
       {({ pressed }) => (
 
         <View style={[

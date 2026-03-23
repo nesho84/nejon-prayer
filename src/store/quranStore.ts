@@ -1,11 +1,23 @@
-import { loadQuranTransliterationJson, Quran, Surah } from "@/services/quranService";
+import { Ayah, fetchAyahsFromApi, loadQuranTransliterationJson, Quran, Surah } from "@/services/quranService";
+import { useLanguageStore } from "@/store/languageStore";
+import { mmkvStorage } from "@/store/storage";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type QuranData = {
   quran: Quran | null;        // Full Quran with verses
   surahs: Surah[] | null;     // Derived — surah list, without verses
-  quranError: unknown | null; // Error during Quran JSON load, if any
-  isQuranReady: boolean;      // True once Quran JSON is loaded into store
+  quranError: unknown | null;
+  isQuranReady: boolean;
+}
+
+type AyahsData = {
+  ayahs: Ayah[] | null; // Ayahs from API for selected surah & language (non-Arabic)
+  isLoadingAyahs: boolean;
+  ayahsError: unknown;
+  lastReadSurahId: number | null;
+  lastReadSurahName: string | null;
+  lastReadAyahId: number | null;
 }
 
 type QuranPlayerData = {
@@ -19,53 +31,106 @@ type QuranPlayerData = {
   playbackError: unknown;
 }
 
-interface QuranState extends QuranData, QuranPlayerData {
+interface QuranState extends QuranData, AyahsData, QuranPlayerData {
+  // Quran actions
   loadFullQuran: () => void;
   getSurahById: (id: number) => Surah | undefined;
-
+  // Ayahs actions
+  fetchAyahs: (surahId: number) => Promise<void>;
+  setLastRead: (surahId: number, surahName: string, ayahId: number) => void;
+  // Player actions
   syncPlayback: (payload: Partial<QuranPlayerData>) => void;
 }
 
-export const useQuranStore = create<QuranState>()((set, get) => ({
-  // Quran data
-  quran: null,
-  surahs: null,
-  quranError: null,
-  isQuranReady: false,
+export const useQuranStore = create<QuranState>()(
+  persist(
+    (set, get) => ({
+      // Quran data
+      quran: null,
+      surahs: null,
+      quranError: null,
+      isQuranReady: false,
 
-  // Player state
-  isActive: false,
-  isPlaying: false,
-  isBuffering: false,
-  hasFinished: false,
-  isSwitching: false,
-  activeSurahId: null,
-  activeSurahName: null,
-  playbackError: null,
+      // Ayahs data
+      ayahs: null,
+      isLoadingAyahs: false,
+      ayahsError: null,
+      lastReadSurahId: null,
+      lastReadSurahName: null,
+      lastReadAyahId: null,
 
-  // Load full Quran once at app startup
-  // Derives surahs list immediately — strips verses
-  loadFullQuran: () => {
-    try {
-      const quran = loadQuranTransliterationJson();
-      const surahs = quran.map(({ verses, ...surah }) => ({
-        ...surah,
-      }));
-      set({ quran, surahs, quranError: null });
-    } catch (err) {
-      console.error("❌ Failed to load Quran JSON:", err);
-      set({ quran: null, surahs: null, quranError: err });
-    } finally {
-      set({ isQuranReady: true });
+      // Player state
+      isActive: false,
+      isPlaying: false,
+      isBuffering: false,
+      hasFinished: false,
+      isSwitching: false,
+      activeSurahId: null,
+      activeSurahName: null,
+      playbackError: null,
+
+      // Load full Quran once at app startup
+      // Derives surahs list immediately — strips verses
+      loadFullQuran: () => {
+        try {
+          const quran = loadQuranTransliterationJson();
+          const surahs = quran.map(({ verses, ...surah }) => ({
+            ...surah,
+          }));
+          set({ quran, surahs, quranError: null });
+        } catch (err) {
+          console.error("❌ Failed to load Quran JSON:", err);
+          set({ quran: null, surahs: null, quranError: err });
+        } finally {
+          set({ isQuranReady: true });
+        }
+      },
+
+      // Get single surah with verses — for details screen
+      getSurahById: (id) => {
+        return get().quran?.find((s) => s.id === id);
+      },
+
+      // Fetch ayahs for a surah from API in the selected language/edition
+      fetchAyahs: async (surahId) => {
+        const { language } = useLanguageStore.getState();
+
+        // Arabic — already in local JSON, use getSurahById()
+        // AyahsScreen reads verses directly from getSurahById() for Arabic
+        if (language === "ar") return;
+
+        set({ isLoadingAyahs: true, ayahsError: null, ayahs: [] });
+        try {
+          const data = await fetchAyahsFromApi(surahId, language);
+          set({ ayahs: data });
+        } catch (err) {
+          console.error("❌ Failed to fetch ayahs:", err);
+          set({ ayahsError: err });
+        } finally {
+          set({ isLoadingAyahs: false });
+        }
+      },
+
+      // Set last read position
+      setLastRead: (surahId, surahName, ayahId) => set({
+        lastReadSurahId: surahId,
+        lastReadSurahName: surahName,
+        lastReadAyahId: ayahId,
+      }),
+
+      // Sync any playback-related state fields into the store
+      // Accepts a partial payload — only passed fields are updated (shallow merge)
+      syncPlayback: (payload) => set(payload),
+    }),
+    {
+      name: "quran-storage",
+      storage: createJSONStorage(() => mmkvStorage),
+      // Only last read persisted — everything else starts fresh
+      partialize: (state) => ({
+        lastReadSurahId: state.lastReadSurahId,
+        lastReadSurahName: state.lastReadSurahName,
+        lastReadAyahId: state.lastReadAyahId,
+      }),
     }
-  },
-
-  // Get single surah with verses — for details screen
-  getSurahById: (id) => {
-    return get().quran?.find((s) => s.id === id);
-  },
-
-  // Sync any playback-related state fields into the store
-  // Accepts a partial payload — only passed fields are updated (shallow merge)
-  syncPlayback: (payload) => set(payload),
-}));
+  )
+);

@@ -3,6 +3,7 @@ import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Surah } from "@/services/quranService";
 import { Translations } from "@/types/language.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -63,7 +64,22 @@ const QuranRow = React.memo(({
 
   return (
     <AppCard style={[styles.quranCard, { backgroundColor: theme.card, height: rowHeight }]}>
-      <View style={styles.innerContainer}>
+      <TouchableOpacity
+        style={styles.innerContainer}
+        delayPressIn={0}
+        delayPressOut={0}
+        activeOpacity={0.3}
+        disabled={isThisBuffering}
+        onPress={() => {
+          router.navigate({
+            pathname: "/(extras)/quran/ayahs",
+            params: {
+              surahId: surah.id,
+              surahName: surah.transliteration,
+            },
+          });
+        }}
+      >
 
         {/* Left: Number badge */}
         <View style={[
@@ -94,10 +110,12 @@ const QuranRow = React.memo(({
 
           {/* Bottom row */}
           <View style={styles.totalVersesRow}>
-            <Text style={[{ color: theme.textMuted }]}>
-              <Text style={{ fontSize: 20, lineHeight: 18 }}>
-                {surah.type === "meccan" ? "🕋" : "🕌"}{" "}
-              </Text>
+            <Text style={[{ fontSize: 20, lineHeight: 18, color: theme.placeholder }]}>
+              {surah.type === "meccan" ? (
+                <Text>🕋</Text>
+              ) : (
+                <Text style={{ fontSize: 18 }}>🕌</Text>
+              )}{" "}
               <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{surah.total_verses}{" "}</Text>
               <Text style={{ fontSize: 14 }}>{tr.labels.ayahs}</Text>
             </Text>
@@ -138,7 +156,7 @@ const QuranRow = React.memo(({
           </TouchableOpacity>
         </View>
 
-      </View>
+      </TouchableOpacity>
     </AppCard>
   );
 });

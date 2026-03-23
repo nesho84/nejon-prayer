@@ -1,6 +1,8 @@
 import { SOUNDS } from '@/constants/sounds';
 import { scheduleNotificationsService } from '@/services/notificationsService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { usePrayersStore } from '@/store/prayersStore';
 import { mmkvStorage } from '@/store/storage';
 import {
   EventSettings,
@@ -14,8 +16,6 @@ import {
 import { PrayerTimes } from '@/types/prayer.types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { useDeviceSettingsStore } from './deviceSettingsStore';
-import { usePrayersStore } from './prayersStore';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -23,9 +23,11 @@ interface NotificationsState {
   events: Record<PrayerEventType, EventSettings>;
   specials: Record<SpecialType, SpecialSettings>;
   lastScheduledHash: string | null;
+  lastBackgroundSync: string | null;
   isLoading: boolean;
   isReady: boolean;
   syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
+  syncNotificationsInBackground: () => Promise<void>;
   setSettings: (updates: Partial<NotifSettings>) => void;
   setPrayer: (prayer: PrayerType, updates: Partial<PrayerSettings>) => void;
   setEvent: (event: PrayerEventType, updates: Partial<EventSettings>) => void;
@@ -64,6 +66,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       events: DEFAULT_EVENT_SETTINGS,
       specials: DEFAULT_SPECIAL_SETTINGS,
       lastScheduledHash: null,
+      lastBackgroundSync: null,
       isLoading: false,
       isReady: false,
 
@@ -119,6 +122,34 @@ export const useNotificationsStore = create<NotificationsState>()(
           console.error('❌ Failed to schedule notifications:', err);
         } finally {
           set({ isLoading: false });
+        }
+      },
+
+      // Sync background notifications (called in root index.ts on background event)
+      syncNotificationsInBackground: async () => {
+        try {
+          console.log('🔄 [Background] Syncing Notifications...');
+
+          // Check if we already updated today
+          const today = new Date().toISOString().split('T')[0];
+          const lastUpdate = get().lastBackgroundSync;
+
+          if (lastUpdate === today) {
+            console.log('⏸️ [Background] Already updated today, skipping API call');
+            return;
+          }
+
+          // Fetch fresh prayer times
+          await usePrayersStore.getState().loadPrayerTimes();
+          // Sync notifications (hash will prevent unnecessary reschedule)
+          await get().syncNotifications();
+
+          // Mark update complete for today
+          set({ lastBackgroundSync: today });
+
+          console.log('✅ [Background] Notifications synced successfully');
+        } catch (error) {
+          console.error('❌ [Background] Notifications sync failed:', error);
         }
       },
 
