@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function AyahsScreen() {
   const { surahId, surahName } = useLocalSearchParams();
@@ -29,6 +29,8 @@ export default function AyahsScreen() {
   const ayahsError = useQuranStore((s) => s.ayahsError);
   const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
   const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
+  const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
+  const translationFontSize = useQuranStore((state) => state.translationFontSize);
   const getSurahById = useQuranStore((s) => s.getSurahById);
   const fetchAyahs = useQuranStore((s) => s.fetchAyahs);
   const setLastRead = useQuranStore((s) => s.setLastRead);
@@ -99,6 +101,8 @@ export default function AyahsScreen() {
       verse={item}
       translation={translationMap.get(item.id) ?? null}
       theme={theme}
+      arabicFontSize={arabicFontSize}
+      translationFontSize={translationFontSize}
       isSelected={selectedAyah === item.id}
       onPress={() => {
         userInteractedRef.current = true;
@@ -106,7 +110,7 @@ export default function AyahsScreen() {
         setLastRead(surahIdNum, surahNameStr, item.id);
       }}
     />
-  ), [surahIdNum, surahNameStr, theme, selectedAyah, translationMap, setLastRead]);
+  ), [surahIdNum, surahNameStr, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead]);
 
   // Loading state
   if (isLoadingAyahs) {

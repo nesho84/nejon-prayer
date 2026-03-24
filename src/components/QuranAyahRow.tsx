@@ -1,6 +1,5 @@
 import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Verse } from "@/services/quranService";
-import { useQuranStore } from "@/store/quranStore";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -12,21 +11,24 @@ interface Props {
   verse: Verse;                  // Arabic — always from local JSON
   translation: string | null;    // User language — from API, null if Arabic
   theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
+  arabicFontSize: number;
+  translationFontSize: number;
   isSelected: boolean;
   onPress: () => void;
 }
 
+// Main Component (memoized for FlatList performance)
 const QuranAyahRow = React.memo(({
   surahId,
   surahName,
   verse,
   translation,
   theme,
+  arabicFontSize,
+  translationFontSize,
   isSelected,
   onPress,
 }: Props) => {
-  const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
-  const translationFontSize = useQuranStore((state) => state.translationFontSize);
 
   // Share text cross-platform
   const handleShare = async () => {

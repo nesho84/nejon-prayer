@@ -39,6 +39,7 @@ const QuranRow = React.memo(({
   onPlayPauseReplay,
   onStop,
 }: Props) => {
+
   // Local state
   const isThisActive = activeSurahId === surah.id;
   const isThisPlaying = isThisActive && isPlaying;
