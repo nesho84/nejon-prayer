@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ModalType = 'alert' | 'confirm' | 'bottomSheet' | 'fullscreen';
+export type ModalType = 'alert' | 'confirm' | 'fullscreen';
 
 export type ModalButton = {
   label: string;
@@ -15,7 +15,6 @@ export type ModalOptions = {
   content?: string;
   component?: React.ReactNode;
   buttons?: ModalButton[];
-  size?: number; // only for bottomSheet — 0 to 1
 };
 
 interface ModalStore {
@@ -31,13 +30,11 @@ export const useModalStore = create<ModalStore>((set, get) => ({
   options: null,
   resolve: null,
 
-  // Returns a Promise that resolves when the user taps a button
   show: (options) =>
     new Promise((resolve) => {
       set({ visible: true, options, resolve });
     }),
 
-  // Resolves the promise with the action and closes the modal
   hide: (action) => {
     get().resolve?.(action);
     set({ visible: false, options: null, resolve: null });

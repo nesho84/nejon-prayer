@@ -1,56 +1,5 @@
-// ============================================================
-// USAGE EXAMPLES
-// ============================================================
-
-// // Simple alert
-// await useModalStore.getState().show({
-//   type: 'alert',
-//   title: 'Success',
-//   content: 'Label created successfully.',
-//   buttons: [
-//     { label: 'OK', action: 'ok', style: 'primary' },
-//   ],
-// });
-
-// // Confirm with result
-// const result = await useModalStore.getState().show({
-//   type: 'confirm',
-//   title: 'Delete Label',
-//   content: 'This will delete all tasks inside. Are you sure?',
-//   buttons: [
-//     { label: 'Cancel', action: 'cancel' },
-//     { label: 'Delete', action: 'confirm', destructive: true },
-//   ],
-// });
-
-// if (result === 'confirm') {
-//   await deleteLabel(item.id);
-// }
-
-// // Bottom sheet with custom component
-// await useModalStore.getState().show({
-//   type: 'bottomSheet',
-//   size: 0.4,
-//   title: 'Pick an option',
-//   component: <MyCustomContent />,
-//   buttons: [
-//     { label: 'Cancel', action: 'cancel' },
-//     { label: 'Confirm', action: 'confirm', style: 'primary' },
-//   ],
-// });
-
-// // Fullscreen
-// await useModalStore.getState().show({
-//   type: 'fullscreen',
-//   title: 'Settings',
-//   component: <SettingsScreen />,
-//   buttons: [
-//     { label: 'Close', action: 'close' },
-//   ],
-// });
-
-
 import { useModalStore } from '@/store/modalStore';
+import { useThemeStore } from '@/store/themeStore';
 import React from 'react';
 import {
   Modal,
@@ -58,20 +7,19 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ModalProvider() {
   const { visible, options, hide } = useModalStore();
-  const { height } = useWindowDimensions();
+  const theme = useThemeStore((s) => s.theme);
+  const insets = useSafeAreaInsets();
 
-  // Always render Modal — controlled by visible prop so animations complete properly
-  // Render nothing inside when not visible to avoid layout work
   if (!options && !visible) return null;
 
   // ------------------------------------------------------------
-  // Shared buttons renderer
+  // Render buttons based on options
   // ------------------------------------------------------------
   const renderButtons = () => (
     <View style={styles.btnRow}>
@@ -80,8 +28,9 @@ export default function ModalProvider() {
           key={btn.action}
           style={[
             styles.btn,
-            btn.style === 'primary' && styles.btnPrimary,
-            btn.destructive && styles.btnDestructive,
+            { backgroundColor: theme.card },
+            btn.style === 'primary' && { backgroundColor: theme.primary },
+            btn.destructive && { backgroundColor: theme.danger + '18' },
           ]}
           onPress={() => hide(btn.action)}
           activeOpacity={0.8}
@@ -89,8 +38,9 @@ export default function ModalProvider() {
           <Text
             style={[
               styles.btnText,
-              btn.style === 'primary' && styles.btnTextPrimary,
-              btn.destructive && styles.btnTextDestructive,
+              { color: theme.text },
+              btn.style === 'primary' && { color: theme.white },
+              btn.destructive && { color: theme.danger },
             ]}
           >
             {btn.label}
@@ -101,7 +51,7 @@ export default function ModalProvider() {
   );
 
   // ------------------------------------------------------------
-  // Alert / Confirm — fade animation, centered on screen
+  // ---- Alert / Confirm ----
   // ------------------------------------------------------------
   if (options?.type === 'alert' || options?.type === 'confirm') {
     return (
@@ -110,14 +60,13 @@ export default function ModalProvider() {
         transparent
         animationType="fade"
         statusBarTranslucent
-        navigationBarTranslucent
         onRequestClose={() => hide('dismiss')}
       >
-        <View style={styles.alertOverlay}>
+        <View style={styles.overlay}>
           <Pressable style={StyleSheet.absoluteFillObject} onPress={() => hide('dismiss')} />
-          <View style={styles.alertContainer}>
-            {options.title && <Text style={styles.title}>{options.title}</Text>}
-            {options.content && <Text style={styles.content}>{options.content}</Text>}
+          <View style={[styles.alertContainer, { backgroundColor: theme.bg2, shadowColor: theme.black }]}>
+            {options.title && <Text style={[styles.title, { color: theme.text }]}>{options.title}</Text>}
+            {options.content && <Text style={[styles.content, { color: theme.text2 }]}>{options.content}</Text>}
             {options.component}
             {options.buttons && renderButtons()}
           </View>
@@ -127,38 +76,7 @@ export default function ModalProvider() {
   }
 
   // ------------------------------------------------------------
-  // Bottom sheet — slide animation, appears from bottom
-  // ------------------------------------------------------------
-  if (options?.type === 'bottomSheet') {
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        animationType="slide"
-        presentationStyle='formSheet'
-        statusBarTranslucent
-        navigationBarTranslucent
-        onRequestClose={() => hide('dismiss')}
-      >
-        <View style={styles.sheetOverlay}>
-          <Pressable style={StyleSheet.absoluteFillObject} onPress={() => hide('dismiss')} />
-          <View style={[
-            styles.bottomSheet,
-            { maxHeight: height * (options.size ?? 0.5) },
-          ]}>
-            <View style={styles.handle} />
-            {options.title && <Text style={styles.title}>{options.title}</Text>}
-            {options.content && <Text style={styles.content}>{options.content}</Text>}
-            {options.component}
-            {options.buttons && renderButtons()}
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  // ------------------------------------------------------------
-  // Fullscreen — slide animation, covers full screen
+  // ---- Fullscreen ----
   // ------------------------------------------------------------
   if (options?.type === 'fullscreen') {
     return (
@@ -166,12 +84,11 @@ export default function ModalProvider() {
         visible={visible}
         animationType="slide"
         statusBarTranslucent
-        navigationBarTranslucent
         onRequestClose={() => hide('dismiss')}
       >
-        <View style={styles.fullscreen}>
-          {options.title && <Text style={styles.title}>{options.title}</Text>}
-          {options.content && <Text style={styles.content}>{options.content}</Text>}
+        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+          {options.title && <Text style={[styles.title, { color: theme.text }]}>{options.title}</Text>}
+          {options.content && <Text style={[styles.content, { color: theme.text2 }]}>{options.content}</Text>}
           {options.component}
           {options.buttons && renderButtons()}
         </View>
@@ -183,8 +100,7 @@ export default function ModalProvider() {
 }
 
 const styles = StyleSheet.create({
-  // Alert overlay — centered
-  alertOverlay: {
+  overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
@@ -193,56 +109,25 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     width: '100%',
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
     gap: 12,
     elevation: 8,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
   },
-  // Sheet overlay — anchored to bottom
-  sheetOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  bottomSheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
-    padding: 20,
-    gap: 12,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    alignSelf: 'center',
-    marginBottom: 4,
-  },
   fullscreen: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     gap: 12,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#1a1a1a',
   },
   content: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
   },
   btnRow: {
@@ -256,23 +141,108 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.06)',
-  },
-  btnPrimary: {
-    backgroundColor: '#1a73e8',
-  },
-  btnDestructive: {
-    backgroundColor: 'rgba(217,48,37,0.1)',
   },
   btnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-  },
-  btnTextPrimary: {
-    color: '#fff',
-  },
-  btnTextDestructive: {
-    color: '#d93025',
   },
 });
+
+// ============================================================
+// USAGE EXAMPLES 1
+// ============================================================
+
+// // Simple alert
+// const result = await useModalStore.getState().show({
+//   type: 'alert',
+//   title: 'Success',
+//   content: 'Operation completed.',
+//   buttons: [{ label: 'OK', action: 'ok', style: 'primary' }],
+// });
+
+// // Confirm dialog
+// const result = await useModalStore.getState().show({
+//   type: 'confirm',
+//   title: 'Delete Item',
+//   content: 'Are you sure?',
+//   buttons: [
+//     { label: 'Cancel', action: 'cancel' },
+//     { label: 'Delete', action: 'confirm', destructive: true },
+//   ],
+// });
+// if (result === 'confirm') { /* do it */ }
+
+// // Fullscreen with custom component
+// await useModalStore.getState().show({
+//   type: 'fullscreen',
+//   title: 'Details',
+//   component: <MyComponent />,
+//   buttons: [{ label: 'Close', action: 'close' }],
+// });
+
+
+// ============================================================
+// USAGE EXAMPLES 2
+// ============================================================
+
+{/* <AppCard style={{ paddingHorizontal: 14, paddingVertical: 16 }}>
+  <Text style={{ color: theme.text, fontSize: 16, fontWeight: '700', marginBottom: 12 }}>
+    🧪 Modal Tests
+  </Text>
+
+  <TouchableOpacity
+    style={{ backgroundColor: theme.primary, padding: 12, borderRadius: 10, marginBottom: 8 }}
+    onPress={async () => {
+      const result = await useModalStore.getState().show({
+        type: 'alert',
+        title: 'Success',
+        content: 'Prayer times have been updated successfully.',
+        buttons: [{ label: 'OK', action: 'ok', style: 'primary' }],
+      });
+      console.log('Alert result:', result);
+    }}
+  >
+    <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Test Alert</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={{ backgroundColor: theme.danger, padding: 12, borderRadius: 10, marginBottom: 8 }}
+    onPress={async () => {
+      const result = await useModalStore.getState().show({
+        type: 'confirm',
+        title: 'Reset Settings',
+        content: 'This will reset all settings to their defaults. Are you sure?',
+        buttons: [
+          { label: 'Cancel', action: 'cancel' },
+          { label: 'Reset', action: 'confirm', destructive: true },
+        ],
+      });
+      console.log('Confirm result:', result);
+    }}
+  >
+    <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Test Confirm</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={{ backgroundColor: theme.accent, padding: 12, borderRadius: 10 }}
+    onPress={async () => {
+      const result = await useModalStore.getState().show({
+        type: 'fullscreen',
+        title: 'Fullscreen Modal',
+        content: 'This is a fullscreen modal example. You can put any component here.',
+        component: (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: '600', color: theme.text2, marginBottom: 12 }}>Fullscreen Modal Content</Text>
+            <Text style={{ fontSize: 14, color: theme.text2, textAlign: 'center' }}>
+              You can customize this with your own components, styles, and logic.
+            </Text>
+          </View>
+        ),
+        buttons: [{ label: 'Close', action: 'close', style: 'primary' }],
+      });
+      console.log('Fullscreen result:', result);
+    }}
+  >
+    <Text style={{ color: '#fff', textAlign: 'center', fontWeight: '600' }}>Test Fullscreen</Text>
+  </TouchableOpacity>
+</AppCard> */}
