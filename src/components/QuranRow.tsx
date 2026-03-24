@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface QuranRowProps {
+interface Props {
   surah: Surah;
   theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
   tr: Translations;
@@ -38,7 +38,7 @@ const QuranRow = React.memo(({
   rowHeight,
   onPlayPauseReplay,
   onStop,
-}: QuranRowProps) => {
+}: Props) => {
   // Local state
   const isThisActive = activeSurahId === surah.id;
   const isThisPlaying = isThisActive && isPlaying;

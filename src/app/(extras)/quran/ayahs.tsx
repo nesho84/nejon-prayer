@@ -6,10 +6,11 @@ import { Verse } from '@/services/quranService';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
+import { Ionicons } from '@expo/vector-icons';
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function AyahsScreen() {
   const { surahId, surahName } = useLocalSearchParams();
@@ -126,7 +127,21 @@ export default function AyahsScreen() {
   return (
     <AppScreen>
       {/* Top Navigation bar */}
-      <Stack.Screen options={{ title: surahNameStr }} />
+      <Stack.Screen
+        options={{
+          title: surahNameStr,
+          headerRight: () => (
+            <TouchableOpacity
+              delayPressIn={0}
+              delayPressOut={0}
+              activeOpacity={0.3}
+              disabled={isLoadingAyahs}
+              onPress={() => router.navigate('/(modals)/quranSettings')}>
+              <Ionicons name="settings-outline" size={24} color={theme.text2} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
 
       <FlashList
         ref={flashListRef}

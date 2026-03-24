@@ -214,7 +214,7 @@ export default function HomeScreen() {
                         delayPressOut={0}
                         activeOpacity={0.3}
                         disabled={!prayerTimes}
-                        onPress={() => router.navigate('/prayerTimings')}
+                        onPress={() => router.navigate('/(modals)/prayerTimings')}
                     >
                         {/* Left: Calendar icon */}
                         <View style={styles.calendarLeftIcon}>
@@ -259,7 +259,7 @@ export default function HomeScreen() {
                                         delayPressOut={0}
                                         activeOpacity={0.3}
                                         onPress={() => {
-                                            router.navigate(`/prayerNotification?prayer=${prayerName}`);
+                                            router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`);
                                         }}
                                     >
                                         <View

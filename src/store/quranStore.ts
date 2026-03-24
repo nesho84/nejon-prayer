@@ -12,7 +12,7 @@ type QuranData = {
 }
 
 type AyahsData = {
-  ayahs: Ayah[] | null; // Ayahs from API for selected surah & language (non-Arabic)
+  ayahs: Ayah[] | null; // Ayahs from API
   isLoadingAyahs: boolean;
   ayahsError: unknown;
   lastReadSurahId: number | null;

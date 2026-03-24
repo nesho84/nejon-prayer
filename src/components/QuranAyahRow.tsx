@@ -5,7 +5,7 @@ import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface QuranAyahRowProps {
+interface Props {
   surahId: number;
   surahName: string;
   verse: Verse;                  // Arabic — always from local JSON
@@ -23,7 +23,7 @@ const QuranAyahRow = React.memo(({
   theme,
   isSelected,
   onPress,
-}: QuranAyahRowProps) => {
+}: Props) => {
 
   // Share text cross-platform
   const handleShare = async () => {
