@@ -1,5 +1,6 @@
 import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Verse } from "@/services/quranService";
+import { useQuranStore } from "@/store/quranStore";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -24,6 +25,8 @@ const QuranAyahRow = React.memo(({
   isSelected,
   onPress,
 }: Props) => {
+  const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
+  const translationFontSize = useQuranStore((state) => state.translationFontSize);
 
   // Share text cross-platform
   const handleShare = async () => {
@@ -96,13 +99,13 @@ const QuranAyahRow = React.memo(({
         </View>
 
         {/* Arabic text */}
-        <Text style={[styles.arabicText, { color: theme.accent }]}>
+        <Text style={[styles.arabicText, { color: theme.accent, fontSize: arabicFontSize, lineHeight: arabicFontSize * 1.85 }]}>
           {verse.text}
         </Text>
 
         {/* Translation */}
         {translation && (
-          <Text style={[styles.translationText, { color: theme.text }]}>
+          <Text style={[styles.translationText, { color: theme.text, fontSize: translationFontSize, lineHeight: translationFontSize * 1.55 }]}>
             {translation}
           </Text>
         )}
@@ -150,7 +153,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   translationText: {
-    fontFamily: "Inter",
     fontSize: 18,
     lineHeight: 28,
     textAlign: "justify",

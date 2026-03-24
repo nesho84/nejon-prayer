@@ -208,6 +208,11 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times based on your location. Designed to be simple, reliable and help you maintain your prayer routine.",
+            // Quran Settings
+            quranSettingsTitle: "Quran Settings",
+            quranSettingsSubtitle: "Customize your Quran reading experience",
+            quranTranslation: "Translation",
+            quranPreviewTranslation: "In the name of Allah, the Most Gracious, the Most Merciful.",
         },
         buttons: {
             cancel: "Cancel",
@@ -437,6 +442,11 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie ist so konzipiert, dass sie einfach, zuverlässig ist und Ihnen hilft, Ihre Gebetsroutine einzuhalten.",
+            // Quran Settings
+            quranSettingsTitle: "Koran-Einstellungen",
+            quranSettingsSubtitle: "Passen Sie Ihr Koran-Leseerlebnis an",
+            quranTranslation: "Übersetzung",
+            quranPreviewTranslation: "Im Namen Allahs, des Allerbarmers, des Barmherzigen.",
         },
         buttons: {
             cancel: "Abbrechen",
@@ -666,6 +676,11 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Rreth këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
+            // Quran Settings
+            quranSettingsTitle: "Cilësimet e Kur'anit",
+            quranSettingsSubtitle: "Personalizoni përvojën tuaj me Kur'anin",
+            quranTranslation: "Përkthimi",
+            quranPreviewTranslation: "Me emrin e All-llahut, Mëshiruesit, Mëshirëbërësit.",
         },
         buttons: {
             cancel: "Anulo",
@@ -895,6 +910,11 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Bu Uygulama Hakkında",
             aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri sağlar. Basit, güvenilir ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
+            // Quran Settings
+            quranSettingsTitle: "Kur'an Ayarları",
+            quranSettingsSubtitle: "Kur'an okuma deneyiminizi özelleştirin",
+            quranTranslation: "Çeviri",
+            quranPreviewTranslation: "Rahman ve Rahîm olan Allah'ın adıyla.",
         },
         buttons: {
             cancel: "İptal",
@@ -1122,6 +1142,11 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "حول هذا التطبيق",
             aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة بناءً على موقعك. تم تصميمه ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",
+            // Quran Settings
+            quranSettingsTitle: "إعدادات القرآن",
+            quranSettingsSubtitle: "خصّص تجربة قراءة القرآن",
+            quranTranslation: "الترجمة",
+            quranPreviewTranslation: "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
         },
         buttons: {
             cancel: "إلغاء",

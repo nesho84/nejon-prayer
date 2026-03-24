@@ -10,7 +10,7 @@ import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
 export default function QuranScreen() {
@@ -130,7 +130,7 @@ export default function QuranScreen() {
             surah.name.includes(q) ||
             String(surah.id).includes(q)
         );
-    }, [surahs, searchQuery]);
+    }, [surahs, searchQuery, activeSurahId]);
 
     // ------------------------------------------------------------
     // Scroll to active surah after unmount or search query clear
@@ -144,6 +144,25 @@ export default function QuranScreen() {
 
         flatListRef.current?.scrollToIndex({ index, animated: true });
     }, [activeSurahId, searchQuery, surahs]);
+
+    // ------------------------------------------------------------
+    // Scroll to the active surah
+    // ------------------------------------------------------------
+    const scrollToSurah = useCallback((info: { index: number; highestMeasuredFrameIndex: number }) => {
+        // First scroll to the highest rendered row so the target gets laid out
+        flatListRef.current?.scrollToIndex({
+            index: Math.max(0, info.highestMeasuredFrameIndex),
+            animated: false,
+        });
+        // Then scroll to the actual target after layout settles
+        setTimeout(() => {
+            flatListRef.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+                viewPosition: 0.4,
+            });
+        }, 100);
+    }, []);
 
     // ------------------------------------------------------------
     // Render surah row
@@ -168,7 +187,7 @@ export default function QuranScreen() {
                 onStop={(surah) => handleStop(surah)}
             />
         );
-    }, [theme, isPlaying, isBuffering, hasFinished, activeSurahId, currentTime, duration, playbackError, handlePlayPauseReplay, handleStop]);
+    }, [theme, tr, isPlaying, isBufferingActive, hasFinished, activeSurahId, currentTime, duration, playbackError, handlePlayPauseReplay, handleStop]);
 
     // Loading state
     if (!isQuranReady) {
@@ -228,23 +247,12 @@ export default function QuranScreen() {
                     windowSize={7}
                     removeClippedSubviews={true}
                     onMomentumScrollBegin={() => textInputRef.current?.blur()}
+                    onScrollToIndexFailed={(info) => scrollToSurah(info)}
                     getItemLayout={(_, index) => ({
                         length: ROW_HEIGHT,
                         offset: (ROW_HEIGHT + ROW_GAP) * index,
                         index
                     })}
-                    onScrollToIndexFailed={(info) => {
-                        setTimeout(() => {
-                            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.4 });
-                        }, 200);
-                    }}
-                    ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Text style={[styles.emptyText, { color: theme.placeholder }]}>
-                                {tr.labels.noSurahsFound ?? "No surahs found"}
-                            </Text>
-                        </View>
-                    }
                 />
 
             </View>

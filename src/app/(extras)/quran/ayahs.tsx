@@ -9,8 +9,8 @@ import { useThemeStore } from '@/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 export default function AyahsScreen() {
   const { surahId, surahName } = useLocalSearchParams();
@@ -136,7 +136,8 @@ export default function AyahsScreen() {
               delayPressOut={0}
               activeOpacity={0.3}
               disabled={isLoadingAyahs}
-              onPress={() => router.navigate('/(modals)/quranSettings')}>
+              onPress={() => router.navigate('/(modals)/quranSettings')}
+            >
               <Ionicons name="settings-outline" size={24} color={theme.text2} />
             </TouchableOpacity>
           ),
@@ -150,7 +151,7 @@ export default function AyahsScreen() {
         renderItem={renderAyahItem}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={styles.ayahList}
         showsVerticalScrollIndicator={false}
         onScrollBeginDrag={() => userInteractedRef.current = true}
         onLayout={() => {
@@ -165,7 +166,7 @@ export default function AyahsScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: {
+  ayahList: {
     paddingBottom: 24,
   },
 });

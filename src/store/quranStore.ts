@@ -20,6 +20,11 @@ type AyahsData = {
   lastReadAyahId: number | null;
 }
 
+type QuranSettings = {
+  arabicFontSize: number;
+  translationFontSize: number;
+}
+
 type QuranPlayerData = {
   isActive: boolean;
   isPlaying: boolean;
@@ -31,13 +36,15 @@ type QuranPlayerData = {
   playbackError: unknown;
 }
 
-interface QuranState extends QuranData, AyahsData, QuranPlayerData {
+interface QuranState extends QuranData, AyahsData, QuranSettings, QuranPlayerData {
   // Quran actions
   loadFullQuran: () => void;
   getSurahById: (id: number) => Surah | undefined;
   // Ayahs actions
   fetchAyahs: (surahId: number) => Promise<void>;
   setLastRead: (surahId: number, surahName: string, ayahId: number) => void;
+  // Settings actions
+  setQuranSettings: (settings: Partial<QuranSettings>) => void;
   // Player actions
   syncPlayback: (payload: Partial<QuranPlayerData>) => void;
 }
@@ -58,6 +65,10 @@ export const useQuranStore = create<QuranState>()(
       lastReadSurahId: null,
       lastReadSurahName: null,
       lastReadAyahId: null,
+
+      // Settings
+      arabicFontSize: 26,
+      translationFontSize: 18,
 
       // Player state
       isActive: false,
@@ -118,6 +129,9 @@ export const useQuranStore = create<QuranState>()(
         lastReadAyahId: ayahId,
       }),
 
+      // Update Quran settings (font sizes)
+      setQuranSettings: (settings) => set(settings),
+
       // Sync any playback-related state fields into the store
       // Accepts a partial payload — only passed fields are updated (shallow merge)
       syncPlayback: (payload) => set(payload),
@@ -130,6 +144,8 @@ export const useQuranStore = create<QuranState>()(
         lastReadSurahId: state.lastReadSurahId,
         lastReadSurahName: state.lastReadSurahName,
         lastReadAyahId: state.lastReadAyahId,
+        arabicFontSize: state.arabicFontSize,
+        translationFontSize: state.translationFontSize,
       }),
     }
   )

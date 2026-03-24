@@ -176,6 +176,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   // ------------------------------------------------------------
   const gesture = Gesture.Pan()
     .enabled(!staticMode)
+    .activeOffsetY([-10, 10])
     .onUpdate((event) => {
       if (event.translationY > 0) translateY.value = event.translationY;
     })
