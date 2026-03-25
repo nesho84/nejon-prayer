@@ -201,6 +201,7 @@ export const TRANSLATIONS = {
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
             quranSurahsError: "Failed to load surahs. Please check your internet connection.",
             noSurahsFound: "No surah found.",
+            quranAyahsError: "Failed to load ayahs. Please check your internet connection.",
             // Prayer times Settings
             calendarTitle: "Prayer Times Calendar",
             calendarSubtitle: "View prayer times for selected date",
@@ -209,6 +210,7 @@ export const TRANSLATIONS = {
             aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times based on your location. Designed to be simple, reliable and help you maintain your prayer routine.",
             // Quran Settings
+            quranArabic: "Arabic",
             quranSettingsTitle: "Quran Settings",
             quranSettingsSubtitle: "Customize your Quran reading experience",
             quranTranslation: "Translation",
@@ -435,6 +437,7 @@ export const TRANSLATIONS = {
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             quranSurahsError: "Surahs konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             noSurahsFound: "Keine Surah gefunden.",
+            quranAyahsError: "Ayahs konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             // Prayer times Settings
             calendarTitle: "Gebetszeiten-Kalender",
             calendarSubtitle: "Gebetszeiten für ausgewähltes Datum anzeigen",
@@ -443,6 +446,7 @@ export const TRANSLATIONS = {
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie ist so konzipiert, dass sie einfach, zuverlässig ist und Ihnen hilft, Ihre Gebetsroutine einzuhalten.",
             // Quran Settings
+            quranArabic: "Arabisch",
             quranSettingsTitle: "Koran-Einstellungen",
             quranSettingsSubtitle: "Passen Sie Ihr Koran-Leseerlebnis an",
             quranTranslation: "Übersetzung",
@@ -669,6 +673,7 @@ export const TRANSLATIONS = {
             prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             quranSurahsError: "Suret nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             noSurahsFound: "Nuk u gjet asnjë Sure.",
+            quranAyahsError: "Ajetet nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             // Prayer times Settings
             calendarTitle: "Kalendari i kohëve të Namazit",
             calendarSubtitle: "Kohët e Namazit sipas datës së caktuar",
@@ -677,8 +682,9 @@ export const TRANSLATIONS = {
             aboutText1: "Rreth këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
             // Quran Settings
+            quranArabic: "Arabisht",
             quranSettingsTitle: "Cilësimet e Kur'anit",
-            quranSettingsSubtitle: "Personalizoni përvojën tuaj me Kur'anin",
+            quranSettingsSubtitle: "Personalizoni përvojën e leximit të Kur'anit",
             quranTranslation: "Përkthimi",
             quranPreviewTranslation: "Me emrin e All-llahut, Mëshiruesit, Mëshirëbërësit.",
         },
@@ -903,6 +909,7 @@ export const TRANSLATIONS = {
             prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             quranSurahsError: "Sureler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             noSurahsFound: "Hiç sure bulunamadı.",
+            quranAyahsError: "Ayetler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             // Prayer times Settings
             calendarTitle: "Namaz Vakitleri Takvimi",
             calendarSubtitle: "Belirli bir tarihe göre namaz vakitleri",
@@ -911,6 +918,7 @@ export const TRANSLATIONS = {
             aboutText1: "Bu Uygulama Hakkında",
             aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri sağlar. Basit, güvenilir ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
             // Quran Settings
+            quranArabic: "Arapça",
             quranSettingsTitle: "Kur'an Ayarları",
             quranSettingsSubtitle: "Kur'an okuma deneyiminizi özelleştirin",
             quranTranslation: "Çeviri",
@@ -1135,6 +1143,7 @@ export const TRANSLATIONS = {
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
             quranSurahsError: "تعذر تحميل السور. يرجى التحقق من اتصال الإنترنت.",
             noSurahsFound: "لم يتم العثور على أي سور.",
+            quranAyahsError: "تعذر تحميل الآيات. يرجى التحقق من اتصال الإنترنت.",
             // Prayer times Settings
             calendarTitle: "تقويم أوقات الصلاة",
             calendarSubtitle: "أوقات الصلاة لتاريخ معين",
@@ -1143,8 +1152,9 @@ export const TRANSLATIONS = {
             aboutText1: "حول هذا التطبيق",
             aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة بناءً على موقعك. تم تصميمه ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",
             // Quran Settings
+            quranArabic: "العربية",
             quranSettingsTitle: "إعدادات القرآن",
-            quranSettingsSubtitle: "خصّص تجربة قراءة القرآن",
+            quranSettingsSubtitle: "خصّص تجربتك في قراءة القرآن",
             quranTranslation: "الترجمة",
             quranPreviewTranslation: "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
         },

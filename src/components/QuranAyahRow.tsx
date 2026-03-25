@@ -1,5 +1,5 @@
-import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Verse } from "@/services/quranService";
+import { ThemeColors } from "@/types/theme.types";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -8,9 +8,9 @@ import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface Props {
   surahId: number;
   surahName: string;
-  verse: Verse;                  // Arabic — always from local JSON
-  translation: string | null;    // User language — from API, null if Arabic
-  theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
+  verse: Verse;               // Arabic — always from local JSON
+  translation: string | null; // User language — from API, null if Arabic
+  theme: ThemeColors;
   arabicFontSize: number;
   translationFontSize: number;
   isSelected: boolean;

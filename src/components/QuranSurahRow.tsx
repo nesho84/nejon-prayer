@@ -1,7 +1,7 @@
 import AppCard from "@/components/AppCard";
-import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
 import { Surah } from "@/services/quranService";
 import { Translations } from "@/types/language.types";
+import { ThemeColors } from "@/types/theme.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -9,7 +9,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 
 interface Props {
   surah: Surah;
-  theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
+  theme: ThemeColors;
   tr: Translations;
   activeSurahId: number | null;
   isPlaying: boolean;
@@ -24,7 +24,7 @@ interface Props {
 }
 
 // Main Component (memoized for FlatList performance)
-const QuranRow = React.memo(({
+const QuranSurahRow = React.memo(({
   surah,
   theme,
   tr,
@@ -162,7 +162,7 @@ const QuranRow = React.memo(({
   );
 });
 
-export default QuranRow;
+export default QuranSurahRow;
 
 const styles = StyleSheet.create({
   quranCard: {

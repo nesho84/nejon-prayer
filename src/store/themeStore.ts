@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "@/store/storage";
 import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
+import { ThemeColors } from "@/types/theme.types";
 import { Appearance } from "react-native";
 
 type ThemeMode = "light" | "dark" | "system";
@@ -9,7 +10,7 @@ type ResolvedTheme = "light" | "dark";
 
 interface ThemeState {
   themeMode: ThemeMode;
-  theme: typeof LIGHT_COLORS | typeof DARK_COLORS;
+  theme: ThemeColors;
   resolvedTheme: ResolvedTheme;
   isReady: boolean;
   setTheme: (themeMode: ThemeMode) => void;

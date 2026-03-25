@@ -55,7 +55,7 @@ export default function ExtrasScreen() {
         },
         {
             id: 4,
-            href: "(extras)/quran/quran",
+            href: "(extras)/quran/surahs",
             type: 'internal',
             label: tr.labels.quran,
             description: tr.labels.quranDesc || "Read and explore the Quran",

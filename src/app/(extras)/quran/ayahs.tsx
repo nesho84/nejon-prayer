@@ -121,7 +121,7 @@ export default function AyahsScreen() {
   if (ayahsError) {
     return (
       <AppError
-        message={"@TODO: 'tr.labels.quranAyahsError'"}
+        message={tr.labels.quranAyahsError}
         buttonText={tr.buttons.retry}
         onPress={() => fetchAyahs(surahIdNum)}
       />

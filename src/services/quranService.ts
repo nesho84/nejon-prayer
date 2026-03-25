@@ -8,9 +8,9 @@ export interface Verse {
 }
 
 export interface Ayah {
-  number: number;        // global ayah number (1–6236)
-  numberInSurah: number; // ayah number within surah (1–N)
-  text: string;          // text in the fetched language/edition
+  number: number;          // global ayah number (1–6236)
+  numberInSurah: number;   // ayah number within surah (1–N)
+  text: string;            // text in the fetched language/edition
 }
 
 export interface Surah {
@@ -35,43 +35,49 @@ export function loadQuranTransliterationJson(): Quran {
 }
 
 // ------------------------------------------------------------
-// Constants - Ayah translation edition identifiers — alquran.cloud API
+// Translation editions per language — alquran.cloud API
 // Full list: https://api.alquran.cloud/v1/edition/language/{code}
 // ------------------------------------------------------------
-// English
-export const EDITION_EN_SAHIH = "en.sahih";         // Saheeh International
-export const EDITION_EN_YUSUFALI = "en.yusufali";   // Abdullah Yusuf Ali
-export const EDITION_EN_PICKTHALL = "en.pickthall"; // Mohammed Marmaduke Pickthall
-export const EDITION_EN_ASAD = "en.asad";           // Muhammad Asad
-export const EDITION_EN_HILALI = "en.hilali";       // Al-Hilali & Muhsin Khan
-export const EDITION_EN_ITANI = "en.itani";         // Clear Qur'an — Talal Itani
-export const EDITION_EN_MAUDUDI = "en.maududi";     // Abul Ala Maududi
-// Deutsch (German)
-export const EDITION_DE_BUBENHEIM = "de.bubenheim"; // Bubenheim & Elyas
-export const EDITION_DE_ABURIDA = "de.aburida";     // Abu Rida Muhammad ibn Ahmad
-export const EDITION_DE_KHOURY = "de.khoury";       // Adel Theodor Khoury
-export const EDITION_DE_ZAIDAN = "de.zaidan";       // Amir Zaidan
-// Shqip (Albanian)
-export const EDITION_SQ_AHMETI = "sq.ahmeti"; // Sherif Ahmeti
-export const EDITION_SQ_MEHDIU = "sq.mehdiu"; // Feti Mehdiu
-export const EDITION_SQ_NAHI = "sq.nahi";     // Hasan Efendi Nahi
-// Turkish
-export const EDITION_TR_DIYANET = "tr.diyanet";   // Diyanet İşleri
-export const EDITION_TR_VAKFI = "tr.vakfi";       // Diyanet Vakfı
-export const EDITION_TR_YAZIR = "tr.yazir";       // Elmalılı Hamdi Yazır
-export const EDITION_TR_BULAC = "tr.bulac";       // Ali Bulaç
-export const EDITION_TR_ATES = "tr.ates";         // Süleyman Ateş
-export const EDITION_TR_YILDIRIM = "tr.yildirim"; // Suat Yıldırım
+export const QURAN_TEXT_EDITIONS = {
+  en: {
+    sahih: "en.sahih",         // Saheeh International (default)
+    yusufali: "en.yusufali",   // Abdullah Yusuf Ali
+    pickthall: "en.pickthall", // Mohammed Marmaduke Pickthall
+    asad: "en.asad",           // Muhammad Asad
+    hilali: "en.hilali",       // Al-Hilali & Muhsin Khan
+    itani: "en.itani",         // Clear Qur'an — Talal Itani
+    maududi: "en.maududi",     // Abul Ala Maududi
+  },
+  de: {
+    bubenheim: "de.bubenheim", // Bubenheim & Elyas (default)
+    aburida: "de.aburida",     // Abu Rida Muhammad ibn Ahmad
+    khoury: "de.khoury",       // Adel Theodor Khoury
+    zaidan: "de.zaidan",       // Amir Zaidan
+  },
+  sq: {
+    ahmeti: "sq.ahmeti",     // Sherif Ahmeti (default)
+    mehdiu: "sq.mehdiu",     // Feti Mehdiu
+    nahi: "sq.nahi",         // Hasan Efendi Nahi
+  },
+  tr: {
+    diyanet: "tr.diyanet",   // Diyanet İşleri (default)
+    vakfi: "tr.vakfi",       // Diyanet Vakfı
+    yazir: "tr.yazir",       // Elmalılı Hamdi Yazır
+    bulac: "tr.bulac",       // Ali Bulaç
+    ates: "tr.ates",         // Süleyman Ateş
+    yildirim: "tr.yildirim", // Suat Yıldırım
+  },
+} as const;
 
 // ------------------------------------------------------------
 // Default edition per app language
 // Change the value to switch translator for that language
 // ------------------------------------------------------------
 const AYAH_EDITIONS: Record<string, string> = {
-  en: EDITION_EN_SAHIH,
-  de: EDITION_DE_BUBENHEIM,
-  sq: EDITION_SQ_AHMETI,
-  tr: EDITION_TR_DIYANET,
+  en: QURAN_TEXT_EDITIONS.en.sahih,
+  de: QURAN_TEXT_EDITIONS.de.bubenheim,
+  sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
+  tr: QURAN_TEXT_EDITIONS.tr.diyanet,
 };
 
 // ------------------------------------------------------------
@@ -107,20 +113,22 @@ export async function fetchAyahsFromApi(surahId: number, language: string): Prom
 }
 
 // ------------------------------------------------------------
-// Constants (Audio)
+// Audio reciter editions
 // ------------------------------------------------------------
-const AUDIO_CDN = "https://cdn.islamic.network/quran/audio-surah";
-const BITRATE = 128;
-
-export const EDITION_ALAFASY = "ar.alafasy";                // Mishary Alafasy
-export const EDITION_AZZAHRANI = "ar.abdulazizazzahrani";   // Abdulaziz Al-Zahrani
-export const EDITION_THUBAITY = "ar.abdulbariaththubaity";  // Abdul Bari Thubaity
-export const EDITION_ABDULBARI = "ar.abdulbarimohammed";    // Abdul Bari Mohammed
-export const EDITION_ABDULBASIT = "ar.abdulbasitmurattal";  // Abdul Basit Murattal
+export const AUDIO_EDITIONS = {
+  alafasy: "ar.alafasy",               // Mishary Alafasy (default)
+  azzahrani: "ar.abdulazizazzahrani",  // Abdulaziz Al-Zahrani
+  thubaity: "ar.abdulbariaththubaity", // Abdul Bari Thubaity
+  abdulbari: "ar.abdulbarimohammed",   // Abdul Bari Mohammed
+  abdulbasit: "ar.abdulbasitmurattal", // Abdul Basit Murattal
+} as const;
 
 // ------------------------------------------------------------
 // Audio CDN URL for a given surah id and edition
 // ------------------------------------------------------------
-export function getSurahAudioUrl(surahId: number, edition: string = EDITION_ALAFASY): string {
+const AUDIO_CDN = "https://cdn.islamic.network/quran/audio-surah";
+const BITRATE = 128;
+
+export function getSurahAudioUrl(surahId: number, edition: string = AUDIO_EDITIONS.alafasy): string {
   return `${AUDIO_CDN}/${BITRATE}/${edition}/${surahId}.mp3`;
 }

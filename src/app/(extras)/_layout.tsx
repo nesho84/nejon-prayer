@@ -35,11 +35,13 @@ export default function ExtrasLayout() {
                     headerShown: true,
                 }}
             />
+            {/* Quran-related screens */}
             <Stack.Screen
-                name="quran/quran"
+                name="quran/surahs"
                 options={{
                     title: tr.labels.quran,
                     headerShown: true,
+                    animation: "slide_from_right",
                 }}
             />
             <Stack.Screen
@@ -47,6 +49,7 @@ export default function ExtrasLayout() {
                 options={{
                     title: tr.labels.ayahs,
                     headerShown: true,
+                    animation: "slide_from_right",
                 }}
             />
             <Stack.Screen

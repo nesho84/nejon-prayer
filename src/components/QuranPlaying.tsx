@@ -77,7 +77,7 @@ export default function QuranPlaying() {
   if (!isActive || activeSurahName === null) return null;
 
   return (
-    <Pressable onPress={() => router.navigate("/(extras)/quran/quran")}>
+    <Pressable onPress={() => router.navigate("/(extras)/quran/surahs")}>
       {({ pressed }) => (
 
         <View style={[

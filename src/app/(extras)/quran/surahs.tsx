@@ -2,18 +2,20 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
-import QuranContinueRead from "@/components/QuranContinueRead";
-import QuranRow from "@/components/QuranRow";
-import { EDITION_ALAFASY, getSurahAudioUrl, Surah } from "@/services/quranService";
+import QuranSurahRow from "@/components/QuranSurahRow";
+import { AUDIO_EDITIONS, getSurahAudioUrl, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
-export default function QuranScreen() {
+export default function SurahsScreen() {
+    const router = useRouter();
+
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
@@ -23,6 +25,9 @@ export default function QuranScreen() {
     const activeSurahId = useQuranStore((s) => s.activeSurahId);
     const quranError = useQuranStore((s) => s.quranError);
     const isQuranReady = useQuranStore((s) => s.isQuranReady);
+    const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
+    const lastReadSurahName = useQuranStore((s) => s.lastReadSurahName);
+    const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
 
     const isPlaying = useQuranStore((s) => s.isPlaying);
     const isBuffering = useQuranStore((s) => s.isBuffering);
@@ -42,7 +47,7 @@ export default function QuranScreen() {
     const textInputRef = useRef<TextInput>(null);
     const flatListRef = useRef<FlatList<Surah>>(null);
 
-    // Must match the height in QuranRow styles
+    // Must match the height in QuranSurahRow styles
     const ROW_HEIGHT = 90;
     const ROW_GAP = 10;
 
@@ -83,7 +88,7 @@ export default function QuranScreen() {
             id: `surah-${surah.id}`,
             url: audioUrl,
             title: surah.transliteration,
-            artist: EDITION_ALAFASY,
+            artist: AUDIO_EDITIONS.alafasy,
             isLiveStream: false,
         });
         await TrackPlayer.play();
@@ -170,7 +175,7 @@ export default function QuranScreen() {
     const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
         const isThisActive = activeSurahId === item.id;
         return (
-            <QuranRow
+            <QuranSurahRow
                 surah={item}
                 theme={theme}
                 tr={tr}
@@ -211,8 +216,39 @@ export default function QuranScreen() {
     return (
         <AppScreen>
             <View style={[styles.container, { backgroundColor: theme.bg }]}>
-                {/* Continue Reading Card */}
-                <QuranContinueRead />
+                {/* CONTINUE Reading Card */}
+                {lastReadSurahId && lastReadAyahId && (
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            router.navigate({
+                                pathname: "/(extras)/quran/ayahs",
+                                params: {
+                                    surahId: lastReadSurahId,
+                                    surahName: lastReadSurahName,
+                                },
+                            });
+                        }}
+                    >
+                        <AppCard style={[styles.continueCard, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
+                            <View style={styles.continueContent}>
+                                <View style={styles.continueLabelRow}>
+                                    <MaterialCommunityIcons name="book-open-variant" size={22} color={theme.text2} />
+                                    <Text style={[styles.continueLabel, { color: theme.text2 }]}>
+                                        {tr.labels.continueReading}
+                                    </Text>
+                                </View>
+                                <Text style={[styles.continueSurahName, { color: theme.text }]}>
+                                    {lastReadSurahName}
+                                </Text>
+                                <Text style={[styles.continueAyahNumber, { color: theme.text2 }]}>
+                                    {tr.labels.ayah} {lastReadAyahId}
+                                </Text>
+                            </View>
+                            <Ionicons name="arrow-forward" size={26} color={theme.accent} style={{ marginRight: -4 }} />
+                        </AppCard>
+                    </TouchableOpacity>
+                )}
 
                 {/* SEARCH bar */}
                 <AppCard style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
@@ -263,6 +299,41 @@ export default function QuranScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    continueCard: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 16,
+        marginHorizontal: 16,
+        paddingHorizontal: 24,
+        paddingVertical: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+    },
+    continueContent: {
+        flex: 1,
+        gap: 10,
+    },
+    continueLabelRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    continueLabel: {
+        fontSize: 14,
+        fontWeight: "400",
+        letterSpacing: 0.5,
+        marginTop: 1,
+    },
+    continueSurahName: {
+        fontSize: 22,
+        fontWeight: "900",
+        letterSpacing: 2,
+    },
+    continueAyahNumber: {
+        fontSize: 13,
+        fontWeight: "400",
+        letterSpacing: 0.5,
     },
     searchInputContainer: {
         flexDirection: "row",

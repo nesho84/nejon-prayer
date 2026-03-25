@@ -99,7 +99,7 @@ export default function QuranSettingsScreen() {
         <AppCard style={styles.settingCard}>
           <View style={styles.statusRow}>
             <Text style={[styles.settingTitle, { color: theme.text }]}>
-              العربية
+              {tr.labels.quranArabic} (العربية):
             </Text>
             <Text style={{ color: theme.text2, opacity: 0.7 }}>
               {tempArabicSize}px
@@ -117,20 +117,20 @@ export default function QuranSettingsScreen() {
             thumbTintColor={theme.accent}
             tapToSeek={true}
           />
-
-          {/* Preview */}
+          {/* Arabic Preview */}
           <View style={[styles.previewContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
             <Text style={[styles.previewArabic, { color: theme.accent, fontSize: tempArabicSize, lineHeight: tempArabicSize * 1.85 }]}>
               بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
             </Text>
           </View>
-        </AppCard>
 
-        {/* ------ Translation Font Size ------ */}
-        <AppCard style={styles.settingCard}>
+          {/* Divider */}
+          <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+
+          {/* ------ Translation Font Size ------ */}
           <View style={styles.statusRow}>
             <Text style={[styles.settingTitle, { color: theme.text }]}>
-              {tr.labels.quranTranslation}
+              {tr.labels.quranTranslation}:
             </Text>
             <Text style={{ color: theme.text2, opacity: 0.7 }}>
               {tempTranslationSize}px
@@ -148,8 +148,7 @@ export default function QuranSettingsScreen() {
             thumbTintColor={theme.accent}
             tapToSeek={true}
           />
-
-          {/* Preview */}
+          {/* Translation Preview */}
           <View style={[styles.previewContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
             <Text style={[styles.previewTranslation, { color: theme.text, fontSize: tempTranslationSize, lineHeight: tempTranslationSize * 1.55 }]}>
               {tr.labels.quranPreviewTranslation}
@@ -200,6 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
   slider: {
     flex: 1,
@@ -207,6 +207,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 3,
     marginHorizontal: -8,
+  },
+  divider: {
+    borderWidth: StyleSheet.hairlineWidth,
+    marginVertical: 24,
+    marginHorizontal: 4,
   },
 
   // Preview
@@ -217,10 +222,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   previewArabic: {
-    textAlign: 'right',
+    textAlign: 'center',
   },
   previewTranslation: {
-    textAlign: 'justify',
+    textAlign: 'center',
   },
 
   // Footer styles
