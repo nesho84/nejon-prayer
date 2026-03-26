@@ -192,7 +192,7 @@ export default function SurahsScreen() {
                 onStop={(surah) => handleStop(surah)}
             />
         );
-    }, [theme, tr, isPlaying, isBufferingActive, hasFinished, activeSurahId, currentTime, duration, playbackError, handlePlayPauseReplay, handleStop]);
+    }, [theme, tr, activeSurahId, isPlaying, hasFinished, playbackError, currentTime, duration]);
 
     // Loading state
     if (!isQuranReady) {
@@ -222,7 +222,7 @@ export default function SurahsScreen() {
                         activeOpacity={0.7}
                         onPress={() => {
                             router.navigate({
-                                pathname: "/(extras)/quran/ayahs",
+                                pathname: "/(quran)/ayahs",
                                 params: {
                                     surahId: lastReadSurahId,
                                     surahName: lastReadSurahName,

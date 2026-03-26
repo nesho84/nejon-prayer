@@ -73,7 +73,7 @@ const QuranSurahRow = React.memo(({
         disabled={isThisBuffering}
         onPress={() => {
           router.navigate({
-            pathname: "/(extras)/quran/ayahs",
+            pathname: "/(quran)/ayahs",
             params: {
               surahId: surah.id,
               surahName: surah.transliteration,

@@ -26,6 +26,7 @@ const RootStack = () => {
       <Stack.Protected guard={onboardingComplete}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
         <Stack.Screen name="(extras)" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="(quran)" options={{ animation: "slide_from_right" }} />
         {/* Modal Screens */}
         <Stack.Screen
           name="(modals)"
