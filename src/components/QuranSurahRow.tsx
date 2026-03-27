@@ -149,12 +149,15 @@ const QuranSurahRow = React.memo(({
 
           {/* Play / Pause / Replay / Error button */}
           <TouchableOpacity
-            style={[styles.playerButton, { marginRight: -5 }]}
+            style={styles.playerButton}
             onPress={() => onPlayPauseReplay(surah)}
             disabled={isThisBuffering}
           >
             {playButtonIcon()}
           </TouchableOpacity>
+
+          {/* Chevron right icon */}
+          <Ionicons name="chevron-forward" size={14} color={theme.text2} style={{ opacity: 0.3, marginRight: -4 }} />
         </View>
 
       </TouchableOpacity>

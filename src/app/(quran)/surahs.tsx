@@ -7,7 +7,7 @@ import { AUDIO_EDITIONS, getSurahAudioUrl, Surah } from "@/services/quranService
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -234,18 +234,18 @@ export default function SurahsScreen() {
                             <View style={styles.continueContent}>
                                 <View style={styles.continueLabelRow}>
                                     <MaterialCommunityIcons name="book-open-variant" size={22} color={theme.text2} />
-                                    <Text style={[styles.continueLabel, { color: theme.text2 }]}>
+                                    <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
                                         {tr.labels.continueReading}
                                     </Text>
                                 </View>
                                 <Text style={[styles.continueSurahName, { color: theme.text }]}>
                                     {lastReadSurahName}
                                 </Text>
-                                <Text style={[styles.continueAyahNumber, { color: theme.text2 }]}>
+                                <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.7 }]}>
                                     {tr.labels.ayah} {lastReadAyahId}
                                 </Text>
                             </View>
-                            <Ionicons name="arrow-forward" size={26} color={theme.accent} style={{ marginRight: -4 }} />
+                            <MaterialIcons name="arrow-right-alt" size={42} color={theme.accent} style={{ marginRight: -6 }} />
                         </AppCard>
                     </TouchableOpacity>
                 )}
@@ -312,21 +312,21 @@ const styles = StyleSheet.create({
     },
     continueContent: {
         flex: 1,
-        gap: 10,
+        gap: 8,
     },
     continueLabelRow: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap: 10,
     },
     continueLabel: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: "400",
         letterSpacing: 0.5,
         marginTop: 1,
     },
     continueSurahName: {
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: "900",
         letterSpacing: 2,
     },

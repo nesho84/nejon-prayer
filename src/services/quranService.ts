@@ -81,7 +81,7 @@ const AYAH_EDITIONS: Record<string, string> = {
 };
 
 // ------------------------------------------------------------
-// Fetch ayahs for a surah from alquran.cloud
+// Fetch ayahs for a surah from alquran.cloud (aladhan.com)
 // Called from quranStore.fetchAyahs() for non-Arabic languages
 // Arabic reads directly from local JSON via getSurahById()
 // ------------------------------------------------------------

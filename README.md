@@ -395,6 +395,8 @@ expo run:ios
 - If using EAS for release builds, do a test build:
 ```bash
 eas build --platform android --profile preview
+eas build --platform android --profile release-apk
+
 eas build --platform ios --profile preview
 ```
 - Verify the app doesn’t crash and native modules behave correctly.
