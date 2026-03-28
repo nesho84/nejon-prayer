@@ -286,9 +286,9 @@ export default function HomeScreen() {
                                                     {prayerTime}
                                                 </Text>
                                                 {/* Prayer Time Icon */}
-                                                <NotifIcon size={22} color={theme.text} />
+                                                <NotifIcon size={22} color={theme.text} style={{ marginRight: -6 }} />
                                                 {/* Chevron Icon */}
-                                                <Ionicons name="chevron-forward" size={12} color={theme.text2} style={{ opacity: 0.2, marginLeft: -6 }} />
+                                                <Ionicons name="chevron-forward" size={12} color={theme.text2} style={{ opacity: 0.2 }} />
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -423,12 +423,12 @@ const styles = StyleSheet.create({
     prayerTimeSection: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 12,
     },
     prayerTimeText: {
         fontSize: 16,
         fontWeight: '600',
-        letterSpacing: 0.3,
+        letterSpacing: 0.5,
     },
     prayerDivider: {
         height: 1,

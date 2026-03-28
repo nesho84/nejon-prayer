@@ -1,24 +1,32 @@
 import { AppLocation } from '@/types/location.types';
-import { PrayerName, PrayerTimes } from '@/types/prayer.types';
+import { PrayerName, PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
 
 interface AladhanTimings {
     [key: string]: string;
 }
 
-interface AladhanResponse {
-    data?: {
-        timings?: AladhanTimings;
+interface AladhanDayData {
+    timings: AladhanTimings;
+    date: {
+        gregorian: {
+            date: string; // "01-01-2026"
+        };
     };
 }
 
-/**
- * @param customTimestamp - Unix timestamp in seconds, normalized to local midnight
- *                          in the user's timezone. Use Math.floor(localDate.getTime() / 1000).
- */
+interface AladhanCalendarResponse {
+    data?: Record<string, AladhanDayData[]>; // { "1": [...], "2": [...], ... }
+}
+
+// Prayers we care about — others (Sunset, Midnight, etc.) are excluded
+const PRAYER_NAMES: PrayerName[] = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
 // ------------------------------------------------------------
-// Fetch prayer times from aladhan.com API
+// Fetch yearly prayer times from aladhan.com API
+// Fetched once per year, on first app start and on location change.
+// Returns a flat map of { "YYYY-MM-DD": PrayerTimes } for all 365 days.
 // ------------------------------------------------------------
-export async function getPrayerTimes(location: AppLocation, customTimestamp?: number): Promise<PrayerTimes> {
+export async function getYearlyPrayerTimes(location: AppLocation, year: number): Promise<YearlyPrayerTimes> {
     const { latitude, longitude } = location;
 
     // Validate coordinates
@@ -31,18 +39,6 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
     let timeout: ReturnType<typeof setTimeout> | undefined;
 
     try {
-        let timestamp: number;
-
-        // Use provided customTimestamp
-        if (customTimestamp !== undefined) {
-            timestamp = customTimestamp;
-        } else {
-            // Compute today's timestamp in user's local timezone
-            const localDate = new Date();
-            localDate.setHours(0, 0, 0, 0);
-            timestamp = Math.floor(localDate.getTime() / 1000);
-        }
-
         // Dynamically choose calculation method based on latitude
         let method: number = 2; // fallback ISNA
         let methodSettings: string | null = null;
@@ -61,7 +57,7 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
         }
 
         // Build API URL
-        let url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
+        let url = `https://api.aladhan.com/v1/calendar/${year}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
         if (method === 99 && methodSettings) {
             url += `&methodSettings=${encodeURIComponent(methodSettings)}`;
         }
@@ -69,11 +65,10 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
             url += `&tune=${encodeURIComponent(tune)}`;
         }
 
-        // Fetch prayer times with AbortController (10s timeout)
+        // Fetch yearly calendar with AbortController (30s timeout for larger payload)
         const controller = new AbortController();
-        timeout = setTimeout(() => controller.abort(), 10000);
+        timeout = setTimeout(() => controller.abort(), 30000);
 
-        // Fetch prayer times
         const response = await fetch(url, { signal: controller.signal });
 
         // Check if response is ok
@@ -82,38 +77,41 @@ export async function getPrayerTimes(location: AppLocation, customTimestamp?: nu
         }
 
         // Get the results
-        const result: AladhanResponse = await response.json();
+        const result: AladhanCalendarResponse = await response.json();
 
         // Validate response structure
-        if (!result?.data?.timings) {
+        if (!result?.data) {
             throw new Error("Invalid API response structure");
         }
 
-        let timings = result.data.timings;
-        // console.log("aladhan api response:", JSON.stringify(result, null, 2));
+        // Flatten months/days { "1": [...], "2": [...] } into { "YYYY-MM-DD": PrayerTimes }
+        // Calendar endpoint returns timings with timezone suffix e.g. "06:10 (CET)" — strip to "06:10"
+        const prayerTimes: YearlyPrayerTimes = {};
 
-        // Return custom prayers
-        const PRAYER_ORDER_FULL: PrayerName[] = [
-            "Imsak",
-            "Fajr",
-            "Sunrise",
-            "Dhuhr",
-            "Asr",
-            "Maghrib",
-            "Isha"
-        ];
+        Object.values(result.data).forEach((month) => {
+            month.forEach((day) => {
+                // Convert Aladhan date format "01-01-2026" → "2026-01-01"
+                const [d, m, y] = day.date.gregorian.date.split("-");
+                const isoDate = `${y}-${m}-${d}`;
 
-        const filtered: Partial<PrayerTimes> = {};
-        PRAYER_ORDER_FULL.forEach((key) => {
-            if (timings[key]) {
-                filtered[key] = timings[key];
-            }
+                // Filter to only needed prayers and strip timezone suffix
+                const filtered: Partial<PrayerTimes> = {};
+                PRAYER_NAMES.forEach((key) => {
+                    if (day.timings[key]) {
+                        filtered[key] = day.timings[key].split(" ")[0];
+                    }
+                });
+
+                prayerTimes[isoDate] = filtered as PrayerTimes;
+            });
         });
 
-        return filtered as PrayerTimes; // { Fajr: "06:00", Dhuhr: "12:50", ... }
+        console.log(`✅ [prayersService] Fetched prayer times for ${Object.keys(prayerTimes).length} days for ${year} from API`);
+
+        return prayerTimes;
 
     } catch (err) {
-        console.warn("❌ [prayersService] API fetch error: ", err);
+        console.warn("❌ [prayersService] Yearly fetch error:", err);
         throw err;
     } finally {
         clearTimeout(timeout);

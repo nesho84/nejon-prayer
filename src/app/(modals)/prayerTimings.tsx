@@ -1,9 +1,9 @@
 import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
-import { getPrayerTimes } from "@/services/prayersService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
+import { usePrayersStore } from "@/store/prayersStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
@@ -29,22 +29,25 @@ export default function PrayersSettingsScreen() {
     const ModalSheetRef = useRef<ModalSheetRef>(null);
 
     // ------------------------------------------------------------
-    // Fetch prayer times by date
+    // Get yearly prayer times from prayers store for the selected date
     // ------------------------------------------------------------
     const fetchPrayerTimesForDate = async (date: Date) => {
         if (!location) return;
 
         setIsLoading(true);
         try {
-            // Compute today's timestamp in user's local timezone
-            const localDate = new Date(date);
-            localDate.setHours(0, 0, 0, 0);
-            const timestamp = Math.floor(localDate.getTime() / 1000);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            const dateKey = `${y}-${m}-${d}`;
 
-            const times = await getPrayerTimes(location, timestamp);
+            // Simulate a short loading delay for better UX
+            await new Promise((resolve) => setTimeout(resolve, 400));
+
+            const times = await usePrayersStore.getState().getPrayerTimesForDate(dateKey);
             setPrayerTimesByDate(times);
         } catch (err) {
-            console.warn("⚠️ [prayerTimings] Failed to fetch prayer times from API:", err);
+            console.warn("⚠️ [prayerTimings] Failed to get prayer times:", err);
             setPrayerTimesByDate(null);
         } finally {
             setIsLoading(false);

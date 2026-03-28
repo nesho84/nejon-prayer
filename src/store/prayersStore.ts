@@ -1,10 +1,10 @@
 import { getUserLocation, hasLocationChanged } from '@/services/locationService';
-import { getPrayerTimes } from '@/services/prayersService';
+import { getYearlyPrayerTimes } from '@/services/prayersService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { mmkvStorage } from '@/store/storage';
-import { PrayerTimes } from '@/types/prayer.types';
+import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -15,11 +15,12 @@ interface PrayersState {
   lastFetchedDate: string | null;
   isLoading: boolean;
   isReady: boolean;
+  yearlyPrayerTimes: YearlyPrayerTimes | null;
+  fetchedYear: number | null;
   loadPrayerTimes: () => Promise<void>;
   reloadPrayerTimes: () => Promise<void>;
+  getPrayerTimesForDate: (dateKey: string) => Promise<PrayerTimes | null>;
 }
-
-const STALE_DAYS = 3;
 
 export const usePrayersStore = create<PrayersState>()(
   persist(
@@ -30,6 +31,8 @@ export const usePrayersStore = create<PrayersState>()(
       lastFetchedDate: null,
       isLoading: false,
       isReady: false,
+      yearlyPrayerTimes: null,
+      fetchedYear: null,
 
       // Load prayer times (uses existing location)
       loadPrayerTimes: async () => {
@@ -46,56 +49,60 @@ export const usePrayersStore = create<PrayersState>()(
             return;
           }
 
-          // ONLINE: fetch from API (always fetch when online)
+          // Compute today's date key
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const m = String(now.getMonth() + 1).padStart(2, "0");
+          const d = String(now.getDate()).padStart(2, "0");
+          const todayKey = `${currentYear}-${m}-${d}`;
+
+          const { yearlyPrayerTimes, fetchedYear } = get();
+
+          // Already have data for this year — derive today's times locally
+          if (yearlyPrayerTimes && fetchedYear === currentYear) {
+            const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
+            if (todaysTimes) {
+              set({ prayerTimes: todaysTimes, prayersOutdated: false });
+              console.log('💾 [prayersStore] Prayer times loaded from stored yearly data');
+              return;
+            }
+          }
+
+          // ONLINE: Need to fetch — first time, new year, or cache miss
           if (internetConnection) {
             try {
-              const timings = await getPrayerTimes(location);
+              const yearly = await getYearlyPrayerTimes(location, currentYear);
 
-              if (timings) {
-                const lastFetched = new Date().toLocaleString('en-GB');
+              set({
+                yearlyPrayerTimes: yearly,
+                fetchedYear: currentYear,
+                prayerTimes: yearly[todayKey] ?? null,
+                lastFetchedDate: new Date().toLocaleString('en-GB'),
+                prayersOutdated: false,
+              });
 
-                set({
-                  prayerTimes: timings,
-                  lastFetchedDate: lastFetched,
-                  prayersOutdated: false
-                });
-
-                console.log('🌐 [prayersStore]  Prayer times loaded from API');
-
-                return; // Exit early
-              }
+              console.log('🌐 [prayersStore] Yearly prayer times fetched&loaded from API');
+              return;
             } catch (err) {
-              console.warn("⚠️ Failed to fetch prayer times from API:", err);
+              console.warn("⚠️ Failed to fetch yearly prayer times:", err);
             }
           }
 
           // OFFLINE: Fallback to saved data if fetch failed
-          const savedTimes = get().prayerTimes;
-          const lastFetched = get().lastFetchedDate;
-          if (savedTimes) {
-            console.log('💾 [prayersStore] Using storage prayer times');
-
-            // Check if outdated EVERY time we use storage
-            let isOutdated = false;
-            if (lastFetched) {
-              const timestamp = new Date(lastFetched).getTime();
-              const daysDiff = (Date.now() - timestamp) / (1000 * 60 * 60 * 24);
-              isOutdated = daysDiff > STALE_DAYS;
-            }
-
-            set({ prayersOutdated: isOutdated });
-
-            if (isOutdated) {
-              console.log(`⚠️ Saved prayer times are outdated (>${STALE_DAYS} days old)`);
-            }
-
-            return; // Exit early
+          if (yearlyPrayerTimes) {
+            set({
+              prayerTimes: yearlyPrayerTimes[todayKey] ?? null,
+              prayersOutdated: fetchedYear !== currentYear,
+            });
+            console.log('💾 [prayersStore] Offline — using stored yearly data');
+            return;
           }
 
-          // NO DATA: no online, no saved
+
+          // No data at all
           set({
             prayerTimes: null,
-            prayersError: !internetConnection ? tr.labels.noInternet : tr.labels.prayersError
+            prayersError: !internetConnection ? tr.labels.noInternet : tr.labels.prayersError,
           });
 
         } catch (err: any) {
@@ -106,26 +113,23 @@ export const usePrayersStore = create<PrayersState>()(
         }
       },
 
-      // Reload prayer times (requests location first, then loads)
+      // Reload prayer times (requests location first, then fetches fresh yearly data)
       reloadPrayerTimes: async () => {
         set({ isLoading: true });
 
         const tr = useLanguageStore.getState().tr;
 
         try {
-          // Get fresh location
           const newLocation = await getUserLocation(tr);
 
           if (!newLocation) {
-            console.log("📍 [prayersStore] Location denied or unavailable, cannot load prayers");
+            console.log("📍 [prayersStore] Location denied or unavailable, cannot load prayer times");
             return;
           }
 
-          // Check for location changes, before updating state
           if (!hasLocationChanged(useLocationStore.getState(), newLocation)) {
             console.log('📍 [prayersStore] Location unchanged — skipping save');
           } else {
-            // Update locationStore
             useLocationStore.getState().setLocation(
               newLocation.location,
               newLocation.fullAddress,
@@ -134,6 +138,8 @@ export const usePrayersStore = create<PrayersState>()(
             console.log("📍 [prayersStore] Location updated to:", newLocation.location);
           }
 
+          // Force fresh yearly fetch
+          set({ fetchedYear: null });
           await get().loadPrayerTimes();
 
         } catch (err) {
@@ -143,21 +149,24 @@ export const usePrayersStore = create<PrayersState>()(
           set({ isLoading: false });
         }
       },
+
+      // Used by prayerTimings modal for offline date explorer
+      getPrayerTimesForDate: async (dateKey: string) => {
+        return get().yearlyPrayerTimes?.[dateKey] ?? null;
+      },
+
     }),
     {
-      name: 'prayers-storage',
+      name: 'prayers-storage-v2',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         prayerTimes: state.prayerTimes,
         lastFetchedDate: state.lastFetchedDate,
+        yearlyPrayerTimes: state.yearlyPrayerTimes,
+        fetchedYear: state.fetchedYear,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state && state.lastFetchedDate) {
-          // Check if prayers are outdated again
-          const timestamp = new Date(state.lastFetchedDate).getTime();
-          const daysDiff = (Date.now() - timestamp) / (1000 * 60 * 60 * 24);
-          state.prayersOutdated = daysDiff > STALE_DAYS;
-
+        if (state) {
           state.isReady = true;
         }
       },

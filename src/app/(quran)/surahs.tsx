@@ -245,7 +245,7 @@ export default function SurahsScreen() {
                                     {tr.labels.ayah} {lastReadAyahId}
                                 </Text>
                             </View>
-                            <MaterialIcons name="arrow-right-alt" size={42} color={theme.accent} style={{ marginRight: -6 }} />
+                            <MaterialIcons name="arrow-right-alt" size={40} color={theme.accent} style={{ marginRight: -6 }} />
                         </AppCard>
                     </TouchableOpacity>
                 )}

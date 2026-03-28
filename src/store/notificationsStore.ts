@@ -135,11 +135,11 @@ export const useNotificationsStore = create<NotificationsState>()(
           const lastUpdate = get().lastBackgroundSync;
 
           if (lastUpdate === today) {
-            console.log('⏸️ [Background] Already updated today, skipping API call');
+            console.log('⏸️ [Background] Already updated today, skipping sync');
             return;
           }
 
-          // Fetch fresh prayer times
+          // Load today's prayer times from yearly cache
           await usePrayersStore.getState().loadPrayerTimes();
           // Sync notifications (hash will prevent unnecessary reschedule)
           await get().syncNotifications();
