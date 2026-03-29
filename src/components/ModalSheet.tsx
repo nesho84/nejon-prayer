@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import {
   BackHandler,
@@ -87,7 +87,6 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   footer,
   onClose
 }, ref) => {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
 

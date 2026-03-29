@@ -28,6 +28,10 @@ export default function PrayersSettingsScreen() {
     // Refs
     const ModalSheetRef = useRef<ModalSheetRef>(null);
 
+    // Edge case checks for year boundaries (for better UX when navigating with arrows)
+    const isFirstDayOfYear = selectedDate.getMonth() === 0 && selectedDate.getDate() === 1;
+    const isLastDayOfYear = selectedDate.getMonth() === 11 && selectedDate.getDate() === 31;
+
     // ------------------------------------------------------------
     // Get yearly prayer times from prayers store for the selected date
     // ------------------------------------------------------------
@@ -41,8 +45,10 @@ export default function PrayersSettingsScreen() {
             const d = String(date.getDate()).padStart(2, "0");
             const dateKey = `${y}-${m}-${d}`;
 
-            // Simulate a short loading delay for better UX
-            await new Promise((resolve) => setTimeout(resolve, 400));
+            // Simulate a short random loading delay for better UX (0, 100, ..., 800 ms)
+            const randomDelay = Math.floor(Math.random() * 9) * 100;
+            // console.log(randomDelay);
+            await new Promise((resolve) => setTimeout(resolve, randomDelay));
 
             const times = await usePrayersStore.getState().getPrayerTimesForDate(dateKey);
             setPrayerTimesByDate(times);
@@ -69,6 +75,9 @@ export default function PrayersSettingsScreen() {
     const changeDate = (dayOffset: number) => {
         const newDate = new Date(selectedDate);
         newDate.setDate(newDate.getDate() + dayOffset);
+
+        if (newDate.getFullYear() !== new Date().getFullYear()) return;
+
         setSelectedDate(newDate);
     };
 
@@ -201,7 +210,7 @@ export default function PrayersSettingsScreen() {
                             style={styles.arrowButton}
                             activeOpacity={0.6}
                         >
-                            <Ionicons name="chevron-back" size={28} color={theme.accent} />
+                            <Ionicons name="chevron-back" size={28} color={isFirstDayOfYear ? theme.placeholder : theme.accent} />
                         </TouchableOpacity>
 
                         {/* Date Input (tap for calendar picker) */}
@@ -231,8 +240,8 @@ export default function PrayersSettingsScreen() {
                                 mode="date"
                                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                                 onChange={onDateChange}
-                                maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
-                                minimumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 1))}
+                                minimumDate={new Date(new Date().getFullYear(), 0, 1)}
+                                maximumDate={new Date(new Date().getFullYear(), 11, 31)}
                             />
                         )}
 
@@ -242,7 +251,7 @@ export default function PrayersSettingsScreen() {
                             style={styles.arrowButton}
                             activeOpacity={0.6}
                         >
-                            <Ionicons name="chevron-forward" size={28} color={theme.accent} />
+                            <Ionicons name="chevron-forward" size={28} color={isLastDayOfYear ? theme.placeholder : theme.accent} />
                         </TouchableOpacity>
                     </View>
                 </AppCard>

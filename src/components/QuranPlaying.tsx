@@ -1,7 +1,7 @@
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -64,8 +64,6 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
 
 // Main component
 export default function QuranPlaying() {
-  const router = useRouter();
-
   // Stores
   const theme = useThemeStore((s) => s.theme);
 

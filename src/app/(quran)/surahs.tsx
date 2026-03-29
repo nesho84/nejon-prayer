@@ -8,14 +8,12 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
 export default function SurahsScreen() {
-    const router = useRouter();
-
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
@@ -46,6 +44,11 @@ export default function SurahsScreen() {
     const [searchQuery, setSearchQuery] = useState("");
     const textInputRef = useRef<TextInput>(null);
     const flatListRef = useRef<FlatList<Surah>>(null);
+
+    // Start reading defaults
+    const FIRST_SURAH_ID = 1;
+    const FIRST_SURAH_NAME = "Al-Fatihah";
+    const FIRST_AYAH_ID = 1;
 
     // Must match the height in QuranSurahRow styles
     const ROW_HEIGHT = 90;
@@ -216,39 +219,37 @@ export default function SurahsScreen() {
     return (
         <AppScreen>
             <View style={[styles.container, { backgroundColor: theme.bg }]}>
-                {/* CONTINUE Reading Card */}
-                {lastReadSurahId && lastReadAyahId && (
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => {
-                            router.navigate({
-                                pathname: "/(quran)/ayahs",
-                                params: {
-                                    surahId: lastReadSurahId,
-                                    surahName: lastReadSurahName,
-                                },
-                            });
-                        }}
-                    >
-                        <AppCard style={[styles.continueCard, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
-                            <View style={styles.continueContent}>
-                                <View style={styles.continueLabelRow}>
-                                    <MaterialCommunityIcons name="book-open-variant" size={22} color={theme.text2} />
-                                    <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
-                                        {tr.labels.continueReading}
-                                    </Text>
-                                </View>
-                                <Text style={[styles.continueSurahName, { color: theme.text }]}>
-                                    {lastReadSurahName}
-                                </Text>
-                                <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.7 }]}>
-                                    {tr.labels.ayah} {lastReadAyahId}
+                {/* START/CONTINUE Reading Card */}
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                        router.navigate({
+                            pathname: "/(quran)/ayahs",
+                            params: {
+                                surahId: lastReadSurahId ?? FIRST_SURAH_ID,
+                                surahName: lastReadSurahName ?? FIRST_SURAH_NAME,
+                            },
+                        });
+                    }}
+                >
+                    <AppCard style={[styles.continueCard, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
+                        <View style={styles.continueContent}>
+                            <View style={styles.continueLabelRow}>
+                                <MaterialCommunityIcons name="book-open-variant" size={22} color={theme.text2} />
+                                <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
+                                    {lastReadSurahId ? tr.labels.continueReading : tr.labels.startReading}
                                 </Text>
                             </View>
-                            <MaterialIcons name="arrow-right-alt" size={40} color={theme.accent} style={{ marginRight: -6 }} />
-                        </AppCard>
-                    </TouchableOpacity>
-                )}
+                            <Text style={[styles.continueSurahName, { color: theme.text }]}>
+                                {lastReadSurahName ?? FIRST_SURAH_NAME}
+                            </Text>
+                            <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.7 }]}>
+                                {lastReadAyahId ? `${tr.labels.ayah} ${lastReadAyahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
+                            </Text>
+                        </View>
+                        <MaterialIcons name="arrow-right-alt" size={40} color={theme.accent} style={{ marginRight: -6 }} />
+                    </AppCard>
+                </TouchableOpacity>
 
                 {/* SEARCH bar */}
                 <AppCard style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>

@@ -92,8 +92,9 @@ export const TRANSLATIONS = {
         labels: {
             // Navigation
             home: "Home",
-            settings: "Settings",
             qibla: "Qibla",
+            read: "Read",
+            settings: "Settings",
             more: "More",
             // General
             loading: "Loading...",
@@ -103,6 +104,7 @@ export const TRANSLATIONS = {
             searchPlaceholder: "Search...",
             ayah: "Ayah",
             ayahs: "Ayahs",
+            startReading: "Start Reading",
             continueReading: "Continue Reading",
             // Settings
             theme: "Theme",
@@ -328,8 +330,9 @@ export const TRANSLATIONS = {
         labels: {
             // Navigation
             home: "Startseite",
-            settings: "Einstellungen",
             qibla: "Qibla",
+            read: "Lesen",
+            settings: "Einstellungen",
             more: "Mehr",
             // General
             loading: "Lädt...",
@@ -339,6 +342,7 @@ export const TRANSLATIONS = {
             searchPlaceholder: "Suche...",
             ayah: "Ayah",
             ayahs: "Ayahs",
+            startReading: "Lesen beginnen",
             continueReading: "Weiterlesen",
             // Settings
             theme: "Darstellung",
@@ -564,8 +568,9 @@ export const TRANSLATIONS = {
         labels: {
             // Navigation
             home: "Kryefaqja",
-            settings: "Cilësimet",
             qibla: "Kibla",
+            read: "Lexo",
+            settings: "Cilësimet",
             more: "Më Tepër",
             // General
             loading: "Duke u ngarkuar...",
@@ -575,6 +580,7 @@ export const TRANSLATIONS = {
             searchPlaceholder: "Kërko...",
             ayah: "Ajeti",
             ayahs: "Ajete",
+            startReading: "Fillo Leximin",
             continueReading: "Vazhdo Leximin",
             // Settings
             theme: "Pamja",
@@ -800,8 +806,9 @@ export const TRANSLATIONS = {
         labels: {
             // Navigation
             home: "Ana Sayfa",
-            settings: "Ayarlar",
             qibla: "Kıble",
+            read: "Oku",
+            settings: "Ayarlar",
             more: "Daha Fazla",
             // General
             loading: "Yükleniyor...",
@@ -811,6 +818,7 @@ export const TRANSLATIONS = {
             searchPlaceholder: "Ara...",
             ayah: "Ayet",
             ayahs: "Ayetler",
+            startReading: "Okumaya Başla",
             continueReading: "Okumaya Devam Et",
             // Settings
             theme: "Tema",
@@ -1034,8 +1042,9 @@ export const TRANSLATIONS = {
         labels: {
             // Navigation
             home: "الرئيسية",
-            settings: "الإعدادات",
             qibla: "القبلة",
+            read: "القراءة",
+            settings: "الإعدادات",
             more: "المزيد",
             // General
             loading: "جاري التحميل...",
@@ -1045,6 +1054,7 @@ export const TRANSLATIONS = {
             searchPlaceholder: "ابحث...",
             ayah: "الآية",
             ayahs: "الآيات",
+            startReading: "ابدأ القراءة",
             continueReading: "تابع القراءة",
             // Settings
             theme: "المظهر",
