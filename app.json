@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nejon Prayer",
     "slug": "nejon-prayer",
-    "version": "2.2.4",
+    "version": "2.2.5",
     "orientation": "default",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
@@ -25,7 +25,7 @@
       "backgroundColor": "#ffffff"
     },
     "android": {
-      "versionCode": 44,
+      "versionCode": 45,
       "package": "com.nejon.nejonprayer",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/android-icon-foreground.png",
@@ -48,7 +48,7 @@
       ]
     },
     "ios": {
-      "buildNumber": "44",
+      "buildNumber": "45",
       "bundleIdentifier": "com.nejon.nejonprayer",
       "supportsTablet": true,
       "infoPlist": {
