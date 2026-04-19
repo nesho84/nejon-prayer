@@ -3,8 +3,8 @@ import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
-import notifee from '@notifee/react-native';
 import { useEffect, useRef } from 'react';
+import notifee from 'react-native-notify-kit';
 
 export function useNotificationsSync() {
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);

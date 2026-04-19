@@ -1,7 +1,7 @@
-import notifee, { AndroidNotificationSetting, AuthorizationStatus } from '@notifee/react-native';
 import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
 import { Platform } from "react-native";
+import notifee, { AndroidNotificationSetting, AuthorizationStatus } from 'react-native-notify-kit';
 import { create } from "zustand";
 
 interface DeviceSettingsState {

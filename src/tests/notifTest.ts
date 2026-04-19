@@ -5,7 +5,7 @@ import notifee, {
     AndroidStyle,
     TimestampTrigger,
     TriggerType
-} from "@notifee/react-native";
+} from "react-native-notify-kit";
 
 interface TestParams {
     options: {

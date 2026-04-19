@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import notifee, { AuthorizationStatus } from "@notifee/react-native";
-import { getUserLocation } from "@/services/locationService";
-import { Ionicons } from "@expo/vector-icons";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
-import { useOnboardingStore } from "@/store/onboardingStore";
+import { getUserLocation } from "@/services/locationService";
 import { useLanguageStore } from "@/store/languageStore";
-import { Language, LANGUAGES } from "@/types/language.types";
-import { useThemeStore } from "@/store/themeStore";
 import { useLocationStore } from "@/store/locationStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Language, LANGUAGES } from "@/types/language.types";
+import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import notifee, { AuthorizationStatus } from "react-native-notify-kit";
 
 export default function OnboardingScreen() {
   // Stores

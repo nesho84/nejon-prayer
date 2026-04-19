@@ -1,6 +1,6 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
-import notifee, { EventType } from '@notifee/react-native';
+import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';

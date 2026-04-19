@@ -12,7 +12,6 @@ import { Language, LANGUAGES } from "@/types/language.types";
 import { SpecialType } from "@/types/notification.types";
 import { Theme, THEMES } from "@/types/theme.types";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
@@ -29,6 +28,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import notifee, { AuthorizationStatus } from "react-native-notify-kit";
 
 export default function SettingsScreen() {
     // Stores

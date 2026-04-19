@@ -4,8 +4,8 @@ import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
-import notifee, { AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from '@notifee/react-native';
 import { Platform } from "react-native";
+import notifee, { AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;

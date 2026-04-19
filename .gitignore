@@ -41,5 +41,5 @@ assets/psd/
 *.tsbuildinfo
 
 # IDE - VSCode
-/.vscode
-**/.vscode/
+# /.vscode
+# **/.vscode/

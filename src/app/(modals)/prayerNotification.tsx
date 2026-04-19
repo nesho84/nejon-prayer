@@ -69,10 +69,9 @@ export default function PrayersSettingsScreen() {
             { id: 3, name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
             { id: 4, name: 'Azan 3', file: SOUNDS.azan3 },
             { id: 5, name: 'Azan 4', file: SOUNDS.azan4 },
-            { id: 6, name: 'Azan 5', file: SOUNDS.azan5 },
-            { id: 7, name: 'Alarm 1', file: SOUNDS.alarm1 },
-            { id: 8, name: 'Alarm 2', file: SOUNDS.alarm2 },
-            { id: 9, name: 'Alarm 3', file: SOUNDS.alarm3 },
+            { id: 6, name: 'Alarm 1', file: SOUNDS.alarm1 },
+            { id: 7, name: 'Alarm 2', file: SOUNDS.alarm2 },
+            { id: 8, name: 'Alarm 3', file: SOUNDS.alarm3 },
         ];
     }, [tr]);
 
