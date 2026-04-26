@@ -54,23 +54,6 @@ export default function ExtrasScreen() {
             icon: <MaterialCommunityIcons name="counter" size={36} color="#8b5cf6" />
         },
         {
-            id: 4,
-            href: "(quran)/surahs",
-            type: 'internal',
-            label: tr.labels.quran,
-            description: tr.labels.quranDesc || "Read and explore the Quran",
-            color: "#d1a127",
-            bg: "#d1a12726",
-            icon: (
-                <>
-                    <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 6 }} size={32} color="#d1a127" />
-                    <View style={{ position: 'absolute', top: 4 }}>
-                        <Ionicons name="volume-medium" size={14} color="#d1a127" />
-                    </View>
-                </>
-            ),
-        },
-        {
             id: 5,
             href: "(extras)/ramazani",
             type: 'internal',

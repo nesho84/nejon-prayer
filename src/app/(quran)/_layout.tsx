@@ -18,7 +18,7 @@ export default function QuranLayout() {
       <Stack.Screen
         name="surahs"
         options={{
-          title: tr.labels.quran,
+          title: tr.labels.quranSurahs,
           headerShown: true,
           animation: "slide_from_right",
         }}

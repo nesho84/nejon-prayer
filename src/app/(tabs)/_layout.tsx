@@ -46,6 +46,14 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
+                name="quran-tab"
+                options={{
+                    title: tr.labels.read ?? "Read",
+                    tabBarIcon: ({ focused, color, size }) =>
+                        <MaterialCommunityIcons name={focused ? "book-open-variant" : "book-open-variant-outline"} size={size} color={color} />,
+                }}
+            />
+            <Tabs.Screen
                 name="settings"
                 options={{
                     title: tr.labels.settings,

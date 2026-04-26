@@ -88,7 +88,7 @@ export async function createNotificationsChannels() {
 // Cancel all scheduled notifications
 // ------------------------------------------------------------
 async function cancelAllNotifications() {
-  const notifTypes = ['prayer', 'prayer-event', 'special', 'prayer-reminder'];
+  const notifTypes = ['prayer', 'prayer-event', 'special'];
   try {
     const scheduled = await notifee.getTriggerNotifications();
     for (const n of scheduled) {
@@ -109,7 +109,7 @@ async function cancelAllNotifications() {
 // ------------------------------------------------------------
 async function cancelDisplayedNotification(notificationId: string) {
   try {
-    await notifee.cancelNotification(notificationId);
+    await notifee.cancelDisplayedNotification(notificationId);
     await stopSound();
   } catch (err) {
     console.error('❌ [Cleanup] Failed to clear:', err);
