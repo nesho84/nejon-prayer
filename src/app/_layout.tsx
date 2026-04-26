@@ -5,9 +5,19 @@ import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
+import * as Sentry from '@sentry/react-native';
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+
+// Initialize Sentry for error tracking and performance monitoring
+Sentry.init({
+  dsn: 'https://df36491525a3844176da451e9b5710de@o4511285567488000.ingest.de.sentry.io/4511285569126480',
+  enabled: !__DEV__,
+  enableLogs: true,
+  tracesSampleRate: 0,
+  debug: false,
+});
 
 const RootStack = () => {
   const isReady = useOnboardingStore((state) => state.isReady);
@@ -40,7 +50,7 @@ const RootStack = () => {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   // Initialization and global sync hooks
   useSystemThemeSync();
   useDeviceSettingsSync();
@@ -56,3 +66,6 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+// Wrap the entire app with Sentry's error boundary to catch any unhandled errors
+export default Sentry.wrap(RootLayout);

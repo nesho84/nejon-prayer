@@ -14,6 +14,7 @@ import {
   SpecialType
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
+import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -104,6 +105,15 @@ export const useNotificationsStore = create<NotificationsState>()(
           console.log('⏸️ [notificationsStore] Notification unchanged, skipping reschedule');
           return;
         }
+
+        // Log the reason for rescheduling with context (e.g. Dhuhr time changed, or user updated settings)
+        Sentry.captureMessage('Notifications rescheduled', {
+          level: 'info',
+          extra: {
+            at: new Date().toISOString(),
+            prayerTimes, // this includes Dhuhr time
+          },
+        });
 
         set({ isLoading: true });
 

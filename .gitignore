@@ -43,3 +43,5 @@ assets/psd/
 # IDE - VSCode
 # /.vscode
 # **/.vscode/
+
+.env.local
