@@ -16,14 +16,6 @@ export default function QuranLayout() {
       }}
     >
       <Stack.Screen
-        name="surahs"
-        options={{
-          title: tr.labels.quranSurahs,
-          headerShown: true,
-          animation: "slide_from_right",
-        }}
-      />
-      <Stack.Screen
         name="ayahs"
         options={{
           title: tr.labels.ayahs,
