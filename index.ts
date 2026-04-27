@@ -32,5 +32,5 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     }
 
     // Handled in notificationsService for both foreground and background
-    await handleNotificationEvent(type, notification, pressAction, 'background');
+    await handleNotificationEvent(type, notification, pressAction, 'background', useNotificationsStore.getState().notifSettings);
 });

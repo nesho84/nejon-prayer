@@ -5,7 +5,7 @@ import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
 import { Platform } from "react-native";
-import notifee, { AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
+import notifee, { AlarmType, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
@@ -214,7 +214,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
       {
         type: TriggerType.TIMESTAMP,
         timestamp: triggerTime.getTime(),
-        alarmManager: hasAlarm,
+        alarmManager: hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
         repeatFrequency: RepeatFrequency.DAILY,
       }
     );
@@ -473,7 +473,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 // ------------------------------------------------------------
 // EVENT HANDLER: Handle notifee notification event (used for foreground and background)
 // ------------------------------------------------------------
-export async function handleNotificationEvent(type: EventType, notification: any, pressAction: any, source: string = 'unknown') {
+export async function handleNotificationEvent(type: EventType, notification: any, pressAction: any, source: string = 'unknown', notifSettings?: NotifSettings) {
   const ns = await notifee.getNotificationSettings();
   const hasAlarm = ns.android.alarm === AndroidNotificationSetting.ENABLED;
   const prefix = source === 'background' ? '[Background]' : '[Foreground]';
@@ -520,6 +520,12 @@ export async function handleNotificationEvent(type: EventType, notification: any
         case 'snooze':
           // "Remind me later" action button pressed (prayers only)
           console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
+
+          // Get fresh settings from the Store (in case user updated them since the notification was scheduled)
+          const freshVolume = notifSettings?.volume ?? volume;
+          const freshVibration = notifSettings?.vibration ?? vibration;
+          const freshSnooze = notifSettings?.snooze ?? snooze;
+
           // Create prayer-reminder notification
           await notifee.createTriggerNotification(
             {
@@ -528,11 +534,11 @@ export async function handleNotificationEvent(type: EventType, notification: any
               body: reminderBody,
               data: {
                 type: 'prayer-reminder',
-                volume: String(volume),
+                volume: String(freshVolume),
                 sound: SOUNDS.alarm1, // Default reminder sound
               },
               android: {
-                channelId: `nejonprayer-vib-${vibration}`,
+                channelId: `nejonprayer-vib-${freshVibration}`,
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,
                 style: { type: AndroidStyle.INBOX, lines: [reminderBody] },
@@ -551,7 +557,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
             },
             {
               type: TriggerType.TIMESTAMP,
-              timestamp: Date.now() + snooze * 60 * 1000,
+              timestamp: Date.now() + freshSnooze * 60 * 1000,
               alarmManager: hasAlarm,
             }
           );

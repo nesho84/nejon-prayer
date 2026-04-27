@@ -66,7 +66,7 @@ export function useNotificationsSync() {
       if (!notification) return;
 
       try {
-        await handleNotificationEvent(type, notification, pressAction, 'foreground');
+        await handleNotificationEvent(type, notification, pressAction, 'foreground', useNotificationsStore.getState().notifSettings);
       } catch (err) {
         console.error('❌ Failed to handle notification event:', err);
       }

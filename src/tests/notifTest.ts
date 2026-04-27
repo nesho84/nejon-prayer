@@ -1,6 +1,7 @@
 import { SOUNDS } from "@/constants/sounds";
 import { NotifSettings } from "@/types/notification.types";
 import notifee, {
+    AlarmType,
     AndroidColor,
     AndroidStyle,
     TimestampTrigger,
@@ -40,7 +41,8 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     reminderBody: "Kujtesë Lutjeje",
                     language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
-                    vibration: notifSettings?.vibration ?? 'on',
+                    // vibration: notifSettings?.vibration ?? 'on',
+                    vibration: 'on',
                     // snooze: String(notifSettings?.snooze ?? 5),
                     snooze: '1',
                     sound: SOUNDS.azan1_short, // Default sound for test
@@ -71,7 +73,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: options.hasAlarm,
+                alarmManager: options.hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
                 // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
@@ -132,7 +134,7 @@ export async function testEventNotification({ options, notifSettings, seconds = 
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: options.hasAlarm,
+                alarmManager: options.hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
                 // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
