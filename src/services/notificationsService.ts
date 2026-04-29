@@ -5,7 +5,7 @@ import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
 import { Platform } from "react-native";
-import notifee, { AlarmType, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
+import notifee, { AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
@@ -185,7 +185,8 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           sound: sound ?? '',
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
-          prayerName: prayer, // for the reminder to know which prayer to remind for
+          prayerName: prayer, // ex. "Fajr"
+          prayerDate: new Date().toISOString().split('T')[0], // "2026-04-28"
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
@@ -196,6 +197,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           color: AndroidColor.OLIVE,
           style: { type: AndroidStyle.INBOX, lines: [body] },
           actions: [
+            { title: tr.actions?.done || '✓ Prayed', pressAction: { id: 'done' } },
             { title: tr.actions?.dismiss || 'Dismiss', pressAction: { id: 'dismiss' } },
             { title: tr.actions?.snooze || 'Snooze', pressAction: { id: 'snooze' } },
           ],
@@ -214,7 +216,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
       {
         type: TriggerType.TIMESTAMP,
         timestamp: triggerTime.getTime(),
-        alarmManager: hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
+        alarmManager: hasAlarm,
         repeatFrequency: RepeatFrequency.DAILY,
       }
     );
@@ -473,7 +475,14 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 // ------------------------------------------------------------
 // EVENT HANDLER: Handle notifee notification event (used for foreground and background)
 // ------------------------------------------------------------
-export async function handleNotificationEvent(type: EventType, notification: any, pressAction: any, source: string = 'unknown', notifSettings?: NotifSettings) {
+export async function handleNotificationEvent(
+  type: EventType,
+  notification: any,
+  pressAction: any,
+  source: string = 'unknown',
+  notifSettings?: NotifSettings
+) {
+  // Check notification settings and alarm permission (Android)
   const ns = await notifee.getNotificationSettings();
   const hasAlarm = ns.android.alarm === AndroidNotificationSetting.ENABLED;
   const prefix = source === 'background' ? '[Background]' : '[Foreground]';
@@ -498,6 +507,7 @@ export async function handleNotificationEvent(type: EventType, notification: any
     case EventType.DELIVERED:
       // Notification was delivered and shown to user
       console.log(`✅ ${prefix} Notification delivered`);
+      // Background sync handled in index.ts
 
       // Actions based on notification type
       if (notifType == 'prayer' || notifType == 'prayer-event') {
@@ -511,8 +521,15 @@ export async function handleNotificationEvent(type: EventType, notification: any
     case EventType.ACTION_PRESS:
       // pressed an action button
       switch (pressAction?.id) {
+        case 'done':
+          // "✓ Prayed" action button pressed (prayers only)
+          console.log(`🕌 ${prefix} Notification "Prayed" pressed`);
+          // Background tracking handled in index.ts and foreground in useNotificationsSync
+          await cancelDisplayedNotification(notification.id);
+          break;
+
         case 'dismiss':
-          // "Dismiss" button pressed (prayers only)
+          // "Dismiss" action button pressed (prayers only)
           console.log(`🔘 ${prefix} Notification "Dismiss" pressed`);
           await cancelDisplayedNotification(notification.id);
           break;

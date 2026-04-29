@@ -1,9 +1,12 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
+import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
+import { usePrayerTrackingStore } from './src/store/prayerTrackingStore';
+import { PrayerName } from './src/types/prayer.types';
 
 // ------------------------------------------------------------
 // 'react-native-track-player' playback service
@@ -26,11 +29,35 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
 
     if (!notification) return;
 
-    // This ensures we have notifications with the latest prayer times
+    // This ensures we have notifications with the latest prayer times — done here to avoid circular dependency (store ↔ service)
     if (type === EventType.DELIVERED && notification.data?.type === 'prayer') {
-        useNotificationsStore.getState().syncNotificationsInBackground();
+        try {
+            await useNotificationsStore.getState().syncNotificationsInBackground();
+        } catch (err) {
+            console.error('❌ [Background] Failed to sync notifications in background:', err);
+            Sentry.captureException(err);
+        }
+    }
+
+    // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
+    if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
+        try {
+            const prayerName = notification.data?.prayerName as PrayerName | undefined;
+            const prayerDate = notification.data?.prayerDate as string | undefined;
+            if (prayerName) {
+                usePrayerTrackingStore.getState().markPrayed(prayerName, prayerDate);
+            }
+        } catch (error) {
+            console.error('❌ [Background] Failed to mark prayer as prayed:', error);
+            Sentry.captureException(error);
+        }
     }
 
     // Handled in notificationsService for both foreground and background
-    await handleNotificationEvent(type, notification, pressAction, 'background', useNotificationsStore.getState().notifSettings);
+    try {
+        await handleNotificationEvent(type, notification, pressAction, 'background', useNotificationsStore.getState().notifSettings);
+    } catch (err) {
+        console.error('❌ [Background] Failed to handle notification event:', err);
+        Sentry.captureException(err);
+    }
 });

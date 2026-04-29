@@ -62,7 +62,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="more"
+                name="extras-tab"
                 options={{
                     title: "More",
                     tabBarLabel: tr.labels.more,

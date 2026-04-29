@@ -3,8 +3,10 @@ import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
+import { usePrayerTrackingStore } from '@/store/prayerTrackingStore';
+import { PrayerName } from '@/types/prayer.types';
 import { useEffect, useRef } from 'react';
-import notifee from 'react-native-notify-kit';
+import notifee, { EventType } from 'react-native-notify-kit';
 
 export function useNotificationsSync() {
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
@@ -63,12 +65,27 @@ export function useNotificationsSync() {
   useEffect(() => {
     const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
       const { notification, pressAction } = detail;
+
       if (!notification) return;
 
+      // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
+      if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
+        try {
+          const prayerName = notification.data?.prayerName as PrayerName | undefined;
+          const prayerDate = notification.data?.prayerDate as string | undefined;
+          if (prayerName) {
+            usePrayerTrackingStore.getState().markPrayed(prayerName, prayerDate);
+          }
+        } catch (err) {
+          console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);
+        }
+      }
+
+      // Handled in notificationsService for both foreground and background
       try {
         await handleNotificationEvent(type, notification, pressAction, 'foreground', useNotificationsStore.getState().notifSettings);
       } catch (err) {
-        console.error('❌ Failed to handle notification event:', err);
+        console.error('❌ [Foreground] Failed to handle notification event:', err);
       }
     });
 

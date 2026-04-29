@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
-export default function SurahsScreen() {
+export default function QuranTabScreen() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -238,56 +238,75 @@ export default function SurahsScreen() {
   return (
     <AppTabScreen>
       <View style={[styles.container, { backgroundColor: theme.bg }]}>
-        {/* START/CONTINUE Reading Card */}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            router.navigate({
-              pathname: "/(quran)/ayahs",
-              params: {
-                surahId: lastReadSurahId ?? FIRST_SURAH_ID,
-                surahName: lastReadSurahName ?? FIRST_SURAH_NAME,
-              },
-            });
-          }}
-        >
-          <AppCard style={[styles.continueCard, { borderColor: theme.divider2, borderLeftColor: QURAN_COLOR }]}>
-            <View style={styles.continueContent}>
-              <View style={styles.continueLabelRow}>
-                <MaterialCommunityIcons name="book-open-variant" size={22} color={theme.text2} />
+
+        {/* Hero Header Section */}
+        <AppCard style={styles.topPanel}>
+
+          {/* Quran title + subtitle */}
+          <View style={styles.panelHeader}>
+            <View style={[styles.headerIconContainer, { backgroundColor: "#d1a12720" }]}>
+              <View style={{ position: 'absolute', top: 6 }}>
+                <Ionicons name="volume-medium" size={14} color="#d1a127" />
+              </View>
+              <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={QURAN_COLOR} />
+            </View>
+            <View>
+              <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
+              <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+          {/* START/CONTINUE Reading */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => {
+              router.navigate({
+                pathname: "/(quran)/ayahs",
+                params: {
+                  surahId: lastReadSurahId ?? FIRST_SURAH_ID,
+                  surahName: lastReadSurahName ?? FIRST_SURAH_NAME,
+                },
+              });
+            }}
+          >
+            <View style={[styles.continueCard, { backgroundColor: theme.overlay, borderColor: theme.divider2, borderLeftColor: QURAN_COLOR }]}>
+              <View style={styles.continueContent}>
                 <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
                   {lastReadSurahId ? tr.labels.continueReading : tr.labels.startReading}
                 </Text>
+                <Text style={[styles.continueSurahName, { color: theme.text }]}>
+                  {lastReadSurahName ?? FIRST_SURAH_NAME}
+                </Text>
+                <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.6 }]}>
+                  {lastReadAyahId ? `${tr.labels.ayah} ${lastReadAyahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
+                </Text>
               </View>
-              <Text style={[styles.continueSurahName, { color: theme.text }]}>
-                {lastReadSurahName ?? FIRST_SURAH_NAME}
-              </Text>
-              <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.7 }]}>
-                {lastReadAyahId ? `${tr.labels.ayah} ${lastReadAyahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
-              </Text>
+              <MaterialIcons name="arrow-right-alt" size={36} color={QURAN_COLOR} />
             </View>
-            <MaterialIcons name="arrow-right-alt" size={40} color={theme.accent} style={{ marginRight: -6 }} />
-          </AppCard>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
-        {/* SEARCH bar */}
-        <AppCard style={[styles.searchInputContainer, { backgroundColor: theme.card, borderColor: theme.divider2 }]}>
-          <Ionicons name="search-outline" size={20} color={theme.text2} />
-          <TextInput
-            style={[styles.searchInput, { color: theme.text }]}
-            ref={textInputRef}
-            placeholder={tr.labels.searchPlaceholder ?? "Search..."}
-            placeholderTextColor={theme.placeholder}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            returnKeyType="search"
-            clearButtonMode="while-editing"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <Ionicons name="close-circle" size={18} color={theme.placeholder} />
-            </TouchableOpacity>
-          )}
+          {/* SEARCH bar */}
+          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
+            <Ionicons name="search-outline" size={20} color={theme.text2} />
+            <TextInput
+              style={[styles.searchInput, { color: theme.text }]}
+              ref={textInputRef}
+              placeholder={tr.labels.searchPlaceholder ?? "Search..."}
+              placeholderTextColor={theme.placeholder}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery("")}>
+                <Ionicons name="close-circle" size={18} color={theme.placeholder} />
+              </TouchableOpacity>
+            )}
+          </View>
+
         </AppCard>
 
         {/* SURAH list */}
@@ -321,54 +340,80 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Continue Reading Card
+  // Single top panel AppCard
+  topPanel: {
+    marginTop: 12,
+    marginBottom: 8,
+    marginHorizontal: 8,
+    padding: 16,
+    gap: 14,
+  },
+  panelHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  headerIconContainer: {
+    width: 58,
+    height: 58,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: 19,
+    fontWeight: "700",
+    lineHeight: 22,
+    letterSpacing: -0.2,
+    paddingBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    opacity: 0.7,
+    lineHeight: 20,
+  },
+  divider: {
+    height: 1,
+  },
+
+  // Continue Reading
   continueCard: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 12,
-    marginHorizontal: 12,
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 10,
     borderWidth: 1,
     borderLeftWidth: 2,
   },
   continueContent: {
     flex: 1,
-    gap: 8,
-  },
-  continueLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    gap: 5,
   },
   continueLabel: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "400",
     letterSpacing: 0.5,
+    fontStyle: "italic",
     marginTop: 1,
   },
   continueSurahName: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: "900",
-    letterSpacing: 2,
+    letterSpacing: 0.5,
   },
   continueAyahNumber: {
     fontSize: 13,
     fontWeight: "400",
-    letterSpacing: 0.5,
   },
 
-  // Search Input
+  // Search
   searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 12,
-    marginBottom: 4,
-    marginHorizontal: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
     gap: 8,
   },
@@ -379,9 +424,8 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   surahList: {
-    paddingHorizontal: 12,
-    paddingTop: 8,
-    paddingBottom: 48,
+    paddingHorizontal: 8,
+    paddingBottom: 24,
     gap: 10,
   },
   emptyContainer: {

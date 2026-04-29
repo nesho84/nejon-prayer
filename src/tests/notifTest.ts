@@ -36,16 +36,15 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 body: "Koha për namaz (06:49)",
                 data: {
                     type: "prayer",
-                    prayer: "Sabahu",
-                    reminderTitle: "» Sabahu «",
-                    reminderBody: "Kujtesë Lutjeje",
+                    prayerName: 'Fajr',
+                    prayerDate: new Date().toISOString().split('T')[0], // "2026-04-28"
                     language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
-                    // vibration: notifSettings?.vibration ?? 'on',
-                    vibration: 'on',
-                    // snooze: String(notifSettings?.snooze ?? 5),
-                    snooze: '1',
+                    vibration: notifSettings?.vibration ?? 'on',
+                    snooze: String(notifSettings?.snooze ?? 5),
                     sound: SOUNDS.azan1_short, // Default sound for test
+                    reminderTitle: "» Sabahu «",
+                    reminderBody: "Kujtesë Lutjeje",
                 },
                 android: {
                     // (Channel is created in notificationsService.js)
@@ -55,7 +54,8 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     color: AndroidColor.OLIVE,
                     style: { type: AndroidStyle.INBOX, lines: ["Koha për namaz. (06:15)"] },
                     actions: [
-                        { title: "Në rregull", pressAction: { id: "dismiss" } },
+                        { title: "✓ Falur", pressAction: { id: 'done' } },
+                        { title: "Anulo", pressAction: { id: "dismiss" } },
                         { title: "Më kujto më vonë", pressAction: { id: "snooze" } },
                     ],
                     pressAction: { id: "default", launchActivity: "default" },

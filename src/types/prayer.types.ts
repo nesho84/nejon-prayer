@@ -11,13 +11,16 @@ export interface PrayerTimes {
   Isha: string;      // "19:45"
 }
 
-export type YearlyPrayerTimes = Record<string, PrayerTimes>; // { "2026-03-28": { Fajr: "06:00", ... } }
-
-// For dropdown options
-export type PrayerTimeEntry = [PrayerName, string];
-
 export interface PrayerCountdown {
   hours: string;
   minutes: string;
   seconds: string;
 }
+
+export type YearlyPrayerTimes = Record<string, PrayerTimes>; // { "2026-03-28": { Fajr: "06:00", ... } }
+
+// For dropdown options
+export type PrayerTimeEntry = [PrayerName, string];
+
+// For prayer tracking
+export const TRACKABLE_PRAYERS: PrayerName[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];

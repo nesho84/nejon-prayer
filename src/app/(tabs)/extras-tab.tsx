@@ -17,7 +17,7 @@ interface MenuItem {
     icon: any;
 }
 
-export default function ExtrasScreen() {
+export default function ExtrasTabScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);

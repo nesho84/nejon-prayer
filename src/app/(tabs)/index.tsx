@@ -11,9 +11,10 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
+import { usePrayerTrackingStore } from "@/store/prayerTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
-import { PrayerCountdown, PrayerTimeEntry } from "@/types/prayer.types";
+import { PrayerCountdown, PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -38,6 +39,9 @@ export default function HomeScreen() {
     const notifReady = useNotificationsStore((state) => state.isReady);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
+    const getTodayStatus = usePrayerTrackingStore((state) => state.getTodayStatus);
+    const markPrayed = usePrayerTrackingStore((state) => state.markPrayed);
+    const unmarkPrayed = usePrayerTrackingStore((state) => state.unmarkPrayed);
 
     // Next prayer countdown
     const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
@@ -117,6 +121,17 @@ export default function HomeScreen() {
         return (props: IconProps) => <Ionicons name="notifications-outline" {...props} />;
     };
 
+    // ------------------------------------------------------------
+    // Check if a prayer time has passed
+    // ------------------------------------------------------------
+    const isPrayerPast = (prayerTime: string): boolean => {
+        const [hours, minutes] = prayerTime.split(':').map(Number);
+        const now = new Date();
+        const prayer = new Date();
+        prayer.setHours(hours, minutes, 0, 0);
+        return now > prayer;
+    };
+
     // Loading state
     if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady) {
         return <AppLoading text={tr.labels.loading} />;
@@ -155,7 +170,7 @@ export default function HomeScreen() {
         <AppTabScreen>
 
             {/* Notifications Test */}
-            {/* {__DEV__ && <NotificationTester seconds={60} />} */}
+            {/* {__DEV__ && <NotificationTester seconds={10} />} */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
@@ -250,6 +265,9 @@ export default function HomeScreen() {
                             const isLast = index === Object.entries(prayerTimes).length - 1;
                             const NameIcon = handlePrayerNameIcon(prayerName);
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
+                            const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
+                            const isPast = isPrayerPast(prayerTime);
+                            const isPrayed = getTodayStatus(prayerName as PrayerName) === 'prayed';
 
                             return (
                                 <View key={prayerName}>
@@ -271,16 +289,34 @@ export default function HomeScreen() {
                                                 ]
                                             ]}
                                         >
-                                            {/* Prayer Name */}
+                                            {/* Prayer Name Left Section */}
                                             <View style={styles.prayerNameSection}>
                                                 {/* Prayer Name Icon */}
                                                 <NameIcon size={22} color={isNext ? theme.accent : theme.text2} />
+                                                {/* Prayer Name */}
                                                 <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
                                                     {tr.prayers[prayerName] || prayerName}
                                                 </Text>
+                                                {/* Prayed indicator */}
+                                                {isTrackable && isPast && (
+                                                    <TouchableOpacity
+                                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                        onPress={() => isPrayed
+                                                            ? unmarkPrayed(prayerName as PrayerName)
+                                                            : markPrayed(prayerName as PrayerName)
+                                                        }
+                                                    >
+                                                        <Ionicons
+                                                            name={isPrayed ? 'checkmark-sharp' : 'alert-circle-outline'}
+                                                            size={20}
+                                                            color={isPrayed ? theme.accent2 : theme.placeholder}
+                                                            style={{ opacity: isPrayed ? 1 : 0.7 }}
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}
                                             </View>
 
-                                            {/* Prayer Time */}
+                                            {/* Prayer Time Right Section */}
                                             <View style={styles.prayerTimeSection}>
                                                 <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
                                                     {prayerTime}
