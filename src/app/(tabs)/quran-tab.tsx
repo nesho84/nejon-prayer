@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   // Single top panel AppCard
   topPanel: {
     marginTop: 12,
-    marginBottom: 8,
+    marginBottom: 10,
     marginHorizontal: 8,
     padding: 16,
     gap: 14,
