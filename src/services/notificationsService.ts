@@ -5,7 +5,7 @@ import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
 import { Platform } from "react-native";
-import notifee, { AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
+import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
@@ -186,12 +186,13 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
-          prayerDate: new Date().toISOString().split('T')[0], // "2026-04-28"
+          prayerDate: `${triggerTime.getFullYear()}-${String(triggerTime.getMonth() + 1).padStart(2, '0')}-${String(triggerTime.getDate()).padStart(2, '0')}`, // "2026-03-20"
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
         android: {
           channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+          category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           largeIcon: require('../../assets/images/moon-islam.png'),
           color: AndroidColor.OLIVE,
@@ -264,6 +265,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
         },
         android: {
           channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+          category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.BLUE,
           style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -359,7 +361,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           style: { type: AndroidStyle.INBOX, lines: [body] },
           actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
           pressAction: { id: 'default', launchActivity: 'default' },
-          fullScreenAction: { id: "default" },
           lightUpScreen: true,
           showTimestamp: true,
           autoCancel: false,
@@ -446,7 +447,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             style: { type: AndroidStyle.BIGTEXT, text: body },
             actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
             pressAction: { id: 'default', launchActivity: 'default' },
-            fullScreenAction: { id: 'default' },
             lightUpScreen: true,
             showTimestamp: true,
             autoCancel: false,
@@ -556,6 +556,7 @@ export async function handleNotificationEvent(
               },
               android: {
                 channelId: `nejonprayer-vib-${freshVibration}`,
+                category: AndroidCategory.ALARM,
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,
                 style: { type: AndroidStyle.INBOX, lines: [reminderBody] },

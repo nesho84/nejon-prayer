@@ -520,7 +520,7 @@ export default function SettingsScreen() {
                             {/* ------ Snooze/Reminder Timeout ------ */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.snooze}
+                                    {tr.labels.remindLater}
                                 </Text>
                                 <Text style={{ color: theme.text2, opacity: 0.7 }}>
                                     {notifSettings?.snooze ?? 5}min

@@ -5,7 +5,7 @@ import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
-import { usePrayerTrackingStore } from './src/store/prayerTrackingStore';
+import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
 import { PrayerName } from './src/types/prayer.types';
 
 // ------------------------------------------------------------
@@ -45,7 +45,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             const prayerName = notification.data?.prayerName as PrayerName | undefined;
             const prayerDate = notification.data?.prayerDate as string | undefined;
             if (prayerName) {
-                usePrayerTrackingStore.getState().markPrayed(prayerName, prayerDate);
+                usePrayersTrackingStore.getState().markPrayed(prayerName, prayerDate);
             }
         } catch (error) {
             console.error('❌ [Background] Failed to mark prayer as prayed:', error);

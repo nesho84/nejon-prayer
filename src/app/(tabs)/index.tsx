@@ -11,7 +11,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
-import { usePrayerTrackingStore } from "@/store/prayerTrackingStore";
+import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerCountdown, PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
@@ -39,9 +39,9 @@ export default function HomeScreen() {
     const notifReady = useNotificationsStore((state) => state.isReady);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
-    const getTodayStatus = usePrayerTrackingStore((state) => state.getTodayStatus);
-    const markPrayed = usePrayerTrackingStore((state) => state.markPrayed);
-    const unmarkPrayed = usePrayerTrackingStore((state) => state.unmarkPrayed);
+    const getTodayStatus = usePrayersTrackingStore((state) => state.getTodayStatus);
+    const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
+    const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
 
     // Next prayer countdown
     const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);

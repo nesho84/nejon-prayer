@@ -3,7 +3,7 @@ import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
-import { usePrayerTrackingStore } from '@/store/prayerTrackingStore';
+import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { PrayerName } from '@/types/prayer.types';
 import { useEffect, useRef } from 'react';
 import notifee, { EventType } from 'react-native-notify-kit';
@@ -74,7 +74,7 @@ export function useNotificationsSync() {
           const prayerName = notification.data?.prayerName as PrayerName | undefined;
           const prayerDate = notification.data?.prayerDate as string | undefined;
           if (prayerName) {
-            usePrayerTrackingStore.getState().markPrayed(prayerName, prayerDate);
+            usePrayersTrackingStore.getState().markPrayed(prayerName, prayerDate);
           }
         } catch (err) {
           console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);
