@@ -4,6 +4,7 @@ import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
+import { formatDateKey } from '@/utils/date';
 import { Platform } from "react-native";
 import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
@@ -186,7 +187,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
-          prayerDate: `${triggerTime.getFullYear()}-${String(triggerTime.getMonth() + 1).padStart(2, '0')}-${String(triggerTime.getDate()).padStart(2, '0')}`, // "2026-03-20"
+          prayerDate: formatDateKey(triggerTime), // "2026-03-20"
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
@@ -423,7 +424,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
       // Date-based ID - ensures idempotency (same date = same ID)
       triggerTime.setHours(hour, 0, 0, 0);
-      const dateISO = triggerTime.toISOString().split('T')[0]; // "2026-03-20"
+      const dateISO = formatDateKey(triggerTime); // "2026-03-20"
       const notificationId = `quote-${dateISO}`;
 
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';

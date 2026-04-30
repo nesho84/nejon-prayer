@@ -14,6 +14,7 @@ import {
   SpecialType
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
+import { formatDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -141,7 +142,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           console.log('🔄 [Background] Syncing Notifications...');
 
           // Check if we already updated today
-          const today = new Date().toISOString().split('T')[0];
+          const today = formatDateKey();
           const lastUpdate = get().lastBackgroundSync;
 
           if (lastUpdate === today) {

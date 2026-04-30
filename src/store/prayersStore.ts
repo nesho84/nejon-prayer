@@ -5,6 +5,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { mmkvStorage } from '@/store/storage';
 import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
+import { formatDateKey } from '@/utils/date';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -52,9 +53,7 @@ export const usePrayersStore = create<PrayersState>()(
           // Compute today's date key
           const now = new Date();
           const currentYear = now.getFullYear();
-          const m = String(now.getMonth() + 1).padStart(2, "0");
-          const d = String(now.getDate()).padStart(2, "0");
-          const todayKey = `${currentYear}-${m}-${d}`;
+          const todayKey = formatDateKey(now);
 
           const { yearlyPrayerTimes, fetchedYear } = get();
 

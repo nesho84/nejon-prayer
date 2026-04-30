@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { PrayerCountdown, PrayerName, PrayerTimes } from '@/types/prayer.types';
 import { useIsFocused } from '@react-navigation/native';
-import { PrayerTimes, PrayerName, PrayerCountdown } from '@/types/prayer.types';
+import { useEffect, useRef, useState } from "react";
 
 const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
@@ -27,6 +27,15 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     // Format numbers with leading zeros (e.g., 5 -> "05")
     // ------------------------------------------------------------
     const pad = (num: number): string => String(num).padStart(2, "0");
+
+    // ------------------------------------------------------------
+    // Convert total seconds into padded { hours, minutes, seconds }
+    // ------------------------------------------------------------
+    const formatCountdown = (totalSec: number) => ({
+        hours: pad(Math.floor(totalSec / 3600)),
+        minutes: pad(Math.floor((totalSec % 3600) / 60)),
+        seconds: pad(totalSec % 60),
+    });
 
     // ------------------------------------------------------------
     // Find the next upcoming and the previous prayer that just passed
@@ -108,21 +117,14 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
                 setRemainingSeconds(remainingTime); // initialize remainingSeconds
 
                 // Format countdown display
-                const hours = pad(Math.floor(remainingTime / 3600));
-                const minutes = pad(Math.floor((remainingTime % 3600) / 60));
-                const seconds = pad(remainingTime % 60);
-                setPrayerCountdown({ hours, minutes, seconds });
+                setPrayerCountdown(formatCountdown(remainingTime));
 
                 return;
             }
 
             // Update countdown for current interval
             const diffSec = Math.max(Math.floor((upcoming.time.getTime() - now.getTime()) / 1000), 0);
-            const hours = pad(Math.floor(diffSec / 3600));
-            const minutes = pad(Math.floor((diffSec % 3600) / 60));
-            const seconds = pad(diffSec % 60);
-
-            setPrayerCountdown({ hours, minutes, seconds });
+            setPrayerCountdown(formatCountdown(diffSec));
             setRemainingSeconds(diffSec);
         };
 

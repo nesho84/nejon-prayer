@@ -1,5 +1,6 @@
 import { mmkvStorage } from '@/store/storage';
 import { PrayerName } from '@/types/prayer.types';
+import { formatDateKey } from '@/utils/date';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -17,10 +18,7 @@ interface PrayersTrackingState {
 const KEEP_DAYS = 30;
 
 // Local date key format: YYYY-MM-DD
-const getDateKey = (date?: Date) => {
-  const d = date ?? new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
+const getDateKey = formatDateKey;
 
 // Remove entries older than KEEP_DAYS from the tracking record
 const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {

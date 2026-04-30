@@ -7,6 +7,7 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
+import { formatDateKey } from "@/utils/date";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useEffect, useRef, useState } from "react";
@@ -40,10 +41,7 @@ export default function PrayersSettingsScreen() {
 
         setIsLoading(true);
         try {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, "0");
-            const d = String(date.getDate()).padStart(2, "0");
-            const dateKey = `${y}-${m}-${d}`;
+            const dateKey = formatDateKey(date);
 
             // Simulate a short random loading delay for better UX (0, 100, ..., 800 ms)
             const randomDelay = Math.floor(Math.random() * 9) * 100;
