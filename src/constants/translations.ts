@@ -235,7 +235,7 @@ export const TRANSLATIONS = {
         actions: {
             done: "✓ Prayed",
             dismiss: "Dismiss",
-            snooze: "Remind me later",
+            snooze: "Later",
         },
     },
 
@@ -475,7 +475,7 @@ export const TRANSLATIONS = {
         actions: {
             done: "✓ Gebetet",
             dismiss: "Verwerfen",
-            snooze: "Später erinnern",
+            snooze: "Später",
         },
     },
 
@@ -714,7 +714,7 @@ export const TRANSLATIONS = {
         actions: {
             done: "✓ Falur",
             dismiss: "Anulo",
-            snooze: "Kujto më vonë",
+            snooze: "Më vonë",
         },
     },
 
@@ -954,7 +954,7 @@ export const TRANSLATIONS = {
         actions: {
             done: "✓ Kılındı",
             dismiss: "Kapat",
-            snooze: "Daha sonra hatırlat",
+            snooze: "Daha sonra",
         },
     },
 
@@ -1192,7 +1192,7 @@ export const TRANSLATIONS = {
         actions: {
             done: "✓ أُدِّيَت",
             dismiss: "إغلاق",
-            snooze: "ذكّرني لاحقًا",
+            snooze: "تأجيل",
         },
     },
 };

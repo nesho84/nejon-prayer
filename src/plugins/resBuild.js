@@ -45,23 +45,5 @@ module.exports = function withNotifeeRepo(config) {
     return config;
   }]);
 
-  // ------------------------------------------------------------
-  // Set showWhenLocked + turnScreenOn on MainActivity
-  // ------------------------------------------------------------
-  config = withAndroidManifest(config, (config) => {
-    const activities = config.modResults.manifest.application?.[0]?.activity ?? [];
-    const mainActivity = activities.find((a) => a.$['android:name'] === '.MainActivity');
-
-    if (mainActivity) {
-      mainActivity.$['android:showWhenLocked'] = 'true';
-      mainActivity.$['android:turnScreenOn'] = 'true';
-      console.log('🔆 Set showWhenLocked + turnScreenOn on MainActivity');
-    } else {
-      console.warn('⚠️  MainActivity not found in AndroidManifest.xml');
-    }
-
-    return config;
-  });
-
   return config;
 };
