@@ -4,7 +4,7 @@ export type SpecialType = 'Friday' | 'DailyQuote';
 
 export interface NotifSettings {
   volume: number; // 0.0 to 1.0
-  vibration: 'on' | 'off';
+  vibration: string; // 'off' | 'short' | 'medium' | 'long'
   snooze: number; // Minutes
 }
 

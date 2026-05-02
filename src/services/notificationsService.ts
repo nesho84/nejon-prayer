@@ -54,8 +54,12 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
 export async function createNotificationsChannels() {
   if (Platform.OS !== 'android') return;
 
-  // = 1000 + (21 × 1300) = 28,300ms = 28.3 seconds
-  const vibrationPattern = Array(21).fill([1000, 300]).flat();
+  // Short: two quick pulses like WhatsApp notification [wait, buzz, pause, buzz]
+  // const vibShort = [0, 200, 100, 200]; — use system default
+  // Medium: half of long — 10 cycles of [wait 1000ms, buzz 300ms] ≈ 13s
+  const vibMedium = Array(10).fill([1000, 300]).flat();
+  // Long: 21 cycles of [wait 1000ms, buzz 300ms] ≈ 28s
+  const vibLong = Array(21).fill([1000, 300]).flat();
 
   // Default channel config
   const defaults = {
@@ -68,19 +72,44 @@ export async function createNotificationsChannels() {
   };
 
   await notifee.createChannel({
-    id: 'nejonprayer-vib-on',
-    name: 'Channel with vibration ON',
-    description: 'Nejon-Prayer Channel With vibration and custom pattern',
-    vibration: true,
-    vibrationPattern: vibrationPattern,
-    ...defaults,
-  });
-  await notifee.createChannel({
     id: 'nejonprayer-vib-off',
     name: 'Channel with vibration OFF',
     description: 'Nejon-Prayer Channel Without vibration',
     vibration: false,
     vibrationPattern: undefined,
+    ...defaults,
+  });
+  await notifee.createChannel({
+    id: 'nejonprayer-vib-short',
+    name: 'Channel with vibration SHORT',
+    description: 'Nejon-Prayer Channel With system default vibration',
+    vibration: true,
+    vibrationPattern: undefined, // system default
+    ...defaults,
+  });
+  await notifee.createChannel({
+    id: 'nejonprayer-vib-medium',
+    name: 'Channel with vibration MEDIUM',
+    description: 'Nejon-Prayer Channel With medium vibration pattern',
+    vibration: true,
+    vibrationPattern: vibMedium,
+    ...defaults,
+  });
+  await notifee.createChannel({
+    id: 'nejonprayer-vib-long',
+    name: 'Channel with vibration LONG',
+    description: 'Nejon-Prayer Channel With long vibration pattern',
+    vibration: true,
+    vibrationPattern: vibLong,
+    ...defaults,
+  });
+  // Legacy channel kept for users who still have 'on' stored in their settings
+  await notifee.createChannel({
+    id: 'nejonprayer-vib-on',
+    name: 'Channel with vibration ON (legacy)',
+    description: 'Legacy channel — replaced by vib-long',
+    vibration: true,
+    vibrationPattern: vibLong,
     ...defaults,
   });
 }
@@ -354,7 +383,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           scheduledFor: triggerTime.toLocaleString('en-GB'),
         },
         android: {
-          channelId: `nejonprayer-vib-off`,
+          channelId: `nejonprayer-vib-short`,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
           style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -440,7 +469,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {
-            channelId: 'nejonprayer-vib-off',
+            channelId: 'nejonprayer-vib-short',
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.BIGTEXT, text: body },

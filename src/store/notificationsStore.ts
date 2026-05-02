@@ -38,7 +38,7 @@ interface NotificationsState {
 
 const DEFAULT_NOTIFICATIONS_SETTINGS: NotifSettings = {
   volume: 0.5,
-  vibration: 'on',
+  vibration: 'short',
   snooze: 5,
 };
 

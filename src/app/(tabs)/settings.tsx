@@ -204,13 +204,14 @@ export default function SettingsScreen() {
     // ------------------------------------------------------------
     // Toggle Notification Vibration
     // ------------------------------------------------------------
-    const handleVibration = async (value: boolean) => {
+    const handleVibration = async (value: string) => {
+        if (notifSettings?.vibration === value) return; // no change
         setLocalLoading(true);
         try {
             // Save notifSettings
-            useNotificationsStore.getState().setSettings({ vibration: value ? 'on' : 'off' });
+            useNotificationsStore.getState().setSettings({ vibration: value });
 
-            console.log("📳 Vibration changed to:", value ? 'on' : 'off');
+            console.log("📳 Vibration pattern changed to:", value);
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (err) {
             console.error("Vibration change error:", err);
@@ -498,13 +499,40 @@ export default function SettingsScreen() {
                                 <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr.labels.vibration}
                                 </Text>
-                                <Switch
-                                    value={notifSettings?.vibration === 'on'}
-                                    onValueChange={handleVibration}
-                                    disabled={localLoading}
-                                    trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={notifSettings?.vibration === 'on' ? theme.border : theme.border}
-                                />
+                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                    {notifSettings?.vibration ?? 'short'}
+                                </Text>
+                            </View>
+                            <View style={styles.presets}>
+                                {(['off', 'short', 'medium', 'long'] as const).map((pattern) => {
+                                    const label = pattern === 'off' ? 'off'
+                                        : pattern === 'short' ? tr.labels.vibrationShort
+                                            : pattern === 'medium' ? tr.labels.vibrationMedium
+                                                : tr.labels.vibrationLong;
+                                    return (
+                                        <TouchableOpacity
+                                            key={pattern}
+                                            style={[
+                                                styles.presetBtnWide,
+                                                {
+                                                    backgroundColor: notifSettings?.vibration === pattern ? theme.primary + '20' : theme.card,
+                                                    borderColor: notifSettings?.vibration === pattern ? theme.primary : 'transparent',
+                                                    marginTop: 4,
+                                                    marginBottom: 2,
+                                                }
+                                            ]}
+                                            onPress={() => handleVibration(pattern)}
+                                            disabled={localLoading}
+                                        >
+                                            <Text style={[
+                                                styles.presetText,
+                                                { color: notifSettings?.vibration === pattern ? theme.primary : theme.text2 }
+                                            ]}>
+                                                {label}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
                             </View>
                             {/* Vibration Note */}
                             <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
@@ -535,8 +563,8 @@ export default function SettingsScreen() {
                                             {
                                                 backgroundColor: notifSettings?.snooze === st ? theme.primary + '20' : theme.card,
                                                 borderColor: notifSettings?.snooze === st ? theme.primary : 'transparent',
-                                                marginTop: 8,
-                                                marginBottom: 3
+                                                marginTop: 4,
+                                                marginBottom: 2
                                             }
                                         ]}
                                         onPress={() => handleSnooze(st)}
@@ -700,12 +728,23 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-evenly',
         gap: 6,
+        marginVertical: 6,
     },
 
     presetBtn: {
         width: 30,
         height: 30,
         borderRadius: 15,
+        borderWidth: 1,
+        borderColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    presetBtnWide: {
+        width: 'auto',
+        paddingHorizontal: 14,
+        height: 34,
+        borderRadius: 17,
         borderWidth: 1,
         borderColor: 'transparent',
         alignItems: 'center',

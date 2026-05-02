@@ -13,6 +13,7 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
+import NotificationTester from "@/tests/NotificationTester";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerCountdown, PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
@@ -170,7 +171,7 @@ export default function HomeScreen() {
         <AppTabScreen>
 
             {/* Notifications Test */}
-            {/* {__DEV__ && <NotificationTester seconds={10} />} */}
+            {__DEV__ && <NotificationTester seconds={10} />}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
