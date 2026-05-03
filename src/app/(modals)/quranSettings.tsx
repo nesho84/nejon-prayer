@@ -1,11 +1,12 @@
 import AppCard from "@/components/AppCard";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
+import { QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import Slider from '@react-native-community/slider';
 import { useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const ARABIC_MIN = 18;
 const ARABIC_MAX = 40;
@@ -16,12 +17,15 @@ export default function QuranSettingsScreen() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
+  const language = useLanguageStore((state) => state.language);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
+  const selectedEditions = useQuranStore((state) => state.selectedEditions);
 
   // Local state (preview before saving)
   const [tempArabicSize, setTempArabicSize] = useState(arabicFontSize);
   const [tempTranslationSize, setTempTranslationSize] = useState(translationFontSize);
+  const [tempSelectedEdition, setTempSelectedEdition] = useState(selectedEditions[language]);
 
   // Refs
   const ModalSheetRef = useRef<ModalSheetRef>(null);
@@ -30,7 +34,7 @@ export default function QuranSettingsScreen() {
   // Save changes to store and dismiss the Modal
   // ------------------------------------------------------------
   const handleSave = () => {
-    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize) {
+    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize && tempSelectedEdition === selectedEditions[language]) {
       console.log("No changes detected, skipping save.");
       ModalSheetRef.current?.close();
       return;
@@ -38,8 +42,11 @@ export default function QuranSettingsScreen() {
     useQuranStore.getState().setQuranSettings({
       arabicFontSize: tempArabicSize,
       translationFontSize: tempTranslationSize,
+      ...(tempSelectedEdition !== selectedEditions[language] && {
+        selectedEditions: { ...selectedEditions, [language]: tempSelectedEdition },
+      }),
     });
-    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px`);
+    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px, Edition: ${tempSelectedEdition}`);
     ModalSheetRef.current?.close();
   };
 
@@ -156,6 +163,38 @@ export default function QuranSettingsScreen() {
           </View>
         </AppCard>
 
+        {/* ------ Translator / Edition — hidden for Arabic (no translation needed) ------ */}
+        {language !== 'ar' && (
+          <AppCard style={[styles.settingCard, styles.translatorCard]}>
+            <View style={styles.statusRow}>
+              <Text style={[styles.settingTitle, { color: theme.text, marginBottom: 2 }]}>
+                {tr.labels.quranTranslator}:
+              </Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipRow}
+            >
+              {Object.entries(QURAN_TEXT_EDITIONS[language as keyof typeof QURAN_TEXT_EDITIONS] ?? {}).map(([key, value]) => {
+                const isActive = tempSelectedEdition === value;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    onPress={() => setTempSelectedEdition(value)}
+                    style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlay : 'transparent' }]}
+                  >
+                    <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>
+                      {/* capitalize the first letter after the dot: "sq.ahmeti" → "sq.Ahmeti" */}
+                      {value.replace(/\.(\w)/, (_, c) => '.' + c.toUpperCase())}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </AppCard>
+        )}
+
       </View>
 
     </ModalSheet>
@@ -204,19 +243,19 @@ const styles = StyleSheet.create({
   slider: {
     flex: 1,
     height: 50,
-    marginTop: 8,
+    marginTop: 3,
     marginBottom: 3,
     marginHorizontal: -8,
   },
   divider: {
     borderWidth: StyleSheet.hairlineWidth,
-    marginVertical: 24,
+    marginVertical: 20,
     marginHorizontal: 4,
   },
 
   // Preview
   previewContainer: {
-    marginTop: 12,
+    marginTop: 8,
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
@@ -252,5 +291,27 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  // Translator chips
+  translatorCard: {
+    paddingVertical: 18,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingTop: 16,
+    paddingBottom: 4,
+    paddingHorizontal: 8,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipText: {
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

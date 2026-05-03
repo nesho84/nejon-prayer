@@ -12,12 +12,11 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
-import NotificationTester from "@/tests/NotificationTester";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDateKey } from "@/utils/date";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
@@ -171,7 +170,7 @@ export default function HomeScreen() {
         <AppTabScreen>
 
             {/* Notifications Test */}
-            {__DEV__ && <NotificationTester seconds={10} />}
+            {/* {__DEV__ && <NotificationTester seconds={10} />} */}
 
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}

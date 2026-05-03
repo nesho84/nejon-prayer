@@ -70,28 +70,11 @@ export const QURAN_TEXT_EDITIONS = {
 } as const;
 
 // ------------------------------------------------------------
-// Default edition per app language
-// Change the value to switch translator for that language
-// ------------------------------------------------------------
-const AYAH_EDITIONS: Record<string, string> = {
-  en: QURAN_TEXT_EDITIONS.en.sahih,
-  de: QURAN_TEXT_EDITIONS.de.bubenheim,
-  sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
-  tr: QURAN_TEXT_EDITIONS.tr.diyanet,
-};
-
-// ------------------------------------------------------------
 // Fetch ayahs for a surah from alquran.cloud (aladhan.com)
 // Called from quranStore.fetchAyahs() for non-Arabic languages
 // Arabic reads directly from local JSON via getSurahById()
 // ------------------------------------------------------------
-export async function fetchAyahsFromApi(surahId: number, language: string): Promise<Ayah[]> {
-  const edition = AYAH_EDITIONS[language];
-
-  if (!edition) {
-    throw new Error(`No edition found for language: ${language}`);
-  }
-
+export async function fetchAyahsFromApi(surahId: number, edition: string): Promise<Ayah[]> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
 

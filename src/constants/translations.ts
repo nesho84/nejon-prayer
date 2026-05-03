@@ -220,6 +220,7 @@ export const TRANSLATIONS = {
             quranSettingsTitle: "Quran Settings",
             quranSettingsSubtitle: "Customize your Quran reading experience",
             quranTranslation: "Translation",
+            quranTranslator: "Translator",
             quranPreviewTranslation: "In the name of Allah, the Most Gracious, the Most Merciful.",
         },
         buttons: {
@@ -463,6 +464,7 @@ export const TRANSLATIONS = {
             quranSettingsTitle: "Koran-Einstellungen",
             quranSettingsSubtitle: "Passen Sie Ihr Koran-Leseerlebnis an",
             quranTranslation: "Übersetzung",
+            quranTranslator: "Übersetzer",
             quranPreviewTranslation: "Im Namen Allahs, des Allerbarmers, des Barmherzigen.",
         },
         buttons: {
@@ -705,6 +707,7 @@ export const TRANSLATIONS = {
             quranSettingsTitle: "Cilësimet e Kur'anit",
             quranSettingsSubtitle: "Personalizoni përvojën e leximit të Kur'anit",
             quranTranslation: "Përkthimi",
+            quranTranslator: "Përkthyesi",
             quranPreviewTranslation: "Me emrin e All-llahut, Mëshiruesit, Mëshirëbërësit.",
         },
         buttons: {
@@ -948,6 +951,7 @@ export const TRANSLATIONS = {
             quranSettingsTitle: "Kur'an Ayarları",
             quranSettingsSubtitle: "Kur'an okuma deneyiminizi özelleştirin",
             quranTranslation: "Çeviri",
+            quranTranslator: "Çevirmen",
             quranPreviewTranslation: "Rahman ve Rahîm olan Allah'ın adıyla.",
         },
         buttons: {
@@ -1189,6 +1193,7 @@ export const TRANSLATIONS = {
             quranSettingsTitle: "إعدادات القرآن",
             quranSettingsSubtitle: "خصّص تجربتك في قراءة القرآن",
             quranTranslation: "الترجمة",
+            quranTranslator: "المترجم",
             quranPreviewTranslation: "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
         },
         buttons: {

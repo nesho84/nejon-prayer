@@ -1,4 +1,4 @@
-import { Ayah, fetchAyahsFromApi, loadQuranTransliterationJson, Quran, Surah } from "@/services/quranService";
+import { Ayah, fetchAyahsFromApi, loadQuranTransliterationJson, Quran, QURAN_TEXT_EDITIONS, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
 import { create } from "zustand";
@@ -23,6 +23,7 @@ type AyahsData = {
 type QuranSettings = {
   arabicFontSize: number;
   translationFontSize: number;
+  selectedEditions: Record<string, string>;
 }
 
 type QuranPlayerData = {
@@ -69,6 +70,12 @@ export const useQuranStore = create<QuranState>()(
       // Settings
       arabicFontSize: 26,
       translationFontSize: 18,
+      selectedEditions: {
+        en: QURAN_TEXT_EDITIONS.en.sahih,
+        de: QURAN_TEXT_EDITIONS.de.bubenheim,
+        sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
+        tr: QURAN_TEXT_EDITIONS.tr.diyanet,
+      },
 
       // Player state
       isActive: false,
@@ -112,7 +119,8 @@ export const useQuranStore = create<QuranState>()(
 
         set({ isLoadingAyahs: true, ayahsError: null, ayahs: [] });
         try {
-          const data = await fetchAyahsFromApi(surahId, language);
+          const edition = get().selectedEditions[language];
+          const data = await fetchAyahsFromApi(surahId, edition);
           set({ ayahs: data });
         } catch (err) {
           console.error("❌ Failed to fetch ayahs:", err);
@@ -146,6 +154,7 @@ export const useQuranStore = create<QuranState>()(
         lastReadAyahId: state.lastReadAyahId,
         arabicFontSize: state.arabicFontSize,
         translationFontSize: state.translationFontSize,
+        selectedEditions: state.selectedEditions,
       }),
     }
   )

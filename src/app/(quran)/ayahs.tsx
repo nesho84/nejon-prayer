@@ -31,6 +31,7 @@ export default function AyahsScreen() {
   const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
+  const selectedEditions = useQuranStore((s) => s.selectedEditions);
   const getSurahById = useQuranStore((s) => s.getSurahById);
   const fetchAyahs = useQuranStore((s) => s.fetchAyahs);
   const setLastRead = useQuranStore((s) => s.setLastRead);
@@ -57,8 +58,12 @@ export default function AyahsScreen() {
   // ------------------------------------------------------------
   useEffect(() => {
     if (!isQuranReady || language === "ar") return;
+
+    // FlashList will remount after fetch; re-enable scroll-to-last-read
+    hasScrolledRef.current = false;
+
     fetchAyahs(surahIdNum);
-  }, [isQuranReady, language]);
+  }, [isQuranReady, language, selectedEditions]);
 
   // ------------------------------------------------------------
   // Scroll to the last-read ayah
