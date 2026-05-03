@@ -216,7 +216,6 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
-          prayerDate: formatDateKey(triggerTime), // "2026-03-20"
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },

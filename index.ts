@@ -43,9 +43,8 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
         try {
             const prayerName = notification.data?.prayerName as PrayerName | undefined;
-            const prayerDate = notification.data?.prayerDate as string | undefined;
             if (prayerName) {
-                usePrayersTrackingStore.getState().markPrayed(prayerName, prayerDate);
+                usePrayersTrackingStore.getState().markPrayed(prayerName);
             }
         } catch (error) {
             console.error('❌ [Background] Failed to mark prayer as prayed:', error);

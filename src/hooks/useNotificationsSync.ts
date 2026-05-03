@@ -72,9 +72,8 @@ export function useNotificationsSync() {
       if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
         try {
           const prayerName = notification.data?.prayerName as PrayerName | undefined;
-          const prayerDate = notification.data?.prayerDate as string | undefined;
           if (prayerName) {
-            usePrayersTrackingStore.getState().markPrayed(prayerName, prayerDate);
+            usePrayersTrackingStore.getState().markPrayed(prayerName);
           }
         } catch (err) {
           console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);

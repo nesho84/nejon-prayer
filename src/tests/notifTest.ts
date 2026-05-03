@@ -37,7 +37,6 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 data: {
                     type: "prayer",
                     prayerName: 'Fajr',
-                    prayerDate: new Date().toISOString().split('T')[0], // "2026-04-28"
                     language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
                     vibration: notifSettings?.vibration ?? 'on',
