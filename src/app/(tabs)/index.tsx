@@ -257,12 +257,13 @@ export default function HomeScreen() {
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index) => {
-                            const isNext = nextPrayerName === prayerName;
                             const isLast = index === Object.entries(prayerTimes).length - 1;
                             const NameIcon = handlePrayerNameIcon(prayerName);
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
                             const isPast = isPrayerPast(prayerTime);
+                            const isDayDone = isPrayerPast(prayerTimes.Isha);
+                            const isNext = !isDayDone && nextPrayerName === prayerName;
                             // Reactive: re-evaluates whenever tracking changes (mark/unmark)
                             const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
 
