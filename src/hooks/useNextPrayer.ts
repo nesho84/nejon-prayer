@@ -1,22 +1,60 @@
 import { PrayerCountdown, PrayerName, PrayerTimes } from '@/types/prayer.types';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
-
-const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+import { AppState } from 'react-native';
 
 interface NextPrayerType {
     nextPrayerName: PrayerName | null;
     nextPrayerTime: Date | null;
-    prayerCountdown: PrayerCountdown | {};
+    prayerCountdown: PrayerCountdown | null;
     remainingSeconds: number | null;
     totalSeconds: number;
+}
+
+const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+// ------------------------------------------------------------
+// Find the next upcoming prayer and the previous one that just passed.
+// Exported so callers can compute nextPrayerName without a per-second hook.
+// ------------------------------------------------------------
+export function computeNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; time: Date; previousTime: Date | null } | null {
+    if (!prayerTimes) return null;
+
+    const now = new Date();
+    let previousPrayer: Date | null = null;
+
+    for (const name of PRAYER_ORDER) {
+        const timeStr = prayerTimes[name];
+        if (!timeStr) continue;
+
+        const [hour, minute] = timeStr.split(":").map(Number);
+        const prayerDate = new Date();
+        prayerDate.setHours(hour, minute, 0, 0);
+
+        if (prayerDate > now) {
+            return { name, time: prayerDate, previousTime: previousPrayer };
+        }
+
+        previousPrayer = prayerDate;
+    }
+
+    // No more prayers today — use tomorrow's Fajr
+    if (prayerTimes.Fajr) {
+        const [hour, minute] = prayerTimes.Fajr.split(":").map(Number);
+        const tomorrowFajr = new Date();
+        tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
+        tomorrowFajr.setHours(hour, minute, 0, 0);
+        return { name: "Fajr", time: tomorrowFajr, previousTime: previousPrayer };
+    }
+
+    return null;
 }
 
 export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPrayerType {
     const isFocused = useIsFocused();
     const [nextPrayerName, setNextPrayerName] = useState<PrayerName | null>(null);
     const [nextPrayerTime, setNextPrayerTime] = useState<Date | null>(null);
-    const [prayerCountdown, setPrayerCountdown] = useState<PrayerCountdown | {}>({});
+    const [prayerCountdown, setPrayerCountdown] = useState<PrayerCountdown | null>(null);
     const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
     const [totalSeconds, setTotalSeconds] = useState<number>(0);
 
@@ -38,61 +76,16 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     });
 
     // ------------------------------------------------------------
-    // Find the next upcoming and the previous prayer that just passed
-    // ------------------------------------------------------------
-    const computeNextPrayer = (): { name: PrayerName; time: Date; previousTime: Date | null } | null => {
-        if (!prayerTimes) return null;
-
-        const now = new Date();
-        let previousPrayer: Date | null = null;
-
-        // Find next prayer in today's schedule
-        for (const name of PRAYER_ORDER) {
-            const timeStr = prayerTimes[name];
-
-            if (!timeStr) continue; // skip if missing
-
-            const [hour, minute] = timeStr.split(":").map(Number);
-            const prayerDate = new Date();
-            prayerDate.setHours(hour, minute, 0, 0);
-
-            if (prayerDate > now) {
-                return {
-                    name,
-                    time: prayerDate,
-                    previousTime: previousPrayer
-                };
-            }
-
-            previousPrayer = prayerDate;
-        }
-
-        // No more prayers today, use tomorrow's Fajr
-        if (prayerTimes.Fajr) {
-            const [hour, minute] = prayerTimes.Fajr.split(":").map(Number);
-            const tomorrowFajr = new Date();
-            tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
-            tomorrowFajr.setHours(hour, minute, 0, 0);
-
-            return {
-                name: "Fajr",
-                time: tomorrowFajr,
-                previousTime: previousPrayer
-            };
-        }
-
-        return null;
-    };
-
-    // ------------------------------------------------------------
     // Update countdown every second
     // ------------------------------------------------------------
     useEffect(() => {
         if (!prayerTimes || !isFocused) return;
 
         const tick = () => {
+            if (AppState.currentState !== 'active') return;
+
             const now = new Date();
-            let upcoming = computeNextPrayer();
+            let upcoming = computeNextPrayer(prayerTimes);
 
             if (!upcoming) return;
 

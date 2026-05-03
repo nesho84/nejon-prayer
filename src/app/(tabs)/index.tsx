@@ -5,7 +5,6 @@ import AppTabScreen from "@/components/AppTabScreen";
 import CountdownCircle from "@/components/CountdownCircle";
 import QuotesCarousel from "@/components/QuotesCarousel";
 import QuranPlaying from "@/components/QuranPlaying";
-import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -15,12 +14,13 @@ import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import NotificationTester from "@/tests/NotificationTester";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
-import { PrayerCountdown, PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
+import { PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
 import { IconProps } from "@/types/types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatDateKey } from "@/utils/date";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
@@ -40,12 +40,12 @@ export default function HomeScreen() {
     const notifReady = useNotificationsStore((state) => state.isReady);
     const prayers = useNotificationsStore((state) => state.prayers);
     const events = useNotificationsStore((state) => state.events);
-    const getTodayStatus = usePrayersTrackingStore((state) => state.getTodayStatus);
+    const tracking = usePrayersTrackingStore((state) => state.tracking);
     const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
     const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
 
-    // Next prayer countdown
-    const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
+    // Local state
+    const [nextPrayerName, setNextPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -199,18 +199,14 @@ export default function HomeScreen() {
 
                 {/* 2. COUNTDOWN CIRCLE CARD */}
                 <AppCard style={styles.countdownCard}>
-                    {nextPrayerName && (
-                        <CountdownCircle
-                            nextPrayerName={nextPrayerName}
-                            prayerCountdown={prayerCountdown as PrayerCountdown}
-                            remainingSeconds={remainingSeconds}
-                            totalSeconds={totalSeconds}
-                            size={160}
-                            strokeWidth={6}
-                            strokeColor={theme.border}
-                            color={theme.accent}
-                        />
-                    )}
+                    <CountdownCircle
+                        prayerTimes={prayerTimes}
+                        onNextPrayerChange={setNextPrayerName}
+                        size={160}
+                        strokeWidth={6}
+                        strokeColor={theme.border}
+                        color={theme.accent}
+                    />
                 </AppCard>
 
                 {/* 3. QUOTES Carousel CARD */}
@@ -268,7 +264,8 @@ export default function HomeScreen() {
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
                             const isPast = isPrayerPast(prayerTime);
-                            const isPrayed = getTodayStatus(prayerName as PrayerName) === 'prayed';
+                            // Reactive: re-evaluates whenever tracking changes (mark/unmark)
+                            const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
 
                             return (
                                 <View key={prayerName}>

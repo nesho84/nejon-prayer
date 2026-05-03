@@ -2,6 +2,7 @@ import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
+import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -55,6 +56,7 @@ function RootLayout() {
   useSystemThemeSync();
   useDeviceSettingsSync();
   useNotificationsSync();
+  usePrayerTimesSync();
   useQuranSetup();
 
   return (

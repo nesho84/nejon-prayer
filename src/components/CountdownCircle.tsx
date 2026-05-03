@@ -1,39 +1,46 @@
-import { View, Text, StyleSheet } from "react-native";
-import Svg, { Circle } from "react-native-svg";
-import { useThemeStore } from "@/store/themeStore";
+import useNextPrayer from "@/hooks/useNextPrayer";
 import { useLanguageStore } from "@/store/languageStore";
-import { PrayerCountdown, PrayerName } from "@/types/prayer.types";
+import { useThemeStore } from "@/store/themeStore";
+import { PrayerName, PrayerTimes } from "@/types/prayer.types";
+import React, { useEffect } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
 interface Props {
-    nextPrayerName: PrayerName;
-    prayerCountdown: PrayerCountdown;
-    remainingSeconds: number | null;
-    totalSeconds: number;
+    prayerTimes: PrayerTimes | null;
+    onNextPrayerChange?: (name: PrayerName) => void;
     size?: number;
     strokeWidth?: number;
     strokeColor?: string;
     color?: string;
 }
 
-export default function CountdownCircle({
-    nextPrayerName,
-    prayerCountdown,
-    remainingSeconds,
-    totalSeconds,
+const CountdownCircle = React.memo(({
+    prayerTimes,
+    onNextPrayerChange,
     size = 140,
     strokeWidth = 10,
     strokeColor = "#eee",
     color = "#2563eb",
-}: Props) {
+}: Props) => {
+
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
 
+    // Countdown state (ticks every second, isolated from HomeScreen)
+    const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds } = useNextPrayer(prayerTimes);
+
+    // Notify parent when the next prayer changes (at most 5x per day)
+    useEffect(() => {
+        if (nextPrayerName) onNextPrayerChange?.(nextPrayerName);
+    }, [nextPrayerName, onNextPrayerChange]);
+
     const radius = (size - strokeWidth) / 2; // Radius of the circle
     const circumference = 2 * Math.PI * radius; // Circle perimeter
 
-    // Don't render if no totalSeconds or remainingSeconds is null
-    if (!totalSeconds || remainingSeconds === null) return null;
+    // Don't render if no totalSeconds, remainingSeconds, or prayerCountdown is null
+    if (!nextPrayerName || !prayerCountdown || !totalSeconds || remainingSeconds === null) return null;
 
     // progress goes from 0 → 1 as time passes
     const progress = 1 - (remainingSeconds / totalSeconds);
@@ -80,7 +87,9 @@ export default function CountdownCircle({
             </View>
         </View>
     );
-};
+});
+
+export default CountdownCircle;
 
 const styles = StyleSheet.create({
     container: {

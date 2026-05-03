@@ -39,7 +39,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     prayerName: 'Fajr',
                     language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
-                    vibration: notifSettings?.vibration ?? 'on',
+                    vibration: notifSettings?.vibration ?? 'short',
                     snooze: String(notifSettings?.snooze ?? 5),
                     sound: SOUNDS.azan1_short, // Default sound for test
                     reminderTitle: "» Sabahu «",
@@ -47,7 +47,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 },
                 android: {
                     // (Channel is created in notificationsService.js)
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
                     color: AndroidColor.OLIVE,
@@ -113,7 +113,7 @@ export async function testEventNotification({ options, notifSettings, seconds = 
                     sound: SOUNDS.alarm2,
                 },
                 android: {
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
                     style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -165,7 +165,7 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
                     sound: SOUNDS.alarm1,
                 },
                 android: {
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'on'}`,
+                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
                     style: { type: AndroidStyle.INBOX, lines: [body] },

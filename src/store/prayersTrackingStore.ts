@@ -11,7 +11,6 @@ interface PrayersTrackingState {
   isReady: boolean;
   markPrayed: (prayer: PrayerName, dateKey?: string) => void;
   unmarkPrayed: (prayer: PrayerName) => void;
-  getTodayStatus: (prayer: PrayerName) => 'prayed' | null;
 }
 
 // Keep tracking data for 30 days to prevent infinite growth of storage
@@ -38,7 +37,7 @@ const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
 
 export const usePrayersTrackingStore = create<PrayersTrackingState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       tracking: {},
       isReady: false,
 
@@ -54,11 +53,6 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
         set((state) => ({
           tracking: { ...state.tracking, [key]: null },
         }));
-      },
-
-      getTodayStatus: (prayer) => {
-        const key = `${getDateKey()}:${prayer}`;
-        return get().tracking[key] ?? null;
       },
     }),
     {
