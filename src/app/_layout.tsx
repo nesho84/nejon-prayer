@@ -27,7 +27,7 @@ const RootStack = () => {
   if (!isReady) return <AppLoading />;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, freezeOnBlur: false }}>
       {/* Onboarding */}
       <Stack.Protected guard={!onboardingComplete}>
         <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
