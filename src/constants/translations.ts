@@ -214,7 +214,7 @@ export const TRANSLATIONS = {
             short: "Short",
             // About
             aboutText1: "About this App",
-            aboutText2: "This app provides accurate prayer times based on your location. Designed to be simple, reliable and help you maintain your prayer routine.",
+            aboutText2: "This app provides accurate prayer times 🕔 based on your location. It also includes a full Quran reader 📖, a Qibla compass 🧭, a Tesbih counter 📿, and smart notifications 🔔 — designed to be simple, reliable and help you maintain your prayer routine.",
             // Quran Settings
             quranArabic: "Arabic",
             quranSettingsTitle: "Quran Settings",
@@ -458,7 +458,7 @@ export const TRANSLATIONS = {
             short: "Kurz",
             // About
             aboutText1: "Über diese App",
-            aboutText2: "Diese App bietet genaue Gebetszeiten basierend auf Ihrem Standort. Sie ist so konzipiert, dass sie einfach, zuverlässig ist und Ihnen hilft, Ihre Gebetsroutine einzuhalten.",
+            aboutText2: "Diese App bietet genaue Gebetszeiten 🕔 basierend auf Ihrem Standort. Sie enthält außerdem einen vollständigen Koran-Reader 📖, einen Qibla-Kompass 🧭, einen Tesbih-Zähler 📿 und intelligente Benachrichtigungen 🔔 — konzipiert, um einfach, zuverlässig zu sein und Ihnen zu helfen, Ihre Gebetsroutine einzuhalten.",
             // Quran Settings
             quranArabic: "Arabisch",
             quranSettingsTitle: "Koran-Einstellungen",
@@ -701,7 +701,7 @@ export const TRANSLATIONS = {
             short: "Shkurt",
             // About
             aboutText1: "Rreth këtij Aplikacioni",
-            aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve bazuar në lokacionin tuaj. I dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
+            aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve 🕔 bazuar në lokacionin tuaj. Ai gjithashtu përfshin një lexues të plotë të Kuranit 📖, kompas Kibla 🧭, numërues Tesbih 📿 dhe njoftime inteligjente 🔔 — i dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
             // Quran Settings
             quranArabic: "Arabisht",
             quranSettingsTitle: "Cilësimet e Kur'anit",
@@ -945,7 +945,7 @@ export const TRANSLATIONS = {
             short: "Kısa",
             // About
             aboutText1: "Bu Uygulama Hakkında",
-            aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri sağlar. Basit, güvenilir ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
+            aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri 🕔 sağlar. Ayrıca tam bir Kuran okuyucu 📖, kıble pusulası 🧭, tesbih sayacı 📿 ve akıllı bildirimler 🔔 içerir — basit, güvenilir olmak ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
             // Quran Settings
             quranArabic: "Arapça",
             quranSettingsTitle: "Kur'an Ayarları",
@@ -1187,7 +1187,7 @@ export const TRANSLATIONS = {
             short: "قصير",
             // About
             aboutText1: "حول هذا التطبيق",
-            aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة بناءً على موقعك. تم تصميمه ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",
+            aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة 🕔 بناءً على موقعك. كما يتضمن قارئ قرآن كامل 📖، وبوصلة قبلة 🧭، وعداد تسبيح 📿، وإشعارات ذكية 🔔 — مصمّم ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",
             // Quran Settings
             quranArabic: "العربية",
             quranSettingsTitle: "إعدادات القرآن",

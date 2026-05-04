@@ -43,12 +43,22 @@ export default function AboutScreen() {
                 </Text>
 
                 {/* Website & Privacy */}
-                <View style={[styles.linksContainer, { backgroundColor: 'transparent' }]}>
-                    <TouchableOpacity onPress={() => openLink("https://nejon.net")}>
-                        <Text style={[styles.linkText, { color: theme.info }]}>nejon.net</Text>
+                <View style={styles.linksContainer}>
+                    <TouchableOpacity
+                        style={[styles.chip, { borderColor: theme.border, backgroundColor: theme.card }]}
+                        onPress={() => openLink("https://nejon.net")}
+                        activeOpacity={0.7}
+                    >
+                        <MaterialCommunityIcons name="web" size={13} color={theme.placeholder} />
+                        <Text style={[styles.chipText, { color: theme.primary }]}>nejon.net</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")}>
-                        <Text style={[styles.linkText, { color: theme.info }]}>Privacy Policy</Text>
+                    <TouchableOpacity
+                        style={[styles.chip, { borderColor: theme.border, backgroundColor: theme.card }]}
+                        onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")}
+                        activeOpacity={0.7}
+                    >
+                        <MaterialCommunityIcons name="shield-lock-outline" size={13} color={theme.placeholder} />
+                        <Text style={[styles.chipText, { color: theme.primary }]}>Privacy Policy</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -108,7 +118,7 @@ const styles = StyleSheet.create({
     desc: {
         fontSize: 15,
         fontWeight: "400",
-        textAlign: "center",
+        textAlign: "justify",
         lineHeight: 22,
         marginBottom: 8,
         paddingHorizontal: 10,
@@ -117,12 +127,20 @@ const styles = StyleSheet.create({
     // Links
     linksContainer: {
         flexDirection: "row",
-        gap: 16,
+        gap: 10,
     },
-    linkText: {
-        fontSize: 16,
-        fontWeight: "600",
-        textDecorationLine: "underline",
+    chip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    chipText: {
+        fontSize: 13,
+        fontWeight: '500',
     },
 
     // Support Button

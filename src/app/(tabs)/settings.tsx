@@ -465,191 +465,180 @@ export default function SettingsScreen() {
 
                     {/* ------ Notifications (show only if notificationPermission=true) ------ */}
                     {notificationPermission && (
-                        <>
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider }]}></View>
+                        <View style={styles.subSections}>
 
                             {/* ------ Sound Volume ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.volume}
-                                </Text>
-                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                                    {tempVolume === 0 ? "off" : `${Math.round((tempVolume) * 100)}%`}
-                                </Text>
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.volume}
+                                    </Text>
+                                    <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                        {tempVolume === 0 ? "off" : `${Math.round((tempVolume) * 100)}%`}
+                                    </Text>
+                                </View>
+                                <Slider
+                                    style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
+                                    minimumValue={0}
+                                    maximumValue={1}
+                                    step={0.1}
+                                    value={tempVolume}
+                                    onValueChange={setTempVolume}
+                                    onSlidingComplete={handleVolume}
+                                    minimumTrackTintColor={theme.primary}
+                                    maximumTrackTintColor={theme.border}
+                                    thumbTintColor={theme.accent}
+                                />
                             </View>
-                            <Slider
-                                style={{ flex: 1, marginTop: 8, marginBottom: 3, marginHorizontal: -8 }}
-                                minimumValue={0}
-                                maximumValue={1}
-                                step={0.1}
-                                value={tempVolume}
-                                onValueChange={setTempVolume}
-                                onSlidingComplete={handleVolume}
-                                minimumTrackTintColor={theme.primary}
-                                maximumTrackTintColor={theme.overlay}
-                                thumbTintColor={theme.accent}
-                            />
-
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
                             {/* ------ Vibration ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.vibration}
-                                </Text>
-                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                                    {notifSettings?.vibration ?? 'short'}
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.vibration}
+                                    </Text>
+                                    <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                        {notifSettings?.vibration ?? 'short'}
+                                    </Text>
+                                </View>
+                                <View style={styles.presets}>
+                                    {(['off', 'short', 'medium', 'long'] as const).map((pattern) => {
+                                        const label = pattern === 'off' ? 'off'
+                                            : pattern === 'short' ? tr.labels.vibrationShort
+                                                : pattern === 'medium' ? tr.labels.vibrationMedium
+                                                    : tr.labels.vibrationLong;
+                                        return (
+                                            <TouchableOpacity
+                                                key={pattern}
+                                                style={[
+                                                    styles.presetBtnWide,
+                                                    {
+                                                        backgroundColor: notifSettings?.vibration === pattern ? theme.primary + '20' : theme.card,
+                                                        borderColor: notifSettings?.vibration === pattern ? theme.primary : 'transparent',
+                                                        marginTop: 4,
+                                                        marginBottom: 2,
+                                                    }
+                                                ]}
+                                                onPress={() => handleVibration(pattern)}
+                                                disabled={localLoading}
+                                            >
+                                                <Text style={[
+                                                    styles.presetText,
+                                                    { color: notifSettings?.vibration === pattern ? theme.primary : theme.text2 }
+                                                ]}>
+                                                    {label}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
+                                </View>
+                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                    {tr.labels.vibrationNote}{' '}
+                                    <Text onPress={openNotificationSettings} disabled={localLoading}>
+                                        <Text style={{ color: theme.primary }}> {tr.buttons.openSettings}</Text>
+                                    </Text>
                                 </Text>
                             </View>
-                            <View style={styles.presets}>
-                                {(['off', 'short', 'medium', 'long'] as const).map((pattern) => {
-                                    const label = pattern === 'off' ? 'off'
-                                        : pattern === 'short' ? tr.labels.vibrationShort
-                                            : pattern === 'medium' ? tr.labels.vibrationMedium
-                                                : tr.labels.vibrationLong;
-                                    return (
+
+                            {/* ------ Snooze/Reminder Timeout ------ */}
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.remindLater}
+                                    </Text>
+                                    <Text style={{ color: theme.text2, opacity: 0.7 }}>
+                                        {notifSettings?.snooze ?? 5}min
+                                    </Text>
+                                </View>
+                                <View style={styles.presets}>
+                                    {[1, 5, 10, 15, 20, 30, 60].map((st) => (
                                         <TouchableOpacity
-                                            key={pattern}
+                                            key={st}
                                             style={[
-                                                styles.presetBtnWide,
+                                                styles.presetBtn,
                                                 {
-                                                    backgroundColor: notifSettings?.vibration === pattern ? theme.primary + '20' : theme.card,
-                                                    borderColor: notifSettings?.vibration === pattern ? theme.primary : 'transparent',
+                                                    backgroundColor: notifSettings?.snooze === st ? theme.primary + '20' : theme.card,
+                                                    borderColor: notifSettings?.snooze === st ? theme.primary : 'transparent',
                                                     marginTop: 4,
-                                                    marginBottom: 2,
+                                                    marginBottom: 2
                                                 }
                                             ]}
-                                            onPress={() => handleVibration(pattern)}
-                                            disabled={localLoading}
+                                            onPress={() => handleSnooze(st)}
                                         >
                                             <Text style={[
                                                 styles.presetText,
-                                                { color: notifSettings?.vibration === pattern ? theme.primary : theme.text2 }
+                                                { color: notifSettings?.snooze === st ? theme.primary : theme.text2 }
                                             ]}>
-                                                {label}
+                                                {st}
                                             </Text>
                                         </TouchableOpacity>
-                                    );
-                                })}
-                            </View>
-                            {/* Vibration Note */}
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                {tr.labels.vibrationNote}{' '}
-                                <Text onPress={openNotificationSettings} disabled={localLoading}>
-                                    <Text style={{ color: theme.primary }}> {tr.buttons.openSettings}</Text>
-                                </Text>
-                            </Text>
-
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                            {/* ------ Snooze/Reminder Timeout ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.remindLater}
-                                </Text>
-                                <Text style={{ color: theme.text2, opacity: 0.7 }}>
-                                    {notifSettings?.snooze ?? 5}min
-                                </Text>
-                            </View>
-                            <View style={styles.presets}>
-                                {[1, 5, 10, 15, 20, 30, 60].map((st) => (
-                                    <TouchableOpacity
-                                        key={st}
-                                        style={[
-                                            styles.presetBtn,
-                                            {
-                                                backgroundColor: notifSettings?.snooze === st ? theme.primary + '20' : theme.card,
-                                                borderColor: notifSettings?.snooze === st ? theme.primary : 'transparent',
-                                                marginTop: 4,
-                                                marginBottom: 2
-                                            }
-                                        ]}
-                                        onPress={() => handleSnooze(st)}
-                                    >
-                                        <Text style={[
-                                            styles.presetText,
-                                            { color: notifSettings?.snooze === st ? theme.primary : theme.text2 }
-                                        ]}>
-                                            {st}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    ))}
+                                </View>
                             </View>
 
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                            {/* ------ Friday Reminder ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.fridayReminder}
-                                </Text>
-                                <Switch
-                                    value={specials.Friday.enabled}
-                                    onValueChange={(value) => handleSpecialNotification('Friday', value)}
-                                    disabled={localLoading}
-                                    trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={specials.Friday.enabled ? theme.border : theme.border}
-                                />
-                            </View>
-
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                            {/* ------ Daily Reminder (Quotes)  ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.dailyReminders}
-                                </Text>
-                                <Switch
-                                    value={specials.DailyQuote.enabled}
-                                    onValueChange={(value) => handleSpecialNotification('DailyQuote', value)}
-                                    disabled={localLoading}
-                                    trackColor={{ false: theme.overlay, true: theme.primary }}
-                                    thumbColor={specials.DailyQuote.enabled ? theme.border : theme.border}
-                                />
-                            </View>
-
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
-                            {/* ------ Battery Optimization ------ */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.batteryOptTitle} {batteryOptimization ? "" : "✅"}
-                                </Text>
-                                <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
-                                    <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
-                                </Pressable>
-                            </View>
-                            {batteryOptimization &&
-                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                    {tr.labels.batteryOptBody}
-                                </Text>
-                            }
-
-                            {/* ------ Alarm&reminders (show only if alarmPermission=false and batteryOptimization=true) ------ */}
-                            {(!alarmPermission && batteryOptimization) &&
-                                <>
-                                    {/* Divider */}
-                                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                                    <View style={styles.statusRow}>
-                                        <Text style={[styles.statusText, { color: theme.text }]}>
-                                            {tr.labels.alarmAccessTitle}
-                                        </Text>
-                                        <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
-                                            <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
-                                        </Pressable>
-                                    </View>
-                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 3 }]}>
-                                        {tr.labels.alarmAccessBody}
+                            {/* ------ Friday Reminder + Daily Reminder ------ */}
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.fridayReminder}
                                     </Text>
-                                </>
-                            }
-                        </>
+                                    <Switch
+                                        value={specials.Friday.enabled}
+                                        onValueChange={(value) => handleSpecialNotification('Friday', value)}
+                                        disabled={localLoading}
+                                        trackColor={{ false: theme.card, true: theme.primary }}
+                                        thumbColor={specials.Friday.enabled ? theme.border : theme.border}
+                                    />
+                                </View>
+                                <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.dailyReminders}
+                                    </Text>
+                                    <Switch
+                                        value={specials.DailyQuote.enabled}
+                                        onValueChange={(value) => handleSpecialNotification('DailyQuote', value)}
+                                        disabled={localLoading}
+                                        trackColor={{ false: theme.card, true: theme.primary }}
+                                        thumbColor={specials.DailyQuote.enabled ? theme.border : theme.border}
+                                    />
+                                </View>
+                            </View>
+
+                            {/* ------ Battery Optimization + Alarm ------ */}
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.batteryOptTitle} {batteryOptimization ? "" : "✅"}
+                                    </Text>
+                                    <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
+                                        <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
+                                    </Pressable>
+                                </View>
+                                {batteryOptimization &&
+                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                        {tr.labels.batteryOptBody}
+                                    </Text>
+                                }
+                                {(!alarmPermission && batteryOptimization) &&
+                                    <>
+                                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                                        <View style={styles.statusRow}>
+                                            <Text style={[styles.statusText, { color: theme.text }]}>
+                                                {tr.labels.alarmAccessTitle}
+                                            </Text>
+                                            <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                                <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
+                                            </Pressable>
+                                        </View>
+                                        <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                            {tr.labels.alarmAccessBody}
+                                        </Text>
+                                    </>
+                                }
+                            </View>
+
+                        </View>
                     )}
                 </AppCard>
 
@@ -698,6 +687,17 @@ const styles = StyleSheet.create({
         width: "100%",
         borderWidth: 1,
         marginVertical: 8,
+    },
+
+    // Settings Card sub-groups
+    subSections: {
+        marginTop: 12,
+        gap: 8,
+    },
+    subGroup: {
+        borderRadius: 10,
+        padding: 12,
+        borderWidth: 1,
     },
 
     // Location

@@ -271,7 +271,7 @@ export default function QuranTabScreen() {
               });
             }}
           >
-            <View style={[styles.continueCard, { backgroundColor: theme.overlay, borderColor: theme.divider2, borderLeftColor: QURAN_COLOR }]}>
+            <View style={[styles.continueCard, { backgroundColor: theme.overlay, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
               <View style={styles.continueContent}>
                 <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
                   {lastReadSurahId ? tr.labels.continueReading : tr.labels.startReading}
@@ -288,7 +288,7 @@ export default function QuranTabScreen() {
           </TouchableOpacity>
 
           {/* SEARCH bar */}
-          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
+          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlay, borderColor: theme.border }]}>
             <Ionicons name="search-outline" size={20} color={theme.text2} />
             <TextInput
               style={[styles.searchInput, { color: theme.text }]}
