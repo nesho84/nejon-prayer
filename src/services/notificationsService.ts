@@ -5,6 +5,7 @@ import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
 import { formatDateKey } from '@/utils/date';
+import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
 import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
 
@@ -131,6 +132,7 @@ async function cancelAllNotifications() {
     console.log('🔴 All existing notifications cancelled');
   } catch (err) {
     console.error("❌ Failed to cancel notifications", err);
+    Sentry.captureException(err);
   }
 }
 
@@ -143,6 +145,7 @@ async function cancelDisplayedNotification(notificationId: string) {
     await stopSound();
   } catch (err) {
     console.error('❌ [Cleanup] Failed to clear:', err);
+    Sentry.captureException(err);
   }
 }
 

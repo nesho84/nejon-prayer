@@ -6,6 +6,7 @@ import { useLocationStore } from '@/store/locationStore';
 import { mmkvStorage } from '@/store/storage';
 import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
 import { formatDateKey } from '@/utils/date';
+import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -84,6 +85,7 @@ export const usePrayersStore = create<PrayersState>()(
               return;
             } catch (err) {
               console.warn("⚠️ Failed to fetch yearly prayer times:", err);
+              Sentry.captureException(err);
             }
           }
 
@@ -106,6 +108,7 @@ export const usePrayersStore = create<PrayersState>()(
 
         } catch (err: any) {
           console.warn("⚠️ Failed to load prayer times:", err);
+          Sentry.captureException(err);
           set({ prayersError: err.message || "An unexpected error occurred." });
         } finally {
           set({ isLoading: false });
@@ -143,6 +146,7 @@ export const usePrayersStore = create<PrayersState>()(
 
         } catch (err) {
           console.error('❌ [prayersStore] Location error:', err);
+          Sentry.captureException(err);
           set({ prayersError: tr.labels.locationError });
         } finally {
           set({ isLoading: false });

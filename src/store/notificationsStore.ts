@@ -108,11 +108,13 @@ export const useNotificationsStore = create<NotificationsState>()(
         }
 
         // Log the reason for rescheduling with context (e.g. Dhuhr time changed, or user updated settings)
-        Sentry.captureMessage('Notifications rescheduled', {
+        Sentry.addBreadcrumb({
+          category: 'notifications',
+          message: 'Notifications rescheduled',
           level: 'info',
-          extra: {
+          data: {
             at: new Date().toISOString(),
-            prayerTimes, // this includes Dhuhr time
+            prayerTimes,
           },
         });
 
@@ -131,6 +133,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           set({ lastScheduledHash: currentHash });
         } catch (err) {
           console.error('❌ Failed to schedule notifications:', err);
+          Sentry.captureException(err);
         } finally {
           set({ isLoading: false });
         }
@@ -157,6 +160,15 @@ export const useNotificationsStore = create<NotificationsState>()(
 
           // Mark update complete for today
           set({ lastBackgroundSync: today });
+
+          // Always send to Sentry so we can audit background scheduling even when no error occurs
+          Sentry.captureMessage('[Background] Notifications synced', {
+            level: 'info',
+            extra: {
+              at: new Date().toISOString(),
+              prayerTimes: usePrayersStore.getState().prayerTimes,
+            },
+          });
 
           console.log('✅ [Background] Notifications synced successfully');
         } catch (error) {

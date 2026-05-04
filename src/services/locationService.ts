@@ -1,5 +1,6 @@
 import { Cords, LocationData, TimeZone } from '@/types/location.types';
 import NetInfo from '@react-native-community/netinfo';
+import * as Sentry from '@sentry/react-native';
 import * as Location from 'expo-location';
 import { Alert, Linking } from 'react-native';
 
@@ -95,6 +96,7 @@ export async function getUserLocation(tr: Translations): Promise<LocationData | 
         };
     } catch (err) {
         console.warn('❌ Location error:', err);
+        Sentry.captureException(err);
         const title = tr?.labels.error ?? "Error";
         const message = tr?.labels.locationError ?? "Failed to get location.";
         Alert.alert(title, message);
@@ -210,6 +212,7 @@ export async function getTimeZoneInfo(coordinates: Cords): Promise<TimeZone | nu
         };
     } catch (err) {
         console.error("❌ Failed to get timezone information:", err);
+        Sentry.captureException(err);
         return null;
     }
 }

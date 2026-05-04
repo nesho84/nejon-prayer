@@ -5,6 +5,7 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { PrayerName } from '@/types/prayer.types';
+import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
 import notifee, { EventType } from 'react-native-notify-kit';
 
@@ -28,6 +29,7 @@ export function useNotificationsSync() {
         // console.log('✅ Notification channels created or already exist');
       } catch (err) {
         console.error('Failed to create notification channels:', err);
+        Sentry.captureException(err);
       }
     };
     initChannels();
@@ -48,7 +50,10 @@ export function useNotificationsSync() {
       try {
         await useNotificationsStore.getState().syncNotifications();
       } catch (err) {
-        if (!cancelled) console.error('❌ Failed to schedule notifications:', err);
+        if (!cancelled) {
+          console.error('❌ Failed to schedule notifications:', err);
+          Sentry.captureException(err);
+        }
       } finally {
         isSchedulingRef.current = false;
       }
@@ -77,6 +82,7 @@ export function useNotificationsSync() {
           }
         } catch (err) {
           console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);
+          Sentry.captureException(err);
         }
       }
 
@@ -85,6 +91,7 @@ export function useNotificationsSync() {
         await handleNotificationEvent(type, notification, pressAction, 'foreground', useNotificationsStore.getState().notifSettings);
       } catch (err) {
         console.error('❌ [Foreground] Failed to handle notification event:', err);
+        Sentry.captureException(err);
       }
     });
 

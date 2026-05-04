@@ -1,518 +1,390 @@
-# Welcome to nejon-prayer app 👋
+# Nejon Prayer — Developer Guide
 
-## Get started
+## What This App Does
 
-1. Install dependencies
+Nejon Prayer is a React Native / Expo app for Muslim daily practice. Its main features:
 
-   ```bash
-   npm install
-   ```
+- **Prayer times** — fetched once per year from [aladhan.com](https://aladhan.com/prayer-times-api) and cached locally. The calculation method is auto-selected by latitude (Balkans/Turkey vs global fallback).
+- **Prayer notifications** — per-prayer scheduling via `react-native-notify-kit`. Each prayer supports enable/disable, time offset (early/late), and custom azan sound. Special notifications for Friday Jumu'ah and daily quotes.
+- **Prayer tracking** — mark each prayer as prayed, 30-day rolling history.
+- **Quran reader** — Arabic text with transliteration loaded locally from a bundled JSON. Translations fetched per-surah from [alquran.cloud](https://alquran.cloud/api). Audio playback via `react-native-track-player`.
+- **Qibla compass** — bearing to Mecca using `expo-sensors`.
+- **Tesbih (dhikr counter)** — digital prayer bead counter with configurable target and lap tracking.
+- **Guides** — step-by-step Wudu (abdest) and Salah (namaz) guides, Ramadan tips.
+- **Settings** — language, theme, notification volume, sounds, location refresh.
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [development build bonus](https://dev.to/cathylai/run-your-expo-app-on-a-physical-phone-with-a-development-build-expo-53-expo-router-h17)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
+**Supported languages:** English, German (`de`), Albanian (`sq`), Turkish (`tr`)
 
 ---
-
-# Build & Development Guide
-
-# Project Build & Development Guide
 
 ## Prerequisites
 - **Node.js** and **npm** installed
 - **Android Studio** with SDK & emulator configured
-- **Java JDK 11**+ installed
+- **Java JDK 17**+ installed
 - **Virtualization enabled** in BIOS/UEFI
 - **ADB** accessible from terminal (`adb devices`)
 
 ---
 
-## 1. Using Expo Go (Managed Workflow)
+## Quick Start
 
-### Purpose
-- Run your app **without a custom dev client**
-- Works only for **managed workflow projects** (no custom native code)
-- Quick iteration with **hot reload**
-
-### Steps
 ```bash
+npm install
 npx expo start
 ```
-- Press:
-```
-a
-```
-- Opens the app in **Expo Go** on the emulator/device
-- Hot reload works automatically
 
-**Notes**
-- ❌ Cannot use custom native modules
-- ✅ Works for pure JS/React Native code
+Press `a` to open on Android emulator, or `i` for iOS simulator.
 
 ---
 
-## 2. Local Development Build (Dev Client / Bare Workflow)
+## Project Structure
 
-### Purpose
-- Supports **custom native modules** and **hot reload**
-- Installed on emulator or physical device for active development
-
-### Steps
-
-1. **Prepare Native Project**
-```bash
-npx expo prebuild --clean
 ```
-- Creates or refreshes `android/` and `ios/` folders
-
-2. **Build & Install Dev Client**
-```bash
-npx expo run:android
+src/
+├── app/                   # Expo Router screens
+│   ├── (tabs)/            # Main tab bar: Home, Quran, Qibla, Extras, Settings
+│   ├── (extras)/          # Wudu guide, Salah guide, Tesbih, Ramadan, About, Notifications
+│   ├── (quran)/           # Ayahs screen (per-surah verse list)
+│   ├── (modals)/          # Bottom-sheet modals: prayer config, timings, Quran settings
+│   └── (onboarding)/      # First-launch location setup
+├── components/            # Shared UI components
+├── constants/             # Colors, sounds list, quotes, translations (i18n strings)
+├── hooks/                 # Sync hooks run at root layout level
+├── services/              # API + device service layer
+├── store/                 # Zustand stores (all persisted via MMKV)
+├── types/                 # TypeScript interfaces
+└── utils/                 # Date helpers
+assets/
+├── data/                  # quran_transliteration.json (bundled, ~3 MB)
+├── fonts/
+├── sounds/                # Azan MP3 files
+└── images/
 ```
-- Builds a **debug APK** (`android/app/build/outputs/apk/debug/app-debug.apk`)
-- Installs it automatically on the **running emulator** or **connected device**
-
-3. **Start Metro**
-```bash
-npx expo start --dev-client
-```
-4. **Switch to Development Build**
-- In Metro terminal, press:
-```
-s
-```
-- Tells Expo to use your **installed dev client** instead of Expo Go
-
-5. **Launch App**
-- Press:
-```
-a
-```
-- Opens the **dev client** on emulator/device
-- Hot reload works immediately
-
-**Optional: Manual Install**
-```bash
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-**Notes**
-- Only **debug/dev builds** support hot reload and custom native modules
-- Rerun `npx expo run:android` if native code changes
 
 ---
 
-## 3. Local Production Build (APK)
+## Architecture
 
-### Purpose
-- For testing **release variant** on devices/emulators
-- Can be shared for QA
-- ❌ Not for Play Store (unsigned APK)
+### Routing — Expo Router
 
-### Steps
+File-based routing. The root layout (`src/app/_layout.tsx`) uses `Stack.Protected` to gate the main app behind `onboardingComplete`. Until onboarding is done, only the onboarding screen is accessible.
+
+### State Management — Zustand + MMKV
+
+All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv) via Zustand's `persist` middleware. MMKV is significantly faster than AsyncStorage for synchronous reads at startup.
+
+| Store | Purpose |
+|---|---|
+| `onboardingStore` | First-launch gate (`onboardingComplete` flag) |
+| `locationStore` | GPS coordinates, full address, timezone |
+| `prayersStore` | Yearly prayer times cache, today's times, load/reload actions |
+| `prayersTrackingStore` | Per-prayer mark-as-prayed, rolling 30-day history |
+| `notificationsStore` | Per-prayer notification config, scheduling, background sync |
+| `quranStore` | Full Quran data, ayahs cache, reading position, player state, settings |
+| `themeStore` | Light / dark / system theme |
+| `languageStore` | Active language + translation strings |
+| `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
+| `tesbihStore` | Counter value, lap count, target |
+| `modalStore` | Global bottom-sheet modal visibility |
+
+### Sync Hooks (run once at root layout)
+
+| Hook | Responsibility |
+|---|---|
+| `useDeviceSettingsSync` | Polls permissions and network state |
+| `usePrayerTimesSync` | Triggers prayer times reload on location/date change |
+| `useNotificationsSync` | Creates notification channels, reschedules on prayer times or settings change |
+| `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
+| `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
+
+### External APIs
+
+| API | Used For | Call Frequency |
+|---|---|---|
+| `api.aladhan.com/v1/calendar/{year}` | Yearly prayer times by GPS coordinates | Once per year per location |
+| `api.alquran.cloud/v1/surah/{id}/{edition}` | Quran translation text | Per surah, on demand |
+
+Prayer calculation method is auto-selected by latitude:
+- **41–44° N** (Albania, Kosovo, N. Macedonia, Bosnia) → Custom angle method (Fajr 15°, Isha 17°)
+- **44–50° N** (Turkey, Central Europe) → Turkish Diyanet method (method 13)
+- **Elsewhere** → ISNA (method 2)
+
+### Notifications
+
+Powered by `react-native-notify-kit` (Notifee fork). Notifications are exact-alarm scheduled (Android 12+ `USE_EXACT_ALARM` permission required). Each scheduling run cancels all existing notifications and reschedules them fresh.
+
+Three notification types:
+- **Prayer notifications** — Fajr, Dhuhr, Asr, Maghrib, Isha (each configurable)
+- **Event notifications** — Imsak (pre-dawn), Sunrise (optional)
+- **Special notifications** — Friday Jumu'ah reminder, daily Islamic quote
+
+### Audio
+
+Two audio systems are used:
+- `react-native-sound` — for azan notification sounds played inside the notification
+- `react-native-track-player` — for the in-app Quran audio player (background-capable)
+
+---
+
+### 1. Expo Go (JS-only, no native modules)
+
+```bash
+npx expo start
+# Press 'a'
+```
+
+> ❌ Cannot use custom native modules
+
+---
+
+### 2. Dev Client (custom native modules + hot reload)
+
+```bash
+npx expo prebuild --clean   # generate android/ and ios/
+npx expo run:android        # build debug APK and install
+npx expo start              # start Metro, then press 's' → 'a'
+```
+
+- Only rerun `npx expo run:android` when native code changes.
+- Manual install: `adb install -r android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+### 3. Local Release APK (QA / testing)
+
 ```bash
 npx expo prebuild --clean
 npx expo run:android --variant release
 ```
-- APK location:
-```
-android/app/build/outputs/apk/release/app-release.apk
-```
-- Install manually:
+
+Output: `android/app/build/outputs/apk/release/app-release.apk`
+
 ```bash
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 ```
 
-**Notes**
-- ❌ Release APK does **not support hot reload**
-- ✅ Useful for testing production behavior or sharing
+> ❌ No hot reload — ✅ Useful for testing production behavior
 
 ---
 
-## 4. Cloud Build (EAS CLI)
+### 4. EAS Cloud Build (store submission)
 
-### Purpose
-- Generate **.aab** for Play Store or **.ipa** for App Store
-- Handles signing, reproducible environment, store uploads
-
-### Setup
 ```bash
 npm install -g eas-cli
 eas login
-eas build:init
 ```
 
-### Build Commands
-- Android-only:
-```bash
-eas build --platform android
-```
-- Both platforms:
-```bash
-eas build --platform all
-```
-- Optional **local build using EAS**:
-```bash
-eas build --platform android --local
-```
-
-**Notes**
-- Outputs `.aab` (Android) and `.ipa` (iOS)
-- Suitable for submission to stores
-- Cloud builds handle signing automatically
+| Profile | Command | Output |
+|---|---|---|
+| Development APK | `eas build --profile development --platform android` | `.apk` |
+| Release APK | `eas build --profile release-apk --platform android` | `.apk` |
+| Preview (AAB) | `eas build --profile preview --platform android` | `.aab` |
+| Production | `eas build --profile production --platform android` | `.aab` (store) |
 
 ---
 
-## 5. Quick Development Workflow Summary (Windows / Emulator)
+## Key Points
 
-### Option A: Expo Go (Managed Workflow)
-```bash
-npx expo start
-# Press 'a' to launch in Expo Go
-```
+| Mode | Hot Reload | Native Modules | Use Case |
+|---|---|---|---|
+| Expo Go | ✅ | ❌ | Quick JS testing |
+| Dev Client | ✅ | ✅ | Active development |
+| Release APK | ❌ | ✅ | QA / sharing |
+| EAS Build | ❌ | ✅ | Store submission |
 
-### Option B: Dev Client (Bare Workflow / Custom Native)
-```bash
-# 1. Prepare native project
-npx expo prebuild --clean
-
-# 2. Build & install dev client
-npx expo run:android
-
-# 3. Start Metro
-npx expo start
-
-# 4. In terminal:
-s   # switch to development build
-a   # launch on emulator
-```
-
-- Hot reload works after dev client is installed
-- Only rerun `npx expo run:android` if native code changes
+**Tip:** Enable **Quick Boot** in AVD Manager and store AVDs on an SSD for faster emulator startup.
 
 ---
 
-## ✅ Key Points
-- **Expo Go** → quick JS-only testing, no native modules
-- **Dev Client** → supports custom native code and hot reload
-- **Release APK** → for QA/testing production, no hot reload
-- **EAS build** → production-ready for store submission
-- **Press `s`** after `npx expo start` to switch to development build
-- **Press `a`** to launch on Android emulator
+## Android Permissions
 
-**Tip:** For faster emulator startup, enable **Quick Boot** in AVD Manager and store AVDs on an **SSD**.
+| Permission | Why |
+|---|---|
+| `ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION` | GPS coordinates for prayer time calculation |
+| `POST_NOTIFICATIONS` | Display prayer time notifications |
+| `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM` | Exact-time azan scheduling (Android 12+) |
+| `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Quran audio player running in background |
+| `WAKE_LOCK` | Keep the device awake while audio plays |
+| `VIBRATE` | Notification vibration |
+| `MODIFY_AUDIO_SETTINGS` | Notification volume control |
+| `INTERNET` / `ACCESS_NETWORK_STATE` | Prayer times API + Quran translation API |
 
-
-
-
-# ---
-
-
-
-
-# To Get Device Logs:
-
-## Clear the logs first:
-## Android:
-## bash# Clear all logs
-```bash
-adb logcat -c
-```
-
-## Then start fresh logging
-```bash
-adb logcat | grep -i "error\|exception\|fatal"
-Or use filtered logging with timestamp:
-bash# Clear first
-adb logcat -c
-```
-
-## Start logging with timestamp, filter for errors
-```bash
-adb logcat -v time *:E *:F
-```
-
-- *:E = Error level
-- *:F = Fatal level
-- Better: Log to a file
-- bash# Clear logs
-```bash
-adb logcat -c
-```
-
-## Now reproduce the crash, logs go to file
-```bash
-adb logcat > crash_log.txt
-```
-
-## When it crashes, stop with Ctrl+C
-## Then search the file for errors
-
-## Or for React Native specific
-```bash
-adb logcat *:S ReactNative:V ReactNativeJS:V
-```
-
-## iOS:
-- In Xcode: Window → Devices and Simulators → View Device Logs
-
-
-
-
-
-# ---
-
-
-
-
-
-# ✅ Expo Dependency Update Workflow 1
-
-A safe, repeatable workflow for keeping your Expo project dependencies up-to-date while minimizing `expo-doctor` warnings and avoiding runtime/native issues.
+> **Battery Optimization:** The app checks if battery optimization is enabled for it (via `notifee.isBatteryOptimizationEnabled()`) and can prompt the user to disable it, which is required for reliable exact-alarm delivery on some OEMs.
 
 ---
 
-## Step 0 — Backup
-Always commit your code or make a backup before updates:
+### Android
+
 ```bash
-git add .
-git commit -m "Backup before monthly dependency update"
+adb logcat -c                                    # clear logs
+adb logcat | grep -i "error\|exception\|fatal"   # filtered output
+adb logcat -v time *:E *:F                       # timestamped errors
+adb logcat > crash_log.txt                       # log to file (Ctrl+C to stop)
+adb logcat *:S ReactNative:V ReactNativeJS:V     # React Native specific
+```
+
+### iOS
+
+Xcode → **Window → Devices and Simulators → View Device Logs**
+
+---
+
+## OTA Updates (EAS Update)
+
+This app uses **EAS Update** to ship JS/asset changes without a full store release.
+
+### How It Works
+
+- `expo-updates` checks `updates.url` on launch
+- The app sends its `channel` and `runtimeVersion` to the server
+- If a matching update exists, it downloads and applies it on next launch
+- **Only JS and assets change** — native changes still require a full build
+
+### Channels (configured in `app.json` + `eas.json`)
+
+| Channel | Purpose |
+|---|---|
+| `production` | Live store builds |
+| `preview` | Internal QA builds |
+| `development` | Dev client builds |
+
+### Publishing an Update
+
+> Do **not** bump `version` or `versionCode` for OTA — those are for store releases only.
+
+```bash
+# All platforms
+eas update --branch production --platform all --message "fix: description"
+
+# Android only
+eas update --branch production --platform android --message "fix: description"
+```
+
+### Rules
+
+- OTA works only when `runtimeVersion` matches the installed build
+- Native code changes (new packages, permissions, `android/` edits) require a full EAS build
+- After a full EAS build, resume publishing OTA updates as normal
+
+### Setup (one-time)
+
+```bash
+npm install -g eas-cli
+eas login
+npx expo install expo-updates
+eas update:configure         # injects updates.url and runtimeVersion into app.json
+eas channel:create production
 ```
 
 ---
 
-## Step 1 — Check outdated packages
-- DevDependencies only:
-```bash
-npx ncu --dep dev
+## Error Monitoring (Sentry)
+
+This app uses **Sentry** (`@sentry/react-native`) for crash reporting and error tracking.
+
+### What It Does
+
+- Automatically captures unhandled JS exceptions and native crashes
+- Sends error reports to [sentry.io](https://sentry.io) with stack traces and device context
+- Configured via the `@sentry/react-native/expo` plugin in `app.json`
+
+### Configuration (`app.json`)
+
+```json
+["@sentry/react-native/expo", {
+  "url": "https://sentry.io/",
+  "project": "react-native",
+  "organization": "nejonnet"
+}]
 ```
-- All dependencies:
-```bash
-npx ncu
-```
-- Review which ones are **minor/patch vs major**.
+
+### Required EAS Environment Variable
+
+> ⚠️ **Critical:** EAS cloud builds will fail to upload source maps to Sentry without this secret.
+
+In the [EAS dashboard](https://expo.dev) under **Project → Secrets**, add:
+
+| Secret Name | Value |
+|---|---|
+| `SENTRY_AUTH_TOKEN` | Your Sentry auth token |
+
+Generate the token at: **Sentry → Settings → Auth Tokens → Create New Token**
+Required scopes: `project:releases`, `org:read`.
+
+This token is also referenced in `android/sentry.properties` for local release builds.
 
 ---
 
-## Step 2 — Update devDependencies (safe)
+## Dependency Update Workflow
+
+### Workflow A — Careful (recommended for native-heavy projects)
+
 ```bash
-npx ncu --dep dev -u
-npm install
-```
-✅ Safe, won’t affect runtime.
+# 0. Backup
+git add . && git commit -m "Backup before update"
 
----
+# 1. Check outdated
+npx ncu --dep dev   # devDependencies only
+npx ncu             # all packages
 
-## Step 3 — Update JS-only runtime packages (safe)
-- For packages with no native code:
-```bash
-npm install axios@latest dayjs@latest redux@latest
-```
-- These **won’t trigger Expo native warnings**.
+# 2. Update devDependencies (safe)
+npx ncu --dep dev -u && npm install
 
----
+# 3. Update native packages — patch/minor only
+npm install @react-native-picker/picker@latest   # example
 
-## Step 4 — Update native/Expo-managed packages selectively
-- Only patch/minor updates (same major version) for packages like:
-  - `@react-native-picker/picker`
-  - `react-native-sound`
-  - `react-native-gesture-handler`
-- Example:
-```bash
-npm install @react-native-picker/picker@2.11.4 react-native-sound@0.11.3
-```
-- ⚠️ **Do not upgrade major versions** until Expo SDK supports them.
-
----
-
-## Step 5 — Clear caches
-After updates:
-```bash
+# 4. Clear caches and verify
 rm -rf node_modules android package-lock.json
 npm install
 npx expo-doctor
 npx expo start -c
 ```
 
-# If => Uncaught Error: java.net.SocketTimeoutException:failed to connect to /192.168.1.49(port 8081) from /ipaddy (port 60524) after 10000ms.
+> If `SocketTimeoutException` on Metro connect: `npx expo start -c --tunnel`
+
+### Workflow B — Expo-first (simpler)
+
 ```bash
-npx expo start -c --tunnel
+# 0. Backup
+git add . && git commit -m "Backup before update"
+
+# 1. Update all packages
+npx npm-check-updates -u && npm install
+
+# 2. Let Expo fix compatibility
+npx expo-doctor
+npx expo install --check
+
+# 3. Clear caches
+rm -rf node_modules android package-lock.json
+npm install && npx expo start -c
 ```
 
-- Refreshes dependency map.
-- Removes stale warnings.
-- Ensures Metro and Expo caches are clean.
+If a package causes `expo-doctor` errors and you want to pin it, add to `package.json`:
 
----
-
-## Step 6 — Test thoroughly
-- Development build:
-```bash
-npx expo start
+```json
+"expo": {
+  "install": {
+    "exclude": ["@react-native-picker/picker"]
+  }
+}
 ```
-- Android/iOS previews:
-```bash
-expo run:android
-expo run:ios
-```
-- If using EAS for release builds, do a test build:
-```bash
-eas build --platform android --profile preview
-eas build --platform android --profile release-apk
 
-eas build --platform ios --profile preview
-```
-- Verify the app doesn’t crash and native modules behave correctly.
+### Rules of Thumb
 
----
+| Package Type | Update Rule |
+|---|---|
+| DevDependencies | Update freely |
+| Pure JS packages | Update freely |
+| Native/community packages | Minor/patch only — test builds |
+| Expo SDK & core | `npx expo upgrade` only — never via npm |
 
-## Step 7 — Ignore harmless Expo warnings
-- If `expo-doctor` warns about **minor patch differences** for native modules you just tested, it’s safe to ignore.
-- Warnings are **informational** — they indicate Expo hasn’t officially verified the version, but if it works, you’re fine.
+### Monthly Checklist
 
----
-
-## Step 8 — Optional: Upgrade Expo SDK
-- Every few months, consider upgrading Expo SDK to reduce warnings permanently:
-```bash
-npx expo upgrade
-```
-- This bumps all supported packages in sync with the SDK.
-- After upgrading, repeat steps 1–7 for any other packages.
-
----
-
-## Rules of Thumb
-| Package Type | Update Rule | Expo Warning? |
-|-------------|-------------|---------------|
-| DevDependencies | Update freely | Usually none |
-| Pure JS | Update freely | Usually none |
-| Community/native packages | Update minor/patch only, test builds | Can ignore warnings if tested |
-| Expo SDK & core packages | Upgrade only via `expo upgrade` | Never update manually |
-
----
-
-## Monthly Checklist
 1. Backup
 2. Update devDependencies
 3. Update JS-only runtime libs
 4. Update native packages carefully (minor/patch)
 5. Clear caches & run `expo-doctor`
-6. Test all builds
-7. Ignore harmless warnings
-8. Upgrade Expo SDK when possible
-
-
-
-
-# ✅ Official expo Dependency Update Workflow 2
-## Step 0 — Backup (mandatory)
-git add .
-git commit -m "Backup before dependency update"
-
-## Step 1 — Update all packages via npm
-```bash
-npx npm-check-updates -u
-npx npm-check-updates -i
-npm install
-```
-
-
-This updates:
-
-JS-only packages
-
-Third-party native packages
-
-Expo patch/minor versions (same SDK)
-
-## Step 2 — Let Expo enforce compatibility
-```bash
-npx expo-doctor
-npx expo install --check
-```
-
-
-Fixes only mismatched Expo-managed packages
-
-Leaves third-party libraries untouched
-
-Ensures SDK compatibility
-
-## Step 3 — Clear caches
-```bash
-rm -rf node_modules android package-lock.json
-npm install
-npx expo start -c
-```
-
-## Step 4 — Test thoroughly
-
-Development build
-
-Android first (real device preferred)
-
-iOS simulator / device
-
-## Step 5 — Expo SDK upgrade (only when intended)
-```bash
-npx expo upgrade
-```
-
-## If some dependencies are not compatible (expo-doctor complaining) or the app does not build (in package.json) example:
-```bash
-"expo": {
-    "install": {
-      "exclude": [
-        "@react-native-picker/picker"
-      ]
-    }
-  }
-```
-
-
-Updates Expo, React, React Native, and Expo modules in sync
-
-Never upgrade SDKs via npm
-
-## Rules of Thumb
-Package Type	Update Rule
-Expo core	expo upgrade only
-Third-party native	Minor
+6. Test dev client + release build
+7. Upgrade Expo SDK when ready (`npx expo upgrade`)
