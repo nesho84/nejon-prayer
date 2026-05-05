@@ -4,7 +4,7 @@ import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
-import { formatDateKey } from '@/utils/date';
+import { formatDateKey, getTriggerTime } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
 import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
@@ -150,39 +150,6 @@ async function cancelDisplayedNotification(notificationId: string) {
 }
 
 // ------------------------------------------------------------
-// Parse time string and calculate next trigger time with offset
-// ------------------------------------------------------------
-function getTriggerTime(timeStringRaw: string, offsetMinutes: number = 0): Date | null {
-  // Normalize: trim whitespace and replace non-breaking spaces
-  const timeString = timeStringRaw.replace(/\u00A0/g, ' ').trim();
-
-  // Validate format: must be HH:mm (e.g., "13:45" or "5:30")
-  const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return null;
-
-  // Extract hour and minute
-  const hour = Number(match[1]);
-  const minute = Number(match[2]);
-
-  // Create trigger time for today
-  const triggerTime = new Date();
-  triggerTime.setHours(hour, minute, 0, 0);
-
-  // Apply offset (e.g., -15 = 15 minutes before, +10 = 10 minutes after)
-  if (offsetMinutes !== 0) {
-    triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
-  }
-
-  // If time has passed today, schedule for tomorrow
-  const now = new Date();
-  if (triggerTime <= now) {
-    triggerTime.setDate(triggerTime.getDate() + 1);
-  }
-
-  return triggerTime;
-}
-
-// ------------------------------------------------------------
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
@@ -219,6 +186,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
+          prayerDate: formatDateKey(triggerTime), // ex. "2026-03-20" (used for tracking in foreground/background)
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },

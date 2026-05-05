@@ -1,5 +1,6 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
+import { resolvePrayerDate } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
@@ -44,7 +45,9 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
         try {
             const prayerName = notification.data?.prayerName as PrayerName | undefined;
             if (prayerName) {
-                usePrayersTrackingStore.getState().markPrayed(prayerName);
+                const prayerDate = notification.data?.prayerDate as string | undefined;
+                const dateToUse = resolvePrayerDate(prayerDate);
+                usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
             }
         } catch (error) {
             console.error('❌ [Background] Failed to mark prayer as prayed:', error);
