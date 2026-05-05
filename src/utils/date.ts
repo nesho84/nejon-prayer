@@ -14,7 +14,11 @@ export const formatDateKey = (date?: Date): string => {
 // ------------------------------------------------------------
 export function resolvePrayerDate(prayerDate?: string): string {
   const today = formatDateKey();
-  const yesterday = formatDateKey(new Date(Date.now() - 86400000));
+
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const yesterday = formatDateKey(d);
+
   return prayerDate === today || prayerDate === yesterday ? prayerDate : today;
 }
 
