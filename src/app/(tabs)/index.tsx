@@ -247,7 +247,7 @@ export default function HomeScreen() {
                         </View>
                         {/* Right: Chevron icon */}
                         <View style={styles.chevronRightIcon}>
-                            <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.5, marginRight: -3 }} />
+                            <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.5 }} />
                         </View>
                     </TouchableOpacity>
 
@@ -256,81 +256,81 @@ export default function HomeScreen() {
 
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
-                        {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index) => {
-                            const isLast = index === Object.entries(prayerTimes).length - 1;
+                        {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
+                            const isLast = index === arr.length - 1;
                             const NameIcon = handlePrayerNameIcon(prayerName);
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
-                            const isPast = isPrayerPast(prayerTime);
+                            const isPast = isTrackable && isPrayerPast(prayerTime);
                             const isDayDone = isPrayerPast(prayerTimes.Isha);
                             const isNext = !isDayDone && nextPrayerName === prayerName;
-                            // Reactive: re-evaluates whenever tracking changes (mark/unmark)
                             const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
 
                             return (
-                                <View key={prayerName}>
-                                    {/* Prayer row */}
+                                <View key={prayerName} style={!isLast && { marginBottom: 0 }}>
+                                    {/* Prayer row card */}
                                     <TouchableOpacity
                                         delayPressIn={0}
                                         delayPressOut={0}
                                         activeOpacity={0.3}
-                                        onPress={() => {
-                                            router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`);
-                                        }}
+                                        onPress={() => router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`)}
                                     >
                                         <View
                                             style={[
                                                 styles.prayerRow,
-                                                isNext && [
-                                                    styles.prayerRowActive,
-                                                    { backgroundColor: theme.accentLight, borderColor: theme.accentLight }
-                                                ]
+                                                { borderColor: isNext ? theme.accent : theme.border },
+                                                isNext && { backgroundColor: theme.accentLight, borderWidth: 1.5, borderColor: theme.accentLight }
+
                                             ]}
                                         >
-                                            {/* Prayer Name Left Section */}
-                                            <View style={styles.prayerNameSection}>
-                                                {/* Prayer Name Icon */}
-                                                <NameIcon size={22} color={isNext ? theme.accent : theme.text2} />
-                                                {/* Prayer Name */}
-                                                <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
-                                                    {tr.prayers[prayerName] || prayerName}
-                                                </Text>
-                                                {/* Prayed indicator */}
-                                                {isTrackable && isPast && (
-                                                    <TouchableOpacity
-                                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                                        onPress={() => isPrayed
-                                                            ? unmarkPrayed(prayerName as PrayerName)
-                                                            : markPrayed(prayerName as PrayerName)
-                                                        }
-                                                    >
-                                                        <Ionicons
-                                                            name={isPrayed ? 'checkmark-sharp' : 'alert-circle-outline'}
-                                                            size={20}
-                                                            color={isPrayed ? theme.accent2 : theme.placeholder}
-                                                            style={{ opacity: isPrayed ? 1 : 0.7 }}
-                                                        />
-                                                    </TouchableOpacity>
-                                                )}
-                                            </View>
+                                            {/* Left: Tracking circle (trackable) or dash placeholder */}
+                                            {isTrackable ? (
+                                                <TouchableOpacity
+                                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                    disabled={!isPast}
+                                                    onPress={() => isPrayed
+                                                        ? unmarkPrayed(prayerName as PrayerName)
+                                                        : markPrayed(prayerName as PrayerName)
+                                                    }
+                                                >
+                                                    <Ionicons
+                                                        name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
+                                                        size={24}
+                                                        color={isPrayed ? theme.accent2 : theme.text2}
+                                                        style={{ opacity: isPrayed ? 1 : 0.45 }}
+                                                    />
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <Ionicons
+                                                    name="remove"
+                                                    size={24}
+                                                    color={theme.text2}
+                                                    style={{ opacity: 0.25 }}
+                                                />
+                                            )}
 
-                                            {/* Prayer Time Right Section */}
-                                            <View style={styles.prayerTimeSection}>
-                                                <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
-                                                    {prayerTime}
-                                                </Text>
-                                                {/* Prayer Time Icon */}
-                                                <NotifIcon size={22} color={theme.text} style={{ marginRight: -6 }} />
-                                                {/* Chevron Icon */}
-                                                <Ionicons name="chevron-forward" size={12} color={theme.text2} style={{ opacity: 0.2 }} />
+                                            {/* Prayer Name Text */}
+                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
+                                                {tr.prayers[prayerName] || prayerName}
+                                            </Text>
+
+                                            {/* Prayer Name Icon */}
+                                            <NameIcon size={20} color={isNext ? theme.accent : theme.text2} style={{ opacity: 0.7 }} />
+
+                                            {/* Horizontal Spacer */}
+                                            <View style={{ flex: 1 }} />
+
+                                            {/* Prayer Time */}
+                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
+                                                {prayerTime}
+                                            </Text>
+
+                                            {/* Notification Icon */}
+                                            <View style={[styles.notifIconContainer, { backgroundColor: theme.surfaceBg }]}>
+                                                <NotifIcon size={20} color={theme.text2} />
                                             </View>
                                         </View>
                                     </TouchableOpacity>
-
-                                    {/* Prayer Divider */}
-                                    {!isLast && (
-                                        <View style={[styles.prayerDivider, { backgroundColor: theme.divider2 }]} />
-                                    )}
                                 </View>
                             );
                         })}
@@ -429,21 +429,20 @@ const styles = StyleSheet.create({
     },
     // Prayers List
     prayersRowContainer: {
-        paddingTop: 8,
+        paddingTop: 9,
         paddingBottom: 16,
+        paddingHorizontal: 6,
+        gap: 7,
     },
     prayerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 11,
-        paddingHorizontal: 12,
-    },
-    prayerRowActive: {
-        borderLeftWidth: 3,
-        borderRightWidth: 3,
-        marginVertical: 2,
-        paddingHorizontal: 10,
+        justifyContent: 'flex-start',
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        borderWidth: 0.8,
+        borderRadius: 12,
+        gap: 10,
     },
     prayerNameSection: {
         flexDirection: 'row',
@@ -462,7 +461,15 @@ const styles = StyleSheet.create({
     prayerTimeText: {
         fontSize: 16,
         fontWeight: '600',
+        marginRight: 4,
         letterSpacing: 0.5,
+    },
+    notifIconContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     prayerDivider: {
         height: 1,
