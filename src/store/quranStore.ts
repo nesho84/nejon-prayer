@@ -15,9 +15,15 @@ type AyahsData = {
   ayahs: Ayah[] | null; // Ayahs from API
   isLoadingAyahs: boolean;
   ayahsError: unknown;
+  // "Start/Continue Reading Card" data
   lastReadSurahId: number | null;
   lastReadSurahName: string | null;
   lastReadAyahId: number | null;
+  // "Start/Continue Khatam Card" data
+  lastKhatamSurahId: number | null;
+  lastKhatamSurahName: string | null;
+  lastKhatamAyahId: number | null;
+  khatamCount: number;
 }
 
 type QuranSettings = {
@@ -44,6 +50,9 @@ interface QuranState extends QuranData, AyahsData, QuranSettings, QuranPlayerDat
   // Ayahs actions
   fetchAyahs: (surahId: number) => Promise<void>;
   setLastRead: (surahId: number, surahName: string, ayahId: number) => void;
+  setLastKhatam: (surahId: number, surahName: string, ayahId: number) => void;
+  completeKhatam: () => void;
+  resetKhatam: () => void;
   // Settings actions
   setQuranSettings: (settings: Partial<QuranSettings>) => void;
   // Player actions
@@ -63,9 +72,15 @@ export const useQuranStore = create<QuranState>()(
       ayahs: null,
       isLoadingAyahs: false,
       ayahsError: null,
+      // Last reading
       lastReadSurahId: null,
       lastReadSurahName: null,
       lastReadAyahId: null,
+      // Khatam reading + count
+      lastKhatamSurahId: null,
+      lastKhatamSurahName: null,
+      lastKhatamAyahId: null,
+      khatamCount: 0,
 
       // Settings
       arabicFontSize: 26,
@@ -137,6 +152,28 @@ export const useQuranStore = create<QuranState>()(
         lastReadAyahId: ayahId,
       }),
 
+      // Set khatam position
+      setLastKhatam: (surahId, surahName, ayahId) => set({
+        lastKhatamSurahId: surahId,
+        lastKhatamSurahName: surahName,
+        lastKhatamAyahId: ayahId,
+      }),
+
+      // Reset khatam position only — does not touch khatamCount
+      resetKhatam: () => set({
+        lastKhatamSurahId: null,
+        lastKhatamSurahName: null,
+        lastKhatamAyahId: null,
+      }),
+
+      // Increment khatam count + clear position (card shows "Start Khatam" for next round)
+      completeKhatam: () => set((state) => ({
+        khatamCount: state.khatamCount + 1,
+        lastKhatamSurahId: null,
+        lastKhatamSurahName: null,
+        lastKhatamAyahId: null,
+      })),
+
       // Update Quran settings (font sizes)
       setQuranSettings: (settings) => set(settings),
 
@@ -147,11 +184,16 @@ export const useQuranStore = create<QuranState>()(
     {
       name: "quran-storage",
       storage: createJSONStorage(() => mmkvStorage),
-      // Only last read persisted — everything else starts fresh
+      // Persist reading/khatam positions, counts, and display settings
+      // — everything else (player state, loaded data) starts fresh
       partialize: (state) => ({
         lastReadSurahId: state.lastReadSurahId,
         lastReadSurahName: state.lastReadSurahName,
         lastReadAyahId: state.lastReadAyahId,
+        lastKhatamSurahId: state.lastKhatamSurahId,
+        lastKhatamSurahName: state.lastKhatamSurahName,
+        lastKhatamAyahId: state.lastKhatamAyahId,
+        khatamCount: state.khatamCount,
         arabicFontSize: state.arabicFontSize,
         translationFontSize: state.translationFontSize,
         selectedEditions: state.selectedEditions,

@@ -2,13 +2,14 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
+import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
 import { AUDIO_EDITIONS, getSurahAudioUrl, Surah } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
@@ -23,9 +24,6 @@ export default function QuranTabScreen() {
   const activeSurahId = useQuranStore((s) => s.activeSurahId);
   const quranError = useQuranStore((s) => s.quranError);
   const isQuranReady = useQuranStore((s) => s.isQuranReady);
-  const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
-  const lastReadSurahName = useQuranStore((s) => s.lastReadSurahName);
-  const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
 
   const isPlaying = useQuranStore((s) => s.isPlaying);
   const isBuffering = useQuranStore((s) => s.isBuffering);
@@ -40,14 +38,6 @@ export default function QuranTabScreen() {
   const duration = isSwitching ? 0 : (progress.duration ?? 0);
   const isBufferingActive = isSwitching || isBuffering;
 
-  // Start reading defaults
-  const FIRST_SURAH_ID = 1;
-  const FIRST_SURAH_NAME = "Al-Fatihah";
-  const FIRST_AYAH_ID = 1;
-
-  // Colors
-  const QURAN_COLOR = "#d1a127";
-
   // Local state / refs
   const [searchQuery, setSearchQuery] = useState("");
   const textInputRef = useRef<TextInput>(null);
@@ -56,6 +46,9 @@ export default function QuranTabScreen() {
   // Must match the height in QuranSurahRow styles
   const ROW_HEIGHT = 90;
   const ROW_GAP = 10;
+
+  // Colors
+  const QURAN_COLOR = "#d1a127";
 
   // ------------------------------------------------------------
   // Play / Pause / Replay handler
@@ -258,34 +251,8 @@ export default function QuranTabScreen() {
 
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
-          {/* START/CONTINUE Reading */}
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => {
-              router.navigate({
-                pathname: "/(quran)/ayahs",
-                params: {
-                  surahId: lastReadSurahId ?? FIRST_SURAH_ID,
-                  surahName: lastReadSurahName ?? FIRST_SURAH_NAME,
-                },
-              });
-            }}
-          >
-            <View style={[styles.continueCard, { backgroundColor: theme.overlay, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
-              <View style={styles.continueContent}>
-                <Text style={[styles.continueLabel, { color: theme.text2, opacity: 0.7 }]}>
-                  {lastReadSurahId ? tr.labels.continueReading : tr.labels.startReading}
-                </Text>
-                <Text style={[styles.continueSurahName, { color: theme.text }]}>
-                  {lastReadSurahName ?? FIRST_SURAH_NAME}
-                </Text>
-                <Text style={[styles.continueAyahNumber, { color: theme.text2, opacity: 0.6 }]}>
-                  {lastReadAyahId ? `${tr.labels.ayah} ${lastReadAyahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
-                </Text>
-              </View>
-              <MaterialIcons name="arrow-right-alt" size={36} color={QURAN_COLOR} />
-            </View>
-          </TouchableOpacity>
+          {/* Reading / Khatam card */}
+          <QuranReadingCard />
 
           {/* SEARCH bar */}
           <View style={[styles.searchInputContainer, { backgroundColor: theme.overlay, borderColor: theme.border }]}>
@@ -346,9 +313,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginHorizontal: 8,
     paddingTop: 24,
-    paddingBottom: 16,
+    paddingBottom: 12,
     paddingHorizontal: 16,
-    gap: 14,
+    gap: 12,
   },
   panelHeader: {
     flexDirection: "row",
@@ -376,37 +343,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-  },
-
-  // Continue Reading
-  continueCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderLeftWidth: 2,
-  },
-  continueContent: {
-    flex: 1,
-    gap: 5,
-  },
-  continueLabel: {
-    fontSize: 13,
-    fontWeight: "400",
-    letterSpacing: 0.5,
-    fontStyle: "italic",
-    marginTop: 1,
-  },
-  continueSurahName: {
-    fontSize: 21,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-  },
-  continueAyahNumber: {
-    fontSize: 13,
-    fontWeight: "400",
   },
 
   // Search

@@ -10,12 +10,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const QURAN_COLOR = "#d1a127";
 
 export default function AyahsScreen() {
-  const { surahId, surahName } = useLocalSearchParams();
+  const { surahId, surahName, readingMode } = useLocalSearchParams();
   const surahIdNum = parseInt(surahId as string, 10);
   const surahNameStr = surahName as string;
+  const mode = (readingMode as string) || "reading";
 
   // Stores
   const theme = useThemeStore((s) => s.theme);
@@ -29,17 +32,25 @@ export default function AyahsScreen() {
   const ayahsError = useQuranStore((s) => s.ayahsError);
   const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
   const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
+  const lastKhatamSurahId = useQuranStore((s) => s.lastKhatamSurahId);
+  const lastKhatamAyahId = useQuranStore((s) => s.lastKhatamAyahId);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
   const selectedEditions = useQuranStore((s) => s.selectedEditions);
   const getSurahById = useQuranStore((s) => s.getSurahById);
   const fetchAyahs = useQuranStore((s) => s.fetchAyahs);
   const setLastRead = useQuranStore((s) => s.setLastRead);
+  const setLastKhatam = useQuranStore((s) => s.setLastKhatam);
+  const completeKhatam = useQuranStore((s) => s.completeKhatam);
 
   // Local state / refs
-  const [selectedAyah, setSelectedAyah] = useState<number | null>(
-    lastReadSurahId === surahIdNum ? lastReadAyahId : null
-  );
+  const [selectedAyah, setSelectedAyah] = useState<number | null>(() => {
+    if (mode === "reading") {
+      return lastReadSurahId === surahIdNum ? lastReadAyahId : null;
+    } else {
+      return lastKhatamSurahId === surahIdNum ? lastKhatamAyahId : null;
+    }
+  });
   const flashListRef = useRef<FlashListRef<Verse>>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasScrolledRef = useRef(false);
@@ -92,7 +103,11 @@ export default function AyahsScreen() {
 
     scrollTimeoutRef.current = setTimeout(() => {
       // setSelectedAyah(firstVisible.id); // <-- optional: update selected on scroll
-      setLastRead(surahIdNum, surahNameStr, firstVisible.id);
+      if (mode === "reading") {
+        setLastRead(surahIdNum, surahNameStr, firstVisible.id);
+      } else {
+        setLastKhatam(surahIdNum, surahNameStr, firstVisible.id);
+      }
     }, 200);
   }).current;
 
@@ -112,10 +127,83 @@ export default function AyahsScreen() {
       onPress={() => {
         userInteractedRef.current = true;
         setSelectedAyah(item.id);
-        setLastRead(surahIdNum, surahNameStr, item.id);
+        if (mode === "reading") {
+          setLastRead(surahIdNum, surahNameStr, item.id);
+        } else {
+          setLastKhatam(surahIdNum, surahNameStr, item.id);
+        }
       }}
     />
-  ), [surahIdNum, surahNameStr, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead]);
+  ), [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam]);
+
+  // ------------------------------------------------------------
+  // Footer: Next Surah button (or Complete Khatam on surah 114)
+  // ------------------------------------------------------------
+  const renderFooter = useCallback(() => {
+    if (surahIdNum === 114) {
+      if (mode !== "khatam") return null;
+      return (
+        <TouchableOpacity
+          style={[styles.footerCard, { backgroundColor: `${QURAN_COLOR}18`, borderColor: theme.border }]}
+          activeOpacity={0.6}
+          onPress={() => {
+            completeKhatam();
+            Alert.alert(
+              tr.labels.khatamCompleteTitle,
+              tr.labels.khatamCompleteMessage,
+              [{ text: "OK", onPress: () => router.back() }]
+            );
+          }}
+        >
+          <View style={[styles.footerIcon, { backgroundColor: `${QURAN_COLOR}25` }]}>
+            <Ionicons name="checkmark-circle-outline" size={22} color={QURAN_COLOR} />
+          </View>
+          <Text style={[styles.footerCardLabel, { color: QURAN_COLOR }]}>
+            {tr.labels.khatamFinish}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    const nextSurah = getSurahById(surahIdNum + 1);
+    if (!nextSurah) return null;
+
+    return (
+      <TouchableOpacity
+        style={[styles.footerCard, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}
+        activeOpacity={0.6}
+        onPress={() => {
+          if (mode === "khatam") {
+            const firstAyahId = nextSurah.verses?.[0]?.id ?? null;
+            if (firstAyahId !== null) {
+              setLastKhatam(nextSurah.id, nextSurah.transliteration, firstAyahId);
+            }
+          }
+          router.replace({
+            pathname: "/(quran)/ayahs",
+            params: {
+              surahId: nextSurah.id,
+              surahName: nextSurah.transliteration,
+              readingMode: mode,
+            },
+          });
+        }}
+      >
+        <View style={[styles.footerIcon, { backgroundColor: `${QURAN_COLOR}20` }]}>
+          <Ionicons name="arrow-forward-circle-outline" size={22} color={QURAN_COLOR} />
+        </View>
+        <View style={styles.footerCardText}>
+          <Text style={[styles.footerCardHint, { color: theme.text2 }]}>
+            {tr.labels.nextSurah}
+          </Text>
+          <Text style={[styles.footerCardLabel, { color: theme.text }]}>
+            {nextSurah.transliteration}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={QURAN_COLOR} />
+      </TouchableOpacity>
+    );
+  }, [surahIdNum, mode, theme, tr, getSurahById, setLastKhatam, completeKhatam]);
 
   // Loading state
   if (isLoadingAyahs) {
@@ -162,6 +250,7 @@ export default function AyahsScreen() {
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         contentContainerStyle={styles.ayahList}
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={renderFooter}
         onScrollBeginDrag={() => userInteractedRef.current = true}
         onLayout={() => {
           if (hasScrolledRef.current) return;
@@ -177,5 +266,38 @@ export default function AyahsScreen() {
 const styles = StyleSheet.create({
   ayahList: {
     paddingBottom: 24,
+  },
+  footerCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginHorizontal: 12,
+    marginTop: 24,
+    marginBottom: 32,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderRadius: 14,
+  },
+  footerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  footerCardText: {
+    flex: 1,
+  },
+  footerCardHint: {
+    fontSize: 11,
+    fontWeight: "500",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  footerCardLabel: {
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

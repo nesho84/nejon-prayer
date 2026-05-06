@@ -77,6 +77,7 @@ const QuranSurahRow = React.memo(({
             params: {
               surahId: surah.id,
               surahName: surah.transliteration,
+              readingMode: "reading",
             },
           });
         }}

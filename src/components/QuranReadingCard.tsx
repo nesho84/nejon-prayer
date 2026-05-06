@@ -1,0 +1,213 @@
+import { useLanguageStore } from "@/store/languageStore";
+import { useQuranStore } from "@/store/quranStore";
+import { useThemeStore } from "@/store/themeStore";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+type ReadingMode = "reading" | "khatam";
+
+const QURAN_COLOR = "#d1a127";
+const FIRST_SURAH_ID = 1;
+const FIRST_SURAH_NAME = "Al-Fatihah";
+const FIRST_AYAH_ID = 1;
+
+export default function QuranReadingCard() {
+  // Stores
+  const theme = useThemeStore((s) => s.theme);
+  const tr = useLanguageStore((s) => s.tr);
+
+  // Quran Store - Reading
+  const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
+  const lastReadSurahName = useQuranStore((s) => s.lastReadSurahName);
+  const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
+  // Quran Store - Khatam
+  const lastKhatamSurahId = useQuranStore((s) => s.lastKhatamSurahId);
+  const lastKhatamSurahName = useQuranStore((s) => s.lastKhatamSurahName);
+  const lastKhatamAyahId = useQuranStore((s) => s.lastKhatamAyahId);
+  const khatamCount = useQuranStore((s) => s.khatamCount);
+  const resetKhatam = useQuranStore((s) => s.resetKhatam);
+
+  // Local state
+  const [mode, setMode] = useState<ReadingMode>("reading");
+
+  // Determine which set of position data to use based on mode
+  const isReading = mode === "reading";
+  const surahId = isReading ? lastReadSurahId : lastKhatamSurahId;
+  const surahName = isReading ? lastReadSurahName : lastKhatamSurahName;
+  const ayahId = isReading ? lastReadAyahId : lastKhatamAyahId;
+  const hasStarted = isReading ? !!lastReadSurahId : !!lastKhatamSurahId;
+
+  // Card label logic
+  const cardLabel = hasStarted
+    ? (isReading ? tr.labels.continueReading : tr.labels.continueKhatam)
+    : (isReading ? tr.labels.startReading : tr.labels.startKhatam);
+
+  // Handle card press
+  const handlePress = () => {
+    router.navigate({
+      pathname: "/(quran)/ayahs",
+      params: {
+        surahId: surahId ?? FIRST_SURAH_ID,
+        surahName: surahName ?? FIRST_SURAH_NAME,
+        readingMode: mode,
+      },
+    });
+  };
+
+  // Handle Khatam reset
+  const handleReset = () => {
+    Alert.alert(
+      tr.labels.khatamResetTitle,
+      tr.labels.khatamResetMessage,
+      [
+        { text: tr.buttons.cancel, style: "cancel" },
+        { text: tr.labels.khatamReset, style: "destructive", onPress: resetKhatam },
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+
+      {/* Mode chips */}
+      <View style={[styles.chipRow, { backgroundColor: theme.overlay, borderColor: theme.border }]}>
+        {(["reading", "khatam"] as ReadingMode[]).map((m) => (
+          <TouchableOpacity
+            key={m}
+            activeOpacity={0.7}
+            style={[styles.chip, mode === m && { backgroundColor: theme.card }]}
+            onPress={() => setMode(m)}
+          >
+            <Text style={[styles.chipText, { color: mode === m ? theme.text : theme.text2 }]}>
+              {m === "reading" ? tr.labels.read : tr.labels.khatam}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Card */}
+      <TouchableOpacity activeOpacity={0.7} onPress={handlePress}>
+        <View style={[styles.card, { backgroundColor: theme.overlay, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
+
+          {/* Main content */}
+          <View style={styles.cardMain}>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardLabel, { color: theme.text2 }]}>{cardLabel}</Text>
+              <Text style={[styles.surahName, { color: theme.text }]}>
+                {surahName ?? FIRST_SURAH_NAME}
+              </Text>
+              <Text style={[styles.ayahNumber, { color: theme.text2 }]}>
+                {ayahId ? `${tr.labels.ayah} ${ayahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
+              </Text>
+            </View>
+            <MaterialIcons name="arrow-right-alt" size={36} color={QURAN_COLOR} />
+          </View>
+
+          {/* Khatam footer: inside card, separated by divider */}
+          {!isReading && (
+            <>
+              <View style={[styles.cardDivider, { backgroundColor: theme.divider2 }]} />
+              <View style={styles.khatamFooter}>
+                <Text style={[styles.khatamCountText, { color: theme.text2 }]}>
+                  {`${khatamCount} × ${tr.labels.khatam}`}
+                </Text>
+                <TouchableOpacity
+                  onPress={handleReset}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Ionicons name="refresh-outline" size={18} color={theme.placeholder} />
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+        </View>
+      </TouchableOpacity>
+
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 8,
+  },
+
+  // Chips
+  chipRow: {
+    flexDirection: "row",
+    borderRadius: 8,
+    borderWidth: 1,
+    overflow: "hidden",
+    padding: 3,
+    gap: 3,
+  },
+  chip: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 7,
+    borderRadius: 6,
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: "600",
+    letterSpacing: 0.4,
+  },
+
+  // Card
+  card: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderLeftWidth: 2,
+    overflow: "hidden",
+  },
+  cardMain: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  cardContent: {
+    flex: 1,
+    gap: 5,
+  },
+  cardLabel: {
+    fontSize: 13,
+    fontWeight: "400",
+    letterSpacing: 0.5,
+    fontStyle: "italic",
+    opacity: 0.7,
+  },
+  surahName: {
+    fontSize: 21,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+  },
+  ayahNumber: {
+    fontSize: 13,
+    fontWeight: "400",
+    opacity: 0.6,
+  },
+
+  // Khatam footer (inside card)
+  cardDivider: {
+    height: 1,
+    marginHorizontal: 16,
+  },
+  khatamFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 6,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+  },
+  khatamCountText: {
+    fontSize: 12,
+    fontWeight: "500",
+    opacity: 0.6,
+  },
+});
