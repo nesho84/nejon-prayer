@@ -2,7 +2,8 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
-import CountdownCircle from "@/components/CountdownCircle";
+import PrayerCountdownCard from "@/components/PrayerCountdownCard";
+import PrayerIcon from "@/components/PrayerIcon";
 import QuotesCarousel from "@/components/QuotesCarousel";
 import QuranPlaying from "@/components/QuranPlaying";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -80,23 +81,6 @@ export default function HomeScreen() {
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }
-    };
-
-    // ------------------------------------------------------------
-    // Prayer name icon
-    // ------------------------------------------------------------
-    const handlePrayerNameIcon = (prayerName: string) => {
-        const pn = prayerName.toLowerCase();
-
-        if (pn.includes("imsak")) return (props: IconProps) => <Ionicons name="time-outline" {...props} />;
-        if (pn.includes("fajr")) return (props: IconProps) => <Ionicons name="moon-outline" {...props} />;
-        if (pn.includes("sunrise")) return (props: IconProps) => <MaterialCommunityIcons name="weather-sunset-up" {...props} />;
-        if (pn.includes("dhuhr")) return (props: IconProps) => <Ionicons name="sunny" {...props} />;
-        if (pn.includes("asr")) return (props: IconProps) => <Ionicons name="partly-sunny-outline" {...props} />;
-        if (pn.includes("maghrib")) return (props: IconProps) => <MaterialCommunityIcons name="weather-sunset-down" {...props} />;
-        if (pn.includes("isha")) return (props: IconProps) => <Ionicons name="moon-sharp" {...props} />;
-
-        return (props: IconProps) => <Ionicons name="time-outline" {...props} />;
     };
 
     // ------------------------------------------------------------
@@ -196,9 +180,9 @@ export default function HomeScreen() {
                     </View>
                 </View>
 
-                {/* 2. COUNTDOWN CIRCLE CARD */}
+                {/* 2. COUNTDOWN CARD */}
                 <AppCard style={styles.countdownCard}>
-                    <CountdownCircle
+                    <PrayerCountdownCard
                         prayerTimes={prayerTimes}
                         onNextPrayerChange={setNextPrayerName}
                         size={160}
@@ -258,7 +242,6 @@ export default function HomeScreen() {
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
                             const isLast = index === arr.length - 1;
-                            const NameIcon = handlePrayerNameIcon(prayerName);
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
                             const isPast = isTrackable && isPrayerPast(prayerTime);
@@ -295,7 +278,7 @@ export default function HomeScreen() {
                                                 >
                                                     <Ionicons
                                                         name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
-                                                        size={24}
+                                                        size={22}
                                                         color={isPrayed ? theme.accent2 : theme.text2}
                                                         style={{ opacity: isPrayed ? 1 : 0.45 }}
                                                     />
@@ -303,7 +286,7 @@ export default function HomeScreen() {
                                             ) : (
                                                 <Ionicons
                                                     name="remove"
-                                                    size={24}
+                                                    size={22}
                                                     color={theme.text2}
                                                     style={{ opacity: 0.25 }}
                                                 />
@@ -315,7 +298,7 @@ export default function HomeScreen() {
                                             </Text>
 
                                             {/* Prayer Name Icon */}
-                                            <NameIcon size={18} color={isNext ? theme.accent : theme.text2} style={{ opacity: 0.7 }} />
+                                            <PrayerIcon name={prayerName} size={18} color={isNext ? theme.accent : theme.text2} opacity={0.7} />
 
                                             {/* Horizontal Spacer */}
                                             <View style={{ flex: 1 }} />
@@ -372,10 +355,8 @@ const styles = StyleSheet.create({
 
     // Countdown Card
     countdownCard: {
-        alignItems: 'center',
-        justifyContent: 'center',
         paddingVertical: 10,
-        paddingHorizontal: 12,
+        paddingHorizontal: 8,
     },
 
     // Quotes Card

@@ -3,15 +3,25 @@ import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
 import { AppState } from 'react-native';
 
+export interface PrayerEntry {
+    name: PrayerName;
+    time: string;
+}
+
 interface NextPrayerType {
     nextPrayerName: PrayerName | null;
     nextPrayerTime: Date | null;
     prayerCountdown: PrayerCountdown | null;
     remainingSeconds: number | null;
     totalSeconds: number;
+    prevPrayer: PrayerEntry | null;
+    afterNextPrayer: PrayerEntry | null;
 }
 
 const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+// Full chronological day order — used only for the side-column display (prevPrayer / afterNextPrayer).
+const FULL_DAY_ORDER: PrayerName[] = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 // ------------------------------------------------------------
 // Find the next upcoming prayer and the previous one that just passed.
@@ -76,6 +86,32 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     });
 
     // ------------------------------------------------------------
+    // Previous prayer (the one that just passed)
+    // ------------------------------------------------------------
+    const prevPrayer: PrayerEntry | null = (() => {
+        if (!prayerTimes || !nextPrayerName) return null;
+        const idx = FULL_DAY_ORDER.indexOf(nextPrayerName);
+        if (idx === -1) return null;
+        const prevName = idx === 0 ? FULL_DAY_ORDER[FULL_DAY_ORDER.length - 1] : FULL_DAY_ORDER[idx - 1];
+        const prevTime = prayerTimes[prevName];
+        if (!prevTime) return null;
+        return { name: prevName, time: prevTime };
+    })();
+
+    // ------------------------------------------------------------
+    // Prayer after next
+    // ------------------------------------------------------------
+    const afterNextPrayer: PrayerEntry | null = (() => {
+        if (!prayerTimes || !nextPrayerName) return null;
+        const idx = FULL_DAY_ORDER.indexOf(nextPrayerName);
+        if (idx === -1) return null;
+        const afterName = FULL_DAY_ORDER[(idx + 1) % FULL_DAY_ORDER.length];
+        const afterTime = prayerTimes[afterName];
+        if (!afterTime) return null;
+        return { name: afterName, time: afterTime };
+    })();
+
+    // ------------------------------------------------------------
     // Update countdown every second
     // ------------------------------------------------------------
     useEffect(() => {
@@ -126,5 +162,6 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
         return () => clearInterval(interval);
     }, [prayerTimes, isFocused]);
 
-    return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds };
+    return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds, prevPrayer, afterNextPrayer };
 }
+
