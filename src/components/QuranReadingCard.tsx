@@ -72,7 +72,7 @@ export default function QuranReadingCard() {
     <View style={styles.container}>
 
       {/* Mode chips */}
-      <View style={[styles.chipRow, { backgroundColor: theme.overlay, borderColor: theme.border }]}>
+      <View style={[styles.chipRow, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
         {(["reading", "khatam"] as ReadingMode[]).map((m) => (
           <TouchableOpacity
             key={m}
@@ -89,7 +89,7 @@ export default function QuranReadingCard() {
 
       {/* Card */}
       <TouchableOpacity activeOpacity={0.7} onPress={handlePress}>
-        <View style={[styles.card, { backgroundColor: theme.overlay, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
+        <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
 
           {/* Main content */}
           <View style={styles.cardMain}>
@@ -108,7 +108,7 @@ export default function QuranReadingCard() {
           {/* Khatam footer: inside card, separated by divider */}
           {!isReading && (
             <>
-              <View style={[styles.cardDivider, { backgroundColor: theme.divider2 }]} />
+              <View style={[styles.cardDivider, { backgroundColor: theme.divider3 }]} />
               <View style={styles.khatamFooter}>
                 <Text style={[styles.khatamCountText, { color: theme.text2 }]}>
                   {`${khatamCount} × ${tr.labels.khatam}`}

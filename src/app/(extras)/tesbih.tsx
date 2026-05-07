@@ -264,7 +264,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 130,
-        backgroundColor: 'rgba(0,0,0,0.05)',
     },
     circleInnerSection: {
         position: "absolute",

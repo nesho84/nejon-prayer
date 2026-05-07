@@ -255,7 +255,7 @@ export default function QuranTabScreen() {
           <QuranReadingCard />
 
           {/* SEARCH bar */}
-          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlay, borderColor: theme.border }]}>
+          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
             <Ionicons name="search-outline" size={20} color={theme.text2} />
             <TextInput
               style={[styles.searchInput, { color: theme.text }]}

@@ -315,7 +315,7 @@ export default function HomeScreen() {
                                             </Text>
 
                                             {/* Prayer Name Icon */}
-                                            <NameIcon size={20} color={isNext ? theme.accent : theme.text2} style={{ opacity: 0.7 }} />
+                                            <NameIcon size={18} color={isNext ? theme.accent : theme.text2} style={{ opacity: 0.7 }} />
 
                                             {/* Horizontal Spacer */}
                                             <View style={{ flex: 1 }} />
@@ -429,18 +429,18 @@ const styles = StyleSheet.create({
     },
     // Prayers List
     prayersRowContainer: {
-        paddingTop: 9,
-        paddingBottom: 16,
-        paddingHorizontal: 6,
+        paddingTop: 10,
+        paddingBottom: 14,
+        paddingHorizontal: 7,
         gap: 7,
     },
     prayerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        paddingVertical: 6,
-        paddingHorizontal: 8,
-        borderWidth: 0.8,
+        paddingVertical: 5,
+        paddingHorizontal: 6,
+        borderWidth: 1.3,
         borderRadius: 12,
         gap: 10,
     },
@@ -452,6 +452,7 @@ const styles = StyleSheet.create({
     prayerNameText: {
         fontSize: 16,
         fontWeight: '500',
+        lineHeight: 22,
     },
     prayerTimeSection: {
         flexDirection: 'row',
