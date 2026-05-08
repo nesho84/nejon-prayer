@@ -11,6 +11,7 @@ import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotif
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
+  tomorrowPrayerTimes?: PrayerTimes | null;
   config: {
     notifSettings: NotifSettings;
     prayers: Record<PrayerType, PrayerSettings>;
@@ -153,7 +154,7 @@ async function cancelDisplayedNotification(notificationId: string) {
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr, hasAlarm } = params;
+  const { config, prayerTimes, tomorrowPrayerTimes, language, tr, hasAlarm } = params;
 
   for (const prayer of PRAYERS) {
     // Skip disabled prayers
@@ -165,7 +166,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.prayers[prayer]?.offset || 0;
-    const triggerTime = getTriggerTime(timeString, offset);
+    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[prayer]);
     if (!triggerTime) continue;
 
     // Prepare notification content
@@ -231,7 +232,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 // PRAYER-EVENT SCHEDULE: All Prayer Event Notifications
 // ------------------------------------------------------------
 async function scheduleEventNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr, hasAlarm } = params;
+  const { config, prayerTimes, tomorrowPrayerTimes, language, tr, hasAlarm } = params;
 
   for (const event of EVENTS) {
     // Skip disabled events
@@ -243,7 +244,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.events[event]?.offset || 0;
-    const triggerTime = getTriggerTime(timeString, offset);
+    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[event]);
     if (!triggerTime) continue;
 
     // Prepare notification content

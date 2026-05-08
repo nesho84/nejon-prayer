@@ -77,11 +77,17 @@ export const useNotificationsStore = create<NotificationsState>()(
         // Pull fresh data from other stores using getState()
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
+        const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
 
         // Extract current notification settings
         const { notifSettings, prayers, events, specials } = get();
+
+        // Tomorrow's prayer times — used for correct scheduling of already-passed prayers
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowPrayerTimes = yearlyPrayerTimes?.[formatDateKey(tomorrow)] ?? null;
 
         // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
@@ -124,6 +130,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           // 3. Call service to schedule notifications with current settings and prayer times
           await scheduleNotificationsService({
             prayerTimes,
+            tomorrowPrayerTimes,
             config: { notifSettings, prayers, events, specials },
             language,
             tr

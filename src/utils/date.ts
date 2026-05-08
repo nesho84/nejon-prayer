@@ -25,8 +25,13 @@ export function resolvePrayerDate(prayerDate?: string): string {
 // ------------------------------------------------------------
 // Notifications: Parse time string and calculate next trigger time with offset
 // timeStringRaw: "HH:mm" format (e.g., "13:45" or "5:30")
+// tomorrowTimeStringRaw: tomorrow's actual time — falls back to today's if omitted/null/invalid
 // ------------------------------------------------------------
-export function getTriggerTime(timeStringRaw: string, offsetMinutes: number = 0): Date | null {
+export function getTriggerTime(
+  timeStringRaw: string,
+  offsetMinutes: number = 0,
+  tomorrowTimeStringRaw?: string | null,
+): Date | null {
   // Normalize: trim whitespace and replace non-breaking spaces
   const timeString = timeStringRaw.replace(/\u00A0/g, ' ').trim();
 
@@ -50,6 +55,17 @@ export function getTriggerTime(timeStringRaw: string, offsetMinutes: number = 0)
   // If time has passed today, schedule for tomorrow
   const now = new Date();
   if (triggerTime <= now) {
+    // Use tomorrow's actual time if provided and valid, otherwise fall back to today's time
+    if (tomorrowTimeStringRaw) {
+      const tomorrowTimeString = tomorrowTimeStringRaw.replace(/\u00A0/g, ' ').trim();
+      const tomorrowMatch = tomorrowTimeString.match(/^(\d{1,2}):(\d{2})$/);
+      if (tomorrowMatch) {
+        triggerTime.setHours(Number(tomorrowMatch[1]), Number(tomorrowMatch[2]), 0, 0);
+        if (offsetMinutes !== 0) {
+          triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
+        }
+      }
+    }
     triggerTime.setDate(triggerTime.getDate() + 1);
   }
 

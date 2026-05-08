@@ -1,4 +1,4 @@
-import { formatDateKey } from '@/utils/date';
+import { formatDateKey, getTriggerTime } from '@/utils/date';
 
 // ------------------------------------------------------------
 // Simple runtime tests for src/utils/date.ts
@@ -71,4 +71,145 @@ export function runDateTests() {
   }
 
   console.log(`\n📅 [dateTest] Done — ${passed} passed, ${failed} failed.\n`);
+}
+
+// ------------------------------------------------------------
+// Tests for getTriggerTime
+// ------------------------------------------------------------
+export function runGetTriggerTimeTests() {
+  let passed = 0;
+  let failed = 0;
+
+  function assert(label: string, actual: unknown, expected: unknown) {
+    if (actual === expected) {
+      console.log(`  ✅ ${label}`);
+      passed++;
+    } else {
+      console.warn(`  ❌ ${label}\n     expected: ${expected}\n     got:      ${actual}`);
+      failed++;
+    }
+  }
+
+  console.log('\n⏰ [getTriggerTimeTest] Running tests...');
+
+  const now = new Date();
+  const todayKey = formatDateKey(now);
+
+  // Helper to build a future time string "HH:mm" that hasn't passed yet today
+  const futureHour = (now.getHours() + 2) % 24;
+  const futureTimeString = `${String(futureHour).padStart(2, '0')}:00`;
+
+  // Helper to build a past time string "HH:mm" that has already passed today
+  const pastHour = now.getHours() === 0 ? 23 : now.getHours() - 1;
+  const pastTimeString = `${String(pastHour).padStart(2, '0')}:00`;
+
+  // --- 1. Future time with no offset → scheduled for TODAY ---
+  const t1 = getTriggerTime(futureTimeString, 0);
+  assert(
+    'Future time (no offset) → scheduled today',
+    t1 ? formatDateKey(t1) : null,
+    todayKey
+  );
+
+  // --- 2. Future time → correct hour set ---
+  assert(
+    'Future time → correct hour',
+    t1 ? t1.getHours() : null,
+    futureHour
+  );
+
+  // --- 3. Past time with no tomorrow string → scheduled for TOMORROW ---
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const tomorrowKey = formatDateKey(tomorrow);
+
+  const t3 = getTriggerTime(pastTimeString, 0);
+  assert(
+    'Past time (no tomorrowTimeString) → scheduled tomorrow',
+    t3 ? formatDateKey(t3) : null,
+    tomorrowKey
+  );
+
+  // --- 4. Past time with no tomorrow string → still uses today's hour ---
+  assert(
+    'Past time (no tomorrowTimeString) → uses today\'s hour (fallback)',
+    t3 ? t3.getHours() : null,
+    pastHour
+  );
+
+  // --- 5. Past time WITH tomorrow string → scheduled for TOMORROW ---
+  const tomorrowHour = (pastHour + 1) % 24; // e.g. 1 hour later tomorrow
+  const tomorrowTimeString = `${String(tomorrowHour).padStart(2, '0')}:30`;
+
+  const t5 = getTriggerTime(pastTimeString, 0, tomorrowTimeString);
+  assert(
+    'Past time + tomorrowTimeString → scheduled tomorrow',
+    t5 ? formatDateKey(t5) : null,
+    tomorrowKey
+  );
+
+  // --- 6. Past time WITH tomorrow string → uses tomorrow's hour ---
+  assert(
+    'Past time + tomorrowTimeString → uses tomorrow\'s hour',
+    t5 ? t5.getHours() : null,
+    tomorrowHour
+  );
+
+  // --- 7. Past time WITH tomorrow string → uses tomorrow's minutes ---
+  assert(
+    'Past time + tomorrowTimeString → uses tomorrow\'s minutes (30)',
+    t5 ? t5.getMinutes() : null,
+    30
+  );
+
+  // --- 8. Offset applied to future time ---
+  const t8 = getTriggerTime(futureTimeString, -15);
+  assert(
+    'Future time with -15 offset → correct minutes (45)',
+    t8 ? t8.getMinutes() : null,
+    45
+  );
+
+  // --- 9. Offset applied to tomorrow's time when past + tomorrowTimeString ---
+  // tomorrowTimeString = "HH:30", offset = +10 → minutes should be 40
+  const t9 = getTriggerTime(pastTimeString, 10, tomorrowTimeString);
+  assert(
+    'Past time + tomorrowTimeString + offset +10 → tomorrow\'s minutes become 40',
+    t9 ? t9.getMinutes() : null,
+    40
+  );
+
+  // --- 10. Invalid today's time string → returns null ---
+  const t10 = getTriggerTime('not-a-time', 0);
+  assert(
+    'Invalid time string → returns null',
+    t10,
+    null
+  );
+
+  // --- 11. Invalid tomorrow string → falls back to today's hour (no crash) ---
+  const t11 = getTriggerTime(pastTimeString, 0, 'bad-time');
+  assert(
+    'Invalid tomorrowTimeString → falls back, scheduled tomorrow with today\'s hour',
+    t11 ? t11.getHours() : null,
+    pastHour
+  );
+
+  // --- 12. Null tomorrow string → behaves same as no tomorrow string ---
+  const t12 = getTriggerTime(pastTimeString, 0, null);
+  assert(
+    'null tomorrowTimeString → falls back, scheduled tomorrow with today\'s hour',
+    t12 ? t12.getHours() : null,
+    pastHour
+  );
+
+  // --- 13. Future time ignores tomorrowTimeString entirely ---
+  const t13 = getTriggerTime(futureTimeString, 0, '01:00');
+  assert(
+    'Future time → tomorrowTimeString ignored, still today',
+    t13 ? formatDateKey(t13) : null,
+    todayKey
+  );
+
+  console.log(`\n⏰ [getTriggerTimeTest] Done — ${passed} passed, ${failed} failed.\n`);
 }
