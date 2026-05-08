@@ -204,7 +204,7 @@ export default function HomeScreen() {
                 <AppCard style={styles.prayersCard}>
                     {/* Prayers Date Header */}
                     <TouchableOpacity
-                        style={styles.prayersDateHeader}
+                        style={[styles.prayersDateHeader, { backgroundColor: 'rgba(0,0,0,0.02)' }]}
                         delayPressIn={0}
                         delayPressOut={0}
                         activeOpacity={0.3}
@@ -236,7 +236,7 @@ export default function HomeScreen() {
                     </TouchableOpacity>
 
                     {/* Divider */}
-                    <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
+                    <View style={[styles.fullDivider, { backgroundColor: theme.divider2 }]} />
 
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
@@ -293,7 +293,7 @@ export default function HomeScreen() {
                                             )}
 
                                             {/* Prayer Name Text */}
-                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text }]}>
+                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text2 }]}>
                                                 {tr.prayers[prayerName] || prayerName}
                                             </Text>
 
@@ -304,7 +304,7 @@ export default function HomeScreen() {
                                             <View style={{ flex: 1 }} />
 
                                             {/* Prayer Time */}
-                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text }]}>
+                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text2 }]}>
                                                 {prayerTime}
                                             </Text>
 
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     fullDivider: {
-        height: 1,
+        height: 2.5,
         width: '100%',
     },
     // Prayers List

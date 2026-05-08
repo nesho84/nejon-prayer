@@ -55,7 +55,7 @@ const PrayerCountdownCard = React.memo(({
       <View style={styles.sideColumn}>
         {prevPrayer && (
           <>
-            <PrayerIcon name={prevPrayer.name} size={20} color={theme.text2} opacity={0.5} />
+            <PrayerIcon name={prevPrayer.name} size={21} color={theme.accent} opacity={0.6} style={{ marginBottom: 2 }} />
             <Text style={[styles.sidePrayerLabel, { color: theme.text2 }]} numberOfLines={1}>
               {tr.prayers[prevPrayer.name] || prevPrayer.name}
             </Text>
@@ -94,11 +94,11 @@ const PrayerCountdownCard = React.memo(({
         </Svg>
 
         {/* Prayer icon floating at top of circle interior — independent of centered text */}
-        <View style={{ position: 'absolute', top: strokeWidth + 17, alignSelf: 'center' }}>
+        <View style={{ position: 'absolute', top: strokeWidth + 18, alignSelf: 'center' }}>
           <PrayerIcon name={nextPrayerName} size={20} color={theme.accent} opacity={0.65} />
         </View>
 
-        {/* Countdown Text — truly centered */}
+        {/* Countdown Text — centered */}
         <View style={styles.innerContainer}>
           <Text style={[styles.prayerName, { color: theme.text }]}>
             » {tr.prayers[nextPrayerName]} «
@@ -115,7 +115,7 @@ const PrayerCountdownCard = React.memo(({
       <View style={styles.sideColumn}>
         {afterNextPrayer && (
           <>
-            <PrayerIcon name={afterNextPrayer.name} size={20} color={theme.text2} opacity={0.5} />
+            <PrayerIcon name={afterNextPrayer.name} size={21} color={theme.accent} opacity={0.6} style={{ marginBottom: 2 }} />
             <Text style={[styles.sidePrayerLabel, { color: theme.text2 }]} numberOfLines={1}>
               {tr.prayers[afterNextPrayer.name] || afterNextPrayer.name}
             </Text>
@@ -138,12 +138,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  sideColumn: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
+
   circleWrapper: {
     alignItems: "center",
     justifyContent: "center",
@@ -154,24 +149,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   prayerName: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 2,
   },
   prayerTime: {
-    fontSize: 23,
+    fontSize: 25,
+    fontWeight: "400",
   },
   hms: {
     fontSize: 13,
   },
+
+  sideColumn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
   sidePrayerLabel: {
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: 13,
+    fontWeight: "600",
     textAlign: "center",
-    opacity: 0.7,
+    opacity: 0.8,
   },
   sidePrayerTime: {
-    fontSize: 22,
-    fontWeight: "700",
-    opacity: 0.55,
+    fontSize: 21,
+    fontWeight: "400",
+    opacity: 0.5,
   },
 });
