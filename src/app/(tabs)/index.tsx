@@ -261,9 +261,10 @@ export default function HomeScreen() {
                                         <View
                                             style={[
                                                 styles.prayerRow,
-                                                { borderColor: isNext ? theme.accent : theme.border },
-                                                isNext && { backgroundColor: theme.accentLight, borderWidth: 1.5, borderColor: theme.accentLight }
-
+                                                {
+                                                    backgroundColor: isNext ? theme.accentLight : theme.card,
+                                                    borderColor: isNext ? theme.accentLight : theme.borderCard
+                                                }
                                             ]}
                                         >
                                             {/* Left: Tracking circle (trackable) or dash placeholder */}

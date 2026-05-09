@@ -55,7 +55,7 @@ const PrayerCountdownCard = React.memo(({
       <View style={styles.sideColumn}>
         {prevPrayer && (
           <>
-            <PrayerIcon name={prevPrayer.name} size={21} color={theme.accent} opacity={0.6} style={{ marginBottom: 2 }} />
+            <PrayerIcon name={prevPrayer.name} size={21} color={theme.accent} opacity={0.5} style={{ marginBottom: 2 }} />
             <Text style={[styles.sidePrayerLabel, { color: theme.text2 }]} numberOfLines={1}>
               {tr.prayers[prevPrayer.name] || prevPrayer.name}
             </Text>
@@ -94,8 +94,8 @@ const PrayerCountdownCard = React.memo(({
         </Svg>
 
         {/* Prayer icon floating at top of circle interior — independent of centered text */}
-        <View style={{ position: 'absolute', top: strokeWidth + 18, alignSelf: 'center' }}>
-          <PrayerIcon name={nextPrayerName} size={20} color={theme.accent} opacity={0.65} />
+        <View style={{ position: 'absolute', top: strokeWidth + 15, alignSelf: 'center' }}>
+          <PrayerIcon name={nextPrayerName} size={21} color={theme.accent} opacity={0.65} />
         </View>
 
         {/* Countdown Text — centered */}
@@ -115,7 +115,7 @@ const PrayerCountdownCard = React.memo(({
       <View style={styles.sideColumn}>
         {afterNextPrayer && (
           <>
-            <PrayerIcon name={afterNextPrayer.name} size={21} color={theme.accent} opacity={0.6} style={{ marginBottom: 2 }} />
+            <PrayerIcon name={afterNextPrayer.name} size={21} color={theme.accent} opacity={0.5} style={{ marginBottom: 2 }} />
             <Text style={[styles.sidePrayerLabel, { color: theme.text2 }]} numberOfLines={1}>
               {tr.prayers[afterNextPrayer.name] || afterNextPrayer.name}
             </Text>
@@ -170,11 +170,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
-    opacity: 0.8,
+    opacity: 0.7,
   },
   sidePrayerTime: {
     fontSize: 21,
     fontWeight: "400",
-    opacity: 0.5,
+    opacity: 0.4,
   },
 });

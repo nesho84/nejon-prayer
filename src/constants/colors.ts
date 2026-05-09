@@ -26,6 +26,7 @@ export const LIGHT_COLORS = {
     // Surfaces
     card: "#f1f1f1",
     border: "#e5e7eb",
+    borderCard: "#dde0e6ff",
     divider: "#d1d5db",
     divider2: "#dde0e6ff",
     divider3: "#c8cbd3",
@@ -79,6 +80,7 @@ export const DARK_COLORS = {
     // Surfaces
     card: "#1f2937",
     border: "#374151",
+    borderCard: "#2d3649",
     divider: "#4b5563",
     divider2: "#2f3d50ff",
     divider3: "#2b3a4f",
