@@ -10,6 +10,7 @@ import PrayerIcon from "./PrayerIcon";
 interface Props {
   prayerTimes: PrayerTimes | null;
   onNextPrayerChange?: (name: PrayerName) => void;
+  onCurrentPrayerChange?: (name: PrayerName | null) => void;
   size?: number;
   strokeWidth?: number;
   strokeColor?: string;
@@ -19,6 +20,7 @@ interface Props {
 const PrayerCountdownCard = React.memo(({
   prayerTimes,
   onNextPrayerChange,
+  onCurrentPrayerChange,
   size = 140,
   strokeWidth = 10,
   strokeColor = "#eee",
@@ -30,12 +32,17 @@ const PrayerCountdownCard = React.memo(({
   const tr = useLanguageStore((state) => state.tr);
 
   // Countdown state (ticks every second, isolated from HomeScreen)
-  const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds, prevPrayer, afterNextPrayer } = useNextPrayer(prayerTimes);
+  const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds, currentPrayer, prevPrayer, afterNextPrayer } = useNextPrayer(prayerTimes);
 
   // Notify parent when the next prayer changes (at most 5x per day)
   useEffect(() => {
     if (nextPrayerName) onNextPrayerChange?.(nextPrayerName);
   }, [nextPrayerName, onNextPrayerChange]);
+
+  // Notify parent when the current prayer period changes
+  useEffect(() => {
+    onCurrentPrayerChange?.(currentPrayer?.name ?? null);
+  }, [currentPrayer?.name, onCurrentPrayerChange]);
 
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;

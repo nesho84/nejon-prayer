@@ -1,12 +1,7 @@
-import { PrayerCountdown, PrayerName, PrayerTimes } from '@/types/prayer.types';
+import { PrayerCountdown, PrayerEntry, PrayerName, PrayerTimes } from '@/types/prayer.types';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
 import { AppState } from 'react-native';
-
-export interface PrayerEntry {
-    name: PrayerName;
-    time: string;
-}
 
 interface NextPrayerType {
     nextPrayerName: PrayerName | null;
@@ -14,10 +9,12 @@ interface NextPrayerType {
     prayerCountdown: PrayerCountdown | null;
     remainingSeconds: number | null;
     totalSeconds: number;
+    currentPrayer: PrayerEntry | null;
     prevPrayer: PrayerEntry | null;
     afterNextPrayer: PrayerEntry | null;
 }
 
+// Order of the 5 main prayers, used to determine current prayer and next prayer
 const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 // Full chronological day order — used only for the side-column display (prevPrayer / afterNextPrayer).
@@ -86,7 +83,33 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     });
 
     // ------------------------------------------------------------
-    // Previous prayer (the one that just passed)
+    // Current prayer period — strictly from PRAYER_ORDER (the 5 main prayers).
+    // This is the last prayer that has started, used to drive the row highlight.
+    // ------------------------------------------------------------
+    const currentPrayer: PrayerEntry | null = (() => {
+        if (!prayerTimes || !nextPrayerName) return null;
+        const idx = PRAYER_ORDER.indexOf(nextPrayerName);
+        if (idx === 0) {
+            // Fajr is next — two possible situations:
+            // 1. Before today's Fajr (early morning, e.g. 04:00) → nothing active yet
+            // 2. After Isha, overnight (e.g. 23:00 or 01:00 AM) → still in Isha period
+            // Distinguish by checking if today's Fajr has already passed.
+            const [fh, fm] = prayerTimes.Fajr.split(":").map(Number);
+            const fajr = new Date();
+            fajr.setHours(fh, fm, 0, 0);
+            if (new Date() > fajr) return { name: "Isha", time: prayerTimes.Isha };
+            return null;
+        }
+        if (idx < 0) return null;
+        const name = PRAYER_ORDER[idx - 1];
+        const time = prayerTimes[name];
+        if (!time) return null;
+        return { name, time };
+    })();
+
+    // ------------------------------------------------------------
+    // Previous prayer (the one that just passed) — from FULL_DAY_ORDER,
+    // used only for the countdown card side-column display label.
     // ------------------------------------------------------------
     const prevPrayer: PrayerEntry | null = (() => {
         if (!prayerTimes || !nextPrayerName) return null;
@@ -162,6 +185,6 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
         return () => clearInterval(interval);
     }, [prayerTimes, isFocused]);
 
-    return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds, prevPrayer, afterNextPrayer };
+    return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds, currentPrayer, prevPrayer, afterNextPrayer };
 }
 

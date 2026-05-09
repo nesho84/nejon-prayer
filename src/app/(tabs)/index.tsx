@@ -45,7 +45,7 @@ export default function HomeScreen() {
     const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
 
     // Local state
-    const [nextPrayerName, setNextPrayerName] = useState<PrayerName | null>(null);
+    const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -184,7 +184,7 @@ export default function HomeScreen() {
                 <AppCard style={styles.countdownCard}>
                     <PrayerCountdownCard
                         prayerTimes={prayerTimes}
-                        onNextPrayerChange={setNextPrayerName}
+                        onCurrentPrayerChange={setCurrentPrayerName}
                         size={160}
                         strokeWidth={6}
                         strokeColor={theme.border}
@@ -245,8 +245,7 @@ export default function HomeScreen() {
                             const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
                             const isPast = isTrackable && isPrayerPast(prayerTime);
-                            const isDayDone = isPrayerPast(prayerTimes.Isha);
-                            const isNext = !isDayDone && nextPrayerName === prayerName;
+                            const isCurrent = currentPrayerName === prayerName;
                             const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
 
                             return (
@@ -262,8 +261,8 @@ export default function HomeScreen() {
                                             style={[
                                                 styles.prayerRow,
                                                 {
-                                                    backgroundColor: isNext ? theme.accentLight : theme.card,
-                                                    borderColor: isNext ? theme.accentLight : theme.borderCard
+                                                    backgroundColor: isCurrent ? theme.accentLight : theme.card,
+                                                    borderColor: isCurrent ? theme.accentLight : theme.borderCard
                                                 }
                                             ]}
                                         >
@@ -294,18 +293,18 @@ export default function HomeScreen() {
                                             )}
 
                                             {/* Prayer Name Text */}
-                                            <Text style={[styles.prayerNameText, { color: isNext ? theme.accent : theme.text2 }]}>
+                                            <Text style={[styles.prayerNameText, { color: isCurrent ? theme.accent : theme.text2 }]}>
                                                 {tr.prayers[prayerName] || prayerName}
                                             </Text>
 
                                             {/* Prayer Name Icon */}
-                                            <PrayerIcon name={prayerName} size={18} color={isNext ? theme.accent : theme.text2} opacity={0.7} />
+                                            <PrayerIcon name={prayerName} size={18} color={isCurrent ? theme.accent : theme.text2} opacity={0.7} />
 
                                             {/* Horizontal Spacer */}
                                             <View style={{ flex: 1 }} />
 
                                             {/* Prayer Time */}
-                                            <Text style={[styles.prayerTimeText, { color: isNext ? theme.accent : theme.text2 }]}>
+                                            <Text style={[styles.prayerTimeText, { color: isCurrent ? theme.accent : theme.text2 }]}>
                                                 {prayerTime}
                                             </Text>
 

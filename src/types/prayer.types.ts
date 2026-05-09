@@ -1,6 +1,11 @@
 // Prayer types
 export type PrayerName = "Imsak" | "Fajr" | "Sunrise" | "Dhuhr" | "Asr" | "Maghrib" | "Isha";
 
+export interface PrayerEntry {
+  name: PrayerName;
+  time: string;
+}
+
 export interface PrayerTimes {
   Imsak?: string;    // "05:55"
   Fajr: string;      // "06:15"
@@ -17,7 +22,8 @@ export interface PrayerCountdown {
   seconds: string;
 }
 
-export type YearlyPrayerTimes = Record<string, PrayerTimes>; // { "2026-03-28": { Fajr: "06:00", ... } }
+// { "2026-03-28": { Fajr: "06:00", ... } }
+export type YearlyPrayerTimes = Record<string, PrayerTimes>;
 
 // For dropdown options
 export type PrayerTimeEntry = [PrayerName, string];
