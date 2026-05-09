@@ -393,7 +393,9 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
     const now = new Date();
     const currentHour = now.getHours();
-    const DAYS_TO_SCHEDULE = shuffledQuotes.length;
+
+    // Shuffle all quotes but schedule only 7 — rescheduled daily at Fajr anyway
+    const DAYS_TO_SCHEDULE = 7;
 
     let scheduledCount = 0;
 
