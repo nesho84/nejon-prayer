@@ -93,7 +93,7 @@ const QuranAyahRow = React.memo(({
             <TouchableOpacity onPress={handleCopy} hitSlop={8}>
               <Ionicons name="copy-outline" size={22} color={theme.accent} />
             </TouchableOpacity>
-            {/* Bookmark button (@TODO) */}
+            {/* @TODO: Bookmark button */}
             {/* <TouchableOpacity onPress={() => { }} hitSlop={8}>
               <Ionicons name="bookmark-outline" size={22} color={theme.accent} />
             </TouchableOpacity> */}

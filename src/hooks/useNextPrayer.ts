@@ -89,17 +89,7 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     const currentPrayer: PrayerEntry | null = (() => {
         if (!prayerTimes || !nextPrayerName) return null;
         const idx = PRAYER_ORDER.indexOf(nextPrayerName);
-        if (idx === 0) {
-            // Fajr is next — two possible situations:
-            // 1. Before today's Fajr (early morning, e.g. 04:00) → nothing active yet
-            // 2. After Isha, overnight (e.g. 23:00 or 01:00 AM) → still in Isha period
-            // Distinguish by checking if today's Fajr has already passed.
-            const [fh, fm] = prayerTimes.Fajr.split(":").map(Number);
-            const fajr = new Date();
-            fajr.setHours(fh, fm, 0, 0);
-            if (new Date() > fajr) return { name: "Isha", time: prayerTimes.Isha };
-            return null;
-        }
+        if (idx === 0) return { name: "Isha", time: prayerTimes.Isha };
         if (idx < 0) return null;
         const name = PRAYER_ORDER[idx - 1];
         const time = prayerTimes[name];
