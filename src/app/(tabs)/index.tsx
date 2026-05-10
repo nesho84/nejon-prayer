@@ -4,6 +4,7 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerIcon from "@/components/PrayerIcon";
+import PrayerNotifIcon from "@/components/PrayerNotifIcon";
 import QuotesCarousel from "@/components/QuotesCarousel";
 import QuranPlaying from "@/components/QuranPlaying";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -13,11 +14,9 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
-import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
-import { IconProps } from "@/types/types";
-import { formatDateKey } from "@/utils/date";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatDateKey, isPrayerPast } from "@/utils/date";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
@@ -29,7 +28,6 @@ export default function HomeScreen() {
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
-    const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
     const location = useLocationStore((state) => state.location);
     const timeZone = useLocationStore((state) => state.timeZone);
@@ -38,15 +36,12 @@ export default function HomeScreen() {
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
-    const prayers = useNotificationsStore((state) => state.prayers);
-    const events = useNotificationsStore((state) => state.events);
     const tracking = usePrayersTrackingStore((state) => state.tracking);
     const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
     const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
 
     // Local state
     const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
-    const [nextPrayerName, setNextPrayerName] = useState<PrayerName | null>(null);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -82,39 +77,6 @@ export default function HomeScreen() {
         } catch (err) {
             console.warn("Prayer times refresh failed:", err);
         }
-    };
-
-    // ------------------------------------------------------------
-    // Prayer notification icon
-    // ------------------------------------------------------------
-    const handlePrayerNotificationIcon = (prayerName: string) => {
-        // Check if it's a prayer or event
-        const prayerSettings = prayers?.[prayerName as PrayerType];
-        const eventSettings = events?.[prayerName as PrayerEventType];
-
-        // Use whichever is available (prayer or event), or default to disabled
-        const settings = prayerSettings || eventSettings;
-        const enabled = notificationPermission && settings?.enabled;
-
-        if (!enabled)
-            return (props: IconProps) => <MaterialCommunityIcons name="bell-off-outline" {...props} style={[props.style, { opacity: 0.3, paddingBottom: 1 }]} />;
-        if (enabled && settings.offset === 0)
-            return (props: IconProps) => <MaterialCommunityIcons name="bell-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
-        if (enabled && settings.offset !== 0)
-            return (props: IconProps) => <MaterialCommunityIcons name="bell-cog-outline" {...props} style={[props.style, { opacity: 0.6, paddingBottom: 1 }]} />;
-
-        return (props: IconProps) => <Ionicons name="notifications-outline" {...props} />;
-    };
-
-    // ------------------------------------------------------------
-    // Check if a prayer time has passed
-    // ------------------------------------------------------------
-    const isPrayerPast = (prayerTime: string): boolean => {
-        const [hours, minutes] = prayerTime.split(':').map(Number);
-        const now = new Date();
-        const prayer = new Date();
-        prayer.setHours(hours, minutes, 0, 0);
-        return now > prayer;
     };
 
     // Loading state
@@ -185,7 +147,6 @@ export default function HomeScreen() {
                 <AppCard style={styles.countdownCard}>
                     <PrayerCountdownCard
                         prayerTimes={prayerTimes}
-                        onNextPrayerChange={setNextPrayerName}
                         onCurrentPrayerChange={setCurrentPrayerName}
                         size={160}
                         strokeWidth={6}
@@ -244,11 +205,10 @@ export default function HomeScreen() {
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
-                            const isLast = index === arr.length - 1;
-                            const NotifIcon = handlePrayerNotificationIcon(prayerName);
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
-                            const isNext = nextPrayerName === prayerName;
+                            const isPast = isTrackable && isPrayerPast(prayerTime);
                             const isCurrent = currentPrayerName === prayerName;
+                            const isLast = index === arr.length - 1;
                             const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
 
                             return (
@@ -272,7 +232,7 @@ export default function HomeScreen() {
                                                 activeOpacity={0.3}
                                                 hitSlop={8}
                                                 onPress={() => {
-                                                    if (isNext) return;
+                                                    if (!isPast && !isCurrent) return;
                                                     isPrayed ? unmarkPrayed(prayerName as PrayerName) : markPrayed(prayerName as PrayerName)
                                                 }}
                                             >
@@ -330,7 +290,7 @@ export default function HomeScreen() {
                                             onPress={() => router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`)}
                                         >
                                             <View style={[styles.notifIconContainer, { backgroundColor: theme.surfaceBg }]}>
-                                                <NotifIcon size={20} color={theme.text2} />
+                                                <PrayerNotifIcon prayerName={prayerName} size={20} color={theme.text2} />
                                             </View>
                                         </TouchableOpacity>
                                     </View>

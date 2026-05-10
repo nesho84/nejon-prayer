@@ -44,11 +44,11 @@ const PrayerCountdownCard = React.memo(({
     onCurrentPrayerChange?.(currentPrayer?.name ?? null);
   }, [currentPrayer?.name, onCurrentPrayerChange]);
 
+  // Don't render until countdown data is ready
+  if (!nextPrayerName || !prayerCountdown || !totalSeconds || remainingSeconds === null) return null;
+
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-
-  // Don't render if no totalSeconds, remainingSeconds, or prayerCountdown is null
-  if (!nextPrayerName || !prayerCountdown || !totalSeconds || remainingSeconds === null) return null;
 
   // progress goes from 0 → 1 as time passes
   const progress = 1 - (remainingSeconds / totalSeconds);

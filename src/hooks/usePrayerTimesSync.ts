@@ -10,7 +10,7 @@ export function usePrayerTimesSync() {
   const loadedDateRef = useRef(formatDateKey());
 
   useEffect(() => {
-    const timerRef = { current: 0 as ReturnType<typeof setTimeout> };
+    let timerId: ReturnType<typeof setTimeout>;
 
     // ------------------------------------------------------------
     // Schedule a reload at the next midnight (foreground case)
@@ -20,7 +20,7 @@ export function usePrayerTimesSync() {
       const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
       const msUntilMidnight = midnight.getTime() - now.getTime();
 
-      timerRef.current = setTimeout(() => {
+      timerId = setTimeout(() => {
         loadedDateRef.current = formatDateKey();
         loadPrayerTimes();
         scheduleMidnightRefresh();
@@ -45,7 +45,7 @@ export function usePrayerTimesSync() {
     });
 
     return () => {
-      clearTimeout(timerRef.current);
+      clearTimeout(timerId);
       subscription.remove();
     };
   }, [loadPrayerTimes]);

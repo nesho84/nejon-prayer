@@ -16,14 +16,11 @@ interface PrayersTrackingState {
 // Keep tracking data for 30 days to prevent infinite growth of storage
 const KEEP_DAYS = 30;
 
-// Local date key format: YYYY-MM-DD
-const getDateKey = formatDateKey;
-
 // Remove entries older than KEEP_DAYS from the tracking record
 const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);
-  const cutoffKey = getDateKey(cutoff);
+  const cutoffKey = formatDateKey(cutoff);
 
   const cleaned: TrackingRecord = {};
   for (const key in tracking) {
@@ -42,14 +39,14 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       isReady: false,
 
       markPrayed: (prayer, dateKey?: string) => {
-        const key = `${dateKey ?? getDateKey()}:${prayer}`;
+        const key = `${dateKey ?? formatDateKey()}:${prayer}`;
         set((state) => ({
           tracking: { ...state.tracking, [key]: 'prayed' },
         }));
       },
 
       unmarkPrayed: (prayer) => {
-        const key = `${getDateKey()}:${prayer}`;
+        const key = `${formatDateKey()}:${prayer}`;
         set((state) => ({
           tracking: { ...state.tracking, [key]: null },
         }));

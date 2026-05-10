@@ -23,6 +23,17 @@ export function resolvePrayerDate(prayerDate?: string): string {
 }
 
 // ------------------------------------------------------------
+// Checks if a given prayer time (in "HH:mm" format) has already passed today
+// ------------------------------------------------------------
+export const isPrayerPast = (prayerTime: string): boolean => {
+  const [hours, minutes] = prayerTime.split(':').map(Number);
+  const now = new Date();
+  const prayer = new Date();
+  prayer.setHours(hours, minutes, 0, 0);
+  return now > prayer;
+};
+
+// ------------------------------------------------------------
 // Notifications: Parse time string and calculate next trigger time with offset
 // timeStringRaw: "HH:mm" format (e.g., "13:45" or "5:30")
 // tomorrowTimeStringRaw: tomorrow's actual time — falls back to today's if omitted/null/invalid
