@@ -5,6 +5,7 @@ import AppTabScreen from "@/components/AppTabScreen";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerIcon from "@/components/PrayerIcon";
 import PrayerNotifIcon from "@/components/PrayerNotifIcon";
+import PrayerProgressCard from "@/components/PrayerProgressCard";
 import QuotesCarousel from "@/components/QuotesCarousel";
 import QuranPlaying from "@/components/QuranPlaying";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -148,7 +149,7 @@ export default function HomeScreen() {
                     <PrayerCountdownCard
                         prayerTimes={prayerTimes}
                         onCurrentPrayerChange={setCurrentPrayerName}
-                        size={160}
+                        size={158}
                         strokeWidth={6}
                         strokeColor={theme.border}
                         color={theme.accent}
@@ -209,7 +210,7 @@ export default function HomeScreen() {
                             const isPast = isTrackable && isPrayerPast(prayerTime);
                             const isCurrent = currentPrayerName === prayerName;
                             const isLast = index === arr.length - 1;
-                            const isPrayed = isTrackable && tracking[`${formatDateKey()}:${prayerName}`] === 'prayed';
+                            const isPrayed = isTrackable && tracking[formatDateKey()]?.[prayerName] === 'prayed';
 
                             return (
                                 <View key={prayerName} style={!isLast && { marginBottom: 0 }}>
@@ -232,14 +233,17 @@ export default function HomeScreen() {
                                                 activeOpacity={0.3}
                                                 hitSlop={8}
                                                 onPress={() => {
+                                                    console.log(tracking);
                                                     if (!isPast && !isCurrent) return;
-                                                    isPrayed ? unmarkPrayed(prayerName as PrayerName) : markPrayed(prayerName as PrayerName)
+                                                    isPrayed
+                                                        ? unmarkPrayed(prayerName as PrayerName)
+                                                        : markPrayed(prayerName as PrayerName)
                                                 }}
                                             >
                                                 {/* Left: Tracking circle */}
                                                 <Ionicons
                                                     name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
-                                                    size={22}
+                                                    size={21}
                                                     color={isPrayed ? theme.accent2 : theme.text2}
                                                     style={{ opacity: isPrayed ? 1 : 0.45 }}
                                                 />
@@ -261,7 +265,7 @@ export default function HomeScreen() {
                                                 {/* Left: Dash placeholder */}
                                                 <Ionicons
                                                     name="remove"
-                                                    size={22}
+                                                    size={21}
                                                     color={theme.text2}
                                                     style={{ opacity: 0.25 }}
                                                 />
@@ -300,6 +304,9 @@ export default function HomeScreen() {
                     </View>
 
                 </AppCard>
+
+                {/* 5. PRAYER PROGRESS CARD */}
+                <PrayerProgressCard />
 
             </ScrollView>
         </AppTabScreen >
@@ -386,7 +393,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     fullDivider: {
-        height: 2.5,
+        height: 1.5,
         width: '100%',
     },
     // Prayers List
@@ -412,20 +419,10 @@ const styles = StyleSheet.create({
         gap: 10,
         paddingVertical: 5,
     },
-    prayerNameSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
     prayerNameText: {
         fontSize: 16,
         fontWeight: '500',
         lineHeight: 22,
-    },
-    prayerTimeSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
     },
     prayerTimeText: {
         fontSize: 16,
@@ -446,10 +443,5 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-
-    prayerDivider: {
-        height: 1,
-        marginHorizontal: 12,
     },
 });

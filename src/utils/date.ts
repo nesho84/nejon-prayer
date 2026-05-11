@@ -1,3 +1,5 @@
+import { TRACKABLE_PRAYERS } from '@/types/prayer.types';
+
 // ------------------------------------------------------------
 // Returns a local date key in YYYY-MM-DD format for a given date (defaults to today)
 // ------------------------------------------------------------
@@ -82,3 +84,46 @@ export function getTriggerTime(
 
   return triggerTime;
 }
+
+// ------------------------------------------------------------
+// Returns the 7 Date objects for the current week (Mon–Sun)
+// ------------------------------------------------------------
+export const getWeekDays = (): Date[] => {
+  const today = new Date();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+};
+
+// ------------------------------------------------------------
+// Returns grid items for the current month (empty padding + day entries)
+// ------------------------------------------------------------
+export const getMonthGridItems = () => {
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const offset = (firstDay.getDay() + 6) % 7;
+  return [
+    ...Array.from({ length: offset }, (_, i) => ({ empty: true as const, key: `empty-${i}` })),
+    ...Array.from({ length: daysInMonth }, (_, i) => {
+      const date = new Date(today.getFullYear(), today.getMonth(), i + 1);
+      return { empty: false as const, date, key: formatDateKey(date) };
+    }),
+  ];
+};
+
+// ------------------------------------------------------------
+// Returns how many trackable prayers were prayed on a given day
+// ------------------------------------------------------------
+export const getPrayedCount = (
+  tracking: Record<string, Partial<Record<string, 'prayed' | null>>>,
+  dateKey: string,
+): number => {
+  const day = tracking[dateKey];
+  if (!day) return 0;
+  return TRACKABLE_PRAYERS.filter((p) => day[p] === 'prayed').length;
+};

@@ -4,17 +4,18 @@ import { formatDateKey } from '@/utils/date';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-type TrackingRecord = Record<string, 'prayed' | null>;
+type DayTracking = Partial<Record<PrayerName, 'prayed' | null>>;
+type TrackingRecord = Record<string, DayTracking>;
 
 interface PrayersTrackingState {
   tracking: TrackingRecord;
   isReady: boolean;
   markPrayed: (prayer: PrayerName, dateKey?: string) => void;
-  unmarkPrayed: (prayer: PrayerName) => void;
+  unmarkPrayed: (prayer: PrayerName, dateKey?: string) => void;
 }
 
-// Keep tracking data for 30 days to prevent infinite growth of storage
-const KEEP_DAYS = 30;
+// Keep tracking data for 31 days to prevent infinite growth of storage
+const KEEP_DAYS = 31;
 
 // Remove entries older than KEEP_DAYS from the tracking record
 const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
@@ -24,8 +25,7 @@ const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
 
   const cleaned: TrackingRecord = {};
   for (const key in tracking) {
-    const [datePart] = key.split(':');
-    if (datePart >= cutoffKey) {
+    if (key >= cutoffKey) {
       cleaned[key] = tracking[key];
     }
   }
@@ -38,17 +38,23 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       tracking: {},
       isReady: false,
 
-      markPrayed: (prayer, dateKey?: string) => {
-        const key = `${dateKey ?? formatDateKey()}:${prayer}`;
+      markPrayed: (prayer, dateKey) => {
+        const key = dateKey ?? formatDateKey();
         set((state) => ({
-          tracking: { ...state.tracking, [key]: 'prayed' },
+          tracking: {
+            ...state.tracking,
+            [key]: { ...state.tracking[key], [prayer]: 'prayed' },
+          },
         }));
       },
 
-      unmarkPrayed: (prayer) => {
-        const key = `${formatDateKey()}:${prayer}`;
+      unmarkPrayed: (prayer, dateKey) => {
+        const key = dateKey ?? formatDateKey();
         set((state) => ({
-          tracking: { ...state.tracking, [key]: null },
+          tracking: {
+            ...state.tracking,
+            [key]: { ...state.tracking[key], [prayer]: null },
+          },
         }));
       },
     }),
