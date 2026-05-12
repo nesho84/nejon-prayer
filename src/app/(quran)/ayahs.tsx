@@ -223,6 +223,7 @@ export default function AyahsScreen() {
 
   return (
     <AppScreen>
+
       {/* Top Navigation bar */}
       <Stack.Screen
         options={{
@@ -259,6 +260,7 @@ export default function AyahsScreen() {
           hasScrolledRef.current = true;
         }}
       />
+
     </AppScreen>
   );
 }

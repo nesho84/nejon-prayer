@@ -1,33 +1,39 @@
 import AppCard from '@/components/AppCard';
 import PrayerDayCell from '@/components/PrayerDayCell';
+import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
-import { formatDateKey, getMonthGridItems, getPrayedCount, getWeekDays } from '@/utils/date';
+import { formatDateKey, getMonthRows, getPrayedCount, getWeekDays } from '@/utils/date';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-const chunkArray = <T,>(arr: T[], size: number): T[][] => {
-  const result: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
-  return result;
-};
-
 export default function PrayerProgressCard() {
+  // Stores
   const theme = useThemeStore((state) => state.theme);
+  const tr = useLanguageStore((state) => state.tr);
+
+  // Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);
+
+  // Local state
   const [view, setView] = useState<'week' | 'month'>('week');
 
+  // Derived data for calendar rendering
   const today = formatDateKey();
   const weekDays = getWeekDays();
-  const monthItems = getMonthGridItems();
+  const monthRows = getMonthRows();
 
   return (
     <AppCard style={styles.card}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>My Progress</Text>
+        {/* Left: Title */}
+        <View style={styles.titleLeftRow}>
+          <MaterialCommunityIcons name="progress-check" size={22} color={theme.text2} style={{ opacity: 0.6 }} />
+          <Text style={[styles.title, { color: theme.text2 }]}>{tr.labels.myProgress}</Text>
+        </View>
+        {/* Right: View toggle */}
         <View style={[styles.toggle, { backgroundColor: theme.surfaceBg }]}>
           {(['week', 'month'] as const).map((v) => (
             <TouchableOpacity
@@ -36,7 +42,7 @@ export default function PrayerProgressCard() {
               style={[styles.toggleBtn, v === view && { backgroundColor: theme.overlayLight }]}
             >
               <Text style={[styles.toggleText, { color: v === view ? theme.white : theme.text2 }]}>
-                {v === 'week' ? 'Week' : 'Month'}
+                {v === 'week' ? tr.labels.week : tr.labels.month}
               </Text>
             </TouchableOpacity>
           ))}
@@ -47,7 +53,7 @@ export default function PrayerProgressCard() {
       <View style={styles.gridContainer}>
         {/* Day names header — shared by both views */}
         <View style={styles.dayNamesRow}>
-          {DAY_NAMES.map((d) => (
+          {tr.labels.dayNames.map((d) => (
             <Text key={d} style={[styles.dayNameText, { color: theme.text2 }]}>{d}</Text>
           ))}
         </View>
@@ -74,43 +80,25 @@ export default function PrayerProgressCard() {
         {/* Month view */}
         {view === 'month' && (
           <View style={styles.monthContainer}>
-            {chunkArray(monthItems, 7).map((row, rowIndex) => (
+            {monthRows.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.row}>
                 {row.map((item) => {
                   if (item.empty) {
-                    return (
-                      <PrayerDayCell
-                        key={item.key}
-                        count={0}
-                        isToday={false}
-                        isFuture={true}
-                        isEmpty={true}
-                        dateNumber={0}
-                      />
-                    );
+                    return <PrayerDayCell key={item.key} count={0} isToday={false} isFuture={true} isEmpty={true} dateNumber={0} />;
                   }
                   const dateKey = item.key;
-                  const isFuture = dateKey > today;
                   return (
                     <PrayerDayCell
                       key={dateKey}
                       count={getPrayedCount(tracking, dateKey)}
                       isToday={dateKey === today}
-                      isFuture={isFuture}
+                      isFuture={dateKey > today}
                       dateNumber={item.date.getDate()}
                     />
                   );
                 })}
-                {/* Fill incomplete last row */}
                 {row.length < 7 && Array.from({ length: 7 - row.length }, (_, i) => (
-                  <PrayerDayCell
-                    key={`fill-${i}`}
-                    count={0}
-                    isToday={false}
-                    isFuture={true}
-                    isEmpty={true}
-                    dateNumber={0}
-                  />
+                  <PrayerDayCell key={`fill-${i}`} count={0} isToday={false} isFuture={true} isEmpty={true} dateNumber={0} />
                 ))}
               </View>
             ))}
@@ -131,12 +119,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    paddingBottom: 6,
+  },
+  titleIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleLeftRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 2,
+    gap: 3,
   },
   title: {
     fontSize: 16,
     fontWeight: '700',
-    marginLeft: 6,
+    marginLeft: 4,
   },
   toggle: {
     flexDirection: 'row',
@@ -153,7 +154,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-
   gridContainer: {
     gap: 0,
   },

@@ -15,19 +15,19 @@ const FIRST_AYAH_ID = 1;
 
 export default function QuranReadingCard() {
   // Stores
-  const theme = useThemeStore((s) => s.theme);
-  const tr = useLanguageStore((s) => s.tr);
+  const theme = useThemeStore((state) => state.theme);
+  const tr = useLanguageStore((state) => state.tr);
 
   // Quran Store - Reading
-  const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
-  const lastReadSurahName = useQuranStore((s) => s.lastReadSurahName);
-  const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
+  const lastReadSurahId = useQuranStore((state) => state.lastReadSurahId);
+  const lastReadSurahName = useQuranStore((state) => state.lastReadSurahName);
+  const lastReadAyahId = useQuranStore((state) => state.lastReadAyahId);
   // Quran Store - Khatam
-  const lastKhatamSurahId = useQuranStore((s) => s.lastKhatamSurahId);
-  const lastKhatamSurahName = useQuranStore((s) => s.lastKhatamSurahName);
-  const lastKhatamAyahId = useQuranStore((s) => s.lastKhatamAyahId);
-  const khatamCount = useQuranStore((s) => s.khatamCount);
-  const resetKhatam = useQuranStore((s) => s.resetKhatam);
+  const lastKhatamSurahId = useQuranStore((state) => state.lastKhatamSurahId);
+  const lastKhatamSurahName = useQuranStore((state) => state.lastKhatamSurahName);
+  const lastKhatamAyahId = useQuranStore((state) => state.lastKhatamAyahId);
+  const khatamCount = useQuranStore((state) => state.khatamCount);
+  const resetKhatam = useQuranStore((state) => state.resetKhatam);
 
   // Local state
   const [mode, setMode] = useState<ReadingMode>("reading");

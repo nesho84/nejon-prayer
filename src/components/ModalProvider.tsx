@@ -12,8 +12,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ModalProvider() {
+  // Stores
   const { visible, options, hide } = useModalStore();
-  const theme = useThemeStore((s) => s.theme);
+  const theme = useThemeStore((state) => state.theme);
   const insets = useSafeAreaInsets();
 
   if (!options && !visible) return null;

@@ -102,6 +102,38 @@ export default function QuranSettingsScreen() {
           </Text>
         </View>
 
+        {/* ------ Translator / Edition — hidden for Arabic ------ */}
+        {language !== 'ar' && (
+          <AppCard style={[styles.settingCard, styles.translatorCard]}>
+            <View style={styles.statusRow}>
+              <Text style={[styles.settingTitle, { color: theme.text, marginBottom: 2 }]}>
+                {tr.labels.quranTranslator}:
+              </Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipRow}
+            >
+              {Object.entries(QURAN_TEXT_EDITIONS[language as keyof typeof QURAN_TEXT_EDITIONS] ?? {}).map(([key, value]) => {
+                const isActive = tempSelectedEdition === value;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    onPress={() => setTempSelectedEdition(value)}
+                    style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlay : 'transparent' }]}
+                  >
+                    <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>
+                      {/* capitalize the first letter after the dot: "sq.ahmeti" → "sq.Ahmeti" */}
+                      {value.replace(/\.(\w)/, (_, c) => '.' + c.toUpperCase())}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </AppCard>
+        )}
+
         {/* ------ Arabic Font Size ------ */}
         <AppCard style={styles.settingCard}>
           <View style={styles.statusRow}>
@@ -162,38 +194,6 @@ export default function QuranSettingsScreen() {
             </Text>
           </View>
         </AppCard>
-
-        {/* ------ Translator / Edition — hidden for Arabic (no translation needed) ------ */}
-        {language !== 'ar' && (
-          <AppCard style={[styles.settingCard, styles.translatorCard]}>
-            <View style={styles.statusRow}>
-              <Text style={[styles.settingTitle, { color: theme.text, marginBottom: 2 }]}>
-                {tr.labels.quranTranslator}:
-              </Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chipRow}
-            >
-              {Object.entries(QURAN_TEXT_EDITIONS[language as keyof typeof QURAN_TEXT_EDITIONS] ?? {}).map(([key, value]) => {
-                const isActive = tempSelectedEdition === value;
-                return (
-                  <TouchableOpacity
-                    key={key}
-                    onPress={() => setTempSelectedEdition(value)}
-                    style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlay : 'transparent' }]}
-                  >
-                    <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>
-                      {/* capitalize the first letter after the dot: "sq.ahmeti" → "sq.Ahmeti" */}
-                      {value.replace(/\.(\w)/, (_, c) => '.' + c.toUpperCase())}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </AppCard>
-        )}
 
       </View>
 

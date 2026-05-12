@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore } from '@/store/themeStore';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
     icon?: keyof typeof Ionicons.glyphMap;
@@ -11,7 +11,7 @@ interface Props {
     onPress?: () => void;
 }
 
-export default function ErrorScreen({
+export default function AppError({
     icon = 'alert-circle-outline',
     iconColor = '#FF3B30',
     message = 'Something went wrong.',
@@ -41,7 +41,7 @@ export default function ErrorScreen({
             </TouchableOpacity>
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
     errorContainer: {

@@ -133,12 +133,12 @@ const styles = StyleSheet.create({
 
     quoteText: {
         fontSize: 14,
-        lineHeight: 23,
+        lineHeight: 20,
         textAlign: 'center',
         fontStyle: 'italic',
         opacity: 0.75,
-        marginTop: 6,
-        marginBottom: 8,
+        marginTop: 4,
+        marginBottom: 7,
     },
 
     dotsContainer: {

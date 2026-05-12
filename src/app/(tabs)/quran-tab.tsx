@@ -9,7 +9,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { useProgress } from "react-native-track-player";
@@ -235,7 +235,7 @@ export default function QuranTabScreen() {
         {/* Hero Header Section */}
         <AppCard style={styles.topPanel}>
 
-          {/* Quran title + subtitle */}
+          {/* Quran title + subtitle + Settings */}
           <View style={styles.panelHeader}>
             <View style={[styles.headerIconContainer, { backgroundColor: "#d1a12720" }]}>
               <View style={{ position: 'absolute', top: 6 }}>
@@ -243,12 +243,22 @@ export default function QuranTabScreen() {
               </View>
               <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={QURAN_COLOR} />
             </View>
+
             <View>
               <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
               <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
             </View>
-          </View>
 
+            <TouchableOpacity
+              style={{ position: 'absolute', top: 12, right: 6 }}
+              delayPressIn={0}
+              delayPressOut={0}
+              activeOpacity={0.3}
+              onPress={() => router.navigate('/(modals)/quranSettings')}
+            >
+              <Ionicons name="settings-outline" size={24} color={theme.text2} />
+            </TouchableOpacity>
+          </View>
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Reading / Khatam card */}

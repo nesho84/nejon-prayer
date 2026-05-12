@@ -47,6 +47,7 @@ const PrayerCountdownCard = React.memo(({
   // Don't render until countdown data is ready
   if (!nextPrayerName || !prayerCountdown || !totalSeconds || remainingSeconds === null) return null;
 
+  // Circle calculations
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 

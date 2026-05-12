@@ -1,39 +1,38 @@
 import { useThemeStore } from '@/store/themeStore';
 import { StyleSheet, Text, View } from 'react-native';
 
-interface PrayerDayCellProps {
-  count: number;        // 0–5
+interface Props {
+  count: number;      // 0–5
   isToday: boolean;
   isFuture: boolean;
-  dateNumber: number;   // e.g. 11
-  isEmpty?: boolean;    // padding cell — show box but no date number
+  dateNumber: number; // e.g. 11
+  isEmpty?: boolean;  // padding cell — show box but no date number
 }
 
-export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, isEmpty }: PrayerDayCellProps) {
+export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, isEmpty }: Props) {
+  // Stores
   const theme = useThemeStore((state) => state.theme);
+
+  const barColor = !isFuture ? (count === 5 ? theme.accent2 : theme.danger) : theme.danger;
+  const barWidth = `${(count / 5) * 100}%` as const;
 
   return (
     <View style={styles.container}>
       <View style={[
         styles.box,
-        { backgroundColor: theme.card, borderColor: isToday ? theme.accent : theme.borderCard },
+        { backgroundColor: theme.card, borderColor: isToday ? theme.accent2 : theme.borderCard },
       ]}>
-        {!isEmpty && isFuture && (
-          <>
-            <Text style={[styles.fraction, { color: theme.text2, opacity: 0.25 }]}>—</Text>
-            <View style={[styles.dot, { backgroundColor: theme.danger, opacity: 0.25 }]} />
-          </>
-        )}
-        {!isFuture && (
-          <>
-            <Text style={[styles.fraction, { color: isToday ? theme.accent : theme.text2 }]}>
-              {count}/5
-            </Text>
-            <View style={[styles.dot, { backgroundColor: count === 5 ? theme.success : theme.danger }]} />
-          </>
-        )}
+        <Text style={[styles.fraction, {
+          color: !isFuture ? (isToday ? theme.accent2 : theme.text2) : theme.text2,
+          opacity: isEmpty ? 0 : (isFuture ? 0.25 : 0.8),
+        }]}>
+          {!isFuture ? `${count}/5` : '—'}
+        </Text>
+        <View style={[styles.barTrack, { opacity: isEmpty ? 0 : (isFuture ? 0.25 : 0.8) }]}>
+          <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
+        </View>
       </View>
-      <Text style={[styles.dateNum, { color: isToday ? theme.accent : theme.text2 }]}>
+      <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.text2 }]}>
         {isEmpty ? ' ' : dateNumber}
       </Text>
     </View>
@@ -54,15 +53,21 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
+    gap: 4,
   },
   fraction: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
-  dot: {
-    width: 7,
-    height: 7,
+  barTrack: {
+    width: '65%',
+    height: 4,
+    borderRadius: 99,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: 4,
     borderRadius: 99,
   },
   dateNum: {

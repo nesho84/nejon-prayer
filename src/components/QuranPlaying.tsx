@@ -68,9 +68,9 @@ export default function QuranPlaying() {
   const theme = useThemeStore((s) => s.theme);
 
   // Quran Store
-  const isActive = useQuranStore((s) => s.isActive);
-  const isPlaying = useQuranStore((s) => s.isPlaying);
-  const activeSurahName = useQuranStore((s) => s.activeSurahName);
+  const isActive = useQuranStore((state) => state.isActive);
+  const isPlaying = useQuranStore((state) => state.isPlaying);
+  const activeSurahName = useQuranStore((state) => state.activeSurahName);
 
   if (!isActive || activeSurahName === null) return null;
 

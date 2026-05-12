@@ -267,18 +267,18 @@ export default function HomeScreen() {
                                                     name="remove"
                                                     size={21}
                                                     color={theme.text2}
-                                                    style={{ opacity: 0.25 }}
+                                                    style={{ opacity: 0.3 }}
                                                 />
                                                 {/* Prayer Name Text */}
-                                                <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
+                                                <Text style={[styles.prayerNameText, { color: theme.text2, opacity: 0.5 }]}>
                                                     {tr.prayers[prayerName] || prayerName}
                                                 </Text>
                                                 {/* Prayer Name Icon */}
-                                                <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.7} />
+                                                <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.5} />
                                                 {/* Horizontal Spacer */}
                                                 <View style={{ flex: 1 }} />
                                                 {/* Prayer Time */}
-                                                <Text style={[styles.prayerTimeText, { color: theme.text2 }]}>
+                                                <Text style={[styles.prayerTimeText, { color: theme.text2, opacity: 0.5 }]}>
                                                     {prayerTime}
                                                 </Text>
                                             </View>

@@ -3,6 +3,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import { Stack } from "expo-router";
 import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function AboutScreen() {
@@ -21,48 +22,45 @@ export default function AboutScreen() {
         });
     };
 
+    // ------------------------------------------------------------
+    // Open app info/settings
+    // ------------------------------------------------------------
+    const openAppInfo = () => {
+        Linking.openSettings();
+    };
+
     return (
         <AppScreen>
+
+            {/* Top Navigation bar */}
+            <Stack.Screen
+                options={{
+                    title: tr.labels.about,
+                    headerRight: () => (
+                        <TouchableOpacity onPress={openAppInfo} style={styles.headerIcon} activeOpacity={0.3}>
+                            <MaterialCommunityIcons name="information-outline" size={22} color={theme.text} />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={[styles.scrollContent]}
+                contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-
-                {/* Logo */}
-                <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
-
-                {/* Title */}
-                <Text style={[styles.title, { color: theme.text }]}>
-                    {tr.labels.aboutText1}
-                </Text>
-
-                {/* Description */}
-                <Text style={[styles.desc, { color: theme.placeholder }]} adjustsFontSizeToFit>
-                    {tr.labels.aboutText2}
-                </Text>
-
-                {/* Website & Privacy */}
-                <View style={styles.linksContainer}>
-                    <TouchableOpacity
-                        style={[styles.chip, { borderColor: theme.border, backgroundColor: theme.card }]}
-                        onPress={() => openLink("https://nejon.net")}
-                        activeOpacity={0.7}
-                    >
-                        <MaterialCommunityIcons name="web" size={13} color={theme.placeholder} />
-                        <Text style={[styles.chipText, { color: theme.primary }]}>nejon.net</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.chip, { borderColor: theme.border, backgroundColor: theme.card }]}
-                        onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")}
-                        activeOpacity={0.7}
-                    >
-                        <MaterialCommunityIcons name="shield-lock-outline" size={13} color={theme.placeholder} />
-                        <Text style={[styles.chipText, { color: theme.primary }]}>Privacy Policy</Text>
-                    </TouchableOpacity>
+                {/* Hero: Logo + Title + Version */}
+                <View style={styles.heroSection}>
+                    <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
+                    <Text style={[styles.title, { color: theme.text }]}>
+                        {Constants?.expoConfig?.name}
+                    </Text>
+                    <Text style={[styles.versionText, { color: theme.placeholder }]}>
+                        Version {Constants?.expoConfig?.version}
+                    </Text>
                 </View>
 
-                {/* Support Section */}
+                {/* Support / PayPal Card */}
                 <TouchableOpacity
                     style={[styles.supportButton, {
                         backgroundColor: theme.primary + '08',
@@ -81,10 +79,25 @@ export default function AboutScreen() {
                     <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
                 </TouchableOpacity>
 
-                {/* Version */}
-                <Text style={[styles.versionText, { color: theme.placeholder }]}>
-                    Version {Constants?.expoConfig?.version}
-                </Text>
+                {/* Bottom Buttons */}
+                <View style={styles.buttonsSection}>
+                    <TouchableOpacity
+                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}
+                        onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")}
+                        activeOpacity={0.75}
+                    >
+                        <MaterialCommunityIcons name="shield-lock-outline" size={18} color={theme.primary} />
+                        <Text style={[styles.pillButtonText, { color: theme.text2 }]}>Privacy Policy</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}
+                        onPress={() => openLink("https://nejon.net")}
+                        activeOpacity={0.75}
+                    >
+                        <MaterialCommunityIcons name="web" size={18} color={theme.primary} />
+                        <Text style={[styles.pillButtonText, { color: theme.text2 }]}>nejon.net</Text>
+                    </TouchableOpacity>
+                </View>
 
             </ScrollView>
         </AppScreen>
@@ -97,62 +110,49 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
+        justifyContent: 'space-between',
+        paddingBottom: 32,
+    },
+
+    // Header
+    headerIcon: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+
+    // Hero section
+    heroSection: {
         alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 16,
-        gap: 16,
-    },
-
-    logo: {
-        width: 120,
-        height: 120,
-        borderRadius: 20,
-    },
-    title: {
-        fontSize: 26,
-        fontWeight: "700",
-        textAlign: "center",
-    },
-    desc: {
-        fontSize: 15,
-        fontWeight: "400",
-        textAlign: "justify",
-        lineHeight: 22,
-        marginBottom: 8,
-        paddingHorizontal: 10,
-    },
-
-    // Links
-    linksContainer: {
-        flexDirection: "row",
+        paddingTop: 48,
+        paddingBottom: 32,
         gap: 10,
     },
-    chip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        borderWidth: 1,
+    logo: {
+        width: 96,
+        height: 96,
+        borderRadius: 22,
+        marginBottom: 6,
     },
-    chipText: {
-        fontSize: 13,
-        fontWeight: '500',
+    title: {
+        fontSize: 28,
+        fontWeight: "700",
+        textAlign: "center",
+        letterSpacing: -0.5,
+    },
+    versionText: {
+        fontSize: 14,
+        fontWeight: "400",
     },
 
     // Support Button
     supportButton: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginHorizontal: 16,
         paddingVertical: 18,
         paddingHorizontal: 20,
         borderWidth: 1,
         borderRadius: 16,
-        marginTop: 18,
-        marginBottom: 12,
         gap: 16,
     },
     iconContainer: {
@@ -177,8 +177,24 @@ const styles = StyleSheet.create({
         opacity: 0.6,
     },
 
-    versionText: {
-        fontSize: 14,
-        fontWeight: "400",
+    // Bottom pill buttons
+    buttonsSection: {
+        paddingHorizontal: 16,
+        paddingTop: 32,
+        gap: 12,
+    },
+    pillButton: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 18,
+        borderWidth: 1,
+        borderRadius: 50,
+    },
+    pillButtonText: {
+        fontSize: 16,
+        fontWeight: "600",
     },
 });

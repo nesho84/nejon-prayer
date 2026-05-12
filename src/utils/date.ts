@@ -117,6 +117,16 @@ export const getMonthGridItems = () => {
 };
 
 // ------------------------------------------------------------
+// Groups month grid items into rows of 7 for rendering
+// ------------------------------------------------------------
+export const getMonthRows = () => {
+  const items = getMonthGridItems();
+  const rows: (typeof items)[] = [];
+  for (let i = 0; i < items.length; i += 7) rows.push(items.slice(i, i + 7));
+  return rows;
+};
+
+// ------------------------------------------------------------
 // Returns how many trackable prayers were prayed on a given day
 // ------------------------------------------------------------
 export const getPrayedCount = (

@@ -232,6 +232,11 @@ export const TRANSLATIONS = {
             quranTranslation: "Translation",
             quranTranslator: "Translator",
             quranPreviewTranslation: "In the name of Allah, the Most Gracious, the Most Merciful.",
+            // Progress Card
+            myProgress: "My Progress",
+            week: "Week",
+            month: "Month",
+            dayNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         },
         buttons: {
             cancel: "Cancel",
@@ -486,6 +491,11 @@ export const TRANSLATIONS = {
             quranTranslation: "Übersetzung",
             quranTranslator: "Übersetzer",
             quranPreviewTranslation: "Im Namen Allahs, des Allerbarmers, des Barmherzigen.",
+            // Progress Card
+            myProgress: "Mein Fortschritt",
+            week: "Woche",
+            month: "Monat",
+            dayNames: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
         },
         buttons: {
             cancel: "Abbrechen",
@@ -739,6 +749,11 @@ export const TRANSLATIONS = {
             quranTranslation: "Përkthimi",
             quranTranslator: "Përkthyesi",
             quranPreviewTranslation: "Me emrin e All-llahut, Mëshiruesit, Mëshirëbërësit.",
+            // Progress Card
+            myProgress: "Progresi im",
+            week: "Javë",
+            month: "Muaj",
+            dayNames: ["Hën", "Mar", "Mër", "Enj", "Pre", "Sht", "Die"],
         },
         buttons: {
             cancel: "Anulo",
@@ -993,6 +1008,11 @@ export const TRANSLATIONS = {
             quranTranslation: "Çeviri",
             quranTranslator: "Çevirmen",
             quranPreviewTranslation: "Rahman ve Rahîm olan Allah'ın adıyla.",
+            // Progress Card
+            myProgress: "İlerlemem",
+            week: "Hafta",
+            month: "Ay",
+            dayNames: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
         },
         buttons: {
             cancel: "İptal",
@@ -1245,6 +1265,11 @@ export const TRANSLATIONS = {
             quranTranslation: "الترجمة",
             quranTranslator: "المترجم",
             quranPreviewTranslation: "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
+            // Progress Card
+            myProgress: "تقدمي",
+            week: "الأسبوع",
+            month: "الشهر",
+            dayNames: ["الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"],
         },
         buttons: {
             cancel: "إلغاء",
