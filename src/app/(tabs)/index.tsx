@@ -233,7 +233,7 @@ export default function HomeScreen() {
                                                 activeOpacity={0.3}
                                                 hitSlop={8}
                                                 onPress={() => {
-                                                    console.log(tracking);
+                                                    // console.log(tracking);
                                                     if (!isPast && !isCurrent) return;
                                                     isPrayed
                                                         ? unmarkPrayed(prayerName as PrayerName)
@@ -286,14 +286,14 @@ export default function HomeScreen() {
 
                                         {/* Right: Notification Icon → opens modal */}
                                         <TouchableOpacity
-                                            style={styles.notifIconTouchable}
+                                            style={styles.notifIconContainer}
                                             delayPressIn={0}
                                             delayPressOut={0}
                                             activeOpacity={0.3}
                                             hitSlop={8}
                                             onPress={() => router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`)}
                                         >
-                                            <View style={[styles.notifIconContainer, { backgroundColor: theme.surfaceBg }]}>
+                                            <View style={[styles.notifIcon, { backgroundColor: theme.surfaceBg }]}>
                                                 <PrayerNotifIcon prayerName={prayerName} size={20} color={theme.text2} />
                                             </View>
                                         </TouchableOpacity>
@@ -358,6 +358,7 @@ const styles = StyleSheet.create({
     prayersCard: {
         overflow: 'hidden',
     },
+
     // Prayer Card - Date Header
     prayersDateHeader: {
         flexDirection: 'row',
@@ -396,6 +397,7 @@ const styles = StyleSheet.create({
         height: 1.5,
         width: '100%',
     },
+
     // Prayers List
     prayersRowContainer: {
         paddingTop: 10,
@@ -407,7 +409,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'stretch',
         justifyContent: 'flex-start',
-        paddingHorizontal: 6,
+        paddingVertical: 4,
+        paddingHorizontal: 4,
         borderWidth: 1.3,
         borderRadius: 12,
         gap: 10,
@@ -416,8 +419,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
+        marginLeft: 5,
         gap: 10,
-        paddingVertical: 5,
     },
     prayerNameText: {
         fontSize: 16,
@@ -430,14 +433,12 @@ const styles = StyleSheet.create({
         marginRight: 4,
         letterSpacing: 0.5,
     },
-
     // Notification Icon
-    notifIconTouchable: {
+    notifIconContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 5,
     },
-    notifIconContainer: {
+    notifIcon: {
         width: 32,
         height: 32,
         borderRadius: 8,

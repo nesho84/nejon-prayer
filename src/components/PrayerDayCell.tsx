@@ -1,5 +1,5 @@
 import { useThemeStore } from '@/store/themeStore';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
   count: number;      // 0–5
@@ -7,15 +7,43 @@ interface Props {
   isFuture: boolean;
   dateNumber: number; // e.g. 11
   isEmpty?: boolean;  // padding cell — show box but no date number
+  onPress?: () => void;
 }
 
-export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, isEmpty }: Props) {
+export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, isEmpty, onPress }: Props) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
 
+  // Derived styles
   const barColor = !isFuture ? (count === 5 ? theme.accent2 : theme.danger) : theme.danger;
   const barWidth = `${(count / 5) * 100}%` as const;
 
+  // Tappable cell — past or today, non-empty
+  if (onPress && !isEmpty && !isFuture) {
+    return (
+      <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.6} delayPressIn={0}>
+        <View style={[
+          styles.box,
+          { backgroundColor: theme.card, borderColor: isToday ? theme.accent2 : theme.borderCard },
+        ]}>
+          <Text style={[styles.fraction, {
+            color: isToday ? theme.accent2 : theme.text2,
+            opacity: 0.8,
+          }]}>
+            {`${count}/5`}
+          </Text>
+          <View style={[styles.barTrack, { opacity: 0.8 }]}>
+            <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
+          </View>
+        </View>
+        <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.text2 }]}>
+          {dateNumber}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
+  // Static cell — future date, empty padding, or no onPress
   return (
     <View style={styles.container}>
       <View style={[

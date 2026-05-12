@@ -1,10 +1,12 @@
 import AppCard from '@/components/AppCard';
 import PrayerDayCell from '@/components/PrayerDayCell';
 import { useLanguageStore } from '@/store/languageStore';
+import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { formatDateKey, getMonthRows, getPrayedCount, getWeekDays } from '@/utils/date';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -12,6 +14,10 @@ export default function PrayerProgressCard() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
+
+  // Subscribing to prayerTimes ensures this component re-renders when
+  // usePrayerTimesSync triggers a midnight reload, so today/weekDays/monthRows
+  const prayerTimes = usePrayersStore((state) => state.prayerTimes);
 
   // Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);
@@ -23,6 +29,13 @@ export default function PrayerProgressCard() {
   const today = formatDateKey();
   const weekDays = getWeekDays();
   const monthRows = getMonthRows();
+
+  // ------------------------------------------------------------
+  // Opens prayerTimings modal for the tapped date
+  // ------------------------------------------------------------
+  const openPrayerTimings = (dateKey: string) => () => {
+    router.navigate(`/(modals)/prayerTimings?date=${dateKey}`);
+  };
 
   return (
     <AppCard style={styles.card}>
@@ -71,6 +84,7 @@ export default function PrayerProgressCard() {
                   isToday={dateKey === today}
                   isFuture={isFuture}
                   dateNumber={date.getDate()}
+                  onPress={openPrayerTimings(dateKey)}
                 />
               );
             })}
@@ -87,13 +101,15 @@ export default function PrayerProgressCard() {
                     return <PrayerDayCell key={item.key} count={0} isToday={false} isFuture={true} isEmpty={true} dateNumber={0} />;
                   }
                   const dateKey = item.key;
+                  const isFuture = dateKey > today;
                   return (
                     <PrayerDayCell
                       key={dateKey}
                       count={getPrayedCount(tracking, dateKey)}
                       isToday={dateKey === today}
-                      isFuture={dateKey > today}
+                      isFuture={isFuture}
                       dateNumber={item.date.getDate()}
+                      onPress={openPrayerTimings(dateKey)}
                     />
                   );
                 })}

@@ -9,6 +9,16 @@ export const formatDateKey = (date?: Date): string => {
 };
 
 // ------------------------------------------------------------
+// Parses a YYYY-MM-DD date key back into a local Date
+// Note: new Date('YYYY-MM-DD') parses as UTC midnight and causes off-by-one day
+// errors in non-UTC timezones — this constructor always uses local time
+// ------------------------------------------------------------
+export const parseDateKey = (dateKey: string): Date => {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
+// ------------------------------------------------------------
 // Resolves the prayer date to use for tracking
 // if the prayerDate from the notification is today or yesterday, use it; otherwise, default to today
 // This handles edge cases where a user might mark a prayer as done after midnight,
