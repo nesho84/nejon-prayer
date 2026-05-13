@@ -4,7 +4,8 @@ import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { PrayerTimes } from "@/types/prayer.types";
-import { formatDateKey, getTriggerTime } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
+import { getNotificationTriggerTime } from '@/utils/timeString';
 import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
 import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
@@ -166,7 +167,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.prayers[prayer]?.offset || 0;
-    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[prayer]);
+    const triggerTime = getNotificationTriggerTime(timeString, offset, tomorrowPrayerTimes?.[prayer]);
     if (!triggerTime) continue;
 
     // Prepare notification content
@@ -187,7 +188,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
           snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
-          prayerDate: formatDateKey(triggerTime), // ex. "2026-03-20" (used for tracking in foreground/background)
+          prayerDate: toDateKey(triggerTime), // ex. "2026-03-20" (used for tracking in foreground/background)
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
@@ -244,7 +245,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.events[event]?.offset || 0;
-    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[event]);
+    const triggerTime = getNotificationTriggerTime(timeString, offset, tomorrowPrayerTimes?.[event]);
     if (!triggerTime) continue;
 
     // Prepare notification content
@@ -424,7 +425,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
       // Date-based ID - ensures idempotency (same date = same ID)
       triggerTime.setHours(hour, 0, 0, 0);
-      const dateISO = formatDateKey(triggerTime); // "2026-03-20"
+      const dateISO = toDateKey(triggerTime); // "2026-03-20"
       const notificationId = `quote-${dateISO}`;
 
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';

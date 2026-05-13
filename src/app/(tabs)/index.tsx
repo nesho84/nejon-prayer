@@ -16,7 +16,8 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
-import { formatDateKey, isPrayerPast } from "@/utils/date";
+import { toDateKey } from "@/utils/dateKey";
+import { isTimePast } from "@/utils/timeString";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
@@ -207,10 +208,10 @@ export default function HomeScreen() {
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
-                            const isPast = isTrackable && isPrayerPast(prayerTime);
+                            const isPast = isTrackable && isTimePast(prayerTime);
                             const isCurrent = currentPrayerName === prayerName;
                             const isLast = index === arr.length - 1;
-                            const isPrayed = isTrackable && tracking[formatDateKey()]?.[prayerName] === 'prayed';
+                            const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 
                             return (
                                 <View key={prayerName} style={!isLast && { marginBottom: 0 }}>

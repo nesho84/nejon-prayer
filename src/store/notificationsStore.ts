@@ -14,7 +14,7 @@ import {
   SpecialType
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
-import { formatDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -87,7 +87,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         // Tomorrow's prayer times — used for correct scheduling of already-passed prayers
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowPrayerTimes = yearlyPrayerTimes?.[formatDateKey(tomorrow)] ?? null;
+        const tomorrowPrayerTimes = yearlyPrayerTimes?.[toDateKey(tomorrow)] ?? null;
 
         // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
@@ -152,7 +152,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           console.log('🔄 [Background] Syncing Notifications...');
 
           // Check if we already updated today
-          const today = formatDateKey();
+          const today = toDateKey();
           const lastUpdate = get().lastBackgroundSync;
 
           if (lastUpdate === today) {

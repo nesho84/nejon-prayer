@@ -4,7 +4,9 @@ import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
-import { formatDateKey, getMonthRows, getPrayedCount, getWeekDays } from '@/utils/date';
+import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendarGrid';
+import { toDateKey } from '@/utils/dateKey';
+import { getDayPrayedCount } from '@/utils/prayerTracking';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -26,9 +28,9 @@ export default function PrayerProgressCard() {
   const [view, setView] = useState<'week' | 'month'>('week');
 
   // Derived data for calendar rendering
-  const today = formatDateKey();
-  const weekDays = getWeekDays();
-  const monthRows = getMonthRows();
+  const today = toDateKey();
+  const weekDays = getCurrentWeekDays();
+  const monthRows = getCurrentMonthRows();
 
   // ------------------------------------------------------------
   // Opens prayerTimings modal for the tapped date
@@ -75,12 +77,12 @@ export default function PrayerProgressCard() {
         {view === 'week' && (
           <View style={styles.row}>
             {weekDays.map((date) => {
-              const dateKey = formatDateKey(date);
+              const dateKey = toDateKey(date);
               const isFuture = dateKey > today;
               return (
                 <PrayerDayCell
                   key={dateKey}
-                  count={getPrayedCount(tracking, dateKey)}
+                  count={getDayPrayedCount(tracking, dateKey)}
                   isToday={dateKey === today}
                   isFuture={isFuture}
                   dateNumber={date.getDate()}
@@ -105,7 +107,7 @@ export default function PrayerProgressCard() {
                   return (
                     <PrayerDayCell
                       key={dateKey}
-                      count={getPrayedCount(tracking, dateKey)}
+                      count={getDayPrayedCount(tracking, dateKey)}
                       isToday={dateKey === today}
                       isFuture={isFuture}
                       dateNumber={item.date.getDate()}

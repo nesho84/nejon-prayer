@@ -1,6 +1,6 @@
 import { mmkvStorage } from '@/store/storage';
 import { PrayerName } from '@/types/prayer.types';
-import { formatDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -21,7 +21,7 @@ const KEEP_DAYS = 31;
 const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);
-  const cutoffKey = formatDateKey(cutoff);
+  const cutoffKey = toDateKey(cutoff);
 
   const cleaned: TrackingRecord = {};
   for (const key in tracking) {
@@ -39,7 +39,7 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       isReady: false,
 
       markPrayed: (prayer, dateKey) => {
-        const key = dateKey ?? formatDateKey();
+        const key = dateKey ?? toDateKey();
         set((state) => ({
           tracking: {
             ...state.tracking,
@@ -49,7 +49,7 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       },
 
       unmarkPrayed: (prayer, dateKey) => {
-        const key = dateKey ?? formatDateKey();
+        const key = dateKey ?? toDateKey();
         set((state) => ({
           tracking: {
             ...state.tracking,

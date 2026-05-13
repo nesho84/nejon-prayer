@@ -1,4 +1,5 @@
-import { formatDateKey, getTriggerTime } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
+import { getNotificationTriggerTime } from '@/utils/timeString';
 
 // ------------------------------------------------------------
 // Simple runtime tests for src/utils/date.ts
@@ -19,24 +20,24 @@ export function runDateTests() {
     }
   }
 
-  console.log('\n📅 [dateTest] Running formatDateKey tests...');
+  console.log('\n📅 [dateTest] Running toDateKey tests...');
 
   // --- Basic format ---
   assert(
     'Known date: Jan 1 2026 → "2026-01-01"',
-    formatDateKey(new Date(2026, 0, 1)),        // month is 0-indexed
+    toDateKey(new Date(2026, 0, 1)),        // month is 0-indexed
     '2026-01-01'
   );
 
   assert(
     'Known date: Dec 31 2025 → "2025-12-31"',
-    formatDateKey(new Date(2025, 11, 31)),
+    toDateKey(new Date(2025, 11, 31)),
     '2025-12-31'
   );
 
   assert(
     'Single-digit month/day are zero-padded: Feb 5 → "2026-02-05"',
-    formatDateKey(new Date(2026, 1, 5)),
+    toDateKey(new Date(2026, 1, 5)),
     '2026-02-05'
   );
 
@@ -45,12 +46,12 @@ export function runDateTests() {
   const expectedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   assert(
     'No argument returns today in local time',
-    formatDateKey(),
+    toDateKey(),
     expectedToday
   );
 
   // --- YYYY-MM-DD format validation ---
-  const result = formatDateKey(new Date(2026, 3, 30));
+  const result = toDateKey(new Date(2026, 3, 30));
   assert(
     'Output matches YYYY-MM-DD pattern',
     /^\d{4}-\d{2}-\d{2}$/.test(result),
@@ -58,14 +59,14 @@ export function runDateTests() {
   );
 
   // --- UTC vs local time bug check ---
-  // Shows that formatDateKey uses LOCAL time, unlike toISOString().split('T')[0]
+  // Shows that toDateKey uses LOCAL time, unlike toISOString().split('T')[0]
   // which uses UTC. In UTC+ timezones after 22:00+ local time, these can differ.
   const utcResult = new Date().toISOString().split('T')[0];
-  const localResult = formatDateKey();
+  const localResult = toDateKey();
   const utcMatchesLocal = utcResult === localResult;
   if (!utcMatchesLocal) {
     console.warn(`  ⚠️  UTC vs local date mismatch detected! UTC: ${utcResult} | Local: ${localResult}`);
-    console.warn(`     This is expected in UTC+ timezones late at night — formatDateKey is CORRECT.`);
+    console.warn(`     This is expected in UTC+ timezones late at night — toDateKey is CORRECT.`);
   } else {
     console.log(`  ℹ️  UTC and local dates match right now (${localResult}) — mismatch only visible near midnight in UTC+ zones.`);
   }
@@ -93,7 +94,7 @@ export function runGetTriggerTimeTests() {
   console.log('\n⏰ [getTriggerTimeTest] Running tests...');
 
   const now = new Date();
-  const todayKey = formatDateKey(now);
+  const todayKey = toDateKey(now);
 
   // Helper to build a future time string "HH:mm" that hasn't passed yet today
   const futureHour = (now.getHours() + 2) % 24;
@@ -104,10 +105,10 @@ export function runGetTriggerTimeTests() {
   const pastTimeString = `${String(pastHour).padStart(2, '0')}:00`;
 
   // --- 1. Future time with no offset → scheduled for TODAY ---
-  const t1 = getTriggerTime(futureTimeString, 0);
+  const t1 = getNotificationTriggerTime(futureTimeString, 0);
   assert(
     'Future time (no offset) → scheduled today',
-    t1 ? formatDateKey(t1) : null,
+    t1 ? toDateKey(t1) : null,
     todayKey
   );
 
@@ -121,12 +122,12 @@ export function runGetTriggerTimeTests() {
   // --- 3. Past time with no tomorrow string → scheduled for TOMORROW ---
   const tomorrow = new Date(now);
   tomorrow.setDate(now.getDate() + 1);
-  const tomorrowKey = formatDateKey(tomorrow);
+  const tomorrowKey = toDateKey(tomorrow);
 
-  const t3 = getTriggerTime(pastTimeString, 0);
+  const t3 = getNotificationTriggerTime(pastTimeString, 0);
   assert(
     'Past time (no tomorrowTimeString) → scheduled tomorrow',
-    t3 ? formatDateKey(t3) : null,
+    t3 ? toDateKey(t3) : null,
     tomorrowKey
   );
 
@@ -141,10 +142,10 @@ export function runGetTriggerTimeTests() {
   const tomorrowHour = (pastHour + 1) % 24; // e.g. 1 hour later tomorrow
   const tomorrowTimeString = `${String(tomorrowHour).padStart(2, '0')}:30`;
 
-  const t5 = getTriggerTime(pastTimeString, 0, tomorrowTimeString);
+  const t5 = getNotificationTriggerTime(pastTimeString, 0, tomorrowTimeString);
   assert(
     'Past time + tomorrowTimeString → scheduled tomorrow',
-    t5 ? formatDateKey(t5) : null,
+    t5 ? toDateKey(t5) : null,
     tomorrowKey
   );
 
@@ -163,7 +164,7 @@ export function runGetTriggerTimeTests() {
   );
 
   // --- 8. Offset applied to future time ---
-  const t8 = getTriggerTime(futureTimeString, -15);
+  const t8 = getNotificationTriggerTime(futureTimeString, -15);
   assert(
     'Future time with -15 offset → correct minutes (45)',
     t8 ? t8.getMinutes() : null,
@@ -172,7 +173,7 @@ export function runGetTriggerTimeTests() {
 
   // --- 9. Offset applied to tomorrow's time when past + tomorrowTimeString ---
   // tomorrowTimeString = "HH:30", offset = +10 → minutes should be 40
-  const t9 = getTriggerTime(pastTimeString, 10, tomorrowTimeString);
+  const t9 = getNotificationTriggerTime(pastTimeString, 10, tomorrowTimeString);
   assert(
     'Past time + tomorrowTimeString + offset +10 → tomorrow\'s minutes become 40',
     t9 ? t9.getMinutes() : null,
@@ -180,7 +181,7 @@ export function runGetTriggerTimeTests() {
   );
 
   // --- 10. Invalid today's time string → returns null ---
-  const t10 = getTriggerTime('not-a-time', 0);
+  const t10 = getNotificationTriggerTime('not-a-time', 0);
   assert(
     'Invalid time string → returns null',
     t10,
@@ -188,7 +189,7 @@ export function runGetTriggerTimeTests() {
   );
 
   // --- 11. Invalid tomorrow string → falls back to today's hour (no crash) ---
-  const t11 = getTriggerTime(pastTimeString, 0, 'bad-time');
+  const t11 = getNotificationTriggerTime(pastTimeString, 0, 'bad-time');
   assert(
     'Invalid tomorrowTimeString → falls back, scheduled tomorrow with today\'s hour',
     t11 ? t11.getHours() : null,
@@ -196,7 +197,7 @@ export function runGetTriggerTimeTests() {
   );
 
   // --- 12. Null tomorrow string → behaves same as no tomorrow string ---
-  const t12 = getTriggerTime(pastTimeString, 0, null);
+  const t12 = getNotificationTriggerTime(pastTimeString, 0, null);
   assert(
     'null tomorrowTimeString → falls back, scheduled tomorrow with today\'s hour',
     t12 ? t12.getHours() : null,
@@ -204,10 +205,10 @@ export function runGetTriggerTimeTests() {
   );
 
   // --- 13. Future time ignores tomorrowTimeString entirely ---
-  const t13 = getTriggerTime(futureTimeString, 0, '01:00');
+  const t13 = getNotificationTriggerTime(futureTimeString, 0, '01:00');
   assert(
     'Future time → tomorrowTimeString ignored, still today',
-    t13 ? formatDateKey(t13) : null,
+    t13 ? toDateKey(t13) : null,
     todayKey
   );
 

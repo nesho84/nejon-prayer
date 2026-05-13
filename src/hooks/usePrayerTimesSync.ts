@@ -1,5 +1,5 @@
 import { usePrayersStore } from '@/store/prayersStore';
-import { formatDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 
@@ -7,7 +7,7 @@ export function usePrayerTimesSync() {
   const loadPrayerTimes = usePrayersStore((state) => state.loadPrayerTimes);
 
   const appStateRef = useRef(AppState.currentState);
-  const loadedDateRef = useRef(formatDateKey());
+  const loadedDateRef = useRef(toDateKey());
 
   useEffect(() => {
     let timerId: ReturnType<typeof setTimeout>;
@@ -21,7 +21,7 @@ export function usePrayerTimesSync() {
       const msUntilMidnight = midnight.getTime() - now.getTime();
 
       timerId = setTimeout(() => {
-        loadedDateRef.current = formatDateKey();
+        loadedDateRef.current = toDateKey();
         loadPrayerTimes();
         scheduleMidnightRefresh();
       }, msUntilMidnight);
@@ -34,7 +34,7 @@ export function usePrayerTimesSync() {
     // ------------------------------------------------------------
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-        const todayKey = formatDateKey();
+        const todayKey = toDateKey();
         if (todayKey !== loadedDateRef.current) {
           loadedDateRef.current = todayKey;
           loadPrayerTimes();

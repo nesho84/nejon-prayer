@@ -5,7 +5,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { mmkvStorage } from '@/store/storage';
 import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
-import { formatDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/dateKey';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -54,7 +54,7 @@ export const usePrayersStore = create<PrayersState>()(
           // Compute today's date key
           const now = new Date();
           const currentYear = now.getFullYear();
-          const todayKey = formatDateKey(now);
+          const todayKey = toDateKey(now);
 
           const { yearlyPrayerTimes, fetchedYear } = get();
 

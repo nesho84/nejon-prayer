@@ -8,7 +8,8 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerName, PrayerTimeEntry, PrayerTimes, TRACKABLE_PRAYERS } from "@/types/prayer.types";
-import { formatDateKey, isPrayerPast } from "@/utils/date";
+import { toDateKey } from "@/utils/dateKey";
+import { isTimePast } from "@/utils/timeString";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from "expo-router";
@@ -44,8 +45,8 @@ export default function PrayersSettingsScreen() {
     const ModalSheetRef = useRef<ModalSheetRef>(null);
 
     // Derived date info
-    const selectedDateKey = formatDateKey(selectedDate);
-    const todayKey = formatDateKey();
+    const selectedDateKey = toDateKey(selectedDate);
+    const todayKey = toDateKey();
     const isSelectedPastDay = selectedDateKey < todayKey;
     const isSelectedToday = selectedDateKey === todayKey;
 
@@ -61,7 +62,7 @@ export default function PrayersSettingsScreen() {
 
         setIsLoading(true);
         try {
-            const dateKey = formatDateKey(date);
+            const dateKey = toDateKey(date);
 
             // Simulate a short random loading delay for better UX (0, 100, ..., 800 ms)
             const randomDelay = Math.floor(Math.random() * 9) * 100;
@@ -278,7 +279,7 @@ export default function PrayersSettingsScreen() {
                             prayerEntries.map(([prayerName, prayerTime], index) => {
                                 const isLast = index === prayerEntries.length - 1;
                                 const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
-                                const isPast = isTrackable && (isSelectedPastDay || (isSelectedToday && isPrayerPast(prayerTime)));
+                                const isPast = isTrackable && (isSelectedPastDay || (isSelectedToday && isTimePast(prayerTime)));
                                 const isPrayed = isTrackable && tracking[selectedDateKey]?.[prayerName as PrayerName] === 'prayed';
 
                                 return (
