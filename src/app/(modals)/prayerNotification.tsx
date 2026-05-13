@@ -276,127 +276,136 @@ export default function PrayersSettingsScreen() {
                     </View>
                 </AppCard>
 
-                {/* SECTION 2: Time Offset */}
-                <AppCard style={styles.sectionCard}>
-                    <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                        <Ionicons name="time-outline" size={20} color={theme.accent} />
-                        <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                            {tr.labels.notificationTime}
-                        </Text>
-                    </View>
+                {/* SECTIONS 2 & 3: disabled when notification is off */}
+                <View style={{ gap: 14 }} pointerEvents={enabled ? 'auto' : 'none'}>
+                    {!enabled && (
+                        // Overlay to indicate disabled state
+                        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg2, opacity: 0.65, zIndex: 10, borderRadius: 12 }]} />
+                    )}
 
-                    {/* Wrapped time Chips */}
-                    <View style={styles.timesContainer}>
-                        {TIME_OPTIONS.map((option) => (
-                            <TouchableOpacity
-                                key={option.offset}
-                                style={[
-                                    styles.timeChipRow,
-                                    { borderColor: theme.divider },
-                                    selectedOffset === option.offset && {
-                                        backgroundColor: theme.accentLight,
-                                        borderColor: theme.accent,
-                                    }
-                                ]}
-                                onPress={() => setSelectedOffset(option.offset)}
-                            >
-                                <Text
-                                    style={[
-                                        styles.timeChipText,
-                                        { color: theme.text2 },
-                                    ]}
-                                >
-                                    {/* Left: Prefix of the Label (5,15,30...) */}
-                                    {option.prefix && (
-                                        <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
-                                    )}
-                                    {/* Center: Label */}
-                                    {option.label}
-                                </Text>
-                                {/* Right: Checkmark */}
-                                {selectedOffset === option.offset && (
-                                    <Ionicons name="checkmark" size={16} color={theme.accent} />
-                                )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </AppCard>
+                    {/* SECTION 2: Offset chips */}
+                    <AppCard style={styles.sectionCard}>
+                        <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
+                            <Ionicons name="time-outline" size={20} color={theme.accent} />
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                                {tr.labels.notificationTime}
+                            </Text>
+                        </View>
 
-                {/* SECTION 3: Sound Selection */}
-                <AppCard style={styles.sectionCard}>
-                    <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                        <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
-                        <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                            {tr.labels.notificationSound}
-                        </Text>
-                    </View>
-
-                    {/* Compact sound Rows */}
-                    <View style={styles.soundsContainer}>
-                        {SOUND_OPTIONS.map((sound) => (
-                            <View
-                                key={sound.id}
-                                style={[
-                                    styles.soundRow,
-                                    { borderColor: theme.divider },
-                                    selectedSound === sound.file && {
-                                        backgroundColor: theme.accentLight,
-                                        borderColor: theme.accent,
-                                    }
-                                ]}
-                            >
-                                {/* Left: selectable area */}
+                        {/* Wrapped time Chips */}
+                        <View style={styles.offsetContainer}>
+                            {TIME_OPTIONS.map((option) => (
                                 <TouchableOpacity
-                                    style={styles.soundLeft}
-                                    onPress={() => setSelectedSound(sound.file)}
+                                    key={option.offset}
+                                    style={[
+                                        styles.offsetChipRow,
+                                        { borderColor: theme.divider },
+                                        selectedOffset === option.offset && {
+                                            backgroundColor: theme.accentLight,
+                                            borderColor: theme.accent,
+                                        }
+                                    ]}
+                                    onPress={() => setSelectedOffset(option.offset)}
                                 >
-                                    {/* Left: Checkmark */}
-                                    {selectedSound === sound.file && (
-                                        <Ionicons name="checkmark" size={16} color={theme.accent} />
-                                    )}
-                                    {/* Left: Sound name */}
                                     <Text
                                         style={[
-                                            styles.soundName,
-                                            { color: sound.file ? theme.text : theme.text2 },
+                                            styles.offsetChipText,
+                                            { color: theme.text2 },
                                         ]}
                                     >
-                                        {sound.name}
+                                        {/* Left: Prefix of the Label (5,15,30...) */}
+                                        {option.prefix && (
+                                            <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
+                                        )}
+                                        {/* Center: Label */}
+                                        {option.label}
                                     </Text>
-                                    {/* Right: Sound duration */}
-                                    {sound.file && (
-                                        <Text style={[styles.soundDuration, { color: theme.text2 }]}>
-                                            {soundDurations[sound.id] && soundDurations[sound.id] >= 60
-                                                ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
-                                                : `${soundDurations[sound.id]?.toFixed(0)}s`
-                                            }
-                                        </Text>
+                                    {/* Right: Checkmark */}
+                                    {selectedOffset === option.offset && (
+                                        <Ionicons name="checkmark" size={16} color={theme.accent} />
                                     )}
                                 </TouchableOpacity>
+                            ))}
+                        </View>
+                    </AppCard>
 
-                                {/* Right: Play Button */}
-                                {sound.file && (
+                    {/* SECTION 3: Sound Selection */}
+                    <AppCard style={styles.sectionCard}>
+                        <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
+                            <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                                {tr.labels.notificationSound}
+                            </Text>
+                        </View>
+
+                        {/* Compact sound Rows */}
+                        <View style={styles.soundsContainer}>
+                            {SOUND_OPTIONS.map((sound) => (
+                                <View
+                                    key={sound.id}
+                                    style={[
+                                        styles.soundRow,
+                                        { borderColor: theme.divider },
+                                        selectedSound === sound.file && {
+                                            backgroundColor: theme.accentLight,
+                                            borderColor: theme.accent,
+                                        }
+                                    ]}
+                                >
+                                    {/* Left: selectable area */}
                                     <TouchableOpacity
-                                        style={styles.soundPlay}
-                                        onPress={() => {
-                                            if (playingId === sound.id) {
-                                                handleStopPreview();
-                                            } else {
-                                                playPreview(sound.file, sound.id);
-                                            }
-                                        }}
+                                        style={styles.soundLeft}
+                                        onPress={() => setSelectedSound(sound.file)}
                                     >
-                                        <Ionicons
-                                            name={(playingId === sound.id) ? "stop-circle" : "play-circle"}
-                                            size={26}
-                                            color={(playingId === sound.id) ? theme.accent : theme.text2}
-                                        />
+                                        {/* Left: Checkmark */}
+                                        {selectedSound === sound.file && (
+                                            <Ionicons name="checkmark" size={16} color={theme.accent} />
+                                        )}
+                                        {/* Left: Sound name */}
+                                        <Text
+                                            style={[
+                                                styles.soundName,
+                                                { color: sound.file ? theme.text : theme.text2 },
+                                            ]}
+                                        >
+                                            {sound.name}
+                                        </Text>
+                                        {/* Right: Sound duration */}
+                                        {sound.file && (
+                                            <Text style={[styles.soundDuration, { color: theme.text2 }]}>
+                                                {soundDurations[sound.id] && soundDurations[sound.id] >= 60
+                                                    ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
+                                                    : `${soundDurations[sound.id]?.toFixed(0)}s`
+                                                }
+                                            </Text>
+                                        )}
                                     </TouchableOpacity>
-                                )}
-                            </View>
-                        ))}
-                    </View>
-                </AppCard>
+
+                                    {/* Right: Play Button */}
+                                    {sound.file && (
+                                        <TouchableOpacity
+                                            style={styles.soundPlay}
+                                            onPress={() => {
+                                                if (playingId === sound.id) {
+                                                    handleStopPreview();
+                                                } else {
+                                                    playPreview(sound.file, sound.id);
+                                                }
+                                            }}
+                                        >
+                                            <Ionicons
+                                                name={(playingId === sound.id) ? "stop-circle" : "play-circle"}
+                                                size={26}
+                                                color={(playingId === sound.id) ? theme.accent : theme.text2}
+                                            />
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                            ))}
+                        </View>
+                    </AppCard>
+
+                </View>
             </View>
 
         </ModalSheet>
@@ -440,13 +449,13 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
 
-    // Time selection styles
-    timesContainer: {
+    // Offset selection styles
+    offsetContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 6,
     },
-    timeChipRow: {
+    offsetChipRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 6,
@@ -455,7 +464,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         gap: 6,
     },
-    timeChipText: {
+    offsetChipText: {
         fontSize: 14,
     },
 
