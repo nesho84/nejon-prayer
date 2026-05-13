@@ -47,9 +47,6 @@ export default function QuranTabScreen() {
   const ROW_HEIGHT = 90;
   const ROW_GAP = 10;
 
-  // Colors
-  const QURAN_COLOR = "#d1a127";
-
   // ------------------------------------------------------------
   // Play / Pause / Replay handler
   // ------------------------------------------------------------
@@ -235,29 +232,41 @@ export default function QuranTabScreen() {
         {/* Hero Header Section */}
         <AppCard style={styles.topPanel}>
 
-          {/* Quran title + subtitle + Settings */}
+          {/* Quran title + subtitle + Favorites + Settings */}
           <View style={styles.panelHeader}>
-            <View style={[styles.headerIconContainer, { backgroundColor: "#d1a12720" }]}>
+            {/* Left: Icon */}
+            <View style={[styles.headerIconContainer, { backgroundColor: `${theme.gold}20` }]}>
               <View style={{ position: 'absolute', top: 6 }}>
-                <Ionicons name="volume-medium" size={14} color="#d1a127" />
+                <Ionicons name="volume-medium" size={14} color={theme.gold} />
               </View>
-              <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={QURAN_COLOR} />
+              <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={theme.gold} />
             </View>
 
+            {/* Center: Title and Subtitle */}
             <View>
               <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
               <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
             </View>
 
-            <TouchableOpacity
-              style={{ position: 'absolute', top: 12, right: 6 }}
-              delayPressIn={0}
-              delayPressOut={0}
-              activeOpacity={0.3}
-              onPress={() => router.navigate('/(modals)/quranSettings')}
-            >
-              <Ionicons name="settings-outline" size={24} color={theme.text2} />
-            </TouchableOpacity>
+            {/* Right: Favorites + Settings */}
+            <View style={styles.topPanelIcons}>
+              <TouchableOpacity
+                delayPressIn={0}
+                delayPressOut={0}
+                activeOpacity={0.3}
+                onPress={() => router.navigate('/(quran)/ayahsFavorites')}
+              >
+                <Ionicons name="bookmark-outline" size={24} color={theme.gold} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                delayPressIn={0}
+                delayPressOut={0}
+                activeOpacity={0.3}
+                onPress={() => router.navigate('/(modals)/quranSettings')}
+              >
+                <Ionicons name="settings-outline" size={24} color={theme.text2} />
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
@@ -350,6 +359,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     opacity: 0.7,
     lineHeight: 20,
+  },
+  topPanelIcons: {
+    marginLeft: 'auto',
+    marginRight: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 22
   },
   divider: {
     height: 1,

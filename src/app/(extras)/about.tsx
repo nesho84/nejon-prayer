@@ -4,7 +4,10 @@ import { useThemeStore } from "@/store/themeStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer';
+// const APPLE_STORE_URL = 'https://apps.apple.com/app/nejon-prayer/idXXXXXXXXX'; // TODO: Add Apple App Store URL
 
 export default function AboutScreen() {
     // Stores
@@ -27,6 +30,27 @@ export default function AboutScreen() {
     // ------------------------------------------------------------
     const openAppInfo = () => {
         Linking.openSettings();
+    };
+
+    // ------------------------------------------------------------
+    // Share the App
+    // ------------------------------------------------------------
+    const handleShare = async () => {
+        const appName = Constants?.expoConfig?.name ?? 'Nejon Prayer';
+        try {
+            await Share.share(
+                {
+                    title: appName,
+                    message: `${appName}\n\n${GOOGLE_PLAY_URL}`,
+                },
+                {
+                    dialogTitle: tr.labels.shareApp,
+                    subject: appName,
+                }
+            );
+        } catch (err) {
+            console.error('Share failed:', err);
+        }
     };
 
     return (
@@ -60,24 +84,68 @@ export default function AboutScreen() {
                     </Text>
                 </View>
 
-                {/* Support / PayPal Card */}
-                <TouchableOpacity
-                    style={[styles.supportButton, {
-                        backgroundColor: theme.primary + '08',
-                        borderColor: theme.primary + '20'
-                    }]}
-                    onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')}
-                    activeOpacity={0.8}
-                >
-                    <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                        <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
-                    </View>
-                    <View style={styles.supportTextContainer}>
-                        <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.supportDesc}</Text>
-                        <Text style={[styles.supportSubtitle, { color: theme.primary }]}>via PayPal</Text>
-                    </View>
-                    <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
-                </TouchableOpacity>
+                {/* Action Cards */}
+                <View style={styles.cardsSection}>
+
+                    {/* Support / PayPal Card */}
+                    <TouchableOpacity
+                        style={[styles.actionCard, {
+                            backgroundColor: theme.primary + '08',
+                            borderColor: theme.primary + '20'
+                        }]}
+                        onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')}
+                        activeOpacity={0.8}
+                    >
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
+                        </View>
+                        <View style={styles.supportTextContainer}>
+                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.supportDesc}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>via PayPal</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                    </TouchableOpacity>
+
+                    {/* Rate the App */}
+                    <TouchableOpacity
+                        style={[styles.actionCard, {
+                            backgroundColor: theme.primary + '08',
+                            borderColor: theme.primary + '20'
+                        }]}
+                        onPress={() => openLink(GOOGLE_PLAY_URL)}
+                        // onPress={() => openLink(APPLE_STORE_URL)} // TODO: Apple App Store
+                        activeOpacity={0.8}
+                    >
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.supportTextContainer}>
+                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.rateApp}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>{tr.labels.rateAppDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                    </TouchableOpacity>
+
+                    {/* Share with a Friend */}
+                    <TouchableOpacity
+                        style={[styles.actionCard, {
+                            backgroundColor: theme.primary + '08',
+                            borderColor: theme.primary + '20'
+                        }]}
+                        onPress={handleShare}
+                        activeOpacity={0.8}
+                    >
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.supportTextContainer}>
+                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.shareApp}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>{tr.labels.shareAppDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="share-variant-outline" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                    </TouchableOpacity>
+
+                </View>
 
                 {/* Bottom Buttons */}
                 <View style={styles.buttonsSection}>
@@ -123,8 +191,8 @@ const styles = StyleSheet.create({
     // Hero section
     heroSection: {
         alignItems: 'center',
-        paddingTop: 48,
-        paddingBottom: 32,
+        paddingTop: 36,
+        paddingBottom: 24,
         gap: 10,
     },
     logo: {
@@ -144,11 +212,14 @@ const styles = StyleSheet.create({
         fontWeight: "400",
     },
 
-    // Support Button
-    supportButton: {
+    // Action cards group
+    cardsSection: {
+        paddingHorizontal: 16,
+        gap: 10,
+    },
+    actionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 16,
         paddingVertical: 18,
         paddingHorizontal: 20,
         borderWidth: 1,
@@ -189,7 +260,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        paddingVertical: 18,
+        paddingVertical: 14,
         borderWidth: 1,
         borderRadius: 50,
     },

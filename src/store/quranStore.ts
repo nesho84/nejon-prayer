@@ -26,6 +26,18 @@ type AyahsData = {
   khatamCount: number;
 }
 
+export type FavoriteAyah = {
+  surahId: number;
+  surahName: string;
+  ayahId: number;     // verse number within the surah
+  arabicText: string; // stored at save time — works offline
+  translation: string | null; // stored at save time, null if Arabic language
+}
+
+type AyahFavoritesData = {
+  favoriteAyahs: FavoriteAyah[];
+}
+
 type QuranSettings = {
   arabicFontSize: number;
   translationFontSize: number;
@@ -43,7 +55,7 @@ type QuranPlayerData = {
   playbackError: unknown;
 }
 
-interface QuranState extends QuranData, AyahsData, QuranSettings, QuranPlayerData {
+interface QuranState extends QuranData, AyahsData, AyahFavoritesData, QuranSettings, QuranPlayerData {
   // Quran actions
   loadFullQuran: () => void;
   getSurahById: (id: number) => Surah | undefined;
@@ -57,6 +69,9 @@ interface QuranState extends QuranData, AyahsData, QuranSettings, QuranPlayerDat
   setQuranSettings: (settings: Partial<QuranSettings>) => void;
   // Player actions
   syncPlayback: (payload: Partial<QuranPlayerData>) => void;
+  // Favorites actions
+  toggleAyahFavorite: (ayah: FavoriteAyah) => void;
+  isAyahFavorite: (surahId: number, ayahId: number) => boolean;
 }
 
 export const useQuranStore = create<QuranState>()(
@@ -91,6 +106,9 @@ export const useQuranStore = create<QuranState>()(
         sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
         tr: QURAN_TEXT_EDITIONS.tr.diyanet,
       },
+
+      // Favorites
+      favoriteAyahs: [],
 
       // Player state
       isActive: false,
@@ -180,6 +198,23 @@ export const useQuranStore = create<QuranState>()(
       // Sync any playback-related state fields into the store
       // Accepts a partial payload — only passed fields are updated (shallow merge)
       syncPlayback: (payload) => set(payload),
+
+      // Toggle a favorite ayah (add if not present, remove if already saved)
+      toggleAyahFavorite: (ayah) => {
+        const current = get().favoriteAyahs;
+        const exists = current.find((f) => f.surahId === ayah.surahId && f.ayahId === ayah.ayahId) !== undefined;
+        set({
+          favoriteAyahs: exists
+            ? current.filter((f) => !(f.surahId === ayah.surahId && f.ayahId === ayah.ayahId))
+            : [...current, ayah],
+        });
+      },
+
+      // Check if a specific ayah is bookmarked
+      isAyahFavorite: (surahId, ayahId) => {
+        const current = get().favoriteAyahs;
+        return current.find((f) => f.surahId === surahId && f.ayahId === ayahId) !== undefined;
+      },
     }),
     {
       name: "quran-storage",
@@ -197,6 +232,7 @@ export const useQuranStore = create<QuranState>()(
         arabicFontSize: state.arabicFontSize,
         translationFontSize: state.translationFontSize,
         selectedEditions: state.selectedEditions,
+        favoriteAyahs: state.favoriteAyahs,
       }),
     }
   )

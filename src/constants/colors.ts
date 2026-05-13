@@ -49,6 +49,7 @@ export const LIGHT_COLORS = {
     // Utility
     white: "#ffffff",
     black: "#000000",
+    gold: "#d1a127",
     transparent: "transparent",
 };
 
@@ -103,5 +104,6 @@ export const DARK_COLORS = {
     // Utility
     white: "#ffffff",
     black: "#000000",
+    gold: "#d1a127",
     transparent: "transparent",
 };

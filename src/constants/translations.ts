@@ -225,6 +225,10 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "About this App",
             aboutText2: "This app provides accurate prayer times 🕔 based on your location. It also includes a full Quran reader 📖, a Qibla compass 🧭, a Tesbih counter 📿, and smart notifications 🔔 — designed to be simple, reliable and help you maintain your prayer routine.",
+            rateApp: "Rate the App",
+            rateAppDesc: "Leave a review on Google Play",
+            shareApp: "Share with a Friend",
+            shareAppDesc: "Recommend Nejon Prayer",
             // Quran Settings
             quranArabic: "Arabic",
             quranSettingsTitle: "Quran Settings",
@@ -237,6 +241,10 @@ export const TRANSLATIONS = {
             week: "Week",
             month: "Month",
             dayNames: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            // Quran Favorites
+            ayahsFavorites: "Bookmarked Ayahs",
+            noAyahsFavorites: "You have no bookmarked ayahs.",
+            ayahsFavoritesDesc: "Bookmark ayahs while reading to view them here.",
         },
         buttons: {
             cancel: "Cancel",
@@ -484,6 +492,10 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Über diese App",
             aboutText2: "Diese App bietet genaue Gebetszeiten 🕔 basierend auf Ihrem Standort. Sie enthält außerdem einen vollständigen Koran-Reader 📖, einen Qibla-Kompass 🧭, einen Tesbih-Zähler 📿 und intelligente Benachrichtigungen 🔔 — konzipiert, um einfach, zuverlässig zu sein und Ihnen zu helfen, Ihre Gebetsroutine einzuhalten.",
+            rateApp: "App bewerten",
+            rateAppDesc: "Bewerte die App auf Google Play",
+            shareApp: "Mit Freunden teilen",
+            shareAppDesc: "Empfehle Nejon Prayer",
             // Quran Settings
             quranArabic: "Arabisch",
             quranSettingsTitle: "Koran-Einstellungen",
@@ -496,6 +508,10 @@ export const TRANSLATIONS = {
             week: "Woche",
             month: "Monat",
             dayNames: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+            // Quran Favorites
+            ayahsFavorites: "Gespeicherte Ayahs",
+            noAyahsFavorites: "Du hast keine gespeicherten Ayahs.",
+            ayahsFavoritesDesc: "Speichere Ayahs während des Lesens, um sie hier anzuzeigen.",
         },
         buttons: {
             cancel: "Abbrechen",
@@ -742,6 +758,10 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Rreth këtij Aplikacioni",
             aboutText2: "Ky aplikacion ofron kohë të sakta të lutjeve 🕔 bazuar në lokacionin tuaj. Ai gjithashtu përfshin një lexues të plotë të Kuranit 📖, kompas Kibla 🧭, numërues Tesbih 📿 dhe njoftime inteligjente 🔔 — i dizajnuar të jetë i thjeshtë, i besueshëm dhe t'ju ndihmojë të mbani rutinën tuaj të lutjeve.",
+            rateApp: "Vlerëso Aplikacionin",
+            rateAppDesc: "Lër një vlerësim në Google Play",
+            shareApp: "Ndaj me miqtë",
+            shareAppDesc: "Rekomando Nejon Prayer",
             // Quran Settings
             quranArabic: "Arabisht",
             quranSettingsTitle: "Cilësimet e Kur'anit",
@@ -754,6 +774,10 @@ export const TRANSLATIONS = {
             week: "Javë",
             month: "Muaj",
             dayNames: ["Hën", "Mar", "Mër", "Enj", "Pre", "Sht", "Die"],
+            // Quran Favorites
+            ayahsFavorites: "Ajetet e Ruajtura",
+            noAyahsFavorites: "Nuk keni asnjë ajet të ruajtur.",
+            ayahsFavoritesDesc: "Ruajni ajetet gjatë leximit për t'i parë këtu.",
         },
         buttons: {
             cancel: "Anulo",
@@ -1001,6 +1025,10 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "Bu Uygulama Hakkında",
             aboutText2: "Bu uygulama, konumunuza göre doğru namaz vakitleri 🕔 sağlar. Ayrıca tam bir Kuran okuyucu 📖, kıble pusulası 🧭, tesbih sayacı 📿 ve akıllı bildirimler 🔔 içerir — basit, güvenilir olmak ve namaz rutininizi sürdürmenize yardımcı olmak için tasarlanmıştır.",
+            rateApp: "Uygulamayı Değerlendir",
+            rateAppDesc: "Google Play'de yorum bırakın",
+            shareApp: "Arkadaşınla Paylaş",
+            shareAppDesc: "Nejon Prayer'ı önerin",
             // Quran Settings
             quranArabic: "Arapça",
             quranSettingsTitle: "Kur'an Ayarları",
@@ -1013,6 +1041,10 @@ export const TRANSLATIONS = {
             week: "Hafta",
             month: "Ay",
             dayNames: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
+            // Quran Favorites
+            ayahsFavorites: "Kaydedilen Ayetler",
+            noAyahsFavorites: "Kaydedilmiş ayetiniz yok.",
+            ayahsFavoritesDesc: "Okurken ayetleri kaydedin, böylece burada görebilirsiniz.",
         },
         buttons: {
             cancel: "İptal",
@@ -1258,6 +1290,10 @@ export const TRANSLATIONS = {
             // About
             aboutText1: "حول هذا التطبيق",
             aboutText2: "يوفر هذا التطبيق أوقات صلاة دقيقة 🕔 بناءً على موقعك. كما يتضمن قارئ قرآن كامل 📖، وبوصلة قبلة 🧭، وعداد تسبيح 📿، وإشعارات ذكية 🔔 — مصمّم ليكون بسيطًا وموثوقًا ويساعدك في الحفاظ على روتين صلاتك.",
+            rateApp: "قيّم التطبيق",
+            rateAppDesc: "اترك تقييمًا على Google Play",
+            shareApp: "شارك مع صديق",
+            shareAppDesc: "أوصِ بتطبيق Nejon Prayer",
             // Quran Settings
             quranArabic: "العربية",
             quranSettingsTitle: "إعدادات القرآن",
@@ -1270,6 +1306,10 @@ export const TRANSLATIONS = {
             week: "الأسبوع",
             month: "الشهر",
             dayNames: ["الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"],
+            // Quran Favorites
+            ayahsFavorites: "الآيات المحفوظة",
+            noAyahsFavorites: "ليس لديك أي آيات محفوظة.",
+            ayahsFavoritesDesc: "احفظ الآيات أثناء القراءة لتراها هنا.",
         },
         buttons: {
             cancel: "إلغاء",

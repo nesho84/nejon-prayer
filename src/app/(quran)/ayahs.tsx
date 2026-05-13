@@ -12,8 +12,6 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const QURAN_COLOR = "#d1a127";
-
 export default function AyahsScreen() {
   const { surahId, surahName, readingMode } = useLocalSearchParams();
   const surahIdNum = parseInt(surahId as string, 10);
@@ -42,6 +40,9 @@ export default function AyahsScreen() {
   const setLastRead = useQuranStore((s) => s.setLastRead);
   const setLastKhatam = useQuranStore((s) => s.setLastKhatam);
   const completeKhatam = useQuranStore((s) => s.completeKhatam);
+  const favoriteAyahs = useQuranStore((s) => s.favoriteAyahs);
+  const toggleAyahFavorite = useQuranStore((s) => s.toggleAyahFavorite);
+  const isAyahFavorite = useQuranStore((s) => s.isAyahFavorite);
 
   // Local state / refs
   const [selectedAyah, setSelectedAyah] = useState<number | null>(() => {
@@ -124,6 +125,7 @@ export default function AyahsScreen() {
       arabicFontSize={arabicFontSize}
       translationFontSize={translationFontSize}
       isSelected={selectedAyah === item.id}
+      isAyahFavorited={isAyahFavorite(surahIdNum, item.id)}
       onPress={() => {
         userInteractedRef.current = true;
         setSelectedAyah(item.id);
@@ -133,18 +135,26 @@ export default function AyahsScreen() {
           setLastKhatam(surahIdNum, surahNameStr, item.id);
         }
       }}
+      onToggleAyahFavorite={() => toggleAyahFavorite({
+        surahId: surahIdNum,
+        surahName: surahNameStr,
+        ayahId: item.id,
+        arabicText: item.text,
+        translation: translationMap.get(item.id) ?? null,
+      })}
     />
-  ), [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam]);
+  ), [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
 
   // ------------------------------------------------------------
   // Footer: Next Surah button (or Complete Khatam on surah 114)
   // ------------------------------------------------------------
   const renderFooter = useCallback(() => {
+    // "Complete Khatam" Button + Alert
     if (surahIdNum === 114) {
       if (mode !== "khatam") return null;
       return (
         <TouchableOpacity
-          style={[styles.footerCard, { backgroundColor: `${QURAN_COLOR}18`, borderColor: theme.border }]}
+          style={[styles.footerCard, { backgroundColor: `${theme.gold}18`, borderColor: theme.border }]}
           activeOpacity={0.6}
           onPress={() => {
             completeKhatam();
@@ -155,20 +165,22 @@ export default function AyahsScreen() {
             );
           }}
         >
-          <View style={[styles.footerIcon, { backgroundColor: `${QURAN_COLOR}25` }]}>
-            <Ionicons name="checkmark-circle-outline" size={22} color={QURAN_COLOR} />
+          <View style={[styles.footerIcon, { backgroundColor: `${theme.gold}25` }]}>
+            <Ionicons name="checkmark-circle-outline" size={22} color={theme.gold} />
           </View>
-          <Text style={[styles.footerCardLabel, { color: QURAN_COLOR }]}>
+          <Text style={[styles.footerCardLabel, { color: theme.gold }]}>
             {tr.labels.khatamFinish}
           </Text>
         </TouchableOpacity>
       );
     }
 
+    // For other surahs, show "Next Surah" button in both modes
     const nextSurah = getSurahById(surahIdNum + 1);
     if (!nextSurah) return null;
 
     return (
+      // "Next Surah" Button
       <TouchableOpacity
         style={[styles.footerCard, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}
         activeOpacity={0.6}
@@ -189,8 +201,8 @@ export default function AyahsScreen() {
           });
         }}
       >
-        <View style={[styles.footerIcon, { backgroundColor: `${QURAN_COLOR}20` }]}>
-          <Ionicons name="arrow-forward-circle-outline" size={22} color={QURAN_COLOR} />
+        <View style={[styles.footerIcon, { backgroundColor: `${theme.gold}20` }]}>
+          <Ionicons name="arrow-forward-circle-outline" size={22} color={theme.gold} />
         </View>
         <View style={styles.footerCardText}>
           <Text style={[styles.footerCardHint, { color: theme.text2 }]}>
@@ -200,7 +212,7 @@ export default function AyahsScreen() {
             {nextSurah.transliteration}
           </Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color={QURAN_COLOR} />
+        <Ionicons name="chevron-forward" size={18} color={theme.gold} />
       </TouchableOpacity>
     );
   }, [surahIdNum, mode, theme, tr, getSurahById, setLastKhatam, completeKhatam]);
@@ -229,15 +241,25 @@ export default function AyahsScreen() {
         options={{
           title: surahNameStr,
           headerRight: () => (
-            <TouchableOpacity
-              delayPressIn={0}
-              delayPressOut={0}
-              activeOpacity={0.3}
-              disabled={isLoadingAyahs}
-              onPress={() => router.navigate('/(modals)/quranSettings')}
-            >
-              <Ionicons name="settings-outline" size={24} color={theme.text2} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 32 }}>
+              <TouchableOpacity
+                delayPressIn={0}
+                delayPressOut={0}
+                activeOpacity={0.3}
+                onPress={() => router.navigate('/(quran)/ayahsFavorites')}
+              >
+                <Ionicons name="bookmark-outline" size={24} color={theme.text2} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                delayPressIn={0}
+                delayPressOut={0}
+                activeOpacity={0.3}
+                disabled={isLoadingAyahs}
+                onPress={() => router.navigate('/(modals)/quranSettings')}
+              >
+                <Ionicons name="settings-outline" size={24} color={theme.text2} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />

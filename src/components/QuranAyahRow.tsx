@@ -14,7 +14,9 @@ interface Props {
   arabicFontSize: number;
   translationFontSize: number;
   isSelected: boolean;
+  isAyahFavorited: boolean;
   onPress: () => void;
+  onToggleAyahFavorite: () => void;
 }
 
 // Main Component (memoized for FlatList performance)
@@ -27,7 +29,9 @@ const QuranAyahRow = React.memo(({
   arabicFontSize,
   translationFontSize,
   isSelected,
+  isAyahFavorited,
   onPress,
+  onToggleAyahFavorite,
 }: Props) => {
 
   // Share text cross-platform
@@ -83,7 +87,7 @@ const QuranAyahRow = React.memo(({
             </Text>
           </View>
 
-          {/* Share + Copy */}
+          {/* Share + Copy + Bookmark */}
           <View style={styles.icons}>
             {/* Share button */}
             <TouchableOpacity onPress={handleShare} hitSlop={8}>
@@ -93,10 +97,14 @@ const QuranAyahRow = React.memo(({
             <TouchableOpacity onPress={handleCopy} hitSlop={8}>
               <Ionicons name="copy-outline" size={22} color={theme.accent} />
             </TouchableOpacity>
-            {/* @TODO: Bookmark button */}
-            {/* <TouchableOpacity onPress={() => { }} hitSlop={8}>
-              <Ionicons name="bookmark-outline" size={22} color={theme.accent} />
-            </TouchableOpacity> */}
+            {/* Bookmark button */}
+            <TouchableOpacity onPress={onToggleAyahFavorite} hitSlop={8}>
+              <Ionicons
+                name={isAyahFavorited ? "bookmark" : "bookmark-outline"}
+                size={22}
+                color={isAyahFavorited ? theme.info : theme.accent}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 

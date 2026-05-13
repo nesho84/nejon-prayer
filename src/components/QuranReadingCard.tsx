@@ -8,7 +8,6 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type ReadingMode = "reading" | "khatam";
 
-const QURAN_COLOR = "#d1a127";
 const FIRST_SURAH_ID = 1;
 const FIRST_SURAH_NAME = "Al-Fatihah";
 const FIRST_AYAH_ID = 1;
@@ -89,7 +88,7 @@ export default function QuranReadingCard() {
 
       {/* Card */}
       <TouchableOpacity activeOpacity={0.7} onPress={handlePress}>
-        <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: QURAN_COLOR }]}>
+        <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: theme.gold }]}>
 
           {/* Main content */}
           <View style={styles.cardMain}>
@@ -102,7 +101,7 @@ export default function QuranReadingCard() {
                 {ayahId ? `${tr.labels.ayah} ${ayahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
               </Text>
             </View>
-            <MaterialIcons name="arrow-right-alt" size={36} color={QURAN_COLOR} />
+            <MaterialIcons name="arrow-right-alt" size={36} color={theme.gold} />
           </View>
 
           {/* Khatam footer: inside card, separated by divider */}

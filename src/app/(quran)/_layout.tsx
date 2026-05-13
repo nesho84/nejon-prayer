@@ -23,6 +23,14 @@ export default function QuranLayout() {
           animation: "slide_from_right",
         }}
       />
+      <Stack.Screen
+        name="ayahsFavorites"
+        options={{
+          title: tr.labels.ayahsFavorites,
+          headerShown: true,
+          animation: "slide_from_right",
+        }}
+      />
     </Stack>
   );
 }
