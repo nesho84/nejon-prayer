@@ -18,7 +18,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerName, PrayerTimeEntry, TRACKABLE_PRAYERS } from "@/types/prayer.types";
 import { toDateKey } from "@/utils/dateKey";
 import { isTimePast } from "@/utils/timeString";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
@@ -137,26 +137,14 @@ export default function HomeScreen() {
 
                 {/* 1. COUNTDOWN CARD */}
                 <AppCard style={styles.countdownCard}>
-                    {/* Location Header */}
-                    <View style={[styles.locationHeader, { backgroundColor: 'rgba(0,0,0,0.02)', borderBottomColor: theme.divider3 }]}>
-                        <MaterialCommunityIcons name="map-marker-circle" size={16} color={theme.accent} style={{ opacity: 0.6 }} />
-                        <Text style={[styles.locationHeaderText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
-                            {timeZone?.location || "Location"}
-                            {/* Saint-Remy-en-Bouzemont-Saint-Genest-et-Isson, France, Europe, Earth, Solar System, Milky Way, Universe */}
-                        </Text>
-                    </View>
-
-                    {/* Countdown Circle */}
-                    <View style={styles.countdownBody}>
-                        <PrayerCountdownCard
-                            prayerTimes={prayerTimes}
-                            onCurrentPrayerChange={setCurrentPrayerName}
-                            size={158}
-                            strokeWidth={6}
-                            strokeColor={theme.border}
-                            color={theme.accent}
-                        />
-                    </View>
+                    <PrayerCountdownCard
+                        prayerTimes={prayerTimes}
+                        onCurrentPrayerChange={setCurrentPrayerName}
+                        size={158}
+                        strokeWidth={6}
+                        strokeColor={theme.border}
+                        color={theme.accent}
+                    />
                 </AppCard>
 
                 {/* 3. QUOTES Carousel CARD */}
@@ -185,7 +173,7 @@ export default function HomeScreen() {
                         </View>
                         {/* Center: Date & Timezone Container */}
                         <View style={styles.dateContainer}>
-                            <Text style={[styles.dateHeaderText, { color: theme.text }]}>
+                            <Text style={[styles.dateHeaderText, { color: theme.text2 }]}>
                                 {new Date().toLocaleDateString(tr.labels.localeDate, {
                                     weekday: "long",
                                     day: "2-digit",
@@ -193,9 +181,12 @@ export default function HomeScreen() {
                                     year: "numeric",
                                 }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                             </Text>
-                            <Text style={[styles.prayersTimezoneInfo, { color: theme.text2 }]}>
-                                {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
-                            </Text>
+                            <View style={styles.locationInfo}>
+                                <MaterialIcons name="my-location" size={14} color={theme.accent} />
+                                <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
+                                    {timeZone?.location || "Location"}
+                                </Text>
+                            </View>
                         </View>
                         {/* Right: Chevron icon */}
                         <View style={styles.chevronRightIcon}>
@@ -330,26 +321,6 @@ const styles = StyleSheet.create({
 
     // Countdown Card
     countdownCard: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-        overflow: 'hidden',
-    },
-    locationHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderBottomWidth: 1,
-        gap: 5,
-    },
-    locationHeaderText: {
-        flex: 1,
-        fontSize: 12,
-        fontWeight: '500',
-        opacity: 0.6,
-    },
-    countdownBody: {
         paddingVertical: 10,
         paddingHorizontal: 8,
     },
@@ -386,6 +357,16 @@ const styles = StyleSheet.create({
     },
     prayersTimezoneInfo: {
         fontSize: 12,
+        opacity: 0.7,
+    },
+    locationInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        maxWidth: '100%',
+        gap: 5,
+    },
+    locationInfoText: {
+        fontSize: 13,
         opacity: 0.7,
     },
     calendarLeftIcon: {
