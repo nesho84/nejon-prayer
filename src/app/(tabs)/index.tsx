@@ -35,6 +35,7 @@ export default function HomeScreen() {
     const timeZone = useLocationStore((state) => state.timeZone);
     const locationReady = useLocationStore.getState().isReady;
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
+    const prayerTimesDate = usePrayersStore((state) => state.prayerTimesDate);
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
@@ -44,6 +45,9 @@ export default function HomeScreen() {
 
     // Local state
     const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
+
+    // True only when the loaded prayer times are for today — gates highlighting and marking
+    const isToday = prayerTimesDate === toDateKey();
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -203,8 +207,8 @@ export default function HomeScreen() {
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
                             const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
-                            const isPast = isTrackable && isTimePast(prayerTime);
-                            const isCurrent = currentPrayerName === prayerName;
+                            const isPast = isTrackable && isToday && isTimePast(prayerTime);
+                            const isCurrent = isToday && currentPrayerName === prayerName;
                             const isLast = index === arr.length - 1;
                             const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 

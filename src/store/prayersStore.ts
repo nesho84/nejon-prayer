@@ -12,6 +12,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface PrayersState {
   prayerTimes: PrayerTimes | null;
+  prayerTimesDate: string | null;
   prayersError: string | null;
   prayersOutdated: boolean;
   lastFetchedDate: string | null;
@@ -28,6 +29,7 @@ export const usePrayersStore = create<PrayersState>()(
   persist(
     (set, get) => ({
       prayerTimes: null,
+      prayerTimesDate: null,
       prayersError: null,
       prayersOutdated: false,
       lastFetchedDate: null,
@@ -38,7 +40,7 @@ export const usePrayersStore = create<PrayersState>()(
 
       // Load prayer times (uses existing location)
       loadPrayerTimes: async () => {
-        set({ isLoading: true, prayersError: null, prayersOutdated: false });
+        set({ prayersError: null, prayersOutdated: false });
 
         try {
           const location = useLocationStore.getState().location;
@@ -47,7 +49,7 @@ export const usePrayersStore = create<PrayersState>()(
 
           // Validate location first
           if (!location) {
-            set({ prayerTimes: null, prayersError: tr.labels.locationSet });
+            set({ prayerTimes: null, prayerTimesDate: null, prayersError: tr.labels.locationSet });
             return;
           }
 
@@ -58,15 +60,19 @@ export const usePrayersStore = create<PrayersState>()(
 
           const { yearlyPrayerTimes, fetchedYear } = get();
 
-          // Already have data for this year — derive today's times locally
+          // Fast path: already have data for this year — update silently (no loading indicator)
+          // This avoids unmounting UI components that depend on prayerTimes (e.g. midnight reload)
           if (yearlyPrayerTimes && fetchedYear === currentYear) {
             const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
             if (todaysTimes) {
-              set({ prayerTimes: todaysTimes, prayersOutdated: false });
+              set({ prayerTimes: todaysTimes, prayerTimesDate: todayKey, prayersOutdated: false });
               console.log('💾 [prayersStore] Prayer times loaded from stored yearly data');
               return;
             }
           }
+
+          // Slow path: need a network fetch — show loading indicator
+          set({ isLoading: true });
 
           // ONLINE: Need to fetch — first time, new year, or cache miss
           if (internetConnection) {
@@ -77,6 +83,7 @@ export const usePrayersStore = create<PrayersState>()(
                 yearlyPrayerTimes: yearly,
                 fetchedYear: currentYear,
                 prayerTimes: yearly[todayKey] ?? null,
+                prayerTimesDate: todayKey,
                 lastFetchedDate: new Date().toLocaleString('en-GB'),
                 prayersOutdated: false,
               });
@@ -93,6 +100,7 @@ export const usePrayersStore = create<PrayersState>()(
           if (yearlyPrayerTimes) {
             set({
               prayerTimes: yearlyPrayerTimes[todayKey] ?? null,
+              prayerTimesDate: todayKey,
               prayersOutdated: fetchedYear !== currentYear,
             });
             console.log('💾 [prayersStore] Offline — using stored yearly data');
@@ -103,6 +111,7 @@ export const usePrayersStore = create<PrayersState>()(
           // No data at all
           set({
             prayerTimes: null,
+            prayerTimesDate: null,
             prayersError: !internetConnection ? tr.labels.noInternet : tr.labels.prayersError,
           });
 
@@ -164,6 +173,7 @@ export const usePrayersStore = create<PrayersState>()(
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         prayerTimes: state.prayerTimes,
+        prayerTimesDate: state.prayerTimesDate,
         lastFetchedDate: state.lastFetchedDate,
         yearlyPrayerTimes: state.yearlyPrayerTimes,
         fetchedYear: state.fetchedYear,
