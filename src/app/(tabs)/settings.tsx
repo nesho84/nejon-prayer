@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         paddingBottom: 24,
         paddingHorizontal: 8,
-        gap: 12,
+        gap: 10,
     },
 
     // Settings Card
