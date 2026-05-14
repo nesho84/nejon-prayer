@@ -1,4 +1,5 @@
 import { PrayerCountdown, PrayerEntry, PrayerName, PrayerTimes } from '@/types/prayer.types';
+import { isTimePast } from '@/utils/timeString';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
 import { AppState } from 'react-native';
@@ -63,10 +64,15 @@ function getNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; tim
 // ------------------------------------------------------------
 function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {
     const idx = PRAYER_ORDER.indexOf(nextPrayerName);
-    if (idx <= 0) return null; // next prayer is Fajr (idx=0), so no prayer is currently active
+    if (idx === 0) {
+        if (isTimePast(prayerTimes.Isha)) return { name: "Isha", time: prayerTimes.Isha };
+        return null;
+    }
+    if (idx < 0) return null;
     const name = PRAYER_ORDER[idx - 1];
     const time = prayerTimes[name];
     if (!time) return null;
+
     return { name, time };
 }
 
@@ -80,6 +86,7 @@ function getPrevPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): Pr
     const prevName = idx === 0 ? FULL_DAY_ORDER[FULL_DAY_ORDER.length - 1] : FULL_DAY_ORDER[idx - 1];
     const prevTime = prayerTimes[prevName];
     if (!prevTime) return null;
+
     return { name: prevName, time: prevTime };
 }
 
@@ -93,6 +100,7 @@ function getAfterNextPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName
     const afterName = FULL_DAY_ORDER[(idx + 1) % FULL_DAY_ORDER.length];
     const afterTime = prayerTimes[afterName];
     if (!afterTime) return null;
+
     return { name: afterName, time: afterTime };
 }
 
