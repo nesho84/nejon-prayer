@@ -256,7 +256,7 @@ export default function PrayersSettingsScreen() {
                     {/* Timezone Container */}
                     <View style={styles.timezoneContainer}>
                         <View style={styles.timezoneInfo}>
-                            <Ionicons name="globe-outline" size={17} color={theme.text2} style={{ marginTop: 2 }} />
+                            <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginTop: 2 }} />
                             <Text style={[styles.timezoneTitle, { color: theme.text2 }]}>
                                 {timeZone?.location || ""}
                             </Text>
@@ -267,7 +267,7 @@ export default function PrayersSettingsScreen() {
                     </View>
 
                     {/* Divider */}
-                    <View style={[styles.fullDivider, { backgroundColor: theme.divider }]} />
+                    <View style={[styles.fullDivider, { backgroundColor: theme.divider2 }]} />
 
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         paddingBottom: 14,
         paddingHorizontal: 8,
-        gap: 14,
+        gap: 10,
     },
 
     // Header styles
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 12,
     },
     timezoneInfo: {

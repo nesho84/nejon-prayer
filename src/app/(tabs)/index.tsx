@@ -171,6 +171,7 @@ export default function HomeScreen() {
                         <View style={styles.calendarLeftIcon}>
                             <Ionicons name="calendar-outline" size={22} color={theme.text} style={{ opacity: 0.6 }} />
                         </View>
+
                         {/* Center: Date & Timezone Container */}
                         <View style={styles.dateContainer}>
                             <Text style={[styles.dateHeaderText, { color: theme.text2 }]}>
@@ -182,12 +183,13 @@ export default function HomeScreen() {
                                 }).replace(/^\p{L}|\s\p{L}/gu, c => c.toUpperCase())}
                             </Text>
                             <View style={styles.locationInfo}>
-                                <MaterialIcons name="my-location" size={14} color={theme.accent} />
+                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginTop: 0.7 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                     {timeZone?.location || "Location"}
                                 </Text>
                             </View>
                         </View>
+
                         {/* Right: Chevron icon */}
                         <View style={styles.chevronRightIcon}>
                             <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.5 }} />
@@ -327,8 +329,8 @@ const styles = StyleSheet.create({
 
     // Quotes Card
     quotesCard: {
-        paddingTop: 9,
-        paddingBottom: 11,
+        paddingTop: 8,
+        paddingBottom: 10,
         paddingHorizontal: 12,
     },
 
@@ -342,7 +344,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 12,
     },
     dateContainer: {
@@ -351,8 +353,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     dateHeaderText: {
-        fontSize: 16,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '500',
         marginBottom: 4,
     },
     prayersTimezoneInfo: {
@@ -363,11 +365,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         maxWidth: '100%',
+        opacity: 0.7,
         gap: 5,
     },
     locationInfoText: {
         fontSize: 13,
-        opacity: 0.7,
+        letterSpacing: 0.3,
     },
     calendarLeftIcon: {
         width: 32,
