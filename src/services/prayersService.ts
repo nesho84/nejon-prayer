@@ -21,6 +21,42 @@ interface AladhanCalendarResponse {
 // Prayers we care about — others (Sunset, Midnight, etc.) are excluded
 const PRAYER_NAMES: PrayerName[] = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
+// Method 3: Muslim World League (MWL)
+// The most widely accepted global baseline, used by major worldwide prayer apps.
+// Consistent and predictable for all coordinates — avoids unpredictable auto-detection
+// which picks by geographic proximity and can apply wrong regional authorities
+// (e.g. French UOIF parameters for Vienna instead of Turkish Diyanet).
+const ALADHAN_METHOD = 3;
+
+// Latitude Adjustment Method 2: One Seventh of the Night
+// Required for high-latitude regions (Europe, Canada, northern US, Russia, etc.)
+// where standard angle-based Fajr/Isha calculation breaks down in summer due to
+// persistent twilight. ONE_SEVENTH divides the night into 7 equal parts and
+// derives Fajr/Isha proportionally. Has zero effect at normal latitudes —
+// angle-based calculation is used as-is there.
+const ALADHAN_LATITUDE_ADJUSTMENT = 2;
+
+// ------------------------------------------------------------
+// TODO: Future — User Calculation Preferences (Advanced Settings)
+// ------------------------------------------------------------
+// Allow advanced users to override the default calculation settings:
+//
+// 1. Calculation Method: Default is MWL (3). Users could select their local
+//    authority (e.g. Diyanet for Turkey, Egyptian for Egypt, etc.) to match
+//    their neighborhood mosque exactly.
+//
+// 2. Latitude Adjustment: Default is ONE_SEVENTH (2). Could be exposed for
+//    users who prefer ANGLE_BASED (3) or MIDDLE_OF_NIGHT (1).
+//
+// 3. Asr School: Default is Standard/Shafi (school=0). Should be toggleable
+//    to Hanafi (school=1) for users in South Asia (Pakistan, India, Bangladesh).
+//
+// These preferences would be stored in Zustand/MMKV and passed into the
+// getYearlyPrayerTimes() call, replacing the constants above.
+// A cache invalidation (bump storage key or reset fetchedYear) would be
+// required whenever the user changes any of these settings.
+// ------------------------------------------------------------
+
 // ------------------------------------------------------------
 // Fetch yearly prayer times from aladhan.com API
 // Fetched once per year, on first app start and on location change.
@@ -39,31 +75,8 @@ export async function getYearlyPrayerTimes(location: AppLocation, year: number):
     let timeout: ReturnType<typeof setTimeout> | undefined;
 
     try {
-        // Dynamically choose calculation method based on latitude
-        let method: number = 2; // fallback ISNA
-        let methodSettings: string | null = null;
-        let tune: string | null = null;
-
-        // Approximate Europe / Balkans regions
-        if (latitude >= 41 && latitude <= 50) {
-            method = 13; // Turkey Diyanet default
-            tune = "1,55,0,0,0,0,0,0,0"; // example: +1 min Imsak, +55 min Fajr
-
-            // Southern Balkans: Albania, Kosovo, Bosnia, Macedonia (~41-44°)
-            if (latitude < 44) {
-                method = 99;
-                methodSettings = "15,null,17"; // Fajr 15°, Isha 17°
-            }
-        }
-
-        // Build API URL
-        let url = `https://api.aladhan.com/v1/calendar/${year}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
-        if (method === 99 && methodSettings) {
-            url += `&methodSettings=${encodeURIComponent(methodSettings)}`;
-        }
-        if (tune) {
-            url += `&tune=${encodeURIComponent(tune)}`;
-        }
+        // Aldhan API URL with query parameters for method, location, and optional tuning
+        const url = `https://api.aladhan.com/v1/calendar/${year}?latitude=${latitude}&longitude=${longitude}&method=${ALADHAN_METHOD}&latitudeAdjustmentMethod=${ALADHAN_LATITUDE_ADJUSTMENT}`;
 
         // Fetch yearly calendar with AbortController (30s timeout for larger payload)
         const controller = new AbortController();
@@ -71,12 +84,11 @@ export async function getYearlyPrayerTimes(location: AppLocation, year: number):
 
         const response = await fetch(url, { signal: controller.signal });
 
-        // Check if response is ok
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Get the results
+        // Get JSON response
         const result: AladhanCalendarResponse = await response.json();
 
         // Validate response structure
@@ -106,7 +118,7 @@ export async function getYearlyPrayerTimes(location: AppLocation, year: number):
             });
         });
 
-        console.log(`✅ [prayersService] Fetched prayer times for ${Object.keys(prayerTimes).length} days for ${year} from API`);
+        console.log(`✅ [prayersService] Fetched prayer times for ${Object.keys(prayerTimes).length} days for ${year} from Aladhan API`);
 
         return prayerTimes;
 

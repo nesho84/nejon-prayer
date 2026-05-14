@@ -160,7 +160,7 @@ export const usePrayersStore = create<PrayersState>()(
 
     }),
     {
-      name: 'prayers-storage-v2',
+      name: 'prayers-storage-v3',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         prayerTimes: state.prayerTimes,
