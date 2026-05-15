@@ -182,6 +182,7 @@ export async function getTimeZoneInfo(coordinates: Cords): Promise<TimeZone | nu
 
         const city = place?.city || place?.region || "";
         const country = place?.country || "";
+        const countryCode = place?.isoCountryCode || "";
 
         // Timezone works offline
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -207,6 +208,7 @@ export async function getTimeZoneInfo(coordinates: Cords): Promise<TimeZone | nu
             offset,                 // "GMT+2"
             city,                   // "Vienna"
             country,                // "Austria"
+            countryCode,            // "AT"
             location: locationName, // "Vienna, Austria"
             offline: !place,        // mark if we were offline
         };

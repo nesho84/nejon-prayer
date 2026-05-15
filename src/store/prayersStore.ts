@@ -44,6 +44,7 @@ export const usePrayersStore = create<PrayersState>()(
 
         try {
           const location = useLocationStore.getState().location;
+          const countryCode = useLocationStore.getState().timeZone?.countryCode ?? "";
           const internetConnection = useDeviceSettingsStore.getState().internetConnection;
           const tr = useLanguageStore.getState().tr;
 
@@ -77,7 +78,7 @@ export const usePrayersStore = create<PrayersState>()(
           // ONLINE: Need to fetch — first time, new year, or cache miss
           if (internetConnection) {
             try {
-              const yearly = await getYearlyPrayerTimes(location, currentYear);
+              const yearly = await getYearlyPrayerTimes(location, currentYear, countryCode);
 
               set({
                 yearlyPrayerTimes: yearly,
