@@ -7,7 +7,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
-import { PrayerName } from "@/types/prayer.types";
+import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -181,8 +181,9 @@ export default function PrayersSettingsScreen() {
         }
 
         // Determine if this is a prayer or event
-        const isPrayer = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].includes(prayerName);
-        const isEvent = ['Imsak', 'Sunrise'].includes(prayerName);
+        const isPrayer = MAIN_PRAYERS.includes(prayerName as PrayerName);
+        const isEvent = PRAYER_EVENTS.includes(prayerName as PrayerName);
+
         // Prepare settings object to save
         const settings = { enabled: enabled, offset: selectedOffset, sound: selectedSound };
 

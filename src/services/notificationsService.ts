@@ -3,7 +3,7 @@ import { SOUNDS } from "@/constants/sounds";
 import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
-import { PrayerTimes } from "@/types/prayer.types";
+import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
 import { toDateKey } from '@/utils/dateKey';
 import { getNotificationTriggerTime } from '@/utils/timeString';
 import * as Sentry from '@sentry/react-native';
@@ -24,8 +24,8 @@ interface ScheduleParams {
   hasAlarm?: boolean;
 }
 
-const PRAYERS: PrayerType[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const EVENTS: PrayerEventType[] = ['Imsak', 'Sunrise'];
+const PRAYERS = MAIN_PRAYERS as PrayerType[];
+const EVENTS = PRAYER_EVENTS as PrayerEventType[];
 
 // ------------------------------------------------------------
 // MAIN SCHEDULING: Called in notificationsStore when prayer times or settings change

@@ -1,5 +1,5 @@
 import { AppLocation } from '@/types/location.types';
-import { PrayerName, PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
+import { ALL_PRAYERS, PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
 
 interface AladhanTimings {
     [key: string]: string;
@@ -17,9 +17,6 @@ interface AladhanDayData {
 interface AladhanCalendarResponse {
     data?: Record<string, AladhanDayData[]>; // { "1": [...], "2": [...], ... }
 }
-
-// Prayers we care about — others (Sunset, Midnight, etc.) are excluded
-const PRAYER_NAMES: PrayerName[] = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 // Latitude Adjustment Method 2: One Seventh of the Night
 // Required for high-latitude regions (Europe, Canada, northern US, Russia, etc.)
@@ -176,7 +173,7 @@ export async function getYearlyPrayerTimes(location: AppLocation, year: number, 
 
                 // Filter to only needed prayers and strip timezone suffix
                 const filtered: Partial<PrayerTimes> = {};
-                PRAYER_NAMES.forEach((key) => {
+                ALL_PRAYERS.forEach((key) => {
                     if (day.timings[key]) {
                         filtered[key] = day.timings[key].split(" ")[0];
                     }

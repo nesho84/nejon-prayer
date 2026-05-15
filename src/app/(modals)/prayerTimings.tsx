@@ -7,7 +7,7 @@ import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
-import { PrayerName, PrayerTimeEntry, PrayerTimes, TRACKABLE_PRAYERS } from "@/types/prayer.types";
+import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { toDateKey } from "@/utils/dateKey";
 import { isTimePast } from "@/utils/timeString";
 import { Ionicons } from "@expo/vector-icons";
@@ -278,7 +278,7 @@ export default function PrayersSettingsScreen() {
                         ) : prayerEntries.length > 0 ? (
                             prayerEntries.map(([prayerName, prayerTime], index) => {
                                 const isLast = index === prayerEntries.length - 1;
-                                const isTrackable = TRACKABLE_PRAYERS.includes(prayerName as PrayerName);
+                                const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
                                 const isPast = isTrackable && (isSelectedPastDay || (isSelectedToday && isTimePast(prayerTime)));
                                 const isPrayed = isTrackable && tracking[selectedDateKey]?.[prayerName as PrayerName] === 'prayed';
 

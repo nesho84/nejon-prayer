@@ -1,4 +1,4 @@
-import { PrayerCountdown, PrayerEntry, PrayerName, PrayerTimes } from '@/types/prayer.types';
+import { ALL_PRAYERS, MAIN_PRAYERS, PrayerCountdown, PrayerEntry, PrayerName, PrayerTimes } from '@/types/prayer.types';
 import { isTimePast } from '@/utils/timeString';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useRef, useState } from "react";
@@ -15,12 +15,6 @@ interface NextPrayerType {
     afterNextPrayer: PrayerEntry | null;
 }
 
-// Order of the 5 main prayers, used to determine current prayer and next prayer
-const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
-// Full chronological day order — used only for the side-column display (prevPrayer / afterNextPrayer).
-const FULL_DAY_ORDER: PrayerName[] = ["Imsak", "Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
 // ------------------------------------------------------------
 // Find the next upcoming prayer and the previous one that just passed.
 // ------------------------------------------------------------
@@ -30,7 +24,7 @@ function getNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; tim
     const now = new Date();
     let previousPrayer: Date | null = null;
 
-    for (const name of PRAYER_ORDER) {
+    for (const name of MAIN_PRAYERS) {
         const timeStr = prayerTimes[name];
         if (!timeStr) continue;
 
@@ -63,7 +57,7 @@ function getNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; tim
 // if next is Fajr (nothing has started yet today).
 // ------------------------------------------------------------
 function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, nextPrayerTime: Date): PrayerEntry | null {
-    const idx = PRAYER_ORDER.indexOf(nextPrayerName);
+    const idx = MAIN_PRAYERS.indexOf(nextPrayerName);
 
     // Not a main prayer (Imsak, Sunrise)
     if (idx < 0) return null;
@@ -80,7 +74,7 @@ function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, 
         return null;
     }
     // Default → prayer just before next is current
-    const name = PRAYER_ORDER[idx - 1];
+    const name = MAIN_PRAYERS[idx - 1];
     const time = prayerTimes[name];
 
     return time ? { name, time } : null;
@@ -91,9 +85,9 @@ function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, 
 // Used only for the countdown card left side-column display.
 // ------------------------------------------------------------
 function getPrevPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {
-    const idx = FULL_DAY_ORDER.indexOf(nextPrayerName);
+    const idx = ALL_PRAYERS.indexOf(nextPrayerName);
     if (idx === -1) return null;
-    const prevName = idx === 0 ? FULL_DAY_ORDER[FULL_DAY_ORDER.length - 1] : FULL_DAY_ORDER[idx - 1];
+    const prevName = idx === 0 ? ALL_PRAYERS[ALL_PRAYERS.length - 1] : ALL_PRAYERS[idx - 1];
     const prevTime = prayerTimes[prevName];
     if (!prevTime) return null;
 
@@ -105,9 +99,9 @@ function getPrevPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): Pr
 // Used only for the countdown card right side-column display.
 // ------------------------------------------------------------
 function getAfterNextPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {
-    const idx = FULL_DAY_ORDER.indexOf(nextPrayerName);
+    const idx = ALL_PRAYERS.indexOf(nextPrayerName);
     if (idx === -1) return null;
-    const afterName = FULL_DAY_ORDER[(idx + 1) % FULL_DAY_ORDER.length];
+    const afterName = ALL_PRAYERS[(idx + 1) % ALL_PRAYERS.length];
     const afterTime = prayerTimes[afterName];
     if (!afterTime) return null;
 
