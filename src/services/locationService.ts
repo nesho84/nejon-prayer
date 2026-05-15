@@ -1,15 +1,14 @@
+import { Translations } from '@/types/language.types';
 import { Cords, LocationData, TimeZone } from '@/types/location.types';
 import NetInfo from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
 import * as Location from 'expo-location';
 import { Alert, Linking } from 'react-native';
 
-type Translations = Record<string, any> | null;
-
 // ------------------------------------------------------------
 // Get user's current location with address and timezone information
 // ------------------------------------------------------------
-export async function getUserLocation(tr: Translations): Promise<LocationData | null> {
+export async function getUserLocation(tr: Translations | null): Promise<LocationData | null> {
     try {
         // Request location permission first
         const { status, canAskAgain } = await Location.requestForegroundPermissionsAsync();

@@ -16,18 +16,3 @@ export const keyToDate = (dateKey: string): Date => {
   return new Date(y, m - 1, d);
 };
 
-// ------------------------------------------------------------
-// Resolves the prayer date to use for tracking
-// if the prayerDate from the notification is today or yesterday, use it; otherwise, default to today
-// This handles edge cases where a user might mark a prayer as done after midnight,
-// but the notification's prayerDate is from the previous day
-// ------------------------------------------------------------
-export function resolveTrackingDate(prayerDate?: string): string {
-  const today = toDateKey();
-
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  const yesterday = toDateKey(d);
-
-  return prayerDate === today || prayerDate === yesterday ? prayerDate : today;
-}
