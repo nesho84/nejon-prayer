@@ -36,7 +36,7 @@ export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, is
             <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
           </View>
         </View>
-        <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.text2 }]}>
+        <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.placeholder }]}>
           {dateNumber}
         </Text>
       </TouchableOpacity>
@@ -60,7 +60,7 @@ export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, is
           <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
         </View>
       </View>
-      <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.text2 }]}>
+      <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.placeholder }]}>
         {isEmpty ? ' ' : dateNumber}
       </Text>
     </View>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: 99,
   },
   dateNum: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
   },
 });

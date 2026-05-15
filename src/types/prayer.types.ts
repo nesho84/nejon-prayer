@@ -7,9 +7,9 @@ export interface PrayerEntry {
 }
 
 export interface PrayerTimes {
-  Imsak?: string;    // "05:55"
+  Imsak: string;     // "05:55"
   Fajr: string;      // "06:15"
-  Sunrise?: string;  // "07:30"
+  Sunrise: string;   // "07:30"
   Dhuhr: string;     // "12:30"
   Asr: string;       // "15:45"
   Maghrib: string;   // "18:20"

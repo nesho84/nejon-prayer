@@ -69,7 +69,7 @@ export default function PrayerProgressCard() {
         {/* Day names header — shared by both views */}
         <View style={styles.dayNamesRow}>
           {tr.labels.dayNames.map((d) => (
-            <Text key={d} style={[styles.dayNameText, { color: theme.text2 }]}>{d}</Text>
+            <Text key={d} style={[styles.dayNameText, { color: theme.placeholder }]}>{d}</Text>
           ))}
         </View>
 
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   dayNameText: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     textTransform: 'uppercase',
   },

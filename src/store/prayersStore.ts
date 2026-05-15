@@ -107,7 +107,6 @@ export const usePrayersStore = create<PrayersState>()(
             return;
           }
 
-
           // No data at all
           set({
             prayerTimes: null,

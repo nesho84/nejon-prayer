@@ -180,7 +180,7 @@ export default function PrayersSettingsScreen() {
     return (
         <ModalSheet
             ref={ModalSheetRef}
-            size="xlx"
+            size="xxl"
             colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
             footer={<FixedFooter />}
         >

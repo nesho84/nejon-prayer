@@ -62,18 +62,28 @@ function getNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; tim
 // Returns the prayer just before nextPrayerName in PRAYER_ORDER, or null
 // if next is Fajr (nothing has started yet today).
 // ------------------------------------------------------------
-function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {
+function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, nextPrayerTime: Date): PrayerEntry | null {
     const idx = PRAYER_ORDER.indexOf(nextPrayerName);
+
+    // Not a main prayer (Imsak, Sunrise)
+    if (idx < 0) return null;
+
+    // idx === 0 means next prayer is Fajr.
+    // If Fajr is tomorrow → we're in the post-Isha overnight window → highlight Isha.
+    // If Fajr is today    → we're before Fajr (e.g. 02:00) → nothing highlighted.
     if (idx === 0) {
-        if (isTimePast(prayerTimes.Isha)) return { name: "Isha", time: prayerTimes.Isha };
+        const isTomorrow = nextPrayerTime.getDate() !== new Date().getDate();
+        return isTomorrow ? { name: "Isha", time: prayerTimes.Isha } : null;
+    }
+    // Fajr window closes at Sunrise
+    if (idx === 1 && isTimePast(prayerTimes.Sunrise)) {
         return null;
     }
-    if (idx < 0) return null;
+    // Default → prayer just before next is current
     const name = PRAYER_ORDER[idx - 1];
     const time = prayerTimes[name];
-    if (!time) return null;
 
-    return { name, time };
+    return time ? { name, time } : null;
 }
 
 // ------------------------------------------------------------
@@ -130,7 +140,7 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     const prevNextTimestampRef = useRef<number | null>(null);
 
     // Derived prayer entries — resolved from current nextPrayerName each render
-    const currentPrayer = prayerTimes && nextPrayerName ? getCurrentPrayer(prayerTimes, nextPrayerName) : null;
+    const currentPrayer = prayerTimes && nextPrayerName && nextPrayerTime ? getCurrentPrayer(prayerTimes, nextPrayerName, nextPrayerTime) : null;
     const prevPrayer = prayerTimes && nextPrayerName ? getPrevPrayer(prayerTimes, nextPrayerName) : null;
     const afterNextPrayer = prayerTimes && nextPrayerName ? getAfterNextPrayer(prayerTimes, nextPrayerName) : null;
 

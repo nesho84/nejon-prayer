@@ -14,6 +14,7 @@ export interface TimeZone {
   offset: string;
   city: string;
   country: string;
+  countryCode: string; // ISO 3166-1 alpha-2, e.g. "AT", "DE", "TR"
   location: string;
   offline: boolean;
 }
