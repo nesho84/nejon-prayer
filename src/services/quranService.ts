@@ -1,29 +1,4 @@
-// ------------------------------------------------------------
-// Types
-// ------------------------------------------------------------
-export interface Verse {
-  id: number;              // Verse number within the surah
-  text: string;            // Arabic (Uthmani) text
-  transliteration: string; // Bismillaahir Rahmaanir Raheem
-}
-
-export interface Ayah {
-  number: number;          // global ayah number (1–6236)
-  numberInSurah: number;   // ayah number within surah (1–N)
-  text: string;            // text in the fetched language/edition
-}
-
-export interface Surah {
-  id: number;              // 1–114
-  name: string;            // Arabic: الفاتحة
-  transliteration: string; // Al-Fatihah
-  translation: string;     // English: The Opener
-  type: string;            // meccan | medinan
-  total_verses: number;    // Total verses in this surah
-  verses?: Verse[];        // present in full quran, absent in surahs list
-}
-
-export type Quran = Surah[];
+import { Ayah, Quran } from '@/types/quran.types';
 
 // ------------------------------------------------------------
 // Load the full Quran from the local JSON asset

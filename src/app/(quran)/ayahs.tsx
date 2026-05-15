@@ -2,7 +2,7 @@ import AppError from '@/components/AppError';
 import AppLoading from '@/components/AppLoading';
 import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
-import { Verse } from '@/services/quranService';
+import { Verse } from '@/types/quran.types';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';

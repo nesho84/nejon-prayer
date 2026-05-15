@@ -1,4 +1,4 @@
-import { Verse } from "@/services/quranService";
+import { Verse } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";

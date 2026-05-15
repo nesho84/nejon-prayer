@@ -1,4 +1,5 @@
-import { Ayah, fetchAyahsFromApi, loadQuranTransliterationJson, Quran, QURAN_TEXT_EDITIONS, Surah } from "@/services/quranService";
+import { Ayah, FavoriteAyah, Quran, Surah } from '@/types/quran.types';
+import { fetchAyahsFromApi, loadQuranTransliterationJson, QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
 import { create } from "zustand";
@@ -24,14 +25,6 @@ type AyahsData = {
   lastKhatamSurahName: string | null;
   lastKhatamAyahId: number | null;
   khatamCount: number;
-}
-
-export type FavoriteAyah = {
-  surahId: number;
-  surahName: string;
-  ayahId: number;     // verse number within the surah
-  arabicText: string; // stored at save time — works offline
-  translation: string | null; // stored at save time, null if Arabic language
 }
 
 type AyahFavoritesData = {

@@ -1,7 +1,8 @@
 import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
 import { useLanguageStore } from '@/store/languageStore';
-import { FavoriteAyah, useQuranStore } from '@/store/quranStore';
+import { FavoriteAyah } from '@/types/quran.types';
+import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';

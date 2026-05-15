@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import { Surah } from "@/services/quranService";
+import { Surah } from '@/types/quran.types';
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
