@@ -22,6 +22,10 @@ export const LIGHT_COLORS = {
     success: "#16a34a",
     warning: "#facc15de",
     info: "#0284c7",
+    pink: "#db2777",
+    brown: "#92400e",
+    gray: "#808080",
+    green: "#15803d",
 
     // Surfaces
     card: "#f1f1f1",
@@ -77,6 +81,10 @@ export const DARK_COLORS = {
     success: "#4ade80",
     warning: "#fde047",
     info: "#60a5fa",
+    pink: "#f472b6",
+    brown: "#d97706",
+    gray: "#808080",
+    green: "#059669",
 
     // Surfaces
     card: "#1f2937",

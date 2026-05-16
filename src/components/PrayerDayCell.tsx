@@ -14,31 +14,49 @@ export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, is
   // Stores
   const theme = useThemeStore((state) => state.theme);
 
-  // Derived styles
-  const barColor = !isFuture ? (count === 5 ? theme.accent2 : theme.danger) : theme.danger;
+  // Derived values
+  const isPast = !isFuture && !isEmpty;
   const barWidth = `${(count / 5) * 100}%` as const;
 
-  // Tappable cell — past or today, non-empty
-  if (onPress && !isEmpty && !isFuture) {
-    return (
-      <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.6} delayPressIn={0}>
-        <View style={[
-          styles.box,
-          { backgroundColor: theme.card, borderColor: isToday ? theme.accent2 : theme.borderCard },
-        ]}>
-          <Text style={[styles.fraction, {
-            color: isToday ? theme.accent2 : theme.text2,
-            opacity: 0.8,
-          }]}>
-            {`${count}/5`}
-          </Text>
-          <View style={[styles.barTrack, { opacity: 0.8 }]}>
-            <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
-          </View>
-        </View>
-        <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.placeholder }]}>
-          {dateNumber}
+  // Bar color mapping based on count
+  const barColorByCount: Record<number, string> = {
+    0: theme.placeholder,
+    1: theme.danger,
+    2: theme.brown,
+    3: theme.gray,
+    4: theme.pink,
+    5: theme.green,
+  };
+
+  // Past dates: colored bar based on count
+  const barColor = isPast ? barColorByCount[count] : theme.placeholder;
+  const borderColor = isToday ? theme.accent2 : theme.borderCard;
+  const fractionColor = isToday ? theme.accent2 : theme.text2;
+  const cellOpacity = isEmpty ? 0 : isFuture ? 0.25 : 0.8;
+  const dateNumColor = isToday ? theme.accent2 : theme.placeholder;
+
+  // Cell base content
+  const cellContent = (
+    <>
+      <View style={[styles.box, { backgroundColor: theme.card, borderColor }]}>
+        <Text style={[styles.fraction, { color: fractionColor, opacity: cellOpacity }]}>
+          {isFuture ? '—' : `${count}/5`}
         </Text>
+        <View style={[styles.barTrack, { opacity: cellOpacity, backgroundColor: theme.divider }]}>
+          <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
+        </View>
+      </View>
+      <Text style={[styles.dateNum, { color: dateNumColor }]}>
+        {isEmpty ? ' ' : dateNumber}
+      </Text>
+    </>
+  );
+
+  // Tappable cell — past or today, non-empty
+  if (onPress && isPast) {
+    return (
+      <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.3} delayPressIn={0}>
+        {cellContent}
       </TouchableOpacity>
     );
   }
@@ -46,23 +64,7 @@ export default function PrayerDayCell({ count, isToday, isFuture, dateNumber, is
   // Static cell — future date, empty padding, or no onPress
   return (
     <View style={styles.container}>
-      <View style={[
-        styles.box,
-        { backgroundColor: theme.card, borderColor: isToday ? theme.accent2 : theme.borderCard },
-      ]}>
-        <Text style={[styles.fraction, {
-          color: !isFuture ? (isToday ? theme.accent2 : theme.text2) : theme.text2,
-          opacity: isEmpty ? 0 : (isFuture ? 0.25 : 0.8),
-        }]}>
-          {!isFuture ? `${count}/5` : '—'}
-        </Text>
-        <View style={[styles.barTrack, { opacity: isEmpty ? 0 : (isFuture ? 0.25 : 0.8) }]}>
-          <View style={[styles.barFill, { width: barWidth, backgroundColor: barColor }]} />
-        </View>
-      </View>
-      <Text style={[styles.dateNum, { color: isToday ? theme.accent2 : theme.placeholder }]}>
-        {isEmpty ? ' ' : dateNumber}
-      </Text>
+      {cellContent}
     </View>
   );
 }
@@ -88,10 +90,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   barTrack: {
-    width: '65%',
+    width: '70%',
     height: 4,
     borderRadius: 99,
-    backgroundColor: 'rgba(255,255,255,0.1)',
     overflow: 'hidden',
   },
   barFill: {
