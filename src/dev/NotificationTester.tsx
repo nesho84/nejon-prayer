@@ -2,6 +2,8 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useThemeStore } from "@/store/themeStore";
+import { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   debugChannelsAndScheduled,
   testDailyQuoteNotification,
@@ -9,9 +11,7 @@ import {
   testFridayNotification,
   testPrayerNotification,
   testPrayerReminderNotification,
-} from "@/tests/notifTest";
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+} from "./notifTest";
 
 const TEST_FUNCTIONS = [
   { label: "Prayer", func: testPrayerNotification },
