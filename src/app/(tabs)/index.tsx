@@ -60,21 +60,6 @@ export default function HomeScreen() {
     }, [deviceSettingsReady, locationReady]);
 
     // ------------------------------------------------------------
-    // Check for expo OTA updates on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (__DEV__) return; // Skip in dev mode
-        const checkForUpdates = async () => {
-            const update = await Updates.checkForUpdateAsync();
-            if (update.isAvailable) {
-                await Updates.fetchUpdateAsync();
-                Updates.reloadAsync();
-            }
-        };
-        checkForUpdates();
-    }, []);
-
-    // ------------------------------------------------------------
     // Handle prayer times refresh
     // ------------------------------------------------------------
     const handlePrayersRefresh = async () => {
@@ -84,6 +69,26 @@ export default function HomeScreen() {
             console.warn("Prayer times refresh failed:", err);
         }
     };
+
+    // ------------------------------------------------------------
+    // Check for expo OTA updates on mount
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (__DEV__) return; // Skip in dev mode
+        const checkForUpdates = async () => {
+            try {
+                const update = await Updates.checkForUpdateAsync();
+                if (update.isAvailable) {
+                    await Updates.fetchUpdateAsync();
+                    Updates.reloadAsync();
+                }
+            } catch {
+                // Network unavailable or EAS unreachable — silently ignore
+            }
+        };
+        checkForUpdates();
+    }, []);
+
 
     // Loading state
     if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady) {
