@@ -1,6 +1,9 @@
 # dependencies
 node_modules/
 
+# Test coverage
+coverage/
+
 # Expo
 .expo/
 .expo-shared/
