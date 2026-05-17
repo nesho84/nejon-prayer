@@ -1,7 +1,6 @@
 import AppCard from '@/components/AppCard';
 import PrayerDayCell from '@/components/PrayerDayCell';
 import { useLanguageStore } from '@/store/languageStore';
-import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendarGrid';
@@ -16,10 +15,6 @@ export default function PrayerProgressCard() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
-
-  // Subscribing to prayerTimes ensures this component re-renders when
-  // usePrayerTimesSync triggers a midnight reload, so today/weekDays/monthRows
-  const prayerTimes = usePrayersStore((state) => state.prayerTimes);
 
   // Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);

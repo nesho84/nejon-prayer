@@ -515,8 +515,10 @@ export async function handleNotificationEvent(
       if (notifType == 'prayer' || notifType == 'prayer-event') {
         if (sound) await startSound(sound, volume);
       }
+      // prayer-reminder fires minutes after snooze — its data.volume may be stale.
+      // Read fresh from notifSettings instead.
       else if (notifType == 'prayer-reminder') {
-        if (sound) await startSound(sound, volume);
+        if (sound) await startSound(sound, notifSettings?.volume ?? volume);
       }
       break;
 
@@ -540,11 +542,6 @@ export async function handleNotificationEvent(
           // "Remind me later" action button pressed (prayers only)
           console.log(`⏰ ${prefix} Notification "Remind me later" pressed. Trigger in (${snooze}min)...`);
 
-          // Get fresh settings from the Store (in case user updated them since the notification was scheduled)
-          const freshVolume = notifSettings?.volume ?? volume;
-          const freshVibration = notifSettings?.vibration ?? vibration;
-          const freshSnooze = notifSettings?.snooze ?? snooze;
-
           // Create prayer-reminder notification
           await notifee.createTriggerNotification(
             {
@@ -553,11 +550,10 @@ export async function handleNotificationEvent(
               body: reminderBody,
               data: {
                 type: 'prayer-reminder',
-                volume: String(freshVolume),
                 sound: SOUNDS.alarm1, // Default reminder sound
               },
               android: {
-                channelId: `nejonprayer-vib-${freshVibration}`,
+                channelId: `nejonprayer-vib-${vibration}`,
                 category: AndroidCategory.ALARM,
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,
@@ -576,7 +572,7 @@ export async function handleNotificationEvent(
             },
             {
               type: TriggerType.TIMESTAMP,
-              timestamp: Date.now() + freshSnooze * 60 * 1000,
+              timestamp: Date.now() + snooze * 60 * 1000,
               alarmManager: hasAlarm,
             }
           );

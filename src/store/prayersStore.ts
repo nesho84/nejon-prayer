@@ -40,7 +40,7 @@ export const usePrayersStore = create<PrayersState>()(
 
       // Load prayer times (uses existing location)
       loadPrayerTimes: async () => {
-        set({ prayersError: null, prayersOutdated: false });
+        set({ isLoading: true, prayersError: null, prayersOutdated: false });
 
         try {
           const location = useLocationStore.getState().location;
@@ -61,8 +61,7 @@ export const usePrayersStore = create<PrayersState>()(
 
           const { yearlyPrayerTimes, fetchedYear } = get();
 
-          // Fast path: already have data for this year — update silently (no loading indicator)
-          // This avoids unmounting UI components that depend on prayerTimes (e.g. midnight reload)
+          // Already have data for this year — derive today's times locally
           if (yearlyPrayerTimes && fetchedYear === currentYear) {
             const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
             if (todaysTimes) {
