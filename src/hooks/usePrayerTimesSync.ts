@@ -10,24 +10,16 @@ export function usePrayerTimesSync() {
   const loadedDateRef = useRef(toDateKey());
 
   useEffect(() => {
-    let timerId: ReturnType<typeof setTimeout>;
-
     // ------------------------------------------------------------
-    // Schedule a reload at the next midnight (foreground case)
+    // Poll every 60 seconds — catches midnight regardless of drift (foreground case)
     // ------------------------------------------------------------
-    const scheduleMidnightRefresh = () => {
-      const now = new Date();
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-      const msUntilMidnight = midnight.getTime() - now.getTime();
-
-      timerId = setTimeout(() => {
-        loadedDateRef.current = toDateKey();
+    const intervalId = setInterval(() => {
+      const todayKey = toDateKey();
+      if (todayKey !== loadedDateRef.current) {
+        loadedDateRef.current = todayKey;
         loadPrayerTimes();
-        scheduleMidnightRefresh();
-      }, msUntilMidnight);
-    };
-
-    scheduleMidnightRefresh();
+      }
+    }, 60_000);
 
     // ------------------------------------------------------------
     // Reload when app comes to foreground on a new day (background case)
@@ -45,7 +37,7 @@ export function usePrayerTimesSync() {
     });
 
     return () => {
-      clearTimeout(timerId);
+      clearInterval(intervalId);
       subscription.remove();
     };
   }, [loadPrayerTimes]);

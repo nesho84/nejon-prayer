@@ -45,9 +45,20 @@ export default function HomeScreen() {
 
     // Local state
     const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
+    // Ticks every 60s — guarantees HomeScreen re-renders at midnight so stale closures
+    // (isPast, isCurrent) are recalculated even if the Zustand subscription misses a beat
+    const [liveDate, setLiveDate] = useState(toDateKey());
 
     // True only when the loaded prayer times are for today — gates highlighting and marking
-    const isToday = prayerTimesDate === toDateKey();
+    const isToday = prayerTimesDate === liveDate;
+
+    // ------------------------------------------------------------
+    // Tick liveDate every 60s — midnight re-render guarantee
+    // ------------------------------------------------------------
+    useEffect(() => {
+        const id = setInterval(() => setLiveDate(toDateKey()), 60_000);
+        return () => clearInterval(id);
+    }, []);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -238,7 +249,6 @@ export default function HomeScreen() {
                                                 activeOpacity={0.3}
                                                 hitSlop={8}
                                                 onPress={() => {
-                                                    // console.log(tracking);
                                                     if (!isPast && !isCurrent) return;
                                                     isPrayed
                                                         ? unmarkPrayed(prayerName as PrayerName)
