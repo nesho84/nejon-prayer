@@ -5,14 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { AppState } from 'react-native';
 
 interface NextPrayerType {
+    prevPrayer: PrayerEntry | null;
+    currentPrayer: PrayerEntry | null;
     nextPrayerName: PrayerName | null;
     nextPrayerTime: Date | null;
+    afterNextPrayer: PrayerEntry | null;
     prayerCountdown: PrayerCountdown | null;
     remainingSeconds: number | null;
     totalSeconds: number;
-    currentPrayer: PrayerEntry | null;
-    prevPrayer: PrayerEntry | null;
-    afterNextPrayer: PrayerEntry | null;
 }
 
 // ------------------------------------------------------------
@@ -189,6 +189,15 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
         return () => clearInterval(interval);
     }, [prayerTimes, isFocused]);
 
-    return { nextPrayerName, nextPrayerTime, prayerCountdown, remainingSeconds, totalSeconds, currentPrayer, prevPrayer, afterNextPrayer };
+    return {
+        prevPrayer,
+        currentPrayer,
+        nextPrayerName,
+        nextPrayerTime,
+        afterNextPrayer,
+        prayerCountdown,
+        remainingSeconds,
+        totalSeconds
+    };
 }
 

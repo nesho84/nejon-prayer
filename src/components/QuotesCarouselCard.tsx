@@ -1,21 +1,19 @@
 import { QUOTES } from "@/constants/quotes";
+import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language } from "@/types/language.types";
 import { Ionicons } from "@expo/vector-icons";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
-
-interface Props {
-    language: Language;
-}
 
 const MAX_QUOTES = 5;
 const PEEK = 12; // small visible edge of next/previous card
 const SPACING = 8; // space between cards
 
-export default function QuotesCarousel({ language }: Props) {
+const QuotesCarouselCard = React.memo(() => {
     // Stores
     const theme = useThemeStore((state) => state.theme);
+    const language = useLanguageStore((state) => state.language);
 
     // Local state
     const [activeIndex, setActiveIndex] = useState(0);
@@ -118,7 +116,9 @@ export default function QuotesCarousel({ language }: Props) {
             </View>
         </>
     );
-}
+});
+
+export default QuotesCarouselCard;
 
 const styles = StyleSheet.create({
     header: {
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     decorativeLine: {
-        height: 1,
         flex: 1,
+        height: 1,
         opacity: 0.3,
     },
 

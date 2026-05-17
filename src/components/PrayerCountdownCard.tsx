@@ -1,16 +1,18 @@
-import useNextPrayer from "@/hooks/useNextPrayer";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { PrayerName, PrayerTimes } from "@/types/prayer.types";
-import React, { useEffect } from "react";
+import { PrayerCountdown, PrayerEntry, PrayerName } from "@/types/prayer.types";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import PrayerIcon from "./PrayerIcon";
 
 interface Props {
-  prayerTimes: PrayerTimes | null;
-  onNextPrayerChange?: (name: PrayerName) => void;
-  onCurrentPrayerChange?: (name: PrayerName | null) => void;
+  prevPrayer: PrayerEntry | null;
+  nextPrayerName: PrayerName | null;
+  afterNextPrayer: PrayerEntry | null;
+  prayerCountdown: PrayerCountdown;
+  remainingSeconds: number | null;
+  totalSeconds: number;
   size?: number;
   strokeWidth?: number;
   strokeColor?: string;
@@ -18,9 +20,12 @@ interface Props {
 }
 
 const PrayerCountdownCard = React.memo(({
-  prayerTimes,
-  onNextPrayerChange,
-  onCurrentPrayerChange,
+  prevPrayer,
+  nextPrayerName,
+  afterNextPrayer,
+  prayerCountdown,
+  remainingSeconds,
+  totalSeconds,
   size = 140,
   strokeWidth = 10,
   strokeColor = "#eee",
@@ -30,19 +35,6 @@ const PrayerCountdownCard = React.memo(({
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
-
-  // Countdown state (ticks every second, isolated from HomeScreen)
-  const { nextPrayerName, prayerCountdown, remainingSeconds, totalSeconds, currentPrayer, prevPrayer, afterNextPrayer } = useNextPrayer(prayerTimes);
-
-  // Notify parent when the next prayer changes (at most 5x per day)
-  useEffect(() => {
-    if (nextPrayerName) onNextPrayerChange?.(nextPrayerName);
-  }, [nextPrayerName, onNextPrayerChange]);
-
-  // Notify parent when the current prayer period changes
-  useEffect(() => {
-    onCurrentPrayerChange?.(currentPrayer?.name ?? null);
-  }, [currentPrayer?.name, onCurrentPrayerChange]);
 
   // Don't render until countdown data is ready
   if (!nextPrayerName || !prayerCountdown || !totalSeconds || remainingSeconds === null) return null;

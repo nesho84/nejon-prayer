@@ -6,8 +6,9 @@ import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerIcon from "@/components/PrayerIcon";
 import PrayerNotifIcon from "@/components/PrayerNotifIcon";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
-import QuotesCarousel from "@/components/QuotesCarousel";
+import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
+import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -15,19 +16,18 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
-import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
+import { MAIN_PRAYERS, PrayerCountdown, PrayerName, PrayerTimeEntry } from "@/types/prayer.types";
 import { toDateKey } from "@/utils/dateKey";
 import { isTimePast } from "@/utils/timeString";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
-    const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
@@ -43,22 +43,16 @@ export default function HomeScreen() {
     const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
     const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
 
-    // Local state
-    const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
-    // Ticks every 60s — guarantees HomeScreen re-renders at midnight so stale closures
-    // (isPast, isCurrent) are recalculated even if the Zustand subscription misses a beat
-    const [liveDate, setLiveDate] = useState(toDateKey());
-
-    // True only when the loaded prayer times are for today — gates highlighting and marking
-    const isToday = prayerTimesDate === liveDate;
-
-    // ------------------------------------------------------------
-    // Tick liveDate every 60s — midnight re-render guarantee
-    // ------------------------------------------------------------
-    useEffect(() => {
-        const id = setInterval(() => setLiveDate(toDateKey()), 60_000);
-        return () => clearInterval(id);
-    }, []);
+    // Next prayer countdown state
+    const {
+        prevPrayer,
+        currentPrayer,
+        nextPrayerName,
+        afterNextPrayer,
+        prayerCountdown,
+        remainingSeconds,
+        totalSeconds
+    } = useNextPrayer(prayerTimes);
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -158,8 +152,12 @@ export default function HomeScreen() {
                 {/* 1. COUNTDOWN CARD */}
                 <AppCard style={styles.countdownCard}>
                     <PrayerCountdownCard
-                        prayerTimes={prayerTimes}
-                        onCurrentPrayerChange={setCurrentPrayerName}
+                        prevPrayer={prevPrayer}
+                        nextPrayerName={nextPrayerName}
+                        afterNextPrayer={afterNextPrayer}
+                        prayerCountdown={prayerCountdown as PrayerCountdown}
+                        remainingSeconds={remainingSeconds}
+                        totalSeconds={totalSeconds}
                         size={158}
                         strokeWidth={6}
                         strokeColor={theme.border}
@@ -169,7 +167,7 @@ export default function HomeScreen() {
 
                 {/* 3. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
-                    <QuotesCarousel language={language} />
+                    <QuotesCarouselCard />
                 </AppCard>
 
                 {/* 3.1 QURAN Playing... CARD */}
@@ -223,8 +221,9 @@ export default function HomeScreen() {
                     <View style={styles.prayersRowContainer}>
                         {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
                             const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
+                            const isToday = prayerTimesDate === toDateKey();
                             const isPast = isTrackable && isToday && isTimePast(prayerTime);
-                            const isCurrent = isToday && currentPrayerName === prayerName;
+                            const isCurrent = isToday && currentPrayer?.name === prayerName;
                             const isLast = index === arr.length - 1;
                             const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 
@@ -321,7 +320,9 @@ export default function HomeScreen() {
                 </AppCard>
 
                 {/* 5. PRAYER PROGRESS CARD */}
-                <PrayerProgressCard />
+                <AppCard style={styles.progressCard}>
+                    <PrayerProgressCard />
+                </AppCard>
 
             </ScrollView>
         </AppTabScreen >
@@ -455,4 +456,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    // Prayers Progress Card
+    progressCard: {
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+    }
 });
