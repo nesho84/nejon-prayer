@@ -4,7 +4,7 @@ import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendarGrid';
-import { toDateKey } from '@/utils/dateKey';
+import { toDateKey } from '@/utils/date';
 import { getDayPrayedCount } from '@/utils/prayerTracking';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';

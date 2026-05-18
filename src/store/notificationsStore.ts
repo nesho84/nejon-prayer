@@ -14,7 +14,7 @@ import {
   SpecialType
 } from '@/types/notification.types';
 import { PrayerTimes } from '@/types/prayer.types';
-import { toDateKey } from '@/utils/dateKey';
+import { toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';

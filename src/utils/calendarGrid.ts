@@ -1,4 +1,4 @@
-import { toDateKey } from '@/utils/dateKey';
+import { toDateKey } from '@/utils/date';
 
 // ------------------------------------------------------------
 // Returns the 7 Date objects for the current week (Mon–Sun)
@@ -15,7 +15,7 @@ export const getCurrentWeekDays = (): Date[] => {
 };
 
 // ------------------------------------------------------------
-// Returns grid items for the current month (empty padding + day entries)
+// Internal: Returns grid items for the current month (empty padding + day entries)
 // ------------------------------------------------------------
 const getCurrentMonthGridItems = () => {
   const today = new Date();

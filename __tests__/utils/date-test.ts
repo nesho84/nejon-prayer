@@ -1,4 +1,4 @@
-import { keyToDate, toDateKey } from '@/utils/dateKey';
+import { keyToDate, toDateKey } from '@/utils/date';
 
 describe('toDateKey', () => {
   it('formats a date correctly', () => {

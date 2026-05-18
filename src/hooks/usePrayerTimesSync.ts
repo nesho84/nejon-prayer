@@ -1,5 +1,5 @@
 import { usePrayersStore } from '@/store/prayersStore';
-import { toDateKey } from '@/utils/dateKey';
+import { toDateKey } from '@/utils/date';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 

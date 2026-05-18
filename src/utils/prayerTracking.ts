@@ -1,5 +1,5 @@
-import { toDateKey } from '@/utils/dateKey';
 import { MAIN_PRAYERS } from '@/types/prayer.types';
+import { toDateKey } from '@/utils/date';
 
 // ------------------------------------------------------------
 // Resolves the prayer date to use for tracking.

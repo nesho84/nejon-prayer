@@ -1,4 +1,4 @@
-import { toDateKey } from '@/utils/dateKey';
+import { toDateKey } from '@/utils/date';
 import { getDayPrayedCount, resolveTrackingDate } from '@/utils/prayerTracking';
 
 describe('getDayPrayedCount', () => {

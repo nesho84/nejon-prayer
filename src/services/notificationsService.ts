@@ -4,8 +4,7 @@ import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
-import { toDateKey } from '@/utils/dateKey';
-import { getNotificationTriggerTime } from '@/utils/timeString';
+import { toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
 import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
@@ -152,6 +151,56 @@ async function cancelDisplayedNotification(notificationId: string) {
 }
 
 // ------------------------------------------------------------
+// Parse time string and calculate next notification trigger time with offset
+// timeStringRaw: "HH:mm" format (e.g., "13:45" or "5:30")
+// tomorrowTimeStringRaw: tomorrow's actual time — falls back to today's if omitted/null/invalid
+// ------------------------------------------------------------
+function getTriggerTime(
+  timeStringRaw: string,
+  offsetMinutes: number = 0,
+  tomorrowTimeStringRaw?: string | null,
+): Date | null {
+  // Normalize: trim whitespace and replace non-breaking spaces
+  const timeString = timeStringRaw.replace(/\u00A0/g, ' ').trim();
+
+  // Validate format: must be HH:mm (e.g., "13:45" or "5:30")
+  const match = timeString.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+
+  // Extract hour and minute
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+
+  // Create trigger time for today
+  const triggerTime = new Date();
+  triggerTime.setHours(hour, minute, 0, 0);
+
+  // Apply offset (e.g., -15 = 15 minutes before, +10 = 10 minutes after)
+  if (offsetMinutes !== 0) {
+    triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
+  }
+
+  // If time has passed today, schedule for tomorrow
+  const now = new Date();
+  if (triggerTime <= now) {
+    // Use tomorrow's actual time if provided and valid, otherwise fall back to today's time
+    if (tomorrowTimeStringRaw) {
+      const tomorrowTimeString = tomorrowTimeStringRaw.replace(/\u00A0/g, ' ').trim();
+      const tomorrowMatch = tomorrowTimeString.match(/^(\d{1,2}):(\d{2})$/);
+      if (tomorrowMatch) {
+        triggerTime.setHours(Number(tomorrowMatch[1]), Number(tomorrowMatch[2]), 0, 0);
+        if (offsetMinutes !== 0) {
+          triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
+        }
+      }
+    }
+    triggerTime.setDate(triggerTime.getDate() + 1);
+  }
+
+  return triggerTime;
+}
+
+// ------------------------------------------------------------
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
@@ -167,7 +216,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.prayers[prayer]?.offset || 0;
-    const triggerTime = getNotificationTriggerTime(timeString, offset, tomorrowPrayerTimes?.[prayer]);
+    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[prayer]);
     if (!triggerTime) continue;
 
     // Prepare notification content
@@ -245,7 +294,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 
     // Calculate trigger time with offset
     const offset = config.events[event]?.offset || 0;
-    const triggerTime = getNotificationTriggerTime(timeString, offset, tomorrowPrayerTimes?.[event]);
+    const triggerTime = getTriggerTime(timeString, offset, tomorrowPrayerTimes?.[event]);
     if (!triggerTime) continue;
 
     // Prepare notification content
