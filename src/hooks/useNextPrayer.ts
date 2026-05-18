@@ -6,9 +6,8 @@ import { AppState } from 'react-native';
 
 interface NextPrayerType {
     prevPrayer: PrayerEntry | null;
-    currentPrayer: PrayerEntry | null;
+    currentPrayerName: PrayerName | null;
     nextPrayerName: PrayerName | null;
-    nextPrayerTime: Date | null;
     afterNextPrayer: PrayerEntry | null;
     prayerCountdown: PrayerCountdown | null;
     remainingSeconds: number | null;
@@ -124,8 +123,10 @@ const formatCountdown = (totalSec: number) => ({
 
 export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPrayerType {
     const isFocused = useIsFocused();
+
+    // State — all values that drive UI updates
+    const [currentPrayerName, setCurrentPrayerName] = useState<PrayerName | null>(null);
     const [nextPrayerName, setNextPrayerName] = useState<PrayerName | null>(null);
-    const [nextPrayerTime, setNextPrayerTime] = useState<Date | null>(null);
     const [prayerCountdown, setPrayerCountdown] = useState<PrayerCountdown | null>(null);
     const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
     const [totalSeconds, setTotalSeconds] = useState<number>(0);
@@ -133,13 +134,15 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
     // Track previous prayer timestamp to detect when interval changes
     const prevNextTimestampRef = useRef<number | null>(null);
 
-    // Derived prayer entries — resolved from current nextPrayerName each render
-    const currentPrayer = prayerTimes && nextPrayerName && nextPrayerTime ? getCurrentPrayer(prayerTimes, nextPrayerName, nextPrayerTime) : null;
+    // ------------------------------------------------------------
+    // Derived values — recompute every render from current nextPrayerName.
+    // Safe as derived because they only depend on nextPrayerName, not real time.
+    // ------------------------------------------------------------
     const prevPrayer = prayerTimes && nextPrayerName ? getPrevPrayer(prayerTimes, nextPrayerName) : null;
     const afterNextPrayer = prayerTimes && nextPrayerName ? getAfterNextPrayer(prayerTimes, nextPrayerName) : null;
 
     // ------------------------------------------------------------
-    // Update countdown every second
+    // Tick every second — drives countdown and detects prayer transitions
     // ------------------------------------------------------------
     useEffect(() => {
         if (!prayerTimes || !isFocused) return;
@@ -149,17 +152,20 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
 
             const now = new Date();
             const upcoming = getNextPrayer(prayerTimes);
-
             if (!upcoming) return;
 
             const upcomingTs = upcoming.time.getTime();
+
+            // Update currentPrayer every second — needed for Sunrise transition
+            // where nextPrayerName stays Dhuhr but Fajr highlight must drop
+            const current = getCurrentPrayer(prayerTimes, upcoming.name, upcoming.time);
+            setCurrentPrayerName(current?.name ?? null);
 
             // Detect when we've moved to a new prayer interval
             if (prevNextTimestampRef.current !== upcomingTs) {
                 prevNextTimestampRef.current = upcomingTs;
 
                 setNextPrayerName(upcoming.name);
-                setNextPrayerTime(upcoming.time);
 
                 // Calculate remaining time until next prayer
                 const remainingTime = Math.max(Math.floor((upcoming.time.getTime() - now.getTime()) / 1000), 0);
@@ -171,9 +177,7 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
 
                 setTotalSeconds(fullInterval); // freeze the interval length for progress calculation
                 setRemainingSeconds(remainingTime); // initialize remainingSeconds
-
-                // Format countdown display
-                setPrayerCountdown(formatCountdown(remainingTime));
+                setPrayerCountdown(formatCountdown(remainingTime)); // Format countdown display
 
                 return;
             }
@@ -191,13 +195,12 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
 
     return {
         prevPrayer,
-        currentPrayer,
+        currentPrayerName,
         nextPrayerName,
-        nextPrayerTime,
         afterNextPrayer,
         prayerCountdown,
         remainingSeconds,
-        totalSeconds
+        totalSeconds,
     };
 }
 

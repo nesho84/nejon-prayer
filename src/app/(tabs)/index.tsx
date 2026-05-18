@@ -33,7 +33,7 @@ export default function HomeScreen() {
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
     const location = useLocationStore((state) => state.location);
     const timeZone = useLocationStore((state) => state.timeZone);
-    const locationReady = useLocationStore.getState().isReady;
+    const locationReady = useLocationStore((state) => state.isReady);
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayerTimesDate = usePrayersStore((state) => state.prayerTimesDate);
     const prayersError = usePrayersStore((state) => state.prayersError);
@@ -46,7 +46,7 @@ export default function HomeScreen() {
     // Next prayer countdown state
     const {
         prevPrayer,
-        currentPrayer,
+        currentPrayerName,
         nextPrayerName,
         afterNextPrayer,
         prayerCountdown,
@@ -193,7 +193,7 @@ export default function HomeScreen() {
                         {/* Center: Date & Timezone Container */}
                         <View style={styles.dateContainer}>
                             <Text style={[styles.dateHeaderText, { color: theme.text2 }]}>
-                                {new Date().toLocaleDateString(tr.labels.localeDate, {
+                                {new Date(prayerTimesDate + 'T00:00:00').toLocaleDateString(tr.labels.localeDate, {
                                     weekday: "long",
                                     day: "2-digit",
                                     month: "long",
@@ -223,7 +223,7 @@ export default function HomeScreen() {
                             const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
                             const isToday = prayerTimesDate === toDateKey();
                             const isPast = isTrackable && isToday && isTimePast(prayerTime);
-                            const isCurrent = isToday && currentPrayer?.name === prayerName;
+                            const isCurrent = isToday && currentPrayerName === prayerName;
                             const isLast = index === arr.length - 1;
                             const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 
