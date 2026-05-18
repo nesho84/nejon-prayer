@@ -53,7 +53,9 @@ src/
 ├── services/              # API + device service layer
 ├── store/                 # Zustand stores (all persisted via MMKV)
 ├── types/                 # TypeScript interfaces
-└── utils/                 # Date helpers
+└── utils/                 # Pure utility functions (date, time, calendar, prayer tracking)
+__tests__/
+└── utils/                 # Unit tests for all utility functions
 assets/
 ├── data/                  # quran_transliteration.json (bundled, ~3 MB)
 ├── fonts/
@@ -193,6 +195,20 @@ eas login
 | EAS Build | ❌ | ✅ | Store submission |
 
 **Tip:** Enable **Quick Boot** in AVD Manager and store AVDs on an SSD for faster emulator startup.
+
+---
+
+## Testing
+
+The project uses **Jest** with the `jest-expo` preset and **@testing-library/react-native**. Tests are scoped to pure utility functions — no component rendering or native module mocking required.
+
+```bash
+npm test
+```
+
+Tests cover date formatting, time comparisons, calendar grid generation, and prayer tracking logic. All test files live under `__tests__/`.
+
+> **Note:** `react-test-renderer` is pinned in `devDependencies` to match the exact `react` version. Do not upgrade it independently — it must always match `react`.
 
 ---
 
