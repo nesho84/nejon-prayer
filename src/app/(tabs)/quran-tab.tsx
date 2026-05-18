@@ -389,9 +389,11 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     padding: 0,
   },
+
+  // Surah list
   surahList: {
-    paddingHorizontal: 8,
     paddingBottom: 24,
+    paddingHorizontal: 8,
     gap: 10,
   },
   emptyContainer: {

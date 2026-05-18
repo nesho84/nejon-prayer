@@ -278,7 +278,7 @@ export default function PrayersSettingsScreen() {
                 </AppCard>
 
                 {/* SECTIONS 2 & 3: disabled when notification is off */}
-                <View style={{ gap: 14 }} pointerEvents={enabled ? 'auto' : 'none'}>
+                <View style={{ gap: 10 }} pointerEvents={enabled ? 'auto' : 'none'}>
                     {!enabled && (
                         // Overlay to indicate disabled state
                         <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg2, opacity: 0.65, zIndex: 10, borderRadius: 12 }]} />
@@ -416,10 +416,10 @@ export default function PrayersSettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        paddingHorizontal: 8,
         paddingTop: 12,
         paddingBottom: 14,
-        gap: 14,
+        paddingHorizontal: 8,
+        gap: 10,
     },
 
     // Header styles

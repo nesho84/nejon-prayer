@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingTop: 12,
     paddingBottom: 14,
-    gap: 14,
+    gap: 10,
   },
 
   // Header styles

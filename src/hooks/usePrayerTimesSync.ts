@@ -10,27 +10,18 @@ export function usePrayerTimesSync() {
   const loadedDateRef = useRef(toDateKey());
 
   useEffect(() => {
-    let timerId: ReturnType<typeof setTimeout>;
+    // Poll every 60s to detect day change while app in foreground.
+    // A long setTimeout is unreliable on Android release builds — OEM Doze
+    // (especially Samsung) throttles JS timers scheduled hours in advance.
+    const intervalId = setInterval(() => {
+      if (AppState.currentState !== 'active') return;
 
-    // ------------------------------------------------------------
-    // Schedule a reload at the next midnight (foreground case)
-    // ------------------------------------------------------------
-    const scheduleMidnightRefresh = () => {
-      const now = new Date();
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
-      const msUntilMidnight = midnight.getTime() - now.getTime();
-
-      timerId = setTimeout(() => {
-        const todayKey = toDateKey();
-        if (todayKey !== loadedDateRef.current) {
-          loadedDateRef.current = todayKey;
-          loadPrayerTimes();
-        }
-        scheduleMidnightRefresh();
-      }, msUntilMidnight);
-    };
-
-    scheduleMidnightRefresh();
+      const todayKey = toDateKey();
+      if (todayKey !== loadedDateRef.current) {
+        loadedDateRef.current = todayKey;
+        loadPrayerTimes();
+      }
+    }, 60000); // 60s
 
     // ------------------------------------------------------------
     // Reload when app comes to foreground on a new day (background case)
@@ -48,7 +39,7 @@ export function usePrayerTimesSync() {
     });
 
     return () => {
-      clearTimeout(timerId);
+      clearInterval(intervalId);
       subscription.remove();
     };
   }, [loadPrayerTimes]);

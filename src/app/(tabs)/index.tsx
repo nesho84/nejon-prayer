@@ -100,7 +100,7 @@ export default function HomeScreen() {
     }, [tr, prayerTimesDate]);
 
     // Loading state
-    if (!deviceSettingsReady || !locationReady || prayersLoading || !notifReady) {
+    if (!deviceSettingsReady || !locationReady || (prayersLoading && !prayerTimes) || !notifReady) {
         return <AppLoading text={tr.labels.loading} />;
     }
 
