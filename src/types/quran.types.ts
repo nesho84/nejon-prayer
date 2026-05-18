@@ -23,9 +23,9 @@ export interface Surah {
 export type Quran = Surah[];
 
 export type FavoriteAyah = {
-  surahId: number;
-  surahName: string;
-  ayahId: number;          // verse number within the surah
-  arabicText: string;      // stored at save time — works offline
+  surahId: number;            // 1–114, stored at save time — works offline
+  surahName: string;          // stored at save time — works offline
+  ayahId: number;             // verse number within the surah
+  arabicText: string;         // stored at save time — works offline
   translation: string | null; // stored at save time, null if Arabic language
 }

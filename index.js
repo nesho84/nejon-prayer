@@ -7,7 +7,6 @@ import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
 import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
-import { PrayerName } from './src/types/prayer.types';
 
 // ------------------------------------------------------------
 // 'react-native-track-player' playback service
@@ -44,9 +43,9 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
     if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
         try {
-            const prayerName = notification.data?.prayerName as PrayerName | undefined;
+            const prayerName = notification.data?.prayerName;
             if (prayerName) {
-                const prayerDate = notification.data?.prayerDate as string | undefined;
+                const prayerDate = notification.data?.prayerDate;
                 const dateToUse = resolveTrackingDate(prayerDate);
                 usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
             }
