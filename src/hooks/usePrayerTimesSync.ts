@@ -21,8 +21,11 @@ export function usePrayerTimesSync() {
       const msUntilMidnight = midnight.getTime() - now.getTime();
 
       timerId = setTimeout(() => {
-        loadedDateRef.current = toDateKey();
-        loadPrayerTimes();
+        const todayKey = toDateKey();
+        if (todayKey !== loadedDateRef.current) {
+          loadedDateRef.current = todayKey;
+          loadPrayerTimes();
+        }
         scheduleMidnightRefresh();
       }, msUntilMidnight);
     };

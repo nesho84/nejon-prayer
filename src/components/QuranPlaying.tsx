@@ -12,9 +12,14 @@ const DURATIONS = [600, 900, 700, 800, 650]; // staggered speeds
 function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive: boolean, isPlaying: boolean }) {
   const anims = useRef(BAR_HEIGHTS.map(() => new Animated.Value(0))).current;
   const animRefs = useRef<Animated.CompositeAnimation[]>([]);
+  const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive) {
+      timeoutIdsRef.current.forEach(clearTimeout);
+      animRefs.current.forEach((a) => a.stop());
+      return;
+    }
 
     if (isPlaying) {
       animRefs.current = anims.map((anim, i) =>
@@ -25,8 +30,11 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
           ])
         )
       );
-      animRefs.current.forEach((anim, i) => setTimeout(() => anim.start(), i * 120));
+      timeoutIdsRef.current = animRefs.current.map((anim, i) =>
+        setTimeout(() => anim.start(), i * 120)
+      );
     } else {
+      timeoutIdsRef.current.forEach(clearTimeout);
       animRefs.current.forEach((a) => a.stop());
       // Animate bars down to a static "paused" state
       anims.forEach((anim) =>
@@ -34,8 +42,11 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
       );
     }
 
-    return () => animRefs.current.forEach((a) => a.stop());
-  }, [isPlaying]);
+    return () => {
+      timeoutIdsRef.current.forEach(clearTimeout);
+      animRefs.current.forEach((a) => a.stop());
+    };
+  }, [isActive, isPlaying]);
 
   return (
     <View style={styles.waveform}>
