@@ -26,10 +26,10 @@ interface Props {
 }
 
 export default function NotificationTester({ seconds = 10 }: Props) {
-  const theme = useThemeStore((s) => s.theme);
-  const language = useLanguageStore((s) => s.language);
-  const location = useLocationStore((s) => s.location);
-  const notifSettings = useNotificationsStore((s) => s.notifSettings);
+  const theme = useThemeStore((state) => state.theme);
+  const language = useLanguageStore((state) => state.language);
+  const location = useLocationStore((state) => state.location);
+  const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
   const options = { language, location, hasAlarm: true };
 

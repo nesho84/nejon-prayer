@@ -1,9 +1,9 @@
 import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
 import { useLanguageStore } from '@/store/languageStore';
-import { FavoriteAyah } from '@/types/quran.types';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
+import { FavoriteAyah } from '@/types/quran.types';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import { router, Stack } from 'expo-router';
@@ -12,14 +12,14 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AyahsFavoritesScreen() {
   // Stores
-  const theme = useThemeStore((s) => s.theme);
-  const tr = useLanguageStore((s) => s.tr);
+  const theme = useThemeStore((state) => state.theme);
+  const tr = useLanguageStore((state) => state.tr);
 
   // Quran Store
-  const favoriteAyahs = useQuranStore((s) => s.favoriteAyahs);
-  const arabicFontSize = useQuranStore((s) => s.arabicFontSize);
-  const translationFontSize = useQuranStore((s) => s.translationFontSize);
-  const toggleAyahFavorite = useQuranStore((s) => s.toggleAyahFavorite);
+  const favoriteAyahs = useQuranStore((state) => state.favoriteAyahs);
+  const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
+  const translationFontSize = useQuranStore((state) => state.translationFontSize);
+  const toggleAyahFavorite = useQuranStore((state) => state.toggleAyahFavorite);
 
   // ------------------------------------------------------------
   // Render a single favorite ayah row

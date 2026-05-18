@@ -1,7 +1,7 @@
-import { Ayah, FavoriteAyah, Quran, Surah } from '@/types/quran.types';
 import { fetchAyahsFromApi, loadQuranTransliterationJson, QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
+import { Ayah, FavoriteAyah, Quran, Surah } from '@/types/quran.types';
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

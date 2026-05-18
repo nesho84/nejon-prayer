@@ -2,7 +2,7 @@ import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 const BAR_HEIGHTS = [10, 16, 22, 16, 10]; // base heights for natural shape
@@ -74,9 +74,9 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
 }
 
 // Main component
-export default function QuranPlaying() {
+const QuranPlaying = React.memo(() => {
   // Stores
-  const theme = useThemeStore((s) => s.theme);
+  const theme = useThemeStore((state) => state.theme);
 
   // Quran Store
   const isActive = useQuranStore((state) => state.isActive);
@@ -120,7 +120,9 @@ export default function QuranPlaying() {
       )}
     </Pressable>
   );
-}
+});
+
+export default QuranPlaying;
 
 const styles = StyleSheet.create({
   container: {

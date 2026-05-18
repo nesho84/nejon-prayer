@@ -4,11 +4,11 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
-import { Surah } from '@/types/quran.types';
 import { AUDIO_EDITIONS, getSurahAudioUrl } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
+import { Surah } from '@/types/quran.types';
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -21,17 +21,18 @@ export default function QuranTabScreen() {
   const tr = useLanguageStore((state) => state.tr);
 
   // Quran Store
-  const surahs = useQuranStore((s) => s.surahs);
-  const activeSurahId = useQuranStore((s) => s.activeSurahId);
-  const quranError = useQuranStore((s) => s.quranError);
-  const isQuranReady = useQuranStore((s) => s.isQuranReady);
+  const surahs = useQuranStore((state) => state.surahs);
+  const activeSurahId = useQuranStore((state) => state.activeSurahId);
+  const quranError = useQuranStore((state) => state.quranError);
+  const isQuranReady = useQuranStore((state) => state.isQuranReady);
 
-  const isPlaying = useQuranStore((s) => s.isPlaying);
-  const isBuffering = useQuranStore((s) => s.isBuffering);
-  const hasFinished = useQuranStore((s) => s.hasFinished);
-  const isSwitching = useQuranStore((s) => s.isSwitching);
-  const playbackError = useQuranStore((s) => s.playbackError);
-  const syncPlayback = useQuranStore((s) => s.syncPlayback);
+  // Playback-related state from the store
+  const isPlaying = useQuranStore((state) => state.isPlaying);
+  const isBuffering = useQuranStore((state) => state.isBuffering);
+  const hasFinished = useQuranStore((state) => state.hasFinished);
+  const isSwitching = useQuranStore((state) => state.isSwitching);
+  const playbackError = useQuranStore((state) => state.playbackError);
+  const syncPlayback = useQuranStore((state) => state.syncPlayback);
 
   // Derived states from TrackPlayer hooks
   const progress = useProgress(1000);

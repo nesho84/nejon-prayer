@@ -2,10 +2,10 @@ import AppError from '@/components/AppError';
 import AppLoading from '@/components/AppLoading';
 import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
-import { Verse } from '@/types/quran.types';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
+import { Verse } from '@/types/quran.types';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import { router, Stack, useLocalSearchParams } from 'expo-router';
@@ -19,30 +19,30 @@ export default function AyahsScreen() {
   const mode = (readingMode as string) || "reading";
 
   // Stores
-  const theme = useThemeStore((s) => s.theme);
-  const tr = useLanguageStore((s) => s.tr);
-  const language = useLanguageStore((s) => s.language);
+  const theme = useThemeStore((state) => state.theme);
+  const language = useLanguageStore((state) => state.language);
+  const tr = useLanguageStore((state) => state.tr);
 
   // Quran Store
-  const ayahs = useQuranStore((s) => s.ayahs);
-  const isLoadingAyahs = useQuranStore((s) => s.isLoadingAyahs);
-  const isQuranReady = useQuranStore((s) => s.isQuranReady);
-  const ayahsError = useQuranStore((s) => s.ayahsError);
-  const lastReadSurahId = useQuranStore((s) => s.lastReadSurahId);
-  const lastReadAyahId = useQuranStore((s) => s.lastReadAyahId);
-  const lastKhatamSurahId = useQuranStore((s) => s.lastKhatamSurahId);
-  const lastKhatamAyahId = useQuranStore((s) => s.lastKhatamAyahId);
+  const ayahs = useQuranStore((state) => state.ayahs);
+  const isLoadingAyahs = useQuranStore((state) => state.isLoadingAyahs);
+  const isQuranReady = useQuranStore((state) => state.isQuranReady);
+  const ayahsError = useQuranStore((state) => state.ayahsError);
+  const lastReadSurahId = useQuranStore((state) => state.lastReadSurahId);
+  const lastReadAyahId = useQuranStore((state) => state.lastReadAyahId);
+  const lastKhatamSurahId = useQuranStore((state) => state.lastKhatamSurahId);
+  const lastKhatamAyahId = useQuranStore((state) => state.lastKhatamAyahId);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
-  const selectedEditions = useQuranStore((s) => s.selectedEditions);
-  const getSurahById = useQuranStore((s) => s.getSurahById);
-  const fetchAyahs = useQuranStore((s) => s.fetchAyahs);
-  const setLastRead = useQuranStore((s) => s.setLastRead);
-  const setLastKhatam = useQuranStore((s) => s.setLastKhatam);
-  const completeKhatam = useQuranStore((s) => s.completeKhatam);
-  const favoriteAyahs = useQuranStore((s) => s.favoriteAyahs);
-  const toggleAyahFavorite = useQuranStore((s) => s.toggleAyahFavorite);
-  const isAyahFavorite = useQuranStore((s) => s.isAyahFavorite);
+  const selectedEditions = useQuranStore((state) => state.selectedEditions);
+  const getSurahById = useQuranStore((state) => state.getSurahById);
+  const fetchAyahs = useQuranStore((state) => state.fetchAyahs);
+  const setLastRead = useQuranStore((state) => state.setLastRead);
+  const setLastKhatam = useQuranStore((state) => state.setLastKhatam);
+  const completeKhatam = useQuranStore((state) => state.completeKhatam);
+  const favoriteAyahs = useQuranStore((state) => state.favoriteAyahs);
+  const toggleAyahFavorite = useQuranStore((state) => state.toggleAyahFavorite);
+  const isAyahFavorite = useQuranStore((state) => state.isAyahFavorite);
 
   // Local state / refs
   const [selectedAyah, setSelectedAyah] = useState<number | null>(() => {

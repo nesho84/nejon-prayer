@@ -11,10 +11,10 @@ export default function TesbihScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
-    const isReady = useTesbihStore((s) => s.isReady);
-    const count = useTesbihStore((s) => s.count);
-    const totalCount = useTesbihStore((s) => s.totalCount);
-    const laps = useTesbihStore((s) => s.laps);
+    const isReady = useTesbihStore((state) => state.isReady);
+    const count = useTesbihStore((state) => state.count);
+    const totalCount = useTesbihStore((state) => state.totalCount);
+    const laps = useTesbihStore((state) => state.laps);
 
     // Calculate circle parameters
     const size = 315;
