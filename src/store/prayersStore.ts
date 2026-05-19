@@ -66,7 +66,7 @@ export const usePrayersStore = create<PrayersState>()(
             const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
             if (todaysTimes) {
               set({ prayerTimes: todaysTimes, prayerTimesDate: todayKey, prayersOutdated: false });
-              console.log('💾 [prayersStore] Prayer times loaded from stored yearly data');
+              console.log('💾 [prayersStore] Prayer times loaded from storage yearly data');
               return;
             }
           }
@@ -103,7 +103,7 @@ export const usePrayersStore = create<PrayersState>()(
               prayerTimesDate: todayKey,
               prayersOutdated: fetchedYear !== currentYear,
             });
-            console.log('💾 [prayersStore] Offline — using stored yearly data');
+            console.log('💾 [prayersStore] Offline — using storage yearly data');
             return;
           }
 

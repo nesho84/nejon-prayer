@@ -381,11 +381,9 @@ export default function SettingsScreen() {
                         onPress={updateLocation}
                         disabled={localLoading}
                     >
-                        <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} onPress={handlePrayersRefresh} />
+                        <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} />
                         <Text style={[styles.updateLocationButtonText, { color: theme.text2 }]}>
-                            {location
-                                ? (tr.labels.locationButtonText1)
-                                : (tr.labels.locationButtonText2)}
+                            {location ? (tr.labels.locationButtonText1) : (tr.labels.locationButtonText2)}
                         </Text>
                     </TouchableOpacity>
 

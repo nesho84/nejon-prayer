@@ -77,7 +77,7 @@ export default function AboutScreen() {
                 {/* Hero: Logo + Title + Version */}
                 <View style={styles.heroSection}>
                     <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
-                    <Text style={[styles.title, { color: theme.text }]}>
+                    <Text style={[styles.title, { color: theme.text2 }]}>
                         {Constants?.expoConfig?.name}
                     </Text>
                     <Text style={[styles.versionText, { color: theme.placeholder }]}>
@@ -92,7 +92,7 @@ export default function AboutScreen() {
                     <TouchableOpacity
                         style={[styles.actionCard, {
                             backgroundColor: theme.primary + '08',
-                            borderColor: theme.primary + '20'
+                            borderColor: theme.divider3
                         }]}
                         onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')}
                         activeOpacity={0.8}
@@ -101,17 +101,17 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.supportDesc}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.textSecondary }]}>{tr.labels.supportDesc}</Text>
                             <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.linkHover} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
 
                     {/* Rate the App */}
                     <TouchableOpacity
                         style={[styles.actionCard, {
                             backgroundColor: theme.primary + '08',
-                            borderColor: theme.primary + '20'
+                            borderColor: theme.divider3
                         }]}
                         onPress={() => openLink(GOOGLE_PLAY_URL)}
                         // onPress={() => openLink(APPLE_STORE_URL)} // TODO: Apple App Store
@@ -121,17 +121,17 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.rateApp}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.textSecondary }]}>{tr.labels.rateApp}</Text>
                             <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.linkHover} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
 
                     {/* Share with a Friend */}
                     <TouchableOpacity
                         style={[styles.actionCard, {
                             backgroundColor: theme.primary + '08',
-                            borderColor: theme.primary + '20'
+                            borderColor: theme.divider3
                         }]}
                         onPress={handleShare}
                         activeOpacity={0.8}
@@ -140,17 +140,17 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.shareApp}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.textSecondary }]}>{tr.labels.shareApp}</Text>
                             <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.shareAppDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="share-variant-outline" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                        <MaterialCommunityIcons name="share-variant-outline" size={18} color={theme.linkHover} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
 
                     {/* Contact Us */}
                     <TouchableOpacity
                         style={[styles.actionCard, {
                             backgroundColor: theme.primary + '08',
-                            borderColor: theme.primary + '20'
+                            borderColor: theme.divider3
                         }]}
                         onPress={() => Linking.openURL(CONTACT_EMAIL)}
                         activeOpacity={0.8}
@@ -159,10 +159,10 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.contactUs}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.textSecondary }]}>{tr.labels.contactUs}</Text>
                             <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.contactUsDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.linkHover} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
 
                 </View>
@@ -170,19 +170,19 @@ export default function AboutScreen() {
                 {/* Bottom Buttons */}
                 <View style={styles.buttonsSection}>
                     <TouchableOpacity
-                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}
+                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider3 }]}
                         onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")}
                         activeOpacity={0.75}
                     >
-                        <MaterialCommunityIcons name="shield-lock-outline" size={18} color={theme.primary} />
+                        <MaterialCommunityIcons name="shield-lock-outline" size={16} color={theme.textMuted} style={{ marginTop: 1 }} />
                         <Text style={[styles.pillButtonText, { color: theme.text2 }]}>Privacy Policy</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}
+                        style={[styles.pillButton, { backgroundColor: theme.overlayLight, borderColor: theme.divider3 }]}
                         onPress={() => openLink("https://nejon.net")}
                         activeOpacity={0.75}
                     >
-                        <MaterialCommunityIcons name="web" size={18} color={theme.primary} />
+                        <MaterialCommunityIcons name="web" size={16} color={theme.textMuted} style={{ marginTop: 2 }} />
                         <Text style={[styles.pillButtonText, { color: theme.text2 }]}>nejon.net</Text>
                     </TouchableOpacity>
                 </View>
@@ -234,14 +234,14 @@ const styles = StyleSheet.create({
 
     // Action cards group
     cardsSection: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 14,
         gap: 10,
     },
     actionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 13,
-        paddingHorizontal: 20,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
         borderWidth: 1,
         borderRadius: 16,
         gap: 16,
@@ -270,9 +270,11 @@ const styles = StyleSheet.create({
 
     // Bottom pill buttons
     buttonsSection: {
-        paddingHorizontal: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 12,
         paddingTop: 32,
-        gap: 12,
+        gap: 10,
     },
     pillButton: {
         width: '100%',
@@ -287,5 +289,6 @@ const styles = StyleSheet.create({
     pillButtonText: {
         fontSize: 16,
         fontWeight: "600",
+        opacity: 0.5,
     },
 });

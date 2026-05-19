@@ -244,7 +244,7 @@ export default function PrayersSettingsScreen() {
                     <Text style={[styles.headerTitle, { color: theme.accent }]}>
                         {tr.prayers[prayerName]}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>
+                    <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>
                         {tr.labels.notificationSettings}
                     </Text>
                 </View>
@@ -413,17 +413,18 @@ export default function PrayersSettingsScreen() {
                     {!notificationPermission && (
                         <View style={[styles.permissionCardAlert, { backgroundColor: theme.card }]}>
                             <MaterialCommunityIcons name="bell-off-outline" size={44} color={theme.accent2} />
-                            <Text style={[styles.permissionTitle, { color: theme.text }]}>
+                            <Text style={[styles.permissionTitle, { color: theme.text2 }]}>
                                 {tr.labels.notificationsDisabled}
                             </Text>
-                            <Text style={[styles.permissionSubtitle, { color: theme.placeholder }]}>
+                            <Text style={[styles.permissionSubtitle, { color: theme.textMuted }]}>
                                 {tr.labels.notificationsDisabledMessage}
                             </Text>
                             <TouchableOpacity
-                                style={[styles.permissionButton, { backgroundColor: theme.accent2 }]}
+                                style={[styles.permissionButton, { backgroundColor: theme.overlay }]}
                                 onPress={handleOpenNotifSettings}
                             >
-                                <Text style={[styles.permissionButtonText, { color: theme.text2 }]}>
+                                <MaterialCommunityIcons name="cog-outline" size={18} color={theme.accent2} />
+                                <Text style={[styles.permissionButtonText, { color: theme.accent }]}>
                                     {tr.buttons.openSettings}
                                 </Text>
                             </TouchableOpacity>
@@ -551,10 +552,14 @@ const styles = StyleSheet.create({
         lineHeight: 20,
     },
     permissionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginTop: 4,
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 10,
+        gap: 6,
     },
     permissionButtonText: {
         fontSize: 16,

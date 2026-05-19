@@ -191,7 +191,7 @@ export default function PrayersSettingsScreen() {
                     <Text style={[styles.headerTitle, { color: theme.accent }]}>
                         {tr.labels.calendarTitle}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.text2, opacity: 0.7 }]}>
+                    <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>
                         {tr.labels.calendarSubtitle}
                     </Text>
                 </View>
@@ -213,7 +213,7 @@ export default function PrayersSettingsScreen() {
                             activeOpacity={0.6}
                             onPress={() => setShowDatePicker(true)}
                             style={[styles.dateInput, {
-                                backgroundColor: theme.overlay,
+                                backgroundColor: theme.overlayLight,
                                 borderColor: theme.divider
                             }]}
                         >

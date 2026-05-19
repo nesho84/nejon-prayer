@@ -1,23 +1,25 @@
 export const LIGHT_COLORS = {
-    // Background layers
+    // Backgrounds
     bg: "#fafafa",
     bg2: "#f8faf8",
     bg3: "#f3f4f6",
+    bg4: "#e5e7eb",
 
-    // Text colors
+    // Typography
     text: "#111827",
     text2: "#374151",
-    textMuted: "#74a2ffff",
+    textSecondary: "#4b5563",
+    textMuted: "#6b7280",
 
-    // Main brand colors
+    // Brand
     primary: "#2563eb",
     secondary: "#0ea5e9",
     accent: "#d97706",
     accent2: "#e0ac2abd",
-    accentLight: '#f59e0b26', // 15% opacity
+    accentLight: '#f59e0b26',
     highlight: "#22c55e",
 
-    // Status colors
+    // Status
     danger: "#dc2626",
     success: "#16a34a",
     warning: "#facc15de",
@@ -27,28 +29,39 @@ export const LIGHT_COLORS = {
     gray: "#808080",
     green: "#15803d",
 
-    // Surfaces
-    card: "#f1f1f1",
-    border: "#e5e7eb",
+    // Surfaces & Borders
+    card: "#f3f3f3",
+    card2: "#e9ecef",
+    card3: "#dee2e6",
     borderCard: "#dde0e6ff",
+    borderCard2: "#ced4da",
+    borderCard3: "#adb5bd",
+    border: "#dce0e6",
     divider: "#d1d5db",
-    divider2: "#dde0e6ff",
+    divider2: "#d3d7de",
     divider3: "#c8cbd3",
     handle: "#c6c6c6",
     statusbar: "#e6e6e6",
     placeholder: "#9ca3af",
 
-    // Tabs
-    tabActive: "#374151",
-    tabInactive: "#9ca3af",
-    tabDivider: "#e5e7eb",
+    // Interactive
+    iconActive: "#1a2130",
+    iconInactive: "#a5aebc",
+    link: "#2060e3",
+    linkHover: "#1d4ed8",
 
-    // Special use
+    // Tabs
+    tab: "#f9fafb",
+    tabActive: "#3e4a5c",
+    tabInactive: "#929aa6",
+    tabDivider: "#ebecf0",
+    tabActiveIndicator: "#1e5de0",
+
+    // Overlays
     shadow: "#00000020",
     overlay: "#00000030",
     overlayLight: "#00000012",
     surfaceBg: "#d9dbde",
-    tab: "#f9fafb",
 
     // Utility
     white: "#ffffff",
@@ -58,25 +71,27 @@ export const LIGHT_COLORS = {
 };
 
 export const DARK_COLORS = {
-    // Background layers
+    // Backgrounds
     bg: "#121212",
     bg2: "#1d1d1d",
     bg3: "#2a2a2a",
+    bg4: "#374151",
 
-    // Text colors
+    // Typography
     text: "#f3f4f6",
     text2: "#d1d5db",
-    textMuted: "#9ca3af",
+    textSecondary: "#9ca3af",
+    textMuted: "#6b7280",
 
-    // Main brand colors
+    // Brand
     primary: "#3b82f6",
     secondary: "#38bdf8",
     accent: "#fbbe24e1",
     accent2: "#e0ac2abd",
-    accentLight: '#f59e0b26', // 15% opacity
+    accentLight: '#f59e0b26',
     highlight: "#22c55e",
 
-    // Status colors
+    // Status
     danger: "#f87171",
     success: "#4ade80",
     warning: "#fde047",
@@ -86,28 +101,39 @@ export const DARK_COLORS = {
     gray: "#808080",
     green: "#059669",
 
-    // Surfaces
+    // Surfaces & Borders
     card: "#1f2937",
-    border: "#374151",
+    card2: "#2d3748",
+    card3: "#3e4a5b",
     borderCard: "#2d3649",
+    borderCard2: "#4a5568",
+    borderCard3: "#4d5b6e",
+    border: "#3d4a5e",
     divider: "#4b5563",
     divider2: "#2f3d50ff",
-    divider3: "#2b3a4f",
+    divider3: "#1c232eff",
     handle: "#5d5d5d",
     statusbar: "transparent",
-    placeholder: "#6b7280",
+    placeholder: "#5c636e",
+
+    // Interactive
+    iconActive: "#ffffff",
+    iconInactive: "#4e545e",
+    link: "#5a9ff8",
+    linkHover: "#93c5fd",
 
     // Tabs
-    tabActive: '#f3f4f6',
-    tabInactive: '#9ca3af',
+    tab: "#1e1e1e",
+    tabActive: "#edf0f3",
+    tabInactive: "#a4adb8",
     tabDivider: "#232527ff",
+    tabActiveIndicator: "#4286f7",
 
-    // Special use
+    // Overlays
     shadow: "#00000080",
     overlay: "#00000060",
     overlayLight: "#00000033",
-    surfaceBg: "#2d3649",
-    tab: "#1e1e1e",
+    surfaceBg: "#2a3244",
 
     // Utility
     white: "#ffffff",

@@ -48,8 +48,8 @@ const PrayerProgressCard = React.memo(() => {
           <MaterialCommunityIcons name="progress-check" size={22} color={theme.accent} style={{ opacity: 0.7 }} />
           <Text style={[styles.title, { color: theme.text2 }]}>{tr.labels.myProgress}</Text>
         </View>
-        {/* Right: View toggle */}
-        <View style={[styles.toggle, { backgroundColor: theme.surfaceBg }]}>
+        {/* Right: View toggle Buttons */}
+        <View style={[styles.toggleRow, { backgroundColor: theme.surfaceBg }]}>
           {(['week', 'month'] as const).map((v) => (
             <TouchableOpacity
               key={v}
@@ -159,14 +159,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 4,
   },
-  toggle: {
+  toggleRow: {
     flexDirection: 'row',
     borderRadius: 8,
     padding: 3,
-    gap: 2,
+    gap: 4,
   },
   toggleBtn: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 18,
     paddingVertical: 4,
     borderRadius: 6,
   },

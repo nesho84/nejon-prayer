@@ -97,7 +97,7 @@ export default function QuranSettingsScreen() {
           <Text style={[styles.headerTitle, { color: theme.accent }]}>
             {tr.labels.quranSettingsTitle}
           </Text>
-          <Text style={[styles.headerSubtitle, { color: theme.text2, opacity: 0.7 }]}>
+          <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>
             {tr.labels.quranSettingsSubtitle}
           </Text>
         </View>
@@ -106,7 +106,7 @@ export default function QuranSettingsScreen() {
         {language !== 'ar' && (
           <AppCard style={[styles.settingCard, styles.translatorCard]}>
             <View style={styles.statusRow}>
-              <Text style={[styles.settingTitle, { color: theme.text, marginBottom: 2 }]}>
+              <Text style={[styles.settingTitle, { color: theme.text2, marginBottom: 2 }]}>
                 {tr.labels.quranTranslator}:
               </Text>
             </View>
@@ -121,7 +121,7 @@ export default function QuranSettingsScreen() {
                   <TouchableOpacity
                     key={key}
                     onPress={() => setTempSelectedEdition(value)}
-                    style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlay : 'transparent' }]}
+                    style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlayLight : 'transparent' }]}
                   >
                     <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>
                       {/* capitalize the first letter after the dot: "sq.ahmeti" → "sq.Ahmeti" */}
@@ -135,12 +135,15 @@ export default function QuranSettingsScreen() {
         )}
 
         {/* ------ Arabic Font Size ------ */}
-        <AppCard style={styles.settingCard}>
+        <AppCard style={[styles.settingCard, styles.fontSizeCard]}>
+          <Text style={[styles.settingTitle, { color: theme.text2, paddingHorizontal: 8, marginBottom: 16 }]}>
+            {tr.labels.quranFontSizeTitle}:
+          </Text>
           <View style={styles.statusRow}>
-            <Text style={[styles.settingTitle, { color: theme.text }]}>
+            <Text style={[styles.settingSubtitle, { color: theme.textSecondary }]}>
               {tr.labels.quranArabic} (العربية):
             </Text>
-            <Text style={{ color: theme.text2, opacity: 0.7 }}>
+            <Text style={{ color: theme.textMuted }}>
               {tempArabicSize}px
             </Text>
           </View>
@@ -157,7 +160,7 @@ export default function QuranSettingsScreen() {
             tapToSeek={true}
           />
           {/* Arabic Preview */}
-          <View style={[styles.previewContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
+          <View style={[styles.previewContainer, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}>
             <Text style={[styles.previewArabic, { color: theme.accent, fontSize: tempArabicSize, lineHeight: tempArabicSize * 1.85 }]}>
               بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
             </Text>
@@ -168,10 +171,10 @@ export default function QuranSettingsScreen() {
 
           {/* ------ Translation Font Size ------ */}
           <View style={styles.statusRow}>
-            <Text style={[styles.settingTitle, { color: theme.text }]}>
+            <Text style={[styles.settingSubtitle, { color: theme.textSecondary }]}>
               {tr.labels.quranTranslation}:
             </Text>
-            <Text style={{ color: theme.text2, opacity: 0.7 }}>
+            <Text style={{ color: theme.textMuted }}>
               {tempTranslationSize}px
             </Text>
           </View>
@@ -188,7 +191,7 @@ export default function QuranSettingsScreen() {
             tapToSeek={true}
           />
           {/* Translation Preview */}
-          <View style={[styles.previewContainer, { backgroundColor: theme.overlay, borderColor: theme.divider2 }]}>
+          <View style={[styles.previewContainer, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}>
             <Text style={[styles.previewTranslation, { color: theme.text, fontSize: tempTranslationSize, lineHeight: tempTranslationSize * 1.55 }]}>
               {tr.labels.quranPreviewTranslation}
             </Text>
@@ -233,6 +236,10 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  settingSubtitle: {
+    fontSize: 15,
+    fontWeight: '500',
   },
   statusRow: {
     flexDirection: 'row',
@@ -296,6 +303,9 @@ const styles = StyleSheet.create({
   // Translator chips
   translatorCard: {
     paddingVertical: 18,
+  },
+  fontSizeCard: {
+    paddingTop: 18,
   },
   chipRow: {
     flexDirection: 'row',
