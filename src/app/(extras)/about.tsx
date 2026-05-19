@@ -7,6 +7,7 @@ import { Stack } from "expo-router";
 import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer';
+const CONTACT_EMAIL = 'mailto:support@nejon.net';
 // const APPLE_STORE_URL = 'https://apps.apple.com/app/nejon-prayer/idXXXXXXXXX'; // TODO: Add Apple App Store URL
 
 export default function AboutScreen() {
@@ -100,8 +101,8 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.supportDesc}</Text>
-                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>via PayPal</Text>
+                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.supportDesc}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
                         </View>
                         <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
@@ -120,8 +121,8 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.rateApp}</Text>
-                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>{tr.labels.rateAppDesc}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.rateApp}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
                         </View>
                         <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
@@ -139,10 +140,29 @@ export default function AboutScreen() {
                             <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.supportTextContainer}>
-                            <Text style={[styles.supportTitle, { color: theme.textMuted }]}>{tr.labels.shareApp}</Text>
-                            <Text style={[styles.supportSubtitle, { color: theme.primary }]}>{tr.labels.shareAppDesc}</Text>
+                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.shareApp}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.shareAppDesc}</Text>
                         </View>
                         <MaterialCommunityIcons name="share-variant-outline" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
+                    </TouchableOpacity>
+
+                    {/* Contact Us */}
+                    <TouchableOpacity
+                        style={[styles.actionCard, {
+                            backgroundColor: theme.primary + '08',
+                            borderColor: theme.primary + '20'
+                        }]}
+                        onPress={() => Linking.openURL(CONTACT_EMAIL)}
+                        activeOpacity={0.8}
+                    >
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.supportTextContainer}>
+                            <Text style={[styles.supportTitle, { color: theme.text2 }]}>{tr.labels.contactUs}</Text>
+                            <Text style={[styles.supportSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.contactUsDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={18} color={theme.primary} style={{ opacity: 0.5 }} />
                     </TouchableOpacity>
 
                 </View>
@@ -220,7 +240,7 @@ const styles = StyleSheet.create({
     actionCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 18,
+        paddingVertical: 13,
         paddingHorizontal: 20,
         borderWidth: 1,
         borderRadius: 16,

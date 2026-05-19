@@ -229,6 +229,8 @@ export const TRANSLATIONS = {
             rateAppDesc: "Leave a review on Google Play",
             shareApp: "Share with a Friend",
             shareAppDesc: "Recommend Nejon Prayer",
+            contactUs: "Contact Us",
+            contactUsDesc: "Feedback & bug reports",
             // Quran Settings
             quranArabic: "Arabic",
             quranSettingsTitle: "Quran Settings",
@@ -496,6 +498,8 @@ export const TRANSLATIONS = {
             rateAppDesc: "Bewerte die App auf Google Play",
             shareApp: "Mit Freunden teilen",
             shareAppDesc: "Empfehle Nejon Prayer",
+            contactUs: "Kontakt",
+            contactUsDesc: "Feedback & Fehlermeldungen",
             // Quran Settings
             quranArabic: "Arabisch",
             quranSettingsTitle: "Koran-Einstellungen",
@@ -762,6 +766,8 @@ export const TRANSLATIONS = {
             rateAppDesc: "Lër një vlerësim në Google Play",
             shareApp: "Ndaj me miqtë",
             shareAppDesc: "Rekomando Nejon Prayer",
+            contactUs: "Na Kontakto",
+            contactUsDesc: "Reagime & raporte gabimesh",
             // Quran Settings
             quranArabic: "Arabisht",
             quranSettingsTitle: "Cilësimet e Kur'anit",
@@ -1029,6 +1035,8 @@ export const TRANSLATIONS = {
             rateAppDesc: "Google Play'de yorum bırakın",
             shareApp: "Arkadaşınla Paylaş",
             shareAppDesc: "Nejon Prayer'ı önerin",
+            contactUs: "Bize Ulaşın",
+            contactUsDesc: "Geri bildirim & hata bildirimi",
             // Quran Settings
             quranArabic: "Arapça",
             quranSettingsTitle: "Kur'an Ayarları",
@@ -1294,6 +1302,8 @@ export const TRANSLATIONS = {
             rateAppDesc: "اترك تقييمًا على Google Play",
             shareApp: "شارك مع صديق",
             shareAppDesc: "أوصِ بتطبيق Nejon Prayer",
+            contactUs: "اتصل بنا",
+            contactUsDesc: "ملاحظات وإبلاغ عن أخطاء",
             // Quran Settings
             quranArabic: "العربية",
             quranSettingsTitle: "إعدادات القرآن",

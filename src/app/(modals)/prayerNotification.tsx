@@ -423,7 +423,7 @@ export default function PrayersSettingsScreen() {
                                 style={[styles.permissionButton, { backgroundColor: theme.accent2 }]}
                                 onPress={handleOpenNotifSettings}
                             >
-                                <Text style={[styles.permissionButtonText, { color: theme.bg }]}>
+                                <Text style={[styles.permissionButtonText, { color: theme.text2 }]}>
                                     {tr.buttons.openSettings}
                                 </Text>
                             </TouchableOpacity>
