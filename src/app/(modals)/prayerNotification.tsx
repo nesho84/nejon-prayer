@@ -9,9 +9,10 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerName } from "@/types/prayer.types";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Linking, Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import notifee from "react-native-notify-kit";
 import Sound from "react-native-sound";
 
 interface SoundsOptionType {
@@ -160,26 +161,6 @@ export default function PrayersSettingsScreen() {
             return;
         }
 
-        // Check system notifications permission first
-        if (!notificationPermission) {
-            Alert.alert(
-                tr.labels.notificationsDisabled,
-                tr.labels.notificationsDisabledMessage,
-                [
-                    { text: tr.buttons.cancel, style: "cancel" },
-                    {
-                        text: tr.labels.goToSettings,
-                        onPress: () => {
-                            router.back(); // Close this screen
-                            router.navigate("/(tabs)/settings"); // Navigate to settings
-                        }
-                    },
-                ],
-                { cancelable: true }
-            );
-            return;
-        }
-
         // Determine if this is a prayer or event
         const isPrayer = MAIN_PRAYERS.includes(prayerName as PrayerName);
         const isEvent = PRAYER_EVENTS.includes(prayerName as PrayerName);
@@ -208,6 +189,17 @@ export default function PrayersSettingsScreen() {
         ModalSheetRef.current?.close();
     };
 
+    // ------------------------------------------------------------
+    // Open device notification settings
+    // ------------------------------------------------------------
+    const handleOpenNotifSettings = async () => {
+        if (Platform.OS === "android") {
+            await notifee.openNotificationSettings();
+        } else {
+            Linking.openSettings();
+        }
+    };
+
     // Dont render if no valid prayer name in params
     if (!prayerName) return null;
 
@@ -225,8 +217,9 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[styles.button, styles.saveButton, { backgroundColor: theme.overlay }]}
+                    style={[styles.button, styles.saveButton, { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }]}
                     onPress={handleSave}
+                    disabled={!notificationPermission}
                 >
                     <Text style={[styles.buttonText, { color: theme.accent }]}>
                         {tr.buttons.save}
@@ -256,156 +249,186 @@ export default function PrayersSettingsScreen() {
                     </Text>
                 </View>
 
-                {/* SECTION 1: Enable/Disable */}
-                <AppCard style={styles.sectionCard}>
-                    <View style={styles.sectionHeader}>
-                        <MaterialCommunityIcons
-                            name="bell-outline"
-                            size={20}
-                            color={theme.accent}
-                        />
-                        <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                            {tr.labels.enableNotification}
-                        </Text>
-                        <Switch
-                            value={enabled}
-                            onValueChange={setEnabled}
-                            trackColor={{ false: theme.divider, true: theme.accent }}
-                            thumbColor={enabled ? theme.border : theme.border}
-                            style={{ marginLeft: 'auto' }}
-                        />
-                    </View>
-                </AppCard>
+                {/* SECTIONS: all disabled when notificationPermission is off */}
+                <View>
+                    <View style={{ gap: 10 }} pointerEvents={notificationPermission ? 'auto' : 'none'}>
+                        {!notificationPermission && (
+                            <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg2, opacity: 0.7, zIndex: 10, borderRadius: 12 }]} />
+                        )}
 
-                {/* SECTIONS 2 & 3: disabled when notification is off */}
-                <View style={{ gap: 10 }} pointerEvents={enabled ? 'auto' : 'none'}>
-                    {!enabled && (
-                        // Overlay to indicate disabled state
-                        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg2, opacity: 0.65, zIndex: 10, borderRadius: 12 }]} />
-                    )}
+                        {/* SECTION 1: Enable/Disable */}
+                        <AppCard style={styles.sectionCard}>
+                            <View style={styles.sectionHeader}>
+                                <MaterialCommunityIcons
+                                    name="bell-outline"
+                                    size={20}
+                                    color={theme.accent}
+                                />
+                                <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                                    {tr.labels.enableNotification}
+                                </Text>
+                                <Switch
+                                    value={enabled}
+                                    onValueChange={setEnabled}
+                                    trackColor={{ false: theme.divider, true: theme.accent }}
+                                    thumbColor={enabled ? theme.border : theme.border}
+                                    style={{ marginLeft: 'auto' }}
+                                />
+                            </View>
+                        </AppCard>
 
-                    {/* SECTION 2: Offset chips */}
-                    <AppCard style={styles.sectionCard}>
-                        <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                            <Ionicons name="time-outline" size={20} color={theme.accent} />
-                            <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                                {tr.labels.notificationTime}
-                            </Text>
-                        </View>
+                        {/* SECTIONS 2 & 3: disabled when notification is off */}
+                        <View style={{ gap: 10 }} pointerEvents={enabled ? 'auto' : 'none'}>
+                            {!enabled && (
+                                // Overlay to indicate disabled state
+                                <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg2, opacity: 0.7, zIndex: 10, borderRadius: 12 }]} />
+                            )}
 
-                        {/* Wrapped time Chips */}
-                        <View style={styles.offsetContainer}>
-                            {TIME_OPTIONS.map((option) => (
-                                <TouchableOpacity
-                                    key={option.offset}
-                                    style={[
-                                        styles.offsetChipRow,
-                                        { borderColor: theme.divider },
-                                        selectedOffset === option.offset && {
-                                            backgroundColor: theme.accentLight,
-                                            borderColor: theme.accent,
-                                        }
-                                    ]}
-                                    onPress={() => setSelectedOffset(option.offset)}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.offsetChipText,
-                                            { color: theme.text2 },
-                                        ]}
-                                    >
-                                        {/* Left: Prefix of the Label (5,15,30...) */}
-                                        {option.prefix && (
-                                            <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
-                                        )}
-                                        {/* Center: Label */}
-                                        {option.label}
+                            {/* SECTION 2: Offset chips */}
+                            <AppCard style={styles.sectionCard}>
+                                <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
+                                    <Ionicons name="time-outline" size={20} color={theme.accent} />
+                                    <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                                        {tr.labels.notificationTime}
                                     </Text>
-                                    {/* Right: Checkmark */}
-                                    {selectedOffset === option.offset && (
-                                        <Ionicons name="checkmark" size={16} color={theme.accent} />
-                                    )}
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    </AppCard>
+                                </View>
 
-                    {/* SECTION 3: Sound Selection */}
-                    <AppCard style={styles.sectionCard}>
-                        <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                            <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
-                            <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                                {tr.labels.notificationSound}
-                            </Text>
-                        </View>
-
-                        {/* Compact sound Rows */}
-                        <View style={styles.soundsContainer}>
-                            {SOUND_OPTIONS.map((sound) => (
-                                <View
-                                    key={sound.id}
-                                    style={[
-                                        styles.soundRow,
-                                        { borderColor: theme.divider },
-                                        selectedSound === sound.file && {
-                                            backgroundColor: theme.accentLight,
-                                            borderColor: theme.accent,
-                                        }
-                                    ]}
-                                >
-                                    {/* Left: selectable area */}
-                                    <TouchableOpacity
-                                        style={styles.soundLeft}
-                                        onPress={() => setSelectedSound(sound.file)}
-                                    >
-                                        {/* Left: Checkmark */}
-                                        {selectedSound === sound.file && (
-                                            <Ionicons name="checkmark" size={16} color={theme.accent} />
-                                        )}
-                                        {/* Left: Sound name */}
-                                        <Text
+                                {/* Wrapped time Chips */}
+                                <View style={styles.offsetContainer}>
+                                    {TIME_OPTIONS.map((option) => (
+                                        <TouchableOpacity
+                                            key={option.offset}
                                             style={[
-                                                styles.soundName,
-                                                { color: sound.file ? theme.text : theme.text2 },
+                                                styles.offsetChipRow,
+                                                { borderColor: theme.divider },
+                                                selectedOffset === option.offset && {
+                                                    backgroundColor: theme.accentLight,
+                                                    borderColor: theme.accent,
+                                                }
+                                            ]}
+                                            onPress={() => setSelectedOffset(option.offset)}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.offsetChipText,
+                                                    { color: theme.text2 },
+                                                ]}
+                                            >
+                                                {/* Left: Prefix of the Label (5,15,30...) */}
+                                                {option.prefix && (
+                                                    <Text style={{ fontWeight: '700', color: theme.danger }}>{option.prefix} </Text>
+                                                )}
+                                                {/* Center: Label */}
+                                                {option.label}
+                                            </Text>
+                                            {/* Right: Checkmark */}
+                                            {selectedOffset === option.offset && (
+                                                <Ionicons name="checkmark" size={16} color={theme.accent} />
+                                            )}
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </AppCard>
+
+                            {/* SECTION 3: Sound Selection */}
+                            <AppCard style={styles.sectionCard}>
+                                <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
+                                    <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
+                                    <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                                        {tr.labels.notificationSound}
+                                    </Text>
+                                </View>
+
+                                {/* Compact sound Rows */}
+                                <View style={styles.soundsContainer}>
+                                    {SOUND_OPTIONS.map((sound) => (
+                                        <View
+                                            key={sound.id}
+                                            style={[
+                                                styles.soundRow,
+                                                { borderColor: theme.divider },
+                                                selectedSound === sound.file && {
+                                                    backgroundColor: theme.accentLight,
+                                                    borderColor: theme.accent,
+                                                }
                                             ]}
                                         >
-                                            {sound.name}
-                                        </Text>
-                                        {/* Right: Sound duration */}
-                                        {sound.file && (
-                                            <Text style={[styles.soundDuration, { color: theme.text2 }]}>
-                                                {soundDurations[sound.id] && soundDurations[sound.id] >= 60
-                                                    ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
-                                                    : `${soundDurations[sound.id]?.toFixed(0)}s`
-                                                }
-                                            </Text>
-                                        )}
-                                    </TouchableOpacity>
+                                            {/* Left: selectable area */}
+                                            <TouchableOpacity
+                                                style={styles.soundLeft}
+                                                onPress={() => setSelectedSound(sound.file)}
+                                            >
+                                                {/* Left: Checkmark */}
+                                                {selectedSound === sound.file && (
+                                                    <Ionicons name="checkmark" size={16} color={theme.accent} />
+                                                )}
+                                                {/* Left: Sound name */}
+                                                <Text
+                                                    style={[
+                                                        styles.soundName,
+                                                        { color: sound.file ? theme.text : theme.text2 },
+                                                    ]}
+                                                >
+                                                    {sound.name}
+                                                </Text>
+                                                {/* Right: Sound duration */}
+                                                {sound.file && (
+                                                    <Text style={[styles.soundDuration, { color: theme.text2 }]}>
+                                                        {soundDurations[sound.id] && soundDurations[sound.id] >= 60
+                                                            ? `${(soundDurations[sound.id] / 60).toFixed(1)}m`
+                                                            : `${soundDurations[sound.id]?.toFixed(0)}s`
+                                                        }
+                                                    </Text>
+                                                )}
+                                            </TouchableOpacity>
 
-                                    {/* Right: Play Button */}
-                                    {sound.file && (
-                                        <TouchableOpacity
-                                            style={styles.soundPlay}
-                                            onPress={() => {
-                                                if (playingId === sound.id) {
-                                                    handleStopPreview();
-                                                } else {
-                                                    playPreview(sound.file, sound.id);
-                                                }
-                                            }}
-                                        >
-                                            <Ionicons
-                                                name={(playingId === sound.id) ? "stop-circle" : "play-circle"}
-                                                size={26}
-                                                color={(playingId === sound.id) ? theme.accent : theme.text2}
-                                            />
-                                        </TouchableOpacity>
-                                    )}
+                                            {/* Right: Play Button */}
+                                            {sound.file && (
+                                                <TouchableOpacity
+                                                    style={styles.soundPlay}
+                                                    onPress={() => {
+                                                        if (playingId === sound.id) {
+                                                            handleStopPreview();
+                                                        } else {
+                                                            playPreview(sound.file, sound.id);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Ionicons
+                                                        name={(playingId === sound.id) ? "stop-circle" : "play-circle"}
+                                                        size={26}
+                                                        color={(playingId === sound.id) ? theme.accent : theme.text2}
+                                                    />
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    ))}
                                 </View>
-                            ))}
-                        </View>
-                    </AppCard>
+                            </AppCard>
 
+                        </View>
+                    </View>
+
+                    {/* Permission prompt — shown above the dimmed sections when notificationPermission=false */}
+                    {!notificationPermission && (
+                        <View style={[styles.permissionCardAlert, { backgroundColor: theme.card }]}>
+                            <MaterialCommunityIcons name="bell-off-outline" size={44} color={theme.accent2} />
+                            <Text style={[styles.permissionTitle, { color: theme.text }]}>
+                                {tr.labels.notificationsDisabled}
+                            </Text>
+                            <Text style={[styles.permissionSubtitle, { color: theme.placeholder }]}>
+                                {tr.labels.notificationsDisabledMessage}
+                            </Text>
+                            <TouchableOpacity
+                                style={[styles.permissionButton, { backgroundColor: theme.accent2 }]}
+                                onPress={handleOpenNotifSettings}
+                            >
+                                <Text style={[styles.permissionButtonText, { color: theme.bg }]}>
+                                    {tr.buttons.openSettings}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </View>
 
@@ -500,6 +523,44 @@ const styles = StyleSheet.create({
         paddingRight: 12,
     },
 
+    // Permission prompt styles
+    permissionCardAlert: {
+        position: 'absolute',
+        left: 20,
+        right: 20,
+        top: '25%',
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+        gap: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+        elevation: 12,
+        zIndex: 20,
+    },
+    permissionTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    permissionSubtitle: {
+        fontSize: 14,
+        textAlign: 'center',
+        lineHeight: 20,
+    },
+    permissionButton: {
+        marginTop: 4,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 10,
+    },
+    permissionButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
+
     // Footer styles
     footer: {
         flexDirection: 'row',
@@ -516,13 +577,13 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         gap: 6,
     },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
     cancelButton: {
         backgroundColor: 'transparent',
         borderWidth: StyleSheet.hairlineWidth,
     },
     saveButton: {},
-    buttonText: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
 });
