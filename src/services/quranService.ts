@@ -29,10 +29,28 @@ export const QURAN_TEXT_EDITIONS = {
     khoury: "de.khoury",       // Adel Theodor Khoury
     zaidan: "de.zaidan",       // Amir Zaidan
   },
+  fr: {
+    hamidullah: "fr.hamidullah", // Muhammad Hamidullah (default)
+    leclerc: "fr.leclerc",       // Youssouf Leclerc
+  },
   sq: {
     ahmeti: "sq.ahmeti",     // Sherif Ahmeti (default)
     mehdiu: "sq.mehdiu",     // Feti Mehdiu
     nahi: "sq.nahi",         // Hasan Efendi Nahi
+  },
+  bs: {
+    korkut: "bs.korkut",     // Besim Korkut (default)
+    mlivo: "bs.mlivo",       // Mustafa Mlivo
+  },
+  // No Macedonian API edition — uses English
+  mk: {
+    sahih: "en.sahih",         // Saheeh International (default)
+    yusufali: "en.yusufali",   // Abdullah Yusuf Ali
+    pickthall: "en.pickthall", // Mohammed Marmaduke Pickthall
+    asad: "en.asad",           // Muhammad Asad
+    hilali: "en.hilali",       // Al-Hilali & Muhsin Khan
+    itani: "en.itani",         // Clear Qur'an — Talal Itani
+    maududi: "en.maududi",     // Abul Ala Maududi
   },
   tr: {
     diyanet: "tr.diyanet",   // Diyanet İşleri (default)

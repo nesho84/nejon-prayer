@@ -245,7 +245,7 @@ export default function QuranTabScreen() {
             </View>
 
             {/* Center: Title and Subtitle */}
-            <View>
+            <View style={styles.headerTextCenter}>
               <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
               <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
             </View>
@@ -349,6 +349,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+  },
+  headerTextCenter: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 19,

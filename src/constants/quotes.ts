@@ -52,6 +52,32 @@ export const QUOTES = {
     ],
 
     // ------------------------------------------------------------
+    // Français
+    // ------------------------------------------------------------
+    fr: [
+        "En vérité, c'est par le rappel d'Allah que les cœurs trouvent la paix 💚 (Ar-Ra'd 13:28)",
+        "Certes, la prière préserve de la turpitude et du blâmable 🌙 (Al-Ankabut 29:45)",
+        "Accomplissez la prière, acquittez-vous de la zakat et inclinez-vous avec ceux qui s'inclinent 🕌 (Al-Baqarah 2:43)",
+        "Veillez strictement à l'observance des prières, surtout la prière du milieu ⏰ (Al-Baqarah 2:238)",
+        "Rappelez-Moi donc, Je vous rappellerai ✨ (Al-Baqarah 2:152)",
+        "Cherchez de l'aide dans la patience et la prière 🤲 (Al-Baqarah 2:153)",
+        "Je suis tout proche, Je réponds à l'appel de celui qui Me prie quand il Me prie 🌟 (Al-Baqarah 2:186)",
+        "Invoquez-Moi, Je vous répondrai 💫 (Al-Mu'min 40:60)",
+        "Certes, ont réussi les croyants qui sont humbles dans leur prière 🤲 (Al-Mu'minun 23:1-2)",
+        "Allah n'impose à aucune âme une charge supérieure à sa capacité 🤍 (Al-Baqarah 2:286)",
+        "Quiconque place sa confiance en Allah, Il lui suffit 💙 (At-Talaq 65:3)",
+        "Certes, avec la difficulté vient la facilité 🌅 (Ash-Sharh 94:5-6)",
+        "Ne désespérez pas de la miséricorde d'Allah 🕊️ (Az-Zumar 39:53)",
+        "Votre Seigneur a dit : Invoquez-Moi, Je vous répondrai 💬 (Al-Mu'min 40:60)",
+        "Soyez patients, car Allah est avec les patients ⌚ (Al-Baqarah 2:153)",
+        "Rappelle souvent ton Seigneur et glorifie-Le en soirée et au matin 🌤 (Al-Imran 3:41)",
+        "La prière a été prescrite aux croyants à des heures déterminées ⏳ (An-Nisa 4:103)",
+        "Quiconque fait le bien, c'est pour sa propre âme 🌻 (Fussilat 41:46)",
+        "Demandez pardon à votre Seigneur et revenez à Lui en repentance 🌼 (Hud 11:3)",
+        "Allah est le meilleur des planificateurs 📖 (Al-Anfal 8:30)",
+    ],
+
+    // ------------------------------------------------------------
     // Shqip
     // ------------------------------------------------------------
     sq: [
@@ -75,6 +101,58 @@ export const QUOTES = {
         "Kush bën mirë, e bën për veten e tij 🌻 (Fussilet 41:46)",
         "Dhe kërkoni falje nga Zoti juaj dhe kthehuni të penduar tek Ai 🌼 (Hud 11:3)",
         "Allahu është planifikuesi më i mirë 📖 (El-Enfal 8:30)",
+    ],
+
+    // ------------------------------------------------------------
+    // Bosanski
+    // ------------------------------------------------------------
+    bs: [
+        "Zaista, u sjećanju na Allaha srca nalaze smirenje 💚 (Er-Ra'd 13:28)",
+        "Zaista, namaz odvraća od razvratnosti i ružnog ponašanja 🌙 (El-Ankebut 29:45)",
+        "I klanjajte namaz i dajite zekat i klanjajte s onima koji se klanjaju 🕌 (El-Bekare 2:43)",
+        "Čuvajte namaze, posebno srednji namaz ⏰ (El-Bekare 2:238)",
+        "Pamtite Me, i Ja ću vas pamtiti ✨ (El-Bekare 2:152)",
+        "Tražite pomoć strpljenjem i namazom 🤲 (El-Bekare 2:153)",
+        "Zaista, Ja sam blizu. Odazivam se pozivu onoga ko Me poziva 🌟 (El-Bekare 2:186)",
+        "Pozovite Me, odazvat ću vam se 💫 (El-Mu'min 40:60)",
+        "Uspjeli su zaista vjernici koji su ponizni u svom namazu 🤲 (El-Mu'minun 23:1-2)",
+        "Allah ne opterećuje nijednu dušu više nego što ona može podnijeti 🤍 (El-Bekare 2:286)",
+        "A ko se pouzdaje u Allaha, On mu je dovoljan 💙 (Et-Talak 65:3)",
+        "Zaista, uz teškoću dolazi olakšanje 🌅 (Eš-Šerh 94:5-6)",
+        "Ne gubite nadu u Allahovu milost 🕊️ (Ez-Zumer 39:53)",
+        "Vaš Gospodar kaže: Zovite Me, odazvat ću vam se 💬 (El-Mu'min 40:60)",
+        "Budite strpljivi, jer Allah je zaista s onima koji su strpljivi ⌚ (El-Bekare 2:153)",
+        "I mnogo spominji svog Gospodara i veličaj Ga ujutro i navečer 🌤 (Al-Imran 3:41)",
+        "Zaista, namaz je propisan vjernicima u određenim vremenima ⏳ (En-Nisa 4:103)",
+        "Ko čini dobro, čini ga za svoju dušu 🌻 (Fussilet 41:46)",
+        "I tražite oprost od svog Gospodara i obratite Mu se u pokajanju 🌼 (Hud 11:3)",
+        "Allah je najbolji planer 📖 (El-Enfal 8:30)",
+    ],
+
+    // ------------------------------------------------------------
+    // Македонски
+    // ------------------------------------------------------------
+    mk: [
+        "Навистина, во споменувањето на Аллах срцата наоѓаат смирение 💚 (Ер-Ра'д 13:28)",
+        "Навистина, намазот одвраќа од разврат и злосторство 🌙 (Ел-Анкебут 29:45)",
+        "Клањајте намаз, давајте зекат и клањајте со оние кои клањаат 🕌 (Ел-Бекаре 2:43)",
+        "Чувајте ги намазите, особено средниот намаз ⏰ (Ел-Бекаре 2:238)",
+        "Споменувајте Ме, и Јас ќе ве споменувам ✨ (Ел-Бекаре 2:152)",
+        "Барајте помош со трпение и намаз 🤲 (Ел-Бекаре 2:153)",
+        "Навистина, Јас сум близу. Му се одзивам на повикот на повикувачот кога Ме повикува 🌟 (Ел-Бекаре 2:186)",
+        "Повикајте Ме, ќе ви се одзовам 💫 (Ел-Му'мин 40:60)",
+        "Навистина успеаа верниците кои се смирени во своите намази 🤲 (Ел-Му'минун 23:1-2)",
+        "Аллах не оптоварува ниту душа повеќе отколку што може да поднесе 🤍 (Ел-Бекаре 2:286)",
+        "А кој се потпира на Аллах, Тој му е доволен 💙 (Ет-Талак 65:3)",
+        "Навистина, со тешкотијата доаѓа олеснување 🌅 (Еш-Шерх 94:5-6)",
+        "Не очајувајте од милоста на Аллах 🕊️ (Ез-Зумер 39:53)",
+        "Вашиот Господар вели: Повикајте Ме, ќе ви се одзовам 💬 (Ел-Му'мин 40:60)",
+        "Бидете трпеливи, бидејќи Аллах е навистина со трпеливите ⌚ (Ел-Бекаре 2:153)",
+        "И многу споменувај го твојот Господар и величај Го навечер и наутро 🌤 (Ал-Имран 3:41)",
+        "Навистина, намазот е пропишан на верниците во одредени времиња ⏳ (Ен-Ниса 4:103)",
+        "Кој прави добро, го прави за своја душа 🌻 (Фусилет 41:46)",
+        "И барајте прошка од вашиот Господар и обрнете Му се во покајание 🌼 (Худ 11:3)",
+        "Аллах е најдобриот планер 📖 (Ел-Енфал 8:30)",
     ],
 
     // ------------------------------------------------------------

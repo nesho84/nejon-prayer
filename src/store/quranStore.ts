@@ -67,6 +67,16 @@ interface QuranState extends QuranData, AyahsData, AyahFavoritesData, QuranSetti
   isAyahFavorite: (surahId: number, ayahId: number) => boolean;
 }
 
+const DEFAULT_EDITIONS: Record<string, string> = {
+  en: QURAN_TEXT_EDITIONS.en.sahih,
+  de: QURAN_TEXT_EDITIONS.de.bubenheim,
+  fr: QURAN_TEXT_EDITIONS.fr.hamidullah,
+  sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
+  bs: QURAN_TEXT_EDITIONS.bs.korkut,
+  mk: QURAN_TEXT_EDITIONS.mk.sahih,
+  tr: QURAN_TEXT_EDITIONS.tr.diyanet,
+};
+
 export const useQuranStore = create<QuranState>()(
   persist(
     (set, get) => ({
@@ -93,12 +103,7 @@ export const useQuranStore = create<QuranState>()(
       // Settings
       arabicFontSize: 26,
       translationFontSize: 18,
-      selectedEditions: {
-        en: QURAN_TEXT_EDITIONS.en.sahih,
-        de: QURAN_TEXT_EDITIONS.de.bubenheim,
-        sq: QURAN_TEXT_EDITIONS.sq.ahmeti,
-        tr: QURAN_TEXT_EDITIONS.tr.diyanet,
-      },
+      selectedEditions: DEFAULT_EDITIONS,
 
       // Favorites
       favoriteAyahs: [],
@@ -143,9 +148,11 @@ export const useQuranStore = create<QuranState>()(
         // AyahsScreen reads verses directly from getSurahById() for Arabic
         if (language === "ar") return;
 
+        // Use the stored edition, fall back to English if somehow missing
+        const edition = get().selectedEditions[language] ?? QURAN_TEXT_EDITIONS.en.sahih;
+
         set({ isLoadingAyahs: true, ayahsError: null, ayahs: [] });
         try {
-          const edition = get().selectedEditions[language];
           const data = await fetchAyahsFromApi(surahId, edition);
           set({ ayahs: data });
         } catch (err) {
@@ -212,6 +219,12 @@ export const useQuranStore = create<QuranState>()(
     {
       name: "quran-storage",
       storage: createJSONStorage(() => mmkvStorage),
+      // Start with defaults, then layer in any user-saved preferences on top
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<QuranState>),
+        selectedEditions: { ...DEFAULT_EDITIONS, ...((persisted as Partial<QuranState>)?.selectedEditions ?? {}) },
+      }),
       // Persist reading/khatam positions, counts, and display settings
       // — everything else (player state, loaded data) starts fresh
       partialize: (state) => ({
