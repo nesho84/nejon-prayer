@@ -45,7 +45,9 @@ const PrayerCountdownCard = React.memo(({
 
   // progress goes from 0 → 1 as time passes
   const progress = 1 - (remainingSeconds / totalSeconds);
-  const strokeDashoffset = circumference * (1 - progress);
+
+  // Clamping to strokeWidth keeps a small gap at the end of the progress circle, which looks nicer than a full circle when time runs out
+  const strokeDashoffset = Math.max(circumference * (1 - progress), strokeWidth); // New
 
   // Main Content
   return (
