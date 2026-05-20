@@ -1,3 +1,5 @@
+import { Language } from "@/types/language.types";
+
 export const QUOTES = {
     // ------------------------------------------------------------
     // English
@@ -206,5 +208,5 @@ export const QUOTES = {
         "وَأَنِ ٱسْتَغْفِرُوا۟ رَبَّكُمْ ثُمَّ تُوبُوٓا۟ إِلَيْهِ 🌼 (Hud 11:3)",
         "وَٱللَّهُ خَيْرُ ٱلْمَـٰكِرِينَ 📖 (Al‑Anfal 8:30)",
     ],
-};
+} satisfies Record<Language, string[]>;
 

@@ -1,6 +1,7 @@
 import { fetchAyahsFromApi, loadQuranTransliterationJson, QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
+import { Language } from "@/types/language.types";
 import { Ayah, FavoriteAyah, Quran, Surah } from '@/types/quran.types';
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -75,7 +76,7 @@ const DEFAULT_EDITIONS: Record<string, string> = {
   bs: QURAN_TEXT_EDITIONS.bs.korkut,
   mk: QURAN_TEXT_EDITIONS.mk.sahih,
   tr: QURAN_TEXT_EDITIONS.tr.diyanet,
-};
+} satisfies Record<Exclude<Language, 'ar'>, string>;
 
 export const useQuranStore = create<QuranState>()(
   persist(
