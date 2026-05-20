@@ -94,7 +94,7 @@ const COUNTRY_METHOD_MAP: Record<string, number> = {
 };
 
 // Helper to get calculation method for a given country code, with fallback
-function getMethodForCountry(countryCode: string): number {
+export function getMethodForCountry(countryCode: string): number {
     return COUNTRY_METHOD_MAP[countryCode] ?? 3; // fallback to MWL
 }
 
