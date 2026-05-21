@@ -1,14 +1,16 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import PrayerNotifIcon from '@/components/PrayerNotifIcon';
 import { useLanguageStore } from '@/store/languageStore';
+import { useModalStore } from '@/store/modalStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/date';
 import { isTimePast } from '@/utils/time';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
@@ -16,6 +18,15 @@ interface Props {
   prayerTimesDate: string | null;
   currentPrayerName: PrayerName | null;
 }
+
+const CELEBRATION_VARIANTS = [
+  { emoji: '🤲', title: 'May Allah accept your prayers', message: 'All 5 prayers completed today' },
+  { emoji: '✨', title: 'Beautiful consistency today', message: 'Keep up the great work' },
+  { emoji: '🌙', title: 'Daily prayers completed', message: 'Alhamdulillah' },
+  { emoji: '🕌', title: 'All prayers completed today', message: 'May Allah accept them' },
+  { emoji: '🎉', title: "You completed today's prayers", message: 'Well done!' },
+  { emoji: '🤍', title: 'Keep it up', message: 'Every prayer counts' },
+];
 
 const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerName }: Props) => {
   // Stores
@@ -26,6 +37,45 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   const tracking = usePrayersTrackingStore((state) => state.tracking);
   const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
   const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
+  const celebratedDate = usePrayersTrackingStore((state) => state.celebratedDate);
+  const setCelebrated = usePrayersTrackingStore((state) => state.setCelebrated);
+
+  const handleMark = useCallback((prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
+    if (!__DEV__ && !isPast && !isCurrent) return;
+
+    // If already marked as prayed, unmark it
+    if (isPrayed) {
+      unmarkPrayed(prayerName); return;
+    }
+    // Mark as prayed and check if all prayers are done for today
+    const prayersComplete = markPrayed(prayerName);
+
+    const today = toDateKey();
+    const alreadyCelebrated = celebratedDate === today;
+    const shouldCelebrate = prayersComplete && (!alreadyCelebrated || prayerName === 'Isha');
+
+    if (shouldCelebrate) {
+      const variant = CELEBRATION_VARIANTS[Math.floor(Math.random() * CELEBRATION_VARIANTS.length)];
+      if (!alreadyCelebrated) setCelebrated(today);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      useModalStore.getState().show({
+        type: 'alert',
+        component: (
+          <View style={{ alignItems: 'center', paddingVertical: 8, gap: 6 }}>
+            <Text style={{ fontSize: 44, lineHeight: 56 }}>{variant.emoji}</Text>
+            <Text style={{ fontSize: 22, fontWeight: '700', color: theme.text, textAlign: 'center', marginTop: 4 }}>
+              {variant.title}
+            </Text>
+            <Text style={{ fontSize: 14, color: theme.textMuted, textAlign: 'center', lineHeight: 20 }}>
+              {variant.message}
+            </Text>
+          </View>
+        ),
+        buttons: [{ label: 'Done', action: 'done', style: 'primary' }],
+      });
+    }
+  }, [celebratedDate, setCelebrated]);
 
   return (
     <View style={styles.container}>
@@ -58,8 +108,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                   activeOpacity={0.3}
                   hitSlop={8}
                   onPress={() => {
-                    if (!isPast && !isCurrent) return;
-                    isPrayed ? unmarkPrayed(prayerName as PrayerName) : markPrayed(prayerName as PrayerName)
+                    handleMark(prayerName as PrayerName, isPrayed, isPast, isCurrent);
                   }}
                 >
                   {/* Left: Tracking circle */}

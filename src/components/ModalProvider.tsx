@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 4,
+    marginVertical: 4,
   },
   btn: {
     flex: 1,

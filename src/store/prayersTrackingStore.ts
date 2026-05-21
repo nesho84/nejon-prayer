@@ -1,5 +1,5 @@
 import { mmkvStorage } from '@/store/storage';
-import { PrayerName } from '@/types/prayer.types';
+import { MAIN_PRAYERS, PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/date';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -10,8 +10,10 @@ type TrackingRecord = Record<string, DayTracking>;
 interface PrayersTrackingState {
   tracking: TrackingRecord;
   isReady: boolean;
-  markPrayed: (prayer: PrayerName, dateKey?: string) => void;
+  celebratedDate: string | null;
+  markPrayed: (prayer: PrayerName, dateKey?: string) => boolean;
   unmarkPrayed: (prayer: PrayerName, dateKey?: string) => void;
+  setCelebrated: (dateKey: string) => void;
 }
 
 // Keep tracking data for 31 days to prevent infinite growth of storage
@@ -34,9 +36,10 @@ const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
 
 export const usePrayersTrackingStore = create<PrayersTrackingState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       tracking: {},
       isReady: false,
+      celebratedDate: null,
 
       markPrayed: (prayer, dateKey) => {
         const key = dateKey ?? toDateKey();
@@ -46,6 +49,13 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
             [key]: { ...state.tracking[key], [prayer]: 'prayed' },
           },
         }));
+        const { tracking } = get();
+        const isToday = key === toDateKey();
+        const allDone = MAIN_PRAYERS.every((p) => tracking[key]?.[p] === 'prayed');
+
+        // Returns whether all prayers are done for that day.
+        // Return value is optional — callers that don't need it can ignore it.
+        return isToday && allDone;
       },
 
       unmarkPrayed: (prayer, dateKey) => {
@@ -57,11 +67,16 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
           },
         }));
       },
+
+      setCelebrated: (dateKey) => set({ celebratedDate: dateKey }),
     }),
     {
       name: 'prayer-tracking-storage',
       storage: createJSONStorage(() => mmkvStorage),
-      partialize: (state) => ({ tracking: state.tracking }),
+      partialize: (state) => ({
+        tracking: state.tracking,
+        celebratedDate: state.celebratedDate,
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.tracking = cleanOldEntries(state.tracking);
