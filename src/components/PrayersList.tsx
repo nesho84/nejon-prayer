@@ -64,18 +64,23 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         component: (
           <View style={{ alignItems: 'center', paddingVertical: 8, gap: 6 }}>
             <Text style={{ fontSize: 44, lineHeight: 56 }}>{variant.emoji}</Text>
-            <Text style={{ fontSize: 22, fontWeight: '700', color: theme.text, textAlign: 'center', marginTop: 4 }}>
+            <Text style={{ fontSize: 22, fontWeight: '700', color: theme.text2, textAlign: 'center', marginTop: 10, marginBottom: 4 }}>
               {variant.title}
             </Text>
-            <Text style={{ fontSize: 14, color: theme.textMuted, textAlign: 'center', lineHeight: 20 }}>
+            <Text style={{ fontSize: 16, color: theme.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 8 }}>
               {variant.message}
             </Text>
           </View>
         ),
-        buttons: [{ label: 'Done', action: 'done', style: 'primary' }],
+        buttons: [{
+          label: 'OK',
+          action: 'ok',
+          buttonStyle: { backgroundColor: theme.accentLight },
+          labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
+        }],
       });
     }
-  }, [celebratedDate, setCelebrated]);
+  }, [markPrayed, unmarkPrayed, celebratedDate, setCelebrated, theme]);
 
   return (
     <View style={styles.container}>

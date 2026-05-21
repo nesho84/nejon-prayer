@@ -28,23 +28,11 @@ export default function ModalProvider() {
       {options?.buttons?.map((btn) => (
         <TouchableOpacity
           key={btn.action}
-          style={[
-            styles.btn,
-            { backgroundColor: theme.card },
-            btn.style === 'primary' && { backgroundColor: theme.primary },
-            btn.destructive && { backgroundColor: theme.danger + '18' },
-          ]}
+          style={[styles.btn, btn.buttonStyle]}
           onPress={() => hide(btn.action)}
           activeOpacity={0.8}
         >
-          <Text
-            style={[
-              styles.btnText,
-              { color: theme.text },
-              btn.style === 'primary' && { color: theme.white },
-              btn.destructive && { color: theme.danger },
-            ]}
-          >
+          <Text style={[styles.btnText, btn.labelStyle]}>
             {btn.label}
           </Text>
         </TouchableOpacity>
@@ -135,12 +123,11 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     gap: 10,
-    marginVertical: 4,
   },
   btn: {
     flex: 1,
     height: 44,
-    borderRadius: 10,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },

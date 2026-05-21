@@ -1,3 +1,4 @@
+import { TextStyle, ViewStyle } from 'react-native';
 import { create } from 'zustand';
 
 export type ModalType = 'alert' | 'confirm' | 'fullscreen';
@@ -5,8 +6,8 @@ export type ModalType = 'alert' | 'confirm' | 'fullscreen';
 export type ModalButton = {
   label: string;
   action: string;
-  destructive?: boolean;
-  style?: 'primary' | 'secondary';
+  buttonStyle?: ViewStyle;
+  labelStyle?: TextStyle;
 };
 
 export type ModalOptions = {
