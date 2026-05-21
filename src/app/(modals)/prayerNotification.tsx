@@ -300,7 +300,7 @@ export default function PrayersSettingsScreen() {
                                             key={option.offset}
                                             style={[
                                                 styles.offsetChipRow,
-                                                { borderColor: theme.divider },
+                                                { borderColor: theme.divider2 },
                                                 selectedOffset === option.offset && {
                                                     backgroundColor: theme.accentLight,
                                                     borderColor: theme.accent,
@@ -346,7 +346,7 @@ export default function PrayersSettingsScreen() {
                                             key={sound.id}
                                             style={[
                                                 styles.soundRow,
-                                                { borderColor: theme.divider },
+                                                { borderColor: theme.divider2 },
                                                 selectedSound === sound.file && {
                                                     backgroundColor: theme.accentLight,
                                                     borderColor: theme.accent,

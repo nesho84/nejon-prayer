@@ -27,7 +27,7 @@ export const LIGHT_COLORS = {
     pink: "#db2777",
     brown: "#92400e",
     gray: "#808080",
-    green: "#15803d",
+    green: "#50C878",
 
     // Surfaces & Borders
     card: "#f3f3f3",
@@ -67,6 +67,7 @@ export const LIGHT_COLORS = {
     white: "#ffffff",
     black: "#000000",
     gold: "#d1a127",
+    islamicGreen: "#009000",
     transparent: "transparent",
 };
 
@@ -99,7 +100,7 @@ export const DARK_COLORS = {
     pink: "#f472b6",
     brown: "#d97706",
     gray: "#808080",
-    green: "#059669",
+    green: "#009000",
 
     // Surfaces & Borders
     card: "#1f2937",
@@ -139,5 +140,6 @@ export const DARK_COLORS = {
     white: "#ffffff",
     black: "#000000",
     gold: "#d1a127",
+    islamicGreen: "#009000",
     transparent: "transparent",
 };

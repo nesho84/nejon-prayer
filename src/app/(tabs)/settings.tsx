@@ -460,6 +460,9 @@ export default function SettingsScreen() {
                         />
                     </View>
 
+                    {/* Divider */}
+                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
                     {/* ------ Notifications (Disabled overlay when notificationPermission=false) ------ */}
                     <View style={styles.subSections} pointerEvents={notificationPermission ? 'auto' : 'none'}>
                         {!notificationPermission && (
@@ -689,7 +692,7 @@ const styles = StyleSheet.create({
 
     // Settings Card sub-groups
     subSections: {
-        marginTop: 12,
+        marginTop: 5,
         gap: 8,
     },
     subGroup: {
