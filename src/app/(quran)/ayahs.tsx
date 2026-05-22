@@ -115,35 +115,40 @@ export default function AyahsScreen() {
   // ------------------------------------------------------------
   // Render a single ayah row
   // ------------------------------------------------------------
-  const renderAyahItem = useCallback(({ item }: { item: Verse }) => (
-    <QuranAyahRow
-      surahId={surahIdNum}
-      surahName={surahNameStr}
-      verse={item}
-      translation={translationMap.get(item.id) ?? null}
-      theme={theme}
-      arabicFontSize={arabicFontSize}
-      translationFontSize={translationFontSize}
-      isSelected={selectedAyah === item.id}
-      isAyahFavorited={isAyahFavorite(surahIdNum, item.id)}
-      onPress={() => {
-        userInteractedRef.current = true;
-        setSelectedAyah(item.id);
-        if (mode === "reading") {
-          setLastRead(surahIdNum, surahNameStr, item.id);
-        } else {
-          setLastKhatam(surahIdNum, surahNameStr, item.id);
-        }
-      }}
-      onToggleAyahFavorite={() => toggleAyahFavorite({
-        surahId: surahIdNum,
-        surahName: surahNameStr,
-        ayahId: item.id,
-        arabicText: item.text,
-        translation: translationMap.get(item.id) ?? null,
-      })}
-    />
-  ), [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
+  const renderAyahItem = useCallback(({ item }: { item: Verse }) => {
+    // Arabic needs no translation — show transliteration instead
+    const ayahTranslation = language === "ar" ? item.transliteration : (translationMap.get(item.id) ?? null);
+
+    return (
+      <QuranAyahRow
+        surahId={surahIdNum}
+        surahName={surahNameStr}
+        verse={item}
+        translation={ayahTranslation}
+        theme={theme}
+        arabicFontSize={arabicFontSize}
+        translationFontSize={translationFontSize}
+        isSelected={selectedAyah === item.id}
+        isAyahFavorited={isAyahFavorite(surahIdNum, item.id)}
+        onPress={() => {
+          userInteractedRef.current = true;
+          setSelectedAyah(item.id);
+          if (mode === "reading") {
+            setLastRead(surahIdNum, surahNameStr, item.id);
+          } else {
+            setLastKhatam(surahIdNum, surahNameStr, item.id);
+          }
+        }}
+        onToggleAyahFavorite={() => toggleAyahFavorite({
+          surahId: surahIdNum,
+          surahName: surahNameStr,
+          ayahId: item.id,
+          arabicText: item.text,
+          translation: ayahTranslation,
+        })}
+      />
+    );
+  }, [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
 
   // ------------------------------------------------------------
   // Footer: Next Surah button (or Complete Khatam on surah 114)

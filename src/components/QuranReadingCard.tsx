@@ -76,23 +76,23 @@ export default function QuranReadingCard() {
   return (
     <View style={styles.container}>
 
-      {/* Mode chips */}
-      <View style={[styles.chipRow, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+      {/* View Mode toggle Buttons */}
+      <View style={[styles.toggleRow, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
         {(["reading", "khatam"] as ReadingMode[]).map((m) => (
           <TouchableOpacity
             key={m}
             activeOpacity={0.7}
-            style={[styles.chip, mode === m && { backgroundColor: theme.card }]}
+            style={[styles.toggleBtn, mode === m && { backgroundColor: theme.card, borderColor: theme.borderCard, borderWidth: 0.4 }]}
             onPress={() => setMode(m)}
           >
-            <Text style={[styles.chipText, { color: mode === m ? theme.text : theme.text2 }]}>
+            <Text style={[styles.toggleBtnText, { color: mode === m ? theme.text : theme.text2 }]}>
               {m === "reading" ? tr.labels.read : tr.labels.khatam}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Card */}
+      {/* Reading mode Card */}
       <TouchableOpacity activeOpacity={0.7} onPress={handlePress}>
         <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: theme.gold }]}>
 
@@ -140,29 +140,30 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  // Chips
-  chipRow: {
-    flexDirection: "row",
-    borderRadius: 8,
-    borderWidth: 1,
+  // Toggle buttons
+  toggleRow: {
     overflow: "hidden",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderRadius: 8,
     padding: 3,
-    gap: 3,
+    gap: 6,
   },
-  chip: {
+  toggleBtn: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 19,
     paddingVertical: 7,
     borderRadius: 6,
   },
-  chipText: {
+  toggleBtnText: {
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: 0.4,
   },
 
-  // Card
+  // Dynamic Card
   card: {
     borderRadius: 10,
     borderWidth: 1,

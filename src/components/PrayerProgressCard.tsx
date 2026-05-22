@@ -48,15 +48,17 @@ const PrayerProgressCard = React.memo(() => {
           <MaterialCommunityIcons name="progress-check" size={23} color={theme.accent} style={{ opacity: 0.8 }} />
           <Text style={[styles.title, { color: theme.text2 }]}>{tr.labels.myProgress}</Text>
         </View>
+
         {/* Right: View toggle Buttons */}
         <View style={[styles.toggleRow, { backgroundColor: theme.surfaceBg, borderColor: theme.borderCard }]}>
           {(['week', 'month'] as const).map((v) => (
             <TouchableOpacity
               key={v}
-              onPress={() => setProgressView(v)}
+              activeOpacity={0.7}
               style={[styles.toggleBtn, v === progressView && { backgroundColor: theme.overlayLight }]}
+              onPress={() => setProgressView(v)}
             >
-              <Text style={[styles.toggleText, { color: v === progressView ? theme.white : theme.textSecondary }]}>
+              <Text style={[styles.toggleBtnText, { color: v === progressView ? theme.white : theme.textSecondary }]}>
                 {v === 'week' ? tr.labels.week : tr.labels.month}
               </Text>
             </TouchableOpacity>
@@ -134,6 +136,8 @@ const styles = StyleSheet.create({
   container: {
     gap: 10,
   },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -158,7 +162,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 4,
   },
+
+  // Toggle buttons
   toggleRow: {
+    overflow: "hidden",
     flexDirection: 'row',
     borderWidth: 1,
     borderRadius: 8,
@@ -170,11 +177,12 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 6,
   },
-  toggleText: {
+  toggleBtnText: {
     fontSize: 13,
     fontWeight: '600',
   },
 
+  // Weeek & Month Grid
   gridContainer: {
     gap: 0,
   },
