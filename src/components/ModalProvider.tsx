@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function ModalProvider() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
+  // Modal store
   const { visible, options, hide } = useModalStore();
 
   const insets = useSafeAreaInsets();
@@ -60,7 +61,10 @@ export default function ModalProvider() {
         <TouchableOpacity
           key={btn.action}
           style={[styles.btn, btn.buttonStyle]}
-          onPress={() => hide(btn.action)}
+          onPress={() => {
+            btn.onPress?.();
+            hide(btn.action);
+          }}
           activeOpacity={0.8}
         >
           <Text style={[styles.btnText, btn.labelStyle]}>

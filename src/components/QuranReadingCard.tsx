@@ -113,11 +113,18 @@ export default function QuranReadingCard() {
           {/* Khatam footer: inside card, separated by divider */}
           {!isReading && (
             <>
-              <View style={[styles.cardDivider, { backgroundColor: theme.divider3 }]} />
+              <View style={[styles.cardDivider, { backgroundColor: theme.divider2 }]} />
               <View style={styles.khatamFooter}>
-                <Text style={[styles.khatamCountText, { color: theme.text2 }]}>
-                  {`${khatamCount} × ${tr.labels.khatam}`}
-                </Text>
+                <View style={styles.khatamCountContainer}>
+                  {/* Count */}
+                  <Text style={[styles.khatamCountText, { color: theme.textMuted }]}>
+                    {khatamCount}
+                  </Text>
+                  {/* Label */}
+                  <Text style={[styles.khatamCountLabel, { color: theme.textMuted }]}>
+                    × {tr.labels.khatam}
+                  </Text>
+                </View>
                 <TouchableOpacity
                   onPress={handleReset}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
   // Khatam footer (inside card)
   cardDivider: {
     height: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 14,
   },
   khatamFooter: {
     flexDirection: "row",
@@ -211,9 +218,16 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     paddingHorizontal: 16,
   },
+  khatamCountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
   khatamCountText: {
     fontSize: 12,
-    fontWeight: "500",
-    opacity: 0.6,
+    fontWeight: "700",
+  },
+  khatamCountLabel: {
+    fontSize: 12,
   },
 });

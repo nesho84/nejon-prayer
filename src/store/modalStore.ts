@@ -7,6 +7,7 @@ export type ModalType = 'alert' | 'confirm' | 'fullscreen';
 export type ModalButton = {
   label: string;
   action: string;
+  onPress?: () => void;
   buttonStyle?: ViewStyle;
   labelStyle?: TextStyle;
 };
