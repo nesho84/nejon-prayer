@@ -1,10 +1,11 @@
+import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useEffect } from "react";
 import TrackPlayer, { AppKilledPlaybackBehavior, Capability, Event, State } from "react-native-track-player";
 
 export function useQuranSetup() {
   const loadFullQuran = useQuranStore((state) => state.loadFullQuran);
-  const syncPlayback = useQuranStore((state) => state.syncPlayback);
+  const syncPlayback = useQuranPlayerStore((state) => state.syncPlayback);
 
   // ------------------------------------------------------------
   // Init: Load Full Quran from local JSON asset into store

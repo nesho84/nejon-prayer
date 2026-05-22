@@ -38,18 +38,7 @@ type QuranSettings = {
   selectedEditions: Record<string, string>;
 }
 
-type QuranPlayerData = {
-  isActive: boolean;
-  isPlaying: boolean;
-  isBuffering: boolean;
-  hasFinished: boolean;
-  isSwitching: boolean;
-  activeSurahId: number | null;
-  activeSurahName: string | null;
-  playbackError: unknown;
-}
-
-interface QuranState extends QuranData, AyahsData, AyahFavoritesData, QuranSettings, QuranPlayerData {
+interface QuranState extends QuranData, AyahsData, AyahFavoritesData, QuranSettings {
   // Quran actions
   loadFullQuran: () => void;
   getSurahById: (id: number) => Surah | undefined;
@@ -61,8 +50,6 @@ interface QuranState extends QuranData, AyahsData, AyahFavoritesData, QuranSetti
   resetKhatam: () => void;
   // Settings actions
   setQuranSettings: (settings: Partial<QuranSettings>) => void;
-  // Player actions
-  syncPlayback: (payload: Partial<QuranPlayerData>) => void;
   // Favorites actions
   toggleAyahFavorite: (ayah: FavoriteAyah) => void;
   isAyahFavorite: (surahId: number, ayahId: number) => boolean;
@@ -108,16 +95,6 @@ export const useQuranStore = create<QuranState>()(
 
       // Favorites
       favoriteAyahs: [],
-
-      // Player state
-      isActive: false,
-      isPlaying: false,
-      isBuffering: false,
-      hasFinished: false,
-      isSwitching: false,
-      activeSurahId: null,
-      activeSurahName: null,
-      playbackError: null,
 
       // Load full Quran once at app startup
       // Derives surahs list immediately — strips verses
@@ -195,10 +172,6 @@ export const useQuranStore = create<QuranState>()(
 
       // Update Quran settings (font sizes)
       setQuranSettings: (settings) => set(settings),
-
-      // Sync any playback-related state fields into the store
-      // Accepts a partial payload — only passed fields are updated (shallow merge)
-      syncPlayback: (payload) => set(payload),
 
       // Toggle a favorite ayah (add if not present, remove if already saved)
       toggleAyahFavorite: (ayah) => {

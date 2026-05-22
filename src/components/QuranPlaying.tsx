@@ -1,4 +1,4 @@
-import { useQuranStore } from "@/store/quranStore";
+import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -79,9 +79,9 @@ const QuranPlaying = React.memo(() => {
   const theme = useThemeStore((state) => state.theme);
 
   // Quran Store
-  const isActive = useQuranStore((state) => state.isActive);
-  const isPlaying = useQuranStore((state) => state.isPlaying);
-  const activeSurahName = useQuranStore((state) => state.activeSurahName);
+  const isActive = useQuranPlayerStore((state) => state.isActive);
+  const isPlaying = useQuranPlayerStore((state) => state.isPlaying);
+  const activeSurahName = useQuranPlayerStore((state) => state.activeSurahName);
 
   if (!isActive || activeSurahName === null) return null;
 
