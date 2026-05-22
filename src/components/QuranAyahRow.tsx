@@ -33,8 +33,9 @@ const QuranAyahRow = React.memo(({
   onPress,
   onToggleAyahFavorite,
 }: Props) => {
-
+  // ------------------------------------------------------------
   // Share text cross-platform
+  // ------------------------------------------------------------
   const handleShare = async () => {
     const title = `${surahId}) ${surahName}, Ayah ${verse.id}`;
     const message = translation ? `${verse.text}\n\n${translation}` : verse.text;
@@ -54,7 +55,9 @@ const QuranAyahRow = React.memo(({
     }
   };
 
+  // ------------------------------------------------------------
   // Copy text (title + message)
+  // ------------------------------------------------------------
   const handleCopy = async () => {
     const title = `${surahId}) ${surahName}, Ayah ${verse.id}`;
     const message = translation ? `${verse.text}\n\n${translation}` : verse.text;
@@ -124,6 +127,7 @@ const QuranAyahRow = React.memo(({
 
       {/* Divider */}
       <View style={[styles.divider, { backgroundColor: theme.divider }]} />
+
     </TouchableOpacity>
   );
 });

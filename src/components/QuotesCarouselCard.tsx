@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useRef, useState } from "react";
 import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 
+// Constants for carousel behavior and appearance
 const MAX_QUOTES = 5;
 const PEEK = 12; // small visible edge of next/previous card
 const SPACING = 8; // space between cards

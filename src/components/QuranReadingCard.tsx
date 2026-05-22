@@ -38,12 +38,16 @@ export default function QuranReadingCard() {
   const ayahId = isReading ? lastReadAyahId : lastKhatamAyahId;
   const hasStarted = isReading ? !!lastReadSurahId : !!lastKhatamSurahId;
 
+  // ------------------------------------------------------------
   // Card label logic
+  // ------------------------------------------------------------
   const cardLabel = hasStarted
     ? (isReading ? tr.labels.continueReading : tr.labels.continueKhatam)
     : (isReading ? tr.labels.startReading : tr.labels.startKhatam);
 
+  // ------------------------------------------------------------
   // Handle card press
+  // ------------------------------------------------------------
   const handlePress = () => {
     router.navigate({
       pathname: "/(quran)/ayahs",
@@ -55,7 +59,9 @@ export default function QuranReadingCard() {
     });
   };
 
+  // ------------------------------------------------------------
   // Handle Khatam reset
+  // ------------------------------------------------------------
   const handleReset = () => {
     Alert.alert(
       tr.labels.khatamResetTitle,

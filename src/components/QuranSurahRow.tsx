@@ -39,7 +39,6 @@ const QuranSurahRow = React.memo(({
   onPlayPauseReplay,
   onStop,
 }: Props) => {
-
   // Local state
   const isThisActive = activeSurahId === surah.id;
   const isThisPlaying = isThisActive && isPlaying;
@@ -48,7 +47,9 @@ const QuranSurahRow = React.memo(({
   const showStop = isThisActive && !isBufferingActive && !hasError;
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
+  // ------------------------------------------------------------
   // Play button icon — error takes priority over all other states
+  // ------------------------------------------------------------
   const playButtonIcon = () => {
     if (isThisBuffering) return <ActivityIndicator size="small" color={theme.accent} />;
 

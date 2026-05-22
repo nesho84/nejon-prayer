@@ -49,7 +49,6 @@ const PrayerCountdownCard = React.memo(({
   // Clamping to strokeWidth keeps a small gap at the end of the progress circle, which looks nicer than a full circle when time runs out
   const strokeDashoffset = Math.max(circumference * (1 - progress), strokeWidth); // New
 
-  // Main Content
   return (
     <View style={styles.row}>
 
@@ -140,7 +139,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-
   circleWrapper: {
     alignItems: "center",
     justifyContent: "center",

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useIsFocused } from '@react-navigation/native';
-import { StyleSheet, View, Text, Animated, TouchableOpacity, Vibration } from 'react-native';
-import { router } from "expo-router";
-import { Magnetometer, Accelerometer } from 'expo-sensors';
-import { Ionicons } from '@expo/vector-icons';
 import { useLanguageStore } from "@/store/languageStore";
+import { Ionicons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
+import { router } from "expo-router";
+import { Accelerometer, Magnetometer } from 'expo-sensors';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 
 interface Props {
     loading: boolean;
@@ -238,6 +238,7 @@ export default function QiblaCompass({
 
     return (
         <View style={[styles.container, { backgroundColor: bgColor }]}>
+
             {/* Warning Banners */}
             {!isFlat && (
                 <View style={[styles.warning, { backgroundColor: '#ff9800' }]}>
@@ -349,6 +350,7 @@ export default function QiblaCompass({
                     </View>
                 )}
             </View>
+
         </View>
     );
 }

@@ -49,12 +49,11 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
             [key]: { ...state.tracking[key], [prayer]: 'prayed' },
           },
         }));
+        // Returns whether all prayers are done for that day.
+        // Return value is optional — callers that don't need it can ignore it.
         const { tracking } = get();
         const isToday = key === toDateKey();
         const allDone = MAIN_PRAYERS.every((p) => tracking[key]?.[p] === 'prayed');
-
-        // Returns whether all prayers are done for that day.
-        // Return value is optional — callers that don't need it can ignore it.
         return isToday && allDone;
       },
 

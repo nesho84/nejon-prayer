@@ -9,6 +9,9 @@ interface Props {
   style?: StyleProp<TextStyle>;
 }
 
+// ------------------------------------------------------------
+// Renders the correct prayer icon based on the prayer name.
+// ------------------------------------------------------------
 export default function PrayerIcon({ name, size, color, opacity = 1, style }: Props) {
   const pn = name.toLowerCase();
   const iconStyle: StyleProp<TextStyle> = [{ opacity }, style];

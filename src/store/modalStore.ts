@@ -1,3 +1,4 @@
+import React from 'react';
 import { TextStyle, ViewStyle } from 'react-native';
 import { create } from 'zustand';
 
@@ -16,6 +17,12 @@ export type ModalOptions = {
   content?: string;
   component?: React.ReactNode;
   buttons?: ModalButton[];
+  animationType?: 'fade' | 'slide' | 'none';
+  dismissable?: boolean;
+  showCloseIcon?: boolean;
+  containerStyle?: ViewStyle;
+  titleStyle?: TextStyle;
+  contentStyle?: TextStyle;
 };
 
 interface ModalStore {

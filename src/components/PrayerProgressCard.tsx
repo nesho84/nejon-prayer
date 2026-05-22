@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
   container: {
     gap: 10,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',

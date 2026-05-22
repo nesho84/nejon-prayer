@@ -1,5 +1,6 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import PrayerNotifIcon from '@/components/PrayerNotifIcon';
+import { CELEBRATION_MESSAGES } from '@/constants/celebrations';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
@@ -19,20 +20,11 @@ interface Props {
   currentPrayerName: PrayerName | null;
 }
 
-const CELEBRATION_VARIANTS = [
-  { emoji: '🤲', title: 'May Allah accept your prayers', message: 'All 5 prayers completed today' },
-  { emoji: '✨', title: 'Beautiful consistency today', message: 'Keep up the great work' },
-  { emoji: '🌙', title: 'Daily prayers completed', message: 'Alhamdulillah' },
-  { emoji: '🕌', title: 'All prayers completed today', message: 'May Allah accept them' },
-  { emoji: '🎉', title: "You completed today's prayers", message: 'Well done!' },
-  { emoji: '🤍', title: 'Keep it up', message: 'Every prayer counts' },
-];
-
 const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerName }: Props) => {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
-
+  const language = useLanguageStore((state) => state.language);
   // Prayers Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);
   const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
@@ -40,12 +32,16 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   const celebratedDate = usePrayersTrackingStore((state) => state.celebratedDate);
   const setCelebrated = usePrayersTrackingStore((state) => state.setCelebrated);
 
+  // ------------------------------------------------------------
+  // Handle marking/unmarking prayers as prayed and show celebration modal
+  // ------------------------------------------------------------
   const handleMark = useCallback((prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
-    if (!__DEV__ && !isPast && !isCurrent) return;
+    if (!isPast && !isCurrent) return;
 
     // If already marked as prayed, unmark it
     if (isPrayed) {
-      unmarkPrayed(prayerName); return;
+      unmarkPrayed(prayerName);
+      return;
     }
     // Mark as prayed and check if all prayers are done for today
     const prayersComplete = markPrayed(prayerName);
@@ -55,27 +51,28 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     const shouldCelebrate = prayersComplete && (!alreadyCelebrated || prayerName === 'Isha');
 
     if (shouldCelebrate) {
-      const variant = CELEBRATION_VARIANTS[Math.floor(Math.random() * CELEBRATION_VARIANTS.length)];
+      // Prevent multiple celebrations in a day
       if (!alreadyCelebrated) setCelebrated(today);
+      // Haptic feedback for celebration
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Get a random celebration message variant for the current language
+      const variants = CELEBRATION_MESSAGES[language] ?? CELEBRATION_MESSAGES['en'];
+      const variant = variants[Math.floor(Math.random() * variants.length)];
 
+      // Show celebration modal
       useModalStore.getState().show({
         type: 'alert',
         component: (
-          <View style={{ alignItems: 'center', paddingVertical: 8, gap: 6 }}>
-            <Text style={{ fontSize: 44, lineHeight: 56 }}>{variant.emoji}</Text>
-            <Text style={{ fontSize: 22, fontWeight: '700', color: theme.text2, textAlign: 'center', marginTop: 10, marginBottom: 4 }}>
-              {variant.title}
-            </Text>
-            <Text style={{ fontSize: 16, color: theme.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 8 }}>
-              {variant.message}
-            </Text>
+          <View style={styles.celebrationContainer}>
+            <Text style={styles.celebrationEmoji}>{variant.emoji}</Text>
+            <Text style={[styles.celebrationTitle, { color: theme.text2 }]}>{variant.title}</Text>
+            <Text style={[styles.celebrationMessage, { color: theme.textMuted }]}>{variant.message}</Text>
           </View>
         ),
         buttons: [{
           label: 'OK',
           action: 'ok',
-          buttonStyle: { backgroundColor: theme.accentLight },
+          buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
           labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
         }],
       });
@@ -84,6 +81,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
 
   return (
     <View style={styles.container}>
+
       {(Object.entries(prayerTimes) as PrayerTimeEntry[]).map(([prayerName, prayerTime], index, arr) => {
         const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
         const isToday = prayerTimesDate === toDateKey();
@@ -179,6 +177,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
           </View>
         );
       })}
+
     </View>
   );
 });
@@ -186,12 +185,15 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
 export default PrayersList;
 
 const styles = StyleSheet.create({
+  // Container
   container: {
     paddingTop: 10,
     paddingBottom: 14,
     paddingHorizontal: 7,
     gap: 7,
   },
+
+  // Prayer Row
   prayerRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -220,6 +222,8 @@ const styles = StyleSheet.create({
     marginRight: 4,
     letterSpacing: 0.5,
   },
+
+  // Notification Icon
   notifIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -230,5 +234,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  // Celebration Modal
+  celebrationContainer: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    gap: 6,
+  },
+  celebrationEmoji: {
+    fontSize: 44,
+    lineHeight: 56,
+  },
+  celebrationTitle: {
+    fontSize: 19,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  celebrationMessage: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 8,
   },
 });
