@@ -20,7 +20,7 @@ interface PrayersTrackingState {
 const KEEP_DAYS = 31;
 
 // Remove entries older than KEEP_DAYS from the tracking record
-const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
+export const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - KEEP_DAYS);
   const cutoffKey = toDateKey(cutoff);

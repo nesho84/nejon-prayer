@@ -155,7 +155,7 @@ async function cancelDisplayedNotification(notificationId: string) {
 // timeStringRaw: "HH:mm" format (e.g., "13:45" or "5:30")
 // tomorrowTimeStringRaw: tomorrow's actual time — falls back to today's if omitted/null/invalid
 // ------------------------------------------------------------
-function getTriggerTime(
+export function getTriggerTime(
   timeStringRaw: string,
   offsetMinutes: number = 0,
   tomorrowTimeStringRaw?: string | null,
