@@ -223,6 +223,9 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
     const title = `» ${tr.prayers?.[prayer] || prayer} «`;
     const body = `${tr.labels?.prayerNotifBody} (${timeString})`;
     const sound = config.prayers[prayer]?.sound;
+    const volume = config.notifSettings.volume;
+    const snooze = config.notifSettings.snooze;
+    const vibration = config.notifSettings.vibration;
 
     // Create prayer notification
     await notifee.createTriggerNotification(
@@ -232,17 +235,17 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
         body: body,
         data: {
           type: 'prayer',
-          volume: config.notifSettings.volume,
+          volume: volume,
           sound: sound ?? '',
-          vibration: config.notifSettings.vibration, // for the reminder to choose the right channel
-          snooze: config.notifSettings.snooze, // for the reminder to set the right trigger time
+          vibration: vibration, // for the reminder to choose the right channel
+          snooze: snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
           prayerDate: toDateKey(triggerTime), // ex. "2026-03-20" (used for tracking in foreground/background)
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
         android: {
-          channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+          channelId: `nejonprayer-vib-${vibration}`,
           category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           largeIcon: require('../../assets/images/moon-islam.png'),
@@ -301,6 +304,8 @@ async function scheduleEventNotifications(params: ScheduleParams) {
     const title = `» ${tr.prayers?.[event] || event} «`;
     const body = `${tr.labels?.eventNotifBody} (${tr.prayers?.[event] || event}) (${timeString})`;
     const sound = config.events[event]?.sound;
+    const volume = config.notifSettings.volume;
+    const vibration = config.notifSettings.vibration;
 
     // Create event notification
     await notifee.createTriggerNotification(
@@ -310,11 +315,11 @@ async function scheduleEventNotifications(params: ScheduleParams) {
         body: body,
         data: {
           type: 'prayer-event',
-          volume: config.notifSettings.volume,
+          volume: volume,
           sound: sound ?? '',
         },
         android: {
-          channelId: `nejonprayer-vib-${config.notifSettings.vibration}`,
+          channelId: `nejonprayer-vib-${vibration}`,
           category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.BLUE,
@@ -391,6 +396,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     // Prepare notification content
     const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
     const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
+    const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 
     // Create Friday reminder notification
     await notifee.createTriggerNotification(
@@ -404,7 +410,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           scheduledFor: triggerTime.toLocaleString('en-GB'),
         },
         android: {
-          channelId: `nejonprayer-vib-short`,
+          channelId: `nejonprayer-vib-${vibration}`,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
           style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -477,8 +483,10 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const dateISO = toDateKey(triggerTime); // "2026-03-20"
       const notificationId = `quote-${dateISO}`;
 
+      // Prepare notification content
       const title = tr.labels?.dailyQuoteTitle || 'Daily Reminder';
       const body = shuffledQuotes[i];
+      const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 
       // Create notification
       await notifee.createTriggerNotification(
@@ -492,7 +500,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {
-            channelId: 'nejonprayer-vib-short',
+            channelId: `nejonprayer-vib-${vibration}`,
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.BIGTEXT, text: body },

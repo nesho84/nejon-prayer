@@ -156,43 +156,6 @@ export default function AyahsScreen() {
   // Footer: Next Surah button (or Complete Khatam on surah 114)
   // ------------------------------------------------------------
   const renderFooter = useCallback(() => {
-    // [DEV] Test trigger — remove before release
-    if (__DEV__) {
-      return (
-        <TouchableOpacity
-          style={[styles.footerCard, { backgroundColor: `${theme.gold}18`, borderColor: theme.border }]}
-          activeOpacity={0.6}
-          onPress={() => {
-            completeKhatam();
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            useModalStore.getState().show({
-              type: 'alert',
-              component: (
-                <View style={styles.celebrationContainer}>
-                  <Text style={styles.celebrationEmoji}>📖</Text>
-                  <Text style={[styles.celebrationTitle, { color: theme.text2 }]}>{tr.labels.khatamCompleteTitle}</Text>
-                  <Text style={[styles.celebrationMessage, { color: theme.textMuted }]}>{tr.labels.khatamCompleteMessage}</Text>
-                </View>
-              ),
-              buttons: [{
-                label: 'OK',
-                action: 'ok',
-                onPress: () => router.back(),
-                buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
-                labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
-              }],
-            });
-          }}
-        >
-          <View style={[styles.footerIcon, { backgroundColor: `${theme.gold}25` }]}>
-            <Ionicons name="bug-outline" size={22} color={theme.gold} />
-          </View>
-          <Text style={[styles.footerCardLabel, { color: theme.gold }]}>[DEV] Test Khatam Celebration</Text>
-        </TouchableOpacity>
-      );
-    }
-
-    // "Complete Khatam" Button with celebration modal on Surah 114, only in khatam mode
     if (surahIdNum === 114) {
       if (mode !== "khatam") return null;
 
