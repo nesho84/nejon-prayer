@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { NAMAZI_TRANSLATIONS } from "@/constants/namazi";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useMemo, useState } from "react";
@@ -24,32 +25,34 @@ export default function NamaziScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const language = useLanguageStore((state) => state.language);
+    const namaziTr = NAMAZI_TRANSLATIONS[language] ?? NAMAZI_TRANSLATIONS.en;
 
     // State for tabs content
     const layout = useWindowDimensions();
     const [index, setIndex] = useState(0);
     const [routes] = useState([
-        { key: 'steps', title: tr.namazi.namaziTab || "NAMAZI" },
-        { key: 'table', title: tr.namazi.rekatetTab || "TABELA E REKATEVE" },
+        { key: 'steps', title: namaziTr.namaziTab || "NAMAZI" },
+        { key: 'table', title: namaziTr.rekatetTab || "TABELA E REKATEVE" },
     ]);
 
     // Prayer tab data
     const STEPS: StepType[] = useMemo(() => {
         return [
-            { id: 1, text: tr.namazi.step1, image: require("../../../assets/images/namazi/step1.png") },
-            { id: 2, text: tr.namazi.step2, image: require("../../../assets/images/namazi/step2.png") },
-            { id: 3, text: tr.namazi.step3 },
-            { id: 4, text: tr.namazi.step4, image: require("../../../assets/images/namazi/step4.png") },
-            { id: 5, text: tr.namazi.step5, image: require("../../../assets/images/namazi/step5.png") },
-            { id: 6, text: tr.namazi.step6, image: require("../../../assets/images/namazi/step6-8.png") },
-            { id: 7, text: tr.namazi.step7, image: require("../../../assets/images/namazi/step7.png") },
-            { id: 8, text: tr.namazi.step8, image: require("../../../assets/images/namazi/step6-8.png") },
-            { id: 9, text: tr.namazi.step9 },
-            { id: 10, text: tr.namazi.step10 },
-            { id: 11, text: tr.namazi.step11, image: require("../../../assets/images/namazi/step11.png") },
-            { id: 12, text: tr.namazi.step12, image: require("../../../assets/images/namazi/step12.png") },
+            { id: 1, text: namaziTr.step1, image: require("../../../assets/images/namazi/step1.png") },
+            { id: 2, text: namaziTr.step2, image: require("../../../assets/images/namazi/step2.png") },
+            { id: 3, text: namaziTr.step3 },
+            { id: 4, text: namaziTr.step4, image: require("../../../assets/images/namazi/step4.png") },
+            { id: 5, text: namaziTr.step5, image: require("../../../assets/images/namazi/step5.png") },
+            { id: 6, text: namaziTr.step6, image: require("../../../assets/images/namazi/step6-8.png") },
+            { id: 7, text: namaziTr.step7, image: require("../../../assets/images/namazi/step7.png") },
+            { id: 8, text: namaziTr.step8, image: require("../../../assets/images/namazi/step6-8.png") },
+            { id: 9, text: namaziTr.step9 },
+            { id: 10, text: namaziTr.step10 },
+            { id: 11, text: namaziTr.step11, image: require("../../../assets/images/namazi/step11.png") },
+            { id: 12, text: namaziTr.step12, image: require("../../../assets/images/namazi/step12.png") },
         ];
-    }, [tr]);
+    }, [namaziTr]);
 
     // ------------------------------------------------------------
     // NAMAZI Tab Content
@@ -64,10 +67,10 @@ export default function NamaziScreen() {
             <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.success }]}>
                 <Text style={[styles.headerIcon]}>🕌</Text>
                 <Text style={[styles.headerTitle, { color: theme.text }]}>
-                    {tr.namazi.headerTitle}
+                    {namaziTr.headerTitle}
                 </Text>
                 <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-                    {tr.namazi.headerSubtitle}
+                    {namaziTr.headerSubtitle}
                 </Text>
             </AppCard>
 
@@ -92,7 +95,7 @@ export default function NamaziScreen() {
             {/* FOOTER NOTE */}
             <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.success }]}>
                 <Text style={[styles.footerText, { color: theme.placeholder }]}>
-                    {tr.namazi.footerText}
+                    {namaziTr.footerText}
                 </Text>
             </AppCard>
         </ScrollView>
@@ -126,10 +129,10 @@ export default function NamaziScreen() {
             <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.placeholder }]}>
                 <Text style={[styles.headerIcon]}>📝</Text>
                 <Text style={[styles.headerTitle, { color: theme.text }]}>
-                    {tr.namazi.tableTitle}
+                    {namaziTr.tableTitle}
                 </Text>
                 <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-                    {tr.namazi.tableSubtitle}
+                    {namaziTr.tableSubtitle}
                 </Text>
             </AppCard>
 
@@ -139,30 +142,30 @@ export default function NamaziScreen() {
                 <View style={[styles.tableRow, { borderBottomWidth: 2, borderBottomColor: theme.border }]}>
                     <View style={[styles.tableCell, styles.nameColumn, styles.cornerCell]}>
                         <Text style={[styles.cornerTopText, { color: theme.text2 }]}>
-                            {tr.namazi.tableRekatetLabel}
+                            {namaziTr.tableRekatetLabel}
                         </Text>
                         <Text style={[styles.cornerBottomText, { color: theme.text2 }]}>
-                            {tr.namazi.tableNameHeader}
+                            {namaziTr.tableNameHeader}
                         </Text>
                     </View>
                     <View style={[styles.tableCell, borderLeft]}>
                         <Text style={[styles.tableHeaderText, { color: theme.text2 }]}>
-                            {tr.namazi.tableSunnetHeader}
+                            {namaziTr.tableSunnetHeader}
                         </Text>
                     </View>
                     <View style={[styles.tableCell, farzColumn]}>
                         <Text style={[styles.tableHeaderTextBold, { color: theme.accent }]}>
-                            {tr.namazi.tableFarzHeader}
+                            {namaziTr.tableFarzHeader}
                         </Text>
                     </View>
                     <View style={[styles.tableCell, borderLeft]}>
                         <Text style={[styles.tableHeaderText, { color: theme.text2 }]}>
-                            {tr.namazi.tableSunnetHeader}
+                            {namaziTr.tableSunnetHeader}
                         </Text>
                     </View>
                     <View style={[styles.tableCell, borderLeft]}>
                         <Text style={[styles.tableHeaderText, { color: theme.text2 }]}>
-                            {tr.namazi.tableVitriHeader}
+                            {namaziTr.tableVitriHeader}
                         </Text>
                     </View>
                 </View>
@@ -202,7 +205,7 @@ export default function NamaziScreen() {
             {/* Footer Note */}
             <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
                 <Text style={[styles.footerText, { color: theme.placeholder }]}>
-                    {tr.namazi.tableFooter}
+                    {namaziTr.tableFooter}
                 </Text>
             </AppCard>
         </ScrollView>

@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { ABDESI_TRANSLATIONS } from "@/constants/abdesi";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useMemo } from "react";
@@ -14,25 +15,26 @@ interface StepType {
 export default function AbdesiScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
-    const tr = useLanguageStore((state) => state.tr);
+    const language = useLanguageStore((state) => state.language);
+    const abdesiTr = ABDESI_TRANSLATIONS[language] ?? ABDESI_TRANSLATIONS.en;
 
     // ------------------------------------------------------------
     // Steps data
     // ------------------------------------------------------------
     const STEPS: StepType[] = useMemo(() => {
         return [
-            { id: 1, text: tr.abdesi.step1 },
-            { id: 2, text: tr.abdesi.step2, image: require("../../../assets/images/abdesi/step2.png") },
-            { id: 3, text: tr.abdesi.step3, image: require("../../../assets/images/abdesi/step3.png") },
-            { id: 4, text: tr.abdesi.step4, image: require("../../../assets/images/abdesi/step4.png") },
-            { id: 5, text: tr.abdesi.step5, image: require("../../../assets/images/abdesi/step5.png") },
-            { id: 6, text: tr.abdesi.step6, image: require("../../../assets/images/abdesi/step6.png") },
-            { id: 7, text: tr.abdesi.step7, image: require("../../../assets/images/abdesi/step7.png") },
-            { id: 8, text: tr.abdesi.step8, image: require("../../../assets/images/abdesi/step8.png") },
-            { id: 9, text: tr.abdesi.step9, image: require("../../../assets/images/abdesi/step9.png") },
-            { id: 10, text: tr.abdesi.step10 },
+            { id: 1, text: abdesiTr.step1 },
+            { id: 2, text: abdesiTr.step2, image: require("../../../assets/images/abdesi/step2.png") },
+            { id: 3, text: abdesiTr.step3, image: require("../../../assets/images/abdesi/step3.png") },
+            { id: 4, text: abdesiTr.step4, image: require("../../../assets/images/abdesi/step4.png") },
+            { id: 5, text: abdesiTr.step5, image: require("../../../assets/images/abdesi/step5.png") },
+            { id: 6, text: abdesiTr.step6, image: require("../../../assets/images/abdesi/step6.png") },
+            { id: 7, text: abdesiTr.step7, image: require("../../../assets/images/abdesi/step7.png") },
+            { id: 8, text: abdesiTr.step8, image: require("../../../assets/images/abdesi/step8.png") },
+            { id: 9, text: abdesiTr.step9, image: require("../../../assets/images/abdesi/step9.png") },
+            { id: 10, text: abdesiTr.step10 },
         ];
-    }, [tr]);
+    }, [abdesiTr]);
 
     return (
         <AppScreen>
@@ -46,10 +48,10 @@ export default function AbdesiScreen() {
                 <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
                     <Text style={[styles.headerIcon]}>✨</Text>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
-                        {tr.abdesi.headerTitle}
+                        {abdesiTr.headerTitle}
                     </Text>
                     <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-                        {tr.abdesi.headerSubtitle}
+                        {abdesiTr.headerSubtitle}
                     </Text>
                 </AppCard>
 

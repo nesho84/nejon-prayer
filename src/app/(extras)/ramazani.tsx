@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { RAMAZANI_TRANSLATIONS } from "@/constants/ramazani";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
@@ -18,6 +19,8 @@ export default function RamadanScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const language = useLanguageStore((state) => state.language);
+    const ramazaniTr = RAMAZANI_TRANSLATIONS[language] ?? RAMAZANI_TRANSLATIONS.en;
 
     // Add state to track both actions
     const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -25,23 +28,23 @@ export default function RamadanScreen() {
 
     const SECTIONS: SectionType[] = useMemo(() => {
         return [
-            { id: 1, icon: "⭐", title: tr.ramazani.title1, desc: tr.ramazani.desc1, },
-            { id: 2, icon: "⚠️", title: tr.ramazani.title2, desc: tr.ramazani.desc2, },
-            { id: 3, icon: "💰", title: tr.ramazani.title3, desc: tr.ramazani.desc3, },
-            { id: 4, icon: "🍽️", title: tr.ramazani.title4, desc: tr.ramazani.desc4, },
-            { id: 5, icon: "🕌", title: tr.ramazani.title5, desc: tr.ramazani.desc5, },
-            { id: 6, icon: "💝", title: tr.ramazani.title6, desc: tr.ramazani.desc6, },
-            { id: 7, icon: "⏰", title: tr.ramazani.title7, desc: tr.ramazani.desc7, },
-            { id: 8, icon: "📖", title: tr.ramazani.title8, desc: tr.ramazani.desc8, },
-            { id: 9, icon: "🗣️", title: tr.ramazani.title9, desc: tr.ramazani.desc9, },
-            { id: 10, icon: "✨", title: tr.ramazani.title10, desc: tr.ramazani.desc10, },
-            { id: 11, icon: "🌙", title: tr.ramazani.title11, desc: tr.ramazani.desc11, },
-            { id: 12, icon: "⭐", title: tr.ramazani.title12, desc: tr.ramazani.desc12, },
-            { id: 13, icon: "🌅", title: tr.ramazani.title13, desc: tr.ramazani.desc13, },
-            { id: 14, icon: "🌆", title: tr.ramazani.title14, desc: tr.ramazani.desc14, },
-            { id: 15, icon: "☪️", title: tr.ramazani.title15, desc: tr.ramazani.desc15, },
+            { id: 1, icon: "⭐", title: ramazaniTr.title1, desc: ramazaniTr.desc1, },
+            { id: 2, icon: "⚠️", title: ramazaniTr.title2, desc: ramazaniTr.desc2, },
+            { id: 3, icon: "💰", title: ramazaniTr.title3, desc: ramazaniTr.desc3, },
+            { id: 4, icon: "🍽️", title: ramazaniTr.title4, desc: ramazaniTr.desc4, },
+            { id: 5, icon: "🕌", title: ramazaniTr.title5, desc: ramazaniTr.desc5, },
+            { id: 6, icon: "💝", title: ramazaniTr.title6, desc: ramazaniTr.desc6, },
+            { id: 7, icon: "⏰", title: ramazaniTr.title7, desc: ramazaniTr.desc7, },
+            { id: 8, icon: "📖", title: ramazaniTr.title8, desc: ramazaniTr.desc8, },
+            { id: 9, icon: "🗣️", title: ramazaniTr.title9, desc: ramazaniTr.desc9, },
+            { id: 10, icon: "✨", title: ramazaniTr.title10, desc: ramazaniTr.desc10, },
+            { id: 11, icon: "🌙", title: ramazaniTr.title11, desc: ramazaniTr.desc11, },
+            { id: 12, icon: "⭐", title: ramazaniTr.title12, desc: ramazaniTr.desc12, },
+            { id: 13, icon: "🌅", title: ramazaniTr.title13, desc: ramazaniTr.desc13, },
+            { id: 14, icon: "🌆", title: ramazaniTr.title14, desc: ramazaniTr.desc14, },
+            { id: 15, icon: "☪️", title: ramazaniTr.title15, desc: ramazaniTr.desc15, },
         ];
-    }, [tr]);
+    }, [ramazaniTr]);
 
     // ------------------------------------------------------------
     // Share text cross-platform
@@ -103,10 +106,10 @@ export default function RamadanScreen() {
                 <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.accent }]}>
                     <Text style={[styles.headerIcon]}>🌙</Text>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
-                        {tr.ramazani.headerTitle}
+                        {ramazaniTr.headerTitle}
                     </Text>
                     <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-                        {tr.ramazani.headerSubtitle}
+                        {ramazaniTr.headerSubtitle}
                     </Text>
                 </AppCard>
 
