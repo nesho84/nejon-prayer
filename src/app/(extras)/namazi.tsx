@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { NAMAZI_TRANSLATIONS } from "@/constants/namazi";
+import { NAMAZI_SURAHS, NAMAZI_TRANSLATIONS } from "@/constants/namazi";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useMemo, useState } from "react";
@@ -20,6 +20,8 @@ interface tableType {
     sunnet2: string;
     vitri: string;
 }
+
+type SurahCell = { label: string; accent: boolean }[];
 
 export default function NamaziScreen() {
     // Stores
@@ -53,6 +55,21 @@ export default function NamaziScreen() {
             { id: 12, text: namaziTr.step12, image: require("../../../assets/images/namazi/step12.png") },
         ];
     }, [namaziTr]);
+
+    // Surah / dua block renderer
+    const renderSurahBlock = (key: string) => {
+        const surah = NAMAZI_SURAHS[key];
+        return (
+            <View key={key} style={[styles.surahBlock, { borderTopColor: theme.border }]}>
+                <Text style={[styles.surahName, { color: theme.success }]}>{surah.name}</Text>
+                {language === 'ar' ? (
+                    <Text style={[styles.surahArabic, { color: theme.text }]}>{surah.arabic}</Text>
+                ) : (
+                    <Text style={[styles.surahTranslit, { color: theme.placeholder }]}>{surah.transliteration}</Text>
+                )}
+            </View>
+        );
+    };
 
     // ------------------------------------------------------------
     // NAMAZI Tab Content
@@ -89,6 +106,26 @@ export default function NamaziScreen() {
                             <Image source={step.image} style={styles.stepImage} />
                         </View>
                     )}
+
+                    {step.id === 2 && renderSurahBlock('subhaneke')}
+
+                    {step.id === 3 && (
+                        <>
+                            {renderSurahBlock('taawwudh')}
+                            {renderSurahBlock('fatiha')}
+                            {renderSurahBlock('kawthar')}
+                            {renderSurahBlock('ikhlas')}
+                        </>
+                    )}
+
+                    {step.id === 11 && (
+                        <>
+                            {renderSurahBlock('attahiyyatu')}
+                            {renderSurahBlock('allahummaSalli')}
+                            {renderSurahBlock('allahummaBarik')}
+                            {renderSurahBlock('rabbena')}
+                        </>
+                    )}
                 </AppCard>
             ))}
 
@@ -111,6 +148,34 @@ export default function NamaziScreen() {
             { name: tr.prayers.Isha, sunnet: "(4)", farz: "4", sunnet2: "2", vitri: "3" },
         ];
     }, [tr]);
+
+    // Surahs table data
+    const surahsTableData: SurahCell[][] = useMemo(() => {
+        const r1: SurahCell = [
+            { label: "Subhaneke", accent: false },
+            { label: "Eudhubilahi", accent: false },
+            { label: "Fatiha", accent: false },
+            { label: "(Kewthar)", accent: false },
+        ];
+        const r2mid: SurahCell = [
+            { label: "Fatiha", accent: false },
+            { label: "(Ihlas)", accent: false },
+            { label: "Et-Tehijatu", accent: true },
+        ];
+        const r2last: SurahCell = [...r2mid, { label: "SELAMI", accent: true }];
+        const rfatiha: SurahCell = [{ label: "Fatiha", accent: false }];
+        const rlast: SurahCell = [
+            { label: "Fatiha", accent: false },
+            { label: "Et-Tehijatu", accent: true },
+            { label: "SELAMI", accent: true },
+        ];
+        return [
+            [r1, r1, r1, r1, r1],
+            [r2last, r2mid, r2mid, r2mid, r2mid],
+            [[], rfatiha, rfatiha, rlast, rfatiha],
+            [[], rlast, rlast, [], rlast],
+        ];
+    }, []);
 
     // Reusable styles
     const borderLeft = { borderLeftWidth: 1, borderLeftColor: theme.border };
@@ -201,6 +266,57 @@ export default function NamaziScreen() {
                     </View>
                 ))}
             </AppCard>
+
+            {/* Surahs Table Title */}
+            <View style={[styles.sectionDivider, { borderColor: theme.divider2 }]} />
+
+            {/* Surahs Table */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <AppCard style={[styles.tableCard, { backgroundColor: theme.card }]}>
+                    {/* Header Row */}
+                    <View style={[styles.tableRow, { borderBottomWidth: 2, borderBottomColor: theme.border }]}>
+                        <View style={[styles.tableCell, styles.cornerCell, { flex: 0, width: 70 }]}>
+                            <Text style={[styles.cornerTopText, { color: theme.text2 }]}>
+                                {namaziTr.tableNameHeader}
+                            </Text>
+                            <Text style={[styles.cornerBottomText, { color: theme.text2 }]}>
+                                {namaziTr.tableRekatetLabel}
+                            </Text>
+                        </View>
+                        {[tr.prayers.Fajr, tr.prayers.Dhuhr, tr.prayers.Asr, tr.prayers.Maghrib, tr.prayers.Isha].map((name, i) => (
+                            <View key={i} style={[styles.tableCell, { flex: 0, width: 90 }, borderLeft]}>
+                                <Text style={[styles.tableHeaderText, { color: theme.text2 }]}>{name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                    {/* Data Rows */}
+                    {surahsTableData.map((row, rIdx) => (
+                        <View key={rIdx} style={[styles.tableRow, { borderTopWidth: 1, borderTopColor: theme.border }]}>
+                            <View style={[styles.tableCell, { flex: 0, width: 70, backgroundColor: theme.overlay }]}>
+                                <Text style={[styles.tableCellTextBold, { color: theme.accent }]}>{rIdx + 1}</Text>
+                            </View>
+                            {row.map((cell, cIdx) => (
+                                <View key={cIdx} style={[styles.tableCell, { flex: 0, width: 90 }, borderLeft]}>
+                                    {cell.length === 0
+                                        ? <Text style={[styles.tableCellText, { color: theme.placeholder }]}>{'—'}</Text>
+                                        : cell.map((item, iIdx) => (
+                                            <Text
+                                                key={iIdx}
+                                                style={[
+                                                    item.accent ? styles.surahCellAccent : styles.surahCellText,
+                                                    { color: item.accent ? theme.accent : theme.text2 },
+                                                ]}
+                                            >
+                                                {item.label}
+                                            </Text>
+                                        ))
+                                    }
+                                </View>
+                            ))}
+                        </View>
+                    ))}
+                </AppCard>
+            </ScrollView>
 
             {/* Footer Note */}
             <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
@@ -388,6 +504,72 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: '700',
         textAlign: 'center',
+    },
+
+    // Surah blocks
+    surahBlock: {
+        marginTop: 14,
+        paddingTop: 14,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        gap: 6,
+    },
+    surahName: {
+        fontSize: 12,
+        fontWeight: '700',
+        letterSpacing: 0.8,
+        textTransform: 'uppercase',
+    },
+    surahArabic: {
+        fontSize: 20,
+        lineHeight: 36,
+        textAlign: 'right',
+        writingDirection: 'rtl',
+    },
+    surahTranslit: {
+        fontSize: 14,
+        lineHeight: 21,
+        fontStyle: 'italic',
+    },
+
+    // Surahs table section separator + title
+    sectionDivider: {
+        marginVertical: 8,
+        borderWidth: 1,
+    },
+
+    // Surahs table cell styles
+    surahsTableCard: {
+        padding: 0,
+    },
+    surahsNameCell: {
+        width: 52,
+        paddingVertical: 12,
+        paddingHorizontal: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    surahsPrayerCell: {
+        width: 84,
+        paddingVertical: 12,
+        paddingHorizontal: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    surahColHeader: {
+        fontSize: 11,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    surahCellText: {
+        fontSize: 11,
+        textAlign: 'center',
+        lineHeight: 17,
+    },
+    surahCellAccent: {
+        fontSize: 11,
+        fontWeight: '700',
+        textAlign: 'center',
+        lineHeight: 17,
     },
 
     // Footer card

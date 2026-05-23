@@ -26,8 +26,85 @@ export type NamaziTranslations = {
   tableTitle: string;
   tableSubtitle: string;
   tableFooter: string;
+  surahsTableTitle: string;
 };
 
+export type NamaziSurah = {
+  name: string;
+  arabic: string;
+  transliteration: string;
+};
+
+// ------------------------------------------------------------
+// Surah / Dua data — language-independent (Arabic + transliteration only)
+// ------------------------------------------------------------
+export const NAMAZI_SURAHS: Record<string, NamaziSurah> = {
+  subhaneke: {
+    name: "Subhaneke",
+    arabic:
+      "سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلٰهَ غَيْرُكَ",
+    transliteration:
+      "Subhaanakal-laahumma wa bihamdika, wa tabaarakasmuka, wa ta'aalaa jadduka, wa laa ilaaha ghayruk.",
+  },
+  taawwudh: {
+    name: "Ta'awwudh",
+    arabic: "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nبِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ",
+    transliteration: "A'udhu billaahi minash-shaytaanir-rajeem.\nBismillaahir-Rahmaanir-Raheem.",
+  },
+  fatiha: {
+    name: "Al-Fatiha",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nالْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ\nالرَّحْمٰنِ الرَّحِيمِ\nمَالِكِ يَوْمِ الدِّينِ\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\nاهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ\nصِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nAl-hamdu lillaahi Rabbil-'aalameen.\nAr-Rahmaanir-Raheem.\nMaaliki Yawmid-Deen.\nIyyaaka na'budu wa iyyaaka nasta'een.\nIhdinas-Siraatal-Mustaqeem.\nSiraatal-ladheena an'amta 'alayhim, ghayril-maghdoobi 'alayhim wa lad-daaalleen.",
+  },
+  ikhlas: {
+    name: "Al-Ikhlas",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nقُلْ هُوَ اللهُ أَحَدٌ\nاللهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nQul huwal-laahu ahad.\nAllaahus-Samad.\nLam yalid wa lam yuulad.\nWa lam yakul-lahu kufuwan ahad.",
+  },
+  kawthar: {
+    name: "Al-Kawthar",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nإِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ\nفَصَلِّ لِرَبِّكَ وَانْحَرْ\nإِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nInnaa a'taynaakal-Kawthar.\nFasalli li-Rabbika wanhar.\nInna shaani'aka huwal-abtar.",
+  },
+  attahiyyatu: {
+    name: "Attahiyyatu",
+    arabic:
+      "التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    transliteration:
+      "Attahiyyaatu lillaahi wassalawaatu wattayyibaat.\nAssalaamu 'alaika ayyuhan-Nabiyyu wa rahmatullaahi wa barakaatuh.\nAssalaamu 'alainaa wa 'alaa 'ibaadillaahis-saaliheen.\nAsh-hadu al-laa ilaaha illallaah,\nwa ash-hadu anna Muhammadan 'abduhu wa rasuuluh.",
+  },
+  allahummaSalli: {
+    name: "Allahumma Salli",
+    arabic:
+      "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    transliteration:
+      "Allaahumma salli 'alaa Muhammadin wa 'alaa aali Muhammad,\nkamaa sallayta 'alaa Ibraaheema wa 'alaa aali Ibraaheem,\ninnaka Hameedun Majeed.",
+  },
+  allahummaBarik: {
+    name: "Allahumma Barik",
+    arabic:
+      "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    transliteration:
+      "Allaahumma baarik 'alaa Muhammadin wa 'alaa aali Muhammad,\nkamaa baarakta 'alaa Ibraaheema wa 'alaa aali Ibraaheem,\ninnaka Hameedun Majeed.",
+  },
+  rabbena: {
+    name: "Rabbena",
+    arabic:
+      "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+    transliteration:
+      "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar.\nRabbanaa ghfir lee wa li-waalidayya wa lil-mu'mineena yawma yaqoomul-hisaab.",
+  },
+};
+
+// ------------------------------------------------------------
+// Namazi translations for each language
+// ------------------------------------------------------------
 export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
   // ------------------------------------------------------------
   // English
@@ -37,8 +114,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "How to Pray",
     headerSubtitle: "Basic guide to 2-rak'ah prayer",
     step1: "Stand facing the Qiblah and make intention in your heart. Raise your hands until your thumbs touch your earlobes and say 'Allahu Akbar' (Allah is the Greatest). Men: Fingers naturally spread, not too tight. Women: Hands up to shoulders.",
-    step2: "Place your right hand over the left below the navel (men) or on the chest (women). Recite Subhanaka:\n\n'Subhaanaka Allaahumma wa bihamdika wa tabaarakasmuka wa ta'aalaa jadduka wa laa ilaaha ghayruk.'\n\n(Glory be to You, O Allah, and praise be to You. Blessed is Your name, exalted is Your majesty, and there is no god but You.)",
-    step3: "Recite A'udhu, Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar):\n\n'A'udhu billahi minash-shaytaanir-rajeem. Bismillahir-Rahmaanir-Raheem...'\n\nThen Fatiha + a Surah. Feet parallel, 4 fingers apart (men).",
+    step2: "Place your right hand over the left below the navel (men) or on the chest (women). Recite Subhanaka.",
+    step3: "Recite A'udhu, Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar). Feet parallel, 4 fingers apart (men).",
     step4: "Say 'Allahu Akbar' and bow into Ruku. Back straight, head in line with back, hands on knees with fingers spread (men) or closed (women). Say 3 times:\n\n'Subhaana Rabbiyal Adheem.'\n\n(Glory be to my Lord, the Most Great.)\n\nEyes looking at the place of prostration.",
     step5: "Rise from Ruku saying 'Sami Allahu liman hamidah' and when fully upright say:\n\n'Rabbanaa wa lakal hamd.'\n\n(Allah hears those who praise Him. Our Lord, all praise is for You.)\n\nHands by your sides.",
     step6: "Say 'Allahu Akbar' and prostrate in Sajdah. 7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. Men: stomach raised, thighs away from shins, arms away from sides. Women: body compact. Say 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n\n(Glory be to my Lord, the Most High.)",
@@ -58,6 +135,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Table of rak'ahs",
     tableSubtitle: "Prayer consists of parts called rak'ahs.",
     tableFooter: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
+    surahsTableTitle: "Overview of prayers recited during the obligatory rak'ahs",
   },
 
   // ------------------------------------------------------------
@@ -68,8 +146,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Wie man betet",
     headerSubtitle: "Grundlegende Anleitung zum 2-Rak'ah-Gebet",
     step1: "Stehe in Richtung Qibla und fasse die Absicht (Niyya) im Herzen. Hebe die Hände, bis die Daumen die Ohrläppchen berühren und sage 'Allahu Akbar' (Allah ist der Größte). Männer: Finger natürlich gespreizt. Frauen: Hände bis zu den Schultern.",
-    step2: "Lege die rechte Hand über die linke unterhalb des Nabels (Männer) oder auf der Brust (Frauen). Rezitiere Subhanaka:\n\n'Subhaanaka Allaahumma wa bihamdika wa tabaarakasmuka wa ta'aalaa jadduka wa laa ilaaha ghayruk.'\n\n(Gepriesen seist Du, o Allah, und gelobt seist Du. Gesegnet ist Dein Name, erhaben ist Deine Herrschaft, und es gibt keinen Gott außer Dir.)",
-    step3: "Rezitiere A'udhu, Bismillah, dann Sura Fatiha und eine weitere Sura (wie Ikhlas oder Kawthar):\n\n'A'udhu billahi minash-shaytaanir-rajeem. Bismillahir-Rahmaanir-Raheem...'\n\nDann Fatiha + eine Sura. Füße parallel, 4 Finger Abstand (Männer).",
+    step2: "Lege die rechte Hand über die linke unterhalb des Nabels (Männer) oder auf der Brust (Frauen). Rezitiere Subhanaka.",
+    step3: "Rezitiere A'udhu, Bismillah, dann Sura Fatiha und eine weitere Sura (wie Ikhlas oder Kawthar). Füße parallel, 4 Finger Abstand (Männer).",
     step4: "Sage 'Allahu Akbar' und beuge dich in Ruku. Rücken gerade, Kopf in einer Linie mit dem Rücken, Hände auf den Knien mit gespreizten Fingern (Männer) oder geschlossenen (Frauen). Sage 3-mal:\n\n'Subhaana Rabbiyal Adheem.'\n\n(Gepriesen sei mein Herr, der Allgewaltige.)\n\nAugen auf die Stelle der Niederwerfung gerichtet.",
     step5: "Erhebe dich aus Ruku und sage 'Sami Allahu liman hamidah', und wenn du vollständig aufrecht stehst, sage:\n\n'Rabbanaa wa lakal hamd.'\n\n(Allah hört denjenigen, der Ihn lobpreist. Unser Herr, Dir gebührt alles Lob.)\n\nHände an den Seiten.",
     step6: "Sage 'Allahu Akbar' und wirf dich in Sajdah (Niederwerfung). 7 Punkte müssen den Boden berühren: Stirn, Nase, beide Handflächen, beide Knie und Zehenspitzen beider Füße. Männer: Bauch angehoben, Oberschenkel von Unterschenkeln weg, Arme von den Seiten weg. Frauen: Körper kompakt. Sage 3-mal:\n\n'Subhaana Rabbiyal A'laa.'\n\n(Gepriesen sei mein Herr, der Allerhöchste.)",
@@ -89,6 +167,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Tabelle der Rak'ahs",
     tableSubtitle: "Das Gebet besteht aus Teilen, die Rak'ahs genannt werden.",
     tableFooter: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
+    surahsTableTitle: "Übersicht der Gebete, die während der Pflicht-Rak'ahs rezitiert werden",
   },
 
   // ------------------------------------------------------------
@@ -99,8 +178,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Comment Prier",
     headerSubtitle: "Guide de base pour la prière de 2 rak'ahs",
     step1: "Tenez-vous face à la Qibla et faites l'intention dans votre cœur. Levez les mains jusqu'à ce que vos pouces touchent vos lobes d'oreilles et dites 'Allahu Akbar' (Allah est le Plus Grand). Hommes : doigts naturellement écartés. Femmes : mains jusqu'aux épaules.",
-    step2: "Placez votre main droite sur la gauche sous le nombril (hommes) ou sur la poitrine (femmes). Récitez Subhanaka :\n\n'Subhaanaka Allaahumma wa bihamdika wa tabaarakasmuka wa ta'aalaa jadduka wa laa ilaaha ghayruk.'\n\n(Gloire à Vous, ô Allah, et louange à Vous. Béni soit Votre nom, exalté Votre majesté, et il n'y a de dieu que Vous.)",
-    step3: "Récitez A'udhu, Bismillah, puis la Sourate Fatiha et une autre Sourate (comme Ikhlas ou Kawthar) :\n\n'A'udhu billahi minash-shaytaanir-rajeem. Bismillahir-Rahmaanir-Raheem...'\n\nPuis Fatiha + une Sourate. Pieds parallèles, 4 doigts d'écart (hommes).",
+    step2: "Placez votre main droite sur la gauche sous le nombril (hommes) ou sur la poitrine (femmes). Récitez Subhanaka.",
+    step3: "Récitez A'udhu, Bismillah, puis la Sourate Fatiha et une autre Sourate (comme Ikhlas ou Kawthar). Pieds parallèles, 4 doigts d'écart (hommes).",
     step4: "Dites 'Allahu Akbar' et inclinez-vous en Ruku. Dos droit, tête dans l'axe du dos, mains sur les genoux avec les doigts écartés (hommes) ou fermés (femmes). Dites 3 fois :\n\n'Subhaana Rabbiyal Adheem.'\n\n(Gloire à mon Seigneur, le Très Grand.)\n\nRegard dirigé vers le lieu de prosternation.",
     step5: "Relevez-vous du Ruku en disant 'Sami Allahu liman hamidah' et une fois debout dites :\n\n'Rabbanaa wa lakal hamd.'\n\n(Allah entend ceux qui Le louent. Notre Seigneur, toute louange T'appartient.)\n\nBras le long du corps.",
     step6: "Dites 'Allahu Akbar' et prosternez-vous en Sajdah. 7 points doivent toucher le sol : front, nez, les deux paumes, les deux genoux et les orteils des deux pieds. Hommes : ventre relevé, cuisses éloignées des mollets, bras éloignés des côtés. Femmes : corps compact. Dites 3 fois :\n\n'Subhaana Rabbiyal A'laa.'\n\n(Gloire à mon Seigneur, le Très Haut.)",
@@ -120,6 +199,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Tableau des rak'ahs",
     tableSubtitle: "La prière est composée de parties appelées rak'ahs.",
     tableFooter: "Chaque prière, qu'elle soit obligatoire ou sunna, est accomplie pour l'amour de Dieu et de nul autre.",
+    surahsTableTitle: "Aperçu des prières récitées pendant les rak'ahs obligatoires",
   },
 
   // ------------------------------------------------------------
@@ -130,8 +210,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Falja e namazit",
     headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
     step1: "Qëndro drejt Kibles dhe bëj nijetin me zemër. Ngriji duart derisa gishti i madh të prekë veshin dhe thuaj: 'Allahu Ekber' (Allahu është më i Madhi). Për burrat: Gishtat të hapur dhe jo të shtrënguar fort. Për gratë: Duart ngrihen deri në nivel të supit.",
-    step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken:\n\n'Subhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.'\n\n(I Shenjtë je Ti, o Allah, dhe i lavdëruar; i bekuar është emri Yt, e lartë është madhëria Jote dhe s'ka Zot tjetër përveç Teje.)",
-    step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther):\n\n'Eudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...'\n\nPastaj Fatiha + një sure. Këmbët paralele, me largësi 4 gishta (burrat).",
+    step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). Lexo Subhaneken.",
+    step3: "Lexo Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (si Ihlas ose Keuther). Këmbët paralele, me largësi 4 gishta (burrat).",
     step4: "Thuaj 'Allahu Ekber' dhe përkulju në Ruku. Shpina e drejtë, kokë në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). Thuaj 3 herë:\n\n'Subhane Rabbijel Adhim.'\n\n(I Shenjtë është Zoti im, i Madhi.)\n\nSytë nga vendi i Sexhdes.",
     step5: "Ngrihu nga Ruku duke thënë 'Semi Allahu limen hamideh' dhe kur je drejtuar tërësisht thuaj:\n\n'Rabbena ve lekel hamd.'\n\n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.)\n\nDuart anash trupit.",
     step6: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. 7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. Burrat: bërryla e ngritur, bërryti larg nga kërciri, krahët larg nga brinjët. Gratë: të grumbulluar. Thuaj 3 herë:\n\n'Subhane Rabbijel A'la.'\n\n(I Shenjtë është Zoti im, më i Larti.)",
@@ -151,6 +231,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Tabela e rekateve",
     tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
     tableFooter: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër.",
+    surahsTableTitle: "Pasqyra e lutjeve që thuhen gjatë faljes së farzeve",
   },
 
   // ------------------------------------------------------------
@@ -161,8 +242,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Kako Klanjati",
     headerSubtitle: "Osnovni vodič za namaz od 2 rekata",
     step1: "Stanite okrenuti prema Kibli i učinite nijjet u srcu. Podignite ruke dok palčevi ne dodirnu ušne resice i recite 'Allahu Ekber' (Allah je Najveći). Muškarci: prsti prirodno raspoređeni. Žene: ruke do ramena.",
-    step2: "Stavite desnu ruku na lijevu ispod pupka (muškarci) ili na prsa (žene). Recitujte Subhaneke:\n\n'Subhānake Allāhumme ve bi hamdike ve tebārekesmuke ve te'ālā džedduke ve lā ilāhe gayruk.'\n\n(Hvaljen si Ti, o Allahu, i slava Tebi. Blagoslovljeno je Tvoje ime, uzvišena Tvoja veličina, i nema boga osim Tebe.)",
-    step3: "Recitujte E'uzu, Bismillu, zatim Suru Fatihu i drugu Suru (poput Ihlaса ili Kevser):\n\n'E'uzu billahi mineš-šejtanir-radžim. Bismillahir-Rahmanir-Rahim...'\n\nZatim Fatiha + Sura. Stopala paralelna, 4 prsta razmaka (muškarci).",
+    step2: "Stavite desnu ruku na lijevu ispod pupka (muškarci) ili na prsa (žene). Recitujte Subhaneke.",
+    step3: "Recitujte E'uzu, Bismillu, zatim Suru Fatihu i drugu Suru (poput Ihlasa ili Kevser). Stopala paralelna, 4 prsta razmaka (muškarci).",
     step4: "Recite 'Allahu Ekber' i sagnite se u ruku. Leđa ravna, glava u liniji s leđima, ruke na koljenima s prstima raširenim (muškarci) ili skupljenim (žene). Recite 3 puta:\n\n'Subhane Rabbiyal Azim.'\n\n(Slava mome Gospodaru, Najvećem.)\n\nPogled usmjeren prema mjestu sedžde.",
     step5: "Ustanite iz rukua govoreći 'Semi'allahu limen hamideh' i kada ste potpuno uspravni recite:\n\n'Rabbenā ve lekel hamd.'\n\n(Allah čuje one koji Ga hvale. Gospodaru naš, Tebi pripada svaka hvala.)\n\nRuke uz tijelo.",
     step6: "Recite 'Allahu Ekber' i učinite sedždu. 7 tačaka mora dodirnuti tlo: čelo, nos, oba dlana, oba koljena i prsti oba stopala. Muškarci: trbuh podignut, bedra odvojena od potkoljenica, ruke odvojene od strana. Žene: tijelo skupljeno. Recite 3 puta:\n\n'Subhane Rabbiyal E'ala.'\n\n(Slava mome Gospodaru, Previšnjem.)",
@@ -182,6 +263,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Tabela rekata",
     tableSubtitle: "Namaz se sastoji od dijelova koji se zovu rekati.",
     tableFooter: "Svaki namaz, bio farz ili sunnet, obavlja se radi Allaha i niko drugog.",
+    surahsTableTitle: "Pregled dova koje se uče tokom klanjanja farzova",
   },
 
   // ------------------------------------------------------------
@@ -192,8 +274,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Како да Клањате",
     headerSubtitle: "Основен водич за намаз од 2 рекати",
     step1: "Застанете свртени кон Кибла и направете ниет во срцето. Подигнете ги рацете додека палците не го допрат ушното ткиво и речете 'Аллаху Екбер' (Аллах е Највеликиот). Мажи: прстите природно раширени. Жени: рацете до рамената.",
-    step2: "Ставете ја десната рака над левата под папокот (мажи) или на градите (жени). Рецитирајте Субханеке:\n\n'Субхāнеке Аллāхумме ве би хамдике ве тебāрекесмуке ве те'āлā џеддуке ве лā илāхе гајрук.'\n\n(Слава Ти, о Аллах, и фала Ти. Благословено е Твоето Ime, возвишена Твојата величина, и нема бог освен Тебе.)",
-    step3: "Рецитирајте Е'узу, Бисмилла, потоа Сура Фатиха и друга Сура (како Ихлас или Кевсер):\n\n'Е'узу биллахи минеш-шејтанир-раџим. Бисмиллахир-Рахманир-Рахим...'\n\nПотоа Фатиха + Сура. Стапалата паралелни, 4 прста растојание (мажи).",
+    step2: "Ставете ја десната рака над левата под папокот (мажи) или на градите (жени). Рецитирајте Субханеке.",
+    step3: "Рецитирајте Е'узу, Бисмилла, потоа Сура Фатиха и друга Сура (како Ихлас или Кевсер). Стапалата паралелни, 4 прста растојание (мажи).",
     step4: "Речете 'Аллаху Екбер' и наведнете се во руку. Грбот рамен, главата во линија со грбот, рацете на колената со прстите раширени (мажи) или затворени (жени). Речете 3 пати:\n\n'Субхане Рабиjал Азим.'\n\n(Слава на мојот Господар, Највеликиот.)\n\nПогледот насочен кон местото на седжда.",
     step5: "Исправете се од руку говорејќи 'Семи'аллаху лимен хамидех' и кога сте целосно исправени речете:\n\n'Рабенā ве лекел хамд.'\n\n(Аллах ги слуша оние кои Го фалат. Господару наш, Тебе Ти припаѓа секоја фала.)\n\nРацете покрај телото.",
     step6: "Речете 'Аллаху Екбер' и учинете седжда. 7 точки мора да го допрат тлото: чело, нос, двете дланки, двете колена и прстите на двете стапала. Мажи: стомакот подигнат, бутовите одвоени од потколениците, рацете одвоени од страните. Жени: телото собрано. Речете 3 пати:\n\n'Субхане Рабиjал Е'ала.'\n\n(Слава на мојот Господар, Превисокиот.)",
@@ -213,6 +295,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Табела на рекати",
     tableSubtitle: "Намазот се состои од делови наречени рекати.",
     tableFooter: "Секој намаз, фарз или сунет, се клања заради Аллах и никој друг.",
+    surahsTableTitle: "Преглед на молитвите кои се читаат за време на фарз рекатите",
   },
 
   // ------------------------------------------------------------
@@ -223,8 +306,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "Namaz Kılma",
     headerSubtitle: "2 rekat namaz için temel rehber",
     step1: "Kıbleye dönün ve kalben niyet edin. Elleriniz başparmaklar kulak memelerine gelecek şekilde kaldırın ve 'Allahu Ekber' deyin. Erkekler: Parmaklar doğal olarak açık, sıkılmamış. Kadınlar: Eller omuz hizasına kadar kaldırılır.",
-    step2: "Sağ elinizi solunuzun üzerine göbek altına (erkekler) veya göğsüne (kadınlar) koyun. İstiftah duasını okuyun:\n\nSubhaneke Allahumme ve bihamdike ve tebarekesmuke ve teala xheduke ve la ilahe gajruke.\n\n(Sen çok yücesin Allah'ım, hamd sanadır, ismin mübarektir, yüceliğin büyüktür ve sana ortak yoktur).",
-    step3: "Eudhu, Besmele'yi okuyun, sonra Fatiha suresini ve başka bir sure (örneğin İhlas veya Kevser) okuyun:\n\nEudhu bil-lahi minesh-shejtanir-raxhim. Bismil-lahir-Rahmanir-Rahim...\n\nSonra Fatiha + başka bir sure. Ayaklar paralel, aralarında dört parmak mesafe (erkekler).",
+    step2: "Sağ elinizi solunuzun üzerine göbek altına (erkekler) veya göğsüne (kadınlar) koyun. İstiftah duasını okuyun.",
+    step3: "Eudhu, Besmele'yi okuyun, sonra Fatiha suresini ve başka bir sure (örneğin İhlas veya Kevser) okuyun. Ayaklar paralel, aralarında dört parmak mesafe (erkekler).",
     step4: "'Allahu Ekber' deyin ve rükûa gidin. Sırt düz, baş sırtla hizalı, eller dizlere açık (erkekler) veya kapalı (kadınlar). Üç kez söyleyin:\n\nSubhane Rabbijel Adhim.\n\n(Rabbim çok yücedir).\n\nGözler secde yerindedir.",
     step5: "Rükûdan 'Semi Allahu limen hamideh' diyerek kalkın ve tam ayağa kalktığınızda söyleyin:\n\nRabbena ve lekel hamd.\n\n(Allah, kendisini hamd ile övenleri işitir. Ey Rabbimiz, hamd sana aittir).\n\nEller vücudun yanında.",
     step6: "'Allahu Ekber' deyin ve secdeye gidin. Yedi organın yere temas etmesi gerekir: Alın, burun, iki avuç, iki diz ve ayak parmaklarının uçları. Erkekler: Dirsekler kalkık, karnı uyluklardan uzak, kollar kaburga kemiklerinden uzak. Kadınlar: Vücut toplanmış. Üç kez söyleyin:\n\nSubhane Rabbijel A'la.\n\n(Rabbim çok yüksektir).",
@@ -244,6 +327,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "Rekat Tablosu",
     tableSubtitle: "Namaz, rekat adı verilen bölümlerden oluşur.",
     tableFooter: "Her namaz, farz veya sünnet olsun, Allah rızası için kılınır ve başka hiç kimse için değil.",
+    surahsTableTitle: "Farz rekatlarda okunan duaların özeti",
   },
 
   // ------------------------------------------------------------
@@ -254,8 +338,8 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "كيفية الصلاة",
     headerSubtitle: "دليل مبسط لصلاة ركعتين",
     step1: "قف متجهًا إلى القبلة وانْوِ الصلاة في قلبك. ارفع يديك حتى تحاذي الإبهامان شحمتي الأذنين وقل: الله أكبر. الرجال: الأصابع مفرقة طبيعيًا دون تشديد. النساء: ترفع اليدان إلى مستوى الكتفين.",
-    step2: "ضع يدك اليمنى فوق اليسرى أسفل السرة (للرجال) أو على الصدر (للنساء). اقرأ دعاء الاستفتاح:\n\nسبحانك اللهم وبحمدك وتبارك اسمك وتعالى جدك ولا إله غيرك.\n\n(تنزيهًا لك يا الله مع حمدك، مبارك اسمك، وتعالى شأنك، ولا معبود غيرك).",
-    step3: "اقرأ الاستعاذة والبسملة، ثم سورة الفاتحة وسورة أخرى (مثل الإخلاص أو الكوثر):\n\nأعوذ بالله من الشيطان الرجيم. بسم الله الرحمن الرحيم...\n\nثم الفاتحة وسورة أخرى. تكون القدمان متوازيتين وبينهما مسافة أربع أصابع (للرجال).",
+    step2: "ضع يدك اليمنى فوق اليسرى أسفل السرة (للرجال) أو على الصدر (للنساء). اقرأ دعاء الاستفتاح.",
+    step3: "اقرأ الاستعاذة والبسملة، ثم سورة الفاتحة وسورة أخرى (مثل الإخلاص أو الكوثر). تكون القدمان متوازيتين وبينهما مسافة أربع أصابع (للرجال).",
     step4: "قل: الله أكبر، ثم اركع. يكون الظهر مستقيمًا والرأس بمحاذاته، وتوضع اليدان على الركبتين مع تفريق الأصابع (للرجال) أو ضمها (للنساء). قل ثلاث مرات:\n\nسبحان ربي العظيم.\n\n(تنزيهًا لربي العظيم).\n\nويكون النظر إلى موضع السجود.",
     step5: "ارفع من الركوع قائلاً: سمع الله لمن حمده، وعند الوقوف التام قل:\n\nربنا ولك الحمد.\n\n(سمع الله لمن حمده، ربنا لك الحمد).\n\nوتكون اليدان بمحاذاة الجانبين.",
     step6: "قل: الله أكبر، واسجد. يجب أن تلامس الأرض سبعة أعضاء: الجبهة، الأنف، الكفان، الركبتان، وأطراف القدمين. الرجال: يبتعد البطن عن الفخذين والذراعان عن الجانبين. النساء: يكون الجسد منضمًا. قل ثلاث مرات:\n\nسبحان ربي الأعلى.\n\n(تنزيهًا لربي الأعلى).",
@@ -275,5 +359,6 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "جدول الركعات",
     tableSubtitle: "تتكون الصلاة من أجزاء تُسمى ركعات.",
     tableFooter: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
+    surahsTableTitle: "نظرة عامة على الأذكار التي تُقرأ خلال ركعات الفرض",
   },
 };
