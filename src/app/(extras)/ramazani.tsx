@@ -5,7 +5,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface SectionType {
@@ -45,6 +45,18 @@ export default function RamadanScreen() {
             { id: 15, icon: "☪️", title: ramazaniTr.title15, desc: ramazaniTr.desc15, },
         ];
     }, [ramazaniTr]);
+
+    // ------------------------------------------------------------
+    // Progress tracking
+    // ------------------------------------------------------------
+    const [currentSection, setCurrentSection] = useState(1);
+    const handleScroll = useCallback((e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
+        const { contentOffset: { y }, contentSize: { height: contentH }, layoutMeasurement: { height: layoutH } } = e.nativeEvent;
+        const maxScroll = contentH - layoutH;
+        if (maxScroll <= 0) return;
+        const section = Math.min(SECTIONS.length, Math.max(1, Math.ceil((y / maxScroll) * SECTIONS.length)));
+        setCurrentSection(section);
+    }, [SECTIONS.length]);
 
     // ------------------------------------------------------------
     // Share text cross-platform
@@ -96,10 +108,23 @@ export default function RamadanScreen() {
 
     return (
         <AppScreen>
+
+            {/* PROGRESS */}
+            <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
+                <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
+                    <View style={[styles.progressFill, { backgroundColor: theme.accent, width: `${(currentSection / SECTIONS.length) * 100}%` as any }]} />
+                </View>
+                <Text style={[styles.progressText, { color: theme.placeholder }]}>
+                    {currentSection} / {SECTIONS.length}
+                </Text>
+            </View>
+
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
             >
 
                 {/* HEADER */}
@@ -131,7 +156,7 @@ export default function RamadanScreen() {
                             {/* Copy button */}
                             <TouchableOpacity
                                 onPress={() => handleCopy(item.id, item.title, item.desc)}
-                                style={[styles.actionButton, { backgroundColor: theme.bg2 }]}
+                                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
                             >
                                 <Feather
                                     name={copiedId === item.id ? "check" : "copy"}
@@ -149,7 +174,7 @@ export default function RamadanScreen() {
                             {/* Share button */}
                             <TouchableOpacity
                                 onPress={() => handleShare(item.id, item.title, item.desc)}
-                                style={[styles.actionButton, { backgroundColor: theme.bg2 }]}
+                                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
                             >
                                 <Feather
                                     name={sharedId === item.id ? "check" : "share-2"}
@@ -182,6 +207,33 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 10,
+    },
+
+    // Progress indicator
+    progressWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+    progressTrack: {
+        flex: 1,
+        height: 6,
+        borderRadius: 3,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        height: 6,
+        borderRadius: 3,
+        opacity: 0.5,
+    },
+    progressText: {
+        fontSize: 12,
+        fontWeight: '600',
+        minWidth: 40,
+        textAlign: 'right',
     },
 
     // Header card

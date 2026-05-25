@@ -96,22 +96,22 @@ export default function NamaziScreen() {
         const uid = `${stepId}-${key}`;
         const expanded = expandedSurahs.has(uid);
         return (
-            <View key={uid} style={[styles.surahBlock, { borderTopColor: theme.border }]}>
+            <View key={uid} style={[styles.surahsBlock, { borderTopColor: theme.border }]}>
                 <Pressable
-                    style={({ pressed }) => [styles.surahToggleRow, { opacity: pressed ? 0.4 : 1 }]}
+                    style={({ pressed }) => [styles.surahsToggleRow, { opacity: pressed ? 0.4 : 1 }]}
                     onPress={() => toggleSurah(stepId, key)}
                     hitSlop={8}
                 >
-                    <Text style={[styles.surahName, { color: theme.islamicGreen }]}>{surah.name}</Text>
-                    <Text style={[styles.surahChevron, { color: theme.islamicGreen }]}>
+                    <Text style={[styles.surahsName, { color: theme.islamicGreen }]}>{surah.name}</Text>
+                    <Text style={[styles.surahsChevron, { color: theme.islamicGreen }]}>
                         {expanded ? '▲' : '▼'}
                     </Text>
                 </Pressable>
                 {expanded && (
                     language === 'ar' ? (
-                        <Text style={[styles.surahArabic, { color: theme.text }]}>{surah.arabic}</Text>
+                        <Text style={[styles.surahsArabic, { color: theme.text }]}>{surah.arabic}</Text>
                     ) : (
-                        <Text style={[styles.surahTranslit, { color: theme.placeholder }]}>{surah.transliteration}</Text>
+                        <Text style={[styles.surahsTranslit, { color: theme.placeholder }]}>{surah.transliteration}</Text>
                     )
                 )}
             </View>
@@ -121,8 +121,8 @@ export default function NamaziScreen() {
     // ------------------------------------------------------------
     // NAMAZI Tab Content
     // ------------------------------------------------------------
-    const renderNamaziScene = () => (
-        <View style={styles.namaziScene}>
+    const renderNamazTab = () => (
+        <View style={styles.namaziTab}>
 
             {/* PROGRESS (fixed below tabs) */}
             <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
@@ -130,7 +130,7 @@ export default function NamaziScreen() {
                     <View style={[styles.progressFill, { backgroundColor: theme.primary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
-                    {namaziTr.stepLabel} {currentStep} / {STEPS.length}
+                    {tr.labels.stepLabel} {currentStep} / {STEPS.length}
                 </Text>
             </View>
 
@@ -167,7 +167,7 @@ export default function NamaziScreen() {
                         </View>
 
                         {step.image && (
-                            <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
+                            <View style={[styles.stepImageContainer, { backgroundColor: theme.bg }]}>
                                 <Image source={step.image} style={styles.stepImage} />
                             </View>
                         )}
@@ -226,12 +226,12 @@ export default function NamaziScreen() {
     const prayerSurahsData = useMemo(() => {
         const { tableSunnetHeader: sun, tableFarzHeader: farz, tableVitriHeader: vitr, tableRekatetLabel: rek, selamiLabel: sel } = namaziTr;
         const { subhaneke: { name: sub }, taawwudh: { name: eudh }, fatiha: { name: fat }, kawthar: { name: kewt }, ikhlas: { name: ihl }, attahiyyatu: { name: att } } = NAMAZI_SURAHS;
-        const r1 = `${sub} › ${eudh} › ${fat} › ${kewt}`;
-        const rMid = `${fat} › ${ihl} › ${att}`;
-        const rFinal = `${fat} › ${ihl} › ${att} + ${sel}`;
-        const rSun3 = `${fat} › ${kewt} / ${ihl}`;
+        const r1 = `${sub} » ${eudh} » ${fat} » ${kewt}`;
+        const rMid = `${fat} » ${ihl} » ${att}`;
+        const rFinal = `${fat} » ${ihl} » ${att} + ${sel}`;
+        const rSun3 = `${fat} » ${kewt} / ${ihl}`;
         const rF3 = fat;
-        const rF4 = `${fat} › ${att} + ${sel}`;
+        const rF4 = `${fat} » ${att} + ${sel}`;
         return [
             {
                 name: tr.prayers.Fajr, summary: `2 ${sun} + 2 ${farz}`, sections: [
@@ -263,7 +263,7 @@ export default function NamaziScreen() {
                     { label: `(4 ${sun}):`, isFarz: false, rows: [r1, rMid, rSun3, rFinal] },
                     { label: `${farz} (4 ${rek}):`, isFarz: true, rows: [r1, rMid, rF3, rF4] },
                     { label: `${sun} (2 ${rek}):`, isFarz: false, rows: [r1, rFinal] },
-                    { label: `${vitr} (3 ${rek}):`, isFarz: false, rows: [r1, rMid, `${fat} › ${ihl} › Kunut › ${att} + ${sel}`] },
+                    { label: `${vitr} (3 ${rek}):`, isFarz: false, rows: [r1, rMid, `${fat} » ${ihl} » Kunut » ${att} + ${sel}`] },
                 ]
             },
         ];
@@ -276,7 +276,7 @@ export default function NamaziScreen() {
     // ------------------------------------------------------------
     // PRAYER TABLE Tab Content
     // ------------------------------------------------------------
-    const renderRekatetScene = () => (
+    const renderRekatTab = () => (
         <ScrollView
             style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
             contentContainerStyle={styles.scrollContent}
@@ -326,7 +326,6 @@ export default function NamaziScreen() {
                         </Text>
                     </View>
                 </View>
-
                 {/* Data Rows */}
                 {prayerTableData.map((prayer, idx) => (
                     <View key={idx} style={[styles.tableRow, { borderTopWidth: 1, borderTopColor: theme.border }]}>
@@ -360,17 +359,11 @@ export default function NamaziScreen() {
             </AppCard>
 
             {/* --- Surahs Per Rak'ah --- */}
-            <View style={styles.sectionHeading}>
-                <View style={[styles.sectionHeadingBar, { backgroundColor: theme.accent }]} />
-                <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                    {namaziTr.surahsTableTitle}
-                </Text>
-            </View>
             <AppCard style={[styles.prayerSurahCard, { backgroundColor: theme.card }]}>
                 {prayerSurahsData.map((prayer, pIdx) => (
-                    <View key={pIdx} style={pIdx > 0 ? [styles.prayerDivider, { borderTopColor: theme.border }] : undefined}>
+                    <View key={pIdx} style={pIdx > 0 ? [styles.prayerDivider, { borderTopColor: theme.borderCard }] : undefined}>
                         <View style={styles.prayerHeader}>
-                            <Text style={[styles.prayerSurahTitle, { color: theme.accent }]}>{prayer.name}</Text>
+                            <Text style={[styles.prayerSurahTitle, { color: theme.text2 }]}>{prayer.name}</Text>
                             <Text style={[styles.prayerSummary, { color: theme.text2 }]}> — {prayer.summary}</Text>
                         </View>
                         {prayer.sections.map((section, sIdx) => (
@@ -404,9 +397,9 @@ export default function NamaziScreen() {
     const renderScene = ({ route }: { route: { key: string } }) => {
         switch (route.key) {
             case 'steps':
-                return renderNamaziScene();
+                return renderNamazTab();
             case 'table':
-                return renderRekatetScene();
+                return renderRekatTab();
             default:
                 return null;
         }
@@ -454,10 +447,6 @@ const styles = StyleSheet.create({
         gap: 10,
     },
 
-    namaziScene: {
-        flex: 1,
-    },
-
     // Progress indicator
     progressWrapper: {
         flexDirection: 'row',
@@ -476,6 +465,7 @@ const styles = StyleSheet.create({
     progressFill: {
         height: 6,
         borderRadius: 3,
+        opacity: 0.5,
     },
     progressText: {
         fontSize: 12,
@@ -507,7 +497,10 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
 
-    // Step cards
+    // Namazi steps tab
+    namaziTab: {
+        flex: 1,
+    },
     stepCard: {
         padding: 16,
     },
@@ -536,7 +529,7 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         fontWeight: "400",
     },
-    imageContainer: {
+    stepImageContainer: {
         width: "100%",
         padding: 10,
         alignItems: "center",
@@ -607,95 +600,50 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Surah blocks
-    surahBlock: {
+    // Surahs blocks
+    surahsBlock: {
         marginTop: 14,
         paddingTop: 14,
         borderTopWidth: StyleSheet.hairlineWidth,
         gap: 6,
     },
-    surahToggleRow: {
+    surahsToggleRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 4,
     },
-    surahChevron: {
-        fontSize: 10,
-        fontWeight: '700',
-    },
-    surahName: {
+    surahsName: {
         fontSize: 12,
         fontWeight: '700',
         letterSpacing: 0.8,
         textTransform: 'uppercase',
     },
-    surahArabic: {
+    surahsChevron: {
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    surahsArabic: {
         fontSize: 20,
         lineHeight: 36,
         textAlign: 'right',
         writingDirection: 'rtl',
     },
-    surahTranslit: {
+    surahsTranslit: {
         fontSize: 14,
         lineHeight: 21,
         fontStyle: 'italic',
         textAlign: 'justify',
     },
 
-    // Surahs section heading
-    sectionHeading: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginTop: 20,
-        marginBottom: 10,
-        gap: 10,
-    },
-    sectionHeadingBar: {
-        width: 3,
-        borderRadius: 2,
-        alignSelf: 'stretch',
-        minHeight: 18,
-    },
-    sectionTitle: {
-        flex: 1,
-        fontSize: 13,
-        fontWeight: '600',
-        lineHeight: 20,
+    // Prayer surahs card
+    prayerSurahCard: {
+        padding: 16,
     },
     prayerDivider: {
         marginTop: 14,
         paddingTop: 14,
-        borderTopWidth: StyleSheet.hairlineWidth,
-    },
-    sectionBlock: {
-        marginTop: 10,
-        gap: 4,
-    },
-    prayerSummary: {
-        fontSize: 15,
-        fontWeight: '300',
-    },
-    sectionLabel: {
-        fontSize: 12,
-        fontWeight: '600',
-        fontStyle: 'italic',
-        letterSpacing: 0.3,
-        marginBottom: 3,
-    },
-    rakatNum: {
-        fontSize: 12,
-        fontWeight: '700',
-    },
-    rakatRowText: {
-        fontSize: 13,
-        lineHeight: 21,
-        paddingLeft: 4,
-    },
-
-    // Prayer surah cards (vertical, one per prayer)
-    prayerSurahCard: {
-        padding: 16,
+        borderTopWidth: 1,
     },
     prayerHeader: {
         flexDirection: 'row',
@@ -708,27 +656,29 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textTransform: 'uppercase',
     },
-    rakahRow: {
-        paddingVertical: 8,
+    prayerSummary: {
+        fontSize: 15,
+        fontWeight: '300',
+    },
+    sectionBlock: {
+        marginTop: 10,
         gap: 4,
     },
-    rakahNumLabel: {
-        fontSize: 11,
+    sectionLabel: {
+        fontSize: 12,
         fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        fontStyle: 'italic',
+        letterSpacing: 0.3,
+        marginBottom: 3,
     },
-    pillsRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 6,
-        marginTop: 4,
-    },
-    surahPillText: {
+    rakatRowText: {
         fontSize: 13,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 6,
+        lineHeight: 21,
+        paddingLeft: 4,
+    },
+    rakatNum: {
+        fontSize: 12,
+        fontWeight: '700',
     },
 
     // Footer card

@@ -3,7 +3,7 @@ import AppScreen from "@/components/AppScreen";
 import { ABDESI_TRANSLATIONS } from "@/constants/abdesi";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface StepType {
@@ -15,6 +15,7 @@ interface StepType {
 export default function AbdesiScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
+    const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
     const abdesiTr = ABDESI_TRANSLATIONS[language] ?? ABDESI_TRANSLATIONS.en;
 
@@ -36,12 +37,37 @@ export default function AbdesiScreen() {
         ];
     }, [abdesiTr]);
 
+    // ------------------------------------------------------------
+    // Progress tracking
+    // ------------------------------------------------------------
+    const [currentStep, setCurrentStep] = useState(1);
+    const handleScroll = useCallback((e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
+        const { contentOffset: { y }, contentSize: { height: contentH }, layoutMeasurement: { height: layoutH } } = e.nativeEvent;
+        const maxScroll = contentH - layoutH;
+        if (maxScroll <= 0) return;
+        const step = Math.min(STEPS.length, Math.max(1, Math.ceil((y / maxScroll) * STEPS.length)));
+        setCurrentStep(step);
+    }, [STEPS.length]);
+
     return (
         <AppScreen>
+
+            {/* PROGRESS (fixed below native Header) */}
+            <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
+                <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
+                    <View style={[styles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
+                </View>
+                <Text style={[styles.progressText, { color: theme.placeholder }]}>
+                    {tr.labels.stepLabel} {currentStep} / {STEPS.length}
+                </Text>
+            </View>
+
             <ScrollView
                 style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
             >
 
                 {/* HEADER */}
@@ -74,6 +100,7 @@ export default function AbdesiScreen() {
                 ))}
 
             </ScrollView>
+
         </AppScreen>
     );
 }
@@ -88,6 +115,33 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
         paddingHorizontal: 8,
         gap: 10,
+    },
+
+    // Progress indicator
+    progressWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+    progressTrack: {
+        flex: 1,
+        height: 6,
+        borderRadius: 3,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        height: 6,
+        borderRadius: 3,
+        opacity: 0.5,
+    },
+    progressText: {
+        fontSize: 12,
+        fontWeight: '600',
+        minWidth: 62,
+        textAlign: 'right',
     },
 
     // Header card
