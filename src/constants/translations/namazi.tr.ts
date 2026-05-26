@@ -39,76 +39,6 @@ export type NamaziSurah = {
   transliteration: string;
 };
 
-// ------------------------------------------------------------
-// Surah / Dua data — language-independent (Arabic + transliteration only)
-// ------------------------------------------------------------
-export const NAMAZI_SURAHS: Record<string, NamaziSurah> = {
-  subhaneke: {
-    name: "Subhaneke",
-    arabic:
-      "سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلٰهَ غَيْرُكَ",
-    transliteration:
-      "Subhaanakal-laahumma wa bihamdika, wa tabaarakasmuka, wa ta'aalaa jadduka, wa laa ilaaha ghayruk.",
-  },
-  taawwudh: {
-    name: "Ta'awwudh",
-    arabic: "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nبِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ",
-    transliteration: "A'udhu billaahi minash-shaytaanir-rajeem.\nBismillaahir-Rahmaanir-Raheem.",
-  },
-  fatiha: {
-    name: "Al-Fatiha",
-    arabic:
-      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nالْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ\nالرَّحْمٰنِ الرَّحِيمِ\nمَالِكِ يَوْمِ الدِّينِ\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\nاهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ\nصِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
-    transliteration:
-      "Bismillaahir-Rahmaanir-Raheem.\nAl-hamdu lillaahi Rabbil-'aalameen.\nAr-Rahmaanir-Raheem.\nMaaliki Yawmid-Deen.\nIyyaaka na'budu wa iyyaaka nasta'een.\nIhdinas-Siraatal-Mustaqeem.\nSiraatal-ladheena an'amta 'alayhim, ghayril-maghdoobi 'alayhim wa lad-daaalleen.",
-  },
-  ikhlas: {
-    name: "Al-Ikhlas",
-    arabic:
-      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nقُلْ هُوَ اللهُ أَحَدٌ\nاللهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
-    transliteration:
-      "Bismillaahir-Rahmaanir-Raheem.\nQul huwal-laahu ahad.\nAllaahus-Samad.\nLam yalid wa lam yuulad.\nWa lam yakul-lahu kufuwan ahad.",
-  },
-  kawthar: {
-    name: "Al-Kawthar",
-    arabic:
-      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nإِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ\nفَصَلِّ لِرَبِّكَ وَانْحَرْ\nإِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
-    transliteration:
-      "Bismillaahir-Rahmaanir-Raheem.\nInnaa a'taynaakal-Kawthar.\nFasalli li-Rabbika wanhar.\nInna shaani'aka huwal-abtar.",
-  },
-  attahiyyatu: {
-    name: "Attahiyyatu",
-    arabic:
-      "التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
-    transliteration:
-      "Attahiyyaatu lillaahi wassalawaatu wattayyibaat.\nAssalaamu 'alaika ayyuhan-Nabiyyu wa rahmatullaahi wa barakaatuh.\nAssalaamu 'alainaa wa 'alaa 'ibaadillaahis-saaliheen.\nAsh-hadu al-laa ilaaha illallaah, wa ash-hadu anna Muhammadan 'abduhu wa rasuuluh.",
-  },
-  allahummaSalli: {
-    name: "Allahumma Salli",
-    arabic:
-      "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
-    transliteration:
-      "Allaahumma salli 'alaa Muhammadin wa 'alaa aali Muhammad, kamaa sallayta 'alaa Ibraaheema wa 'alaa aali Ibraaheem, innaka Hameedun Majeed.",
-  },
-  allahummaBarik: {
-    name: "Allahumma Barik",
-    arabic:
-      "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
-    transliteration:
-      "Allaahumma baarik 'alaa Muhammadin wa 'alaa aali Muhammad, kamaa baarakta 'alaa Ibraaheema wa 'alaa aali Ibraaheem, innaka Hameedun Majeed.",
-  },
-  rabbena: {
-    name: "Rabbena",
-    arabic:
-      "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
-    transliteration:
-      "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar.\nRabbanaa ghfir lee wa li-waalidayya wa lil-mu'mineena yawma yaqoomul-hisaab.",
-  },
-};
-
-// ------------------------------------------------------------
-// Namazi translations for each language
-// ------------------------------------------------------------
 export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
   // ------------------------------------------------------------
   // English
@@ -118,35 +48,35 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     headerTitle: "How to Pray",
     headerSubtitle: "Basic guide to 2-rak'ah prayer",
 
-    step1: "Stand facing the Qiblah and make intention in your heart.\n\nRaise your hands until your thumbs touch your earlobes and say:\n\n'Allahu Akbar'\n(Allah is the Greatest).\n\nMen: Fingers naturally spread, not too tight.\nWomen: Hands up to shoulders.",
+    step1: "Stand facing the Qiblah and make intention in your heart. \n\nRaise your hands until your thumbs touch your earlobes and say: \n\n'Allahu Akbar' \n(Allah is the Greatest). \n\nMen: Fingers naturally spread, not too tight. \nWomen: Hands up to shoulders.",
 
-    step2: "Place your right hand over the left below the navel (men) or on the chest (women).\n\nFeet parallel, 4 fingers apart (men).\n\nRecite Subhanaka, A'udhu, Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar).",
+    step2: "Place your right hand over the left below the navel (men) or on the chest (women). \n\nFeet parallel, 4 fingers apart (men). \n\nRecite Subhanaka, A'udhu, Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar).",
 
-    step3: "Say 'Allahu Akbar' and bow into Ruku.\n\nBack straight, head in line with back, hands on knees with fingers spread (men) or closed (women).\n\nSay 3 times:\n\n'Subhaana Rabbiyal Adheem.'\n(Glory be to my Lord, the Most Great.)\n\nEyes looking at the place of prostration.",
+    step3: "Say 'Allahu Akbar' and bow into Ruku. \n\nBack straight, head in line with back, hands on knees with fingers spread (men) or closed (women). \n\nSay 3 times: \n\n'Subhaana Rabbiyal Adheem.' \n(Glory be to my Lord, the Most Great.) \n\nEyes looking at the place of prostration.",
 
-    step4: "Rise from Ruku saying:\n\n'Sami Allahu liman hamidah'\n\nAnd when fully upright say:\n\n'Rabbanaa wa lakal hamd.'\n(Allah hears those who praise Him. Our Lord, all praise is for You.)\n\nHands by your sides.",
+    step4: "Rise from Ruku saying: \n\n'Sami Allahu liman hamidah' \n\nAnd when fully upright say: \n\n'Rabbanaa wa lakal hamd.' \n(Allah hears those who praise Him. Our Lord, all praise is for You.) \n\nHands by your sides.",
 
-    step5: "Say 'Allahu Akbar' and prostrate in Sajdah.\n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet.\n\nMen: stomach raised, thighs away from shins, arms away from sides.\nWomen: body compact.\n\nSay 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n(Glory be to my Lord, the Most High.)",
+    step5: "Say 'Allahu Akbar' and prostrate in Sajdah. \n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. \n\nMen: stomach raised, thighs away from shins, arms away from sides. \nWomen: body compact. \n\nSay 3 times: \n\n'Subhaana Rabbiyal A'laa.' \n(Glory be to my Lord, the Most High.)",
 
-    step6: "Say 'Allahu Akbar' and sit up.\n\nLeft foot flat (men), right foot with toes towards Qiblah.\nWomen: both feet to the right.\n\nStay briefly in this position. You may say:\n\n'Rabbighfir lee, Rabbighfir lee.'\n(My Lord, forgive me. My Lord, forgive me.)",
+    step6: "Say 'Allahu Akbar' and sit up. \n\nLeft foot flat (men), right foot with toes towards Qiblah.\nWomen: both feet to the right. \n\nStay briefly in this position. You may say: \n\n'Rabbighfir lee, Rabbighfir lee.' \n(My Lord, forgive me. My Lord, forgive me.)",
 
-    step7: "Say 'Allahu Akbar' and prostrate again in Sajdah.\n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet.\n\nMen: stomach raised, thighs away from shins, arms away from sides.\nWomen: body compact.\n\nSay 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n(Glory be to my Lord, the Most High.)\n\nThis completes the first Rak'ah.",
+    step7: "Say 'Allahu Akbar' and prostrate again in Sajdah. \n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. \n\nMen: stomach raised, thighs away from shins, arms away from sides. \nWomen: body compact. \n\nSay 3 times: \n\n'Subhaana Rabbiyal A'laa.' \n(Glory be to my Lord, the Most High.) \n\nThis completes the first Rak'ah.",
 
-    step8: "Say 'Allahu Akbar' and stand up for the second Rak'ah. Do not raise your hands this time.\n\nPlace your right hand over the left below the navel (men) or on the chest (women).\n\nFeet parallel, 4 fingers apart (men).\n\nRecite Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar).",
+    step8: "Say 'Allahu Akbar' and stand up for the second Rak'ah. Do not raise your hands this time. \n\nPlace your right hand over the left below the navel (men) or on the chest (women). \n\nFeet parallel, 4 fingers apart (men). \n\nRecite Bismillah, then Surah Fatiha and another Surah (like Ikhlas or Kawthar).",
 
-    step9: "Say 'Allahu Akbar' and bow into Ruku.\n\nBack straight, head in line with back, hands on knees with fingers spread (men) or closed (women).\n\nSay 3 times:\n\n'Subhaana Rabbiyal Adheem.'\n(Glory be to my Lord, the Most Great.)\n\nEyes looking at the place of prostration.",
+    step9: "Say 'Allahu Akbar' and bow into Ruku. \n\nBack straight, head in line with back, hands on knees with fingers spread (men) or closed (women). \n\nSay 3 times: \n\n'Subhaana Rabbiyal Adheem.' \n(Glory be to my Lord, the Most Great.) \n\nEyes looking at the place of prostration.",
 
-    step10: "Rise from Ruku saying:\n\n'Sami Allahu liman hamidah'\n\nAnd when fully upright say:\n\n'Rabbanaa wa lakal hamd.'\n(Allah hears those who praise Him. Our Lord, all praise is for You.)\n\nHands by your sides.",
+    step10: "Rise from Ruku saying: \n\n'Sami Allahu liman hamidah' \n\nAnd when fully upright say: \n\n'Rabbanaa wa lakal hamd.' \n(Allah hears those who praise Him. Our Lord, all praise is for You.) \n\nHands by your sides.",
 
-    step11: "Say 'Allahu Akbar' and prostrate in Sajdah.\n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet.\n\nMen: stomach raised, thighs away from shins, arms away from sides.\nWomen: body compact.\n\nSay 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n(Glory be to my Lord, the Most High.)",
+    step11: "Say 'Allahu Akbar' and prostrate in Sajdah. \n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. \n\nMen: stomach raised, thighs away from shins, arms away from sides. \nWomen: body compact. \n\nSay 3 times: \n\n'Subhaana Rabbiyal A'laa.' \n(Glory be to my Lord, the Most High.)",
 
-    step12: "Say 'Allahu Akbar' and sit up.\n\nLeft foot flat (men), right foot with toes towards Qiblah.\nWomen: both feet to the right.\n\nStay briefly in this position. You may say:\n\n'Rabbighfir lee, Rabbighfir lee.'\n(My Lord, forgive me. My Lord, forgive me.)",
+    step12: "Say 'Allahu Akbar' and sit up. \n\nLeft foot flat (men), right foot with toes towards Qiblah. \nWomen: both feet to the right. \n\nStay briefly in this position. You may say: \n\n'Rabbighfir lee, Rabbighfir lee.' \n(My Lord, forgive me. My Lord, forgive me.)",
 
-    step13: "Say 'Allahu Akbar' and prostrate in Sajdah.\n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet.\n\nMen: stomach raised, thighs away from shins, arms away from sides.\nWomen: body compact.\n\nSay 3 times:\n\n'Subhaana Rabbiyal A'laa.'\n(Glory be to my Lord, the Most High.)\n\nThen say:\n\n'Allahu Akbar' and remain seated for Qa'dah.",
+    step13: "Say 'Allahu Akbar' and prostrate in Sajdah. \n\n7 points must touch the ground: forehead, nose, both palms, both knees, and toes of both feet. \n\nMen: stomach raised, thighs away from shins, arms away from sides.\nWomen: body compact. \n\nSay 3 times: \n\n'Subhaana Rabbiyal A'laa.' \n(Glory be to my Lord, the Most High.) \n\nThen say: \n\n'Allahu Akbar' and remain seated for Qa'dah.",
 
-    step14: "After the second Sajdah of the second Rak'ah, say 'Allahu Akbar' and sit in Qa'dah (final sitting).\n\nRecite Tashahhud, Durood Ibrahim, and supplications.\n\nThe right index finger is raised when bearing witness.",
+    step14: "After the second Sajdah of the second Rak'ah, say 'Allahu Akbar' and sit in Qa'dah (final sitting). \n\nRecite Tashahhud, Durood Ibrahim, and supplications. \n\nThe right index finger is raised when bearing witness.",
 
-    step15: "Turn your head to the right and say:\n\n'Assalamu alaikum wa rahmatullah'\n\nThen turn left and say the same.\n\nThe prayer is complete.\nYou may make dua after the prayer.",
+    step15: "Turn your head to the right and say: \n\n'Assalamu alaikum wa rahmatullah' \n\nThen turn left and say the same. \n\nThe prayer is complete. \nYou may make dua after the prayer.",
 
     selamiLabel: "Salam",
     rakatLabel: "Rakat",
@@ -246,7 +176,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
 
     step2: "Vendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). \n\nKëmbët paralele, me largësi 4 gishta (burrat). \n\nLexo Subhaneken, Eudhu, Bismilah, pastaj suren Fatiha dhe një sure tjetër (Ihlas ose Kewthar).",
 
-    step3: "Thuaj 'Allahu Ekber' dhe përkulu në Ruku. \n\nShpina e drejtë, koka në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). \n\nThuaj 3 herë:\n\n'Subhane Rabbijel Adhim.' \n(I Shenjtë është Zoti im, i Madhi.) \n\nSytë nga vendi i Sexhdes.",
+    step3: "Thuaj 'Allahu Ekber' dhe përkulu në Ruku. \n\nShpina e drejtë, koka në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). \n\nThuaj 3 herë: \n\n'Subhane Rabbijel Adhim.' \n(I Shenjtë është Zoti im, i Madhi.) \n\nSytë nga vendi i Sexhdes.",
     step4: "Ngrihu nga Ruku duke thënë: \n\n'Semi Allahu limen hamideh' \n\nDhe kur je drejtuar tërësisht thuaj: \n\n'Rabbena ve lekel hamd.' \n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.) \n\nDuart anash trupit.",
 
     step5: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. \n\n7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. \n\nBurrat: bërryla e ngritur, bërryli larg nga kërciri, krahët larg nga brinjët. \nGratë: të grumbulluara. \n\nThuaj 3 herë: \n\n'Subhane Rabbijel A'la.' \n(I Shenjtë është Zoti im, më i Larti.)",
@@ -257,7 +187,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
 
     step8: "Thuaj 'Allahu Ekber' dhe ngrihu në këmbë për Rekatin e dytë. Mos i ngrit duart këtë herë. \n\nVendose dorën e djathtë mbi të majtën poshtë kërthizës (burrat) ose mbi gjoks (gratë). \n\nKëmbët paralele, me largësi 4 gishta (burrat). \n\nLexo Bismilah, pastaj suren Fatiha dhe një sure tjetër (Ihlas ose Kewthar).",
 
-    step9: "Thuaj 'Allahu Ekber' dhe përkulu në Ruku. \n\nShpina e drejtë, koka në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). \n\nThuaj 3 herë:\n\n'Subhane Rabbijel Adhim.' \n(I Shenjtë është Zoti im, i Madhi.) \n\nSytë nga vendi i Sexhdes.",
+    step9: "Thuaj 'Allahu Ekber' dhe përkulu në Ruku. \n\nShpina e drejtë, koka në linjë me shpinën, duart mbi gjunjë me gishta të hapura (burrat) ose të mbyllura (gratë). \n\nThuaj 3 herë: \n\n'Subhane Rabbijel Adhim.' \n(I Shenjtë është Zoti im, i Madhi.) \n\nSytë nga vendi i Sexhdes.",
 
     step10: "Ngrihu nga Ruku duke thënë: \n\n'Semi Allahu limen hamideh' \n\nDhe kur je drejtuar tërësisht thuaj: \n\n'Rabbena ve lekel hamd.' \n(Allahu i dëgjon ata që e lavdërojnë. O Zoti ynë, Ty të takon lavdia.) \n\nDuart anash trupit.",
 
@@ -267,7 +197,7 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
 
     step13: "Thuaj 'Allahu Ekber' dhe bie në Sexhde. \n\n7 pika duhet të prekin tokën: balli, hunda, të dyja pëllëmbët, të dy gjunjët, dhe majat e gishtave të këmbëve. \n\nBurrat: bërryla e ngritur, bërryli larg nga kërciri, krahët larg nga brinjët. \nGratë: të grumbulluara. \n\nThuaj 3 herë: \n\n'Subhane Rabbijel A'la.' \n(I Shenjtë është Zoti im, më i Larti.) \n\nPastaj thuaj: \n\n'Allahu Ekber' dhe qëndro ulur për Kaaden.",
 
-    step14: "Pas Sexhdes së dytë të Rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). \n\nLexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë.\n\nGishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
+    step14: "Pas Sexhdes së dytë të Rekatit të dytë, thuaj 'Allahu Ekber' dhe ulu në Kaade (pozicioni përfundimtar). \n\nLexo Ettehijjatun, Allahumme Sal-li, Allahumme Barik dhe Rabbena duatë. \n\nGishti tregues i dorës së djathtë ngrihet kur thuhet dëshmia.",
 
     step15: "Kthe kokën djathtas dhe thuaj: \n\n'Es-selamu alejkum ve rahmetullah' \n\nPastaj ktheje majtas dhe thuaj të njëjtën. \n\nNamazi përfundon. \nMund të bësh dua pas namazit.",
 
@@ -427,5 +357,72 @@ export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
     tableTitle: "جدول الركعات",
     tableSubtitle: "تتكون الصلاة من أجزاء تُسمى ركعات.",
     tableFooter: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
+  },
+};
+
+// ------------------------------------------------------------
+// Surah / Dua data — language-independent (Arabic + transliteration only)
+// ------------------------------------------------------------
+export const NAMAZI_SURAHS: Record<string, NamaziSurah> = {
+  subhaneke: {
+    name: "Subhaneke",
+    arabic:
+      "سُبْحَانَكَ اللّٰهُمَّ وَبِحَمْدِكَ وَتَبَارَكَ اسْمُكَ وَتَعَالَى جَدُّكَ وَلَا إِلٰهَ غَيْرُكَ",
+    transliteration:
+      "Subhaanakal-laahumma wa bihamdika, wa tabaarakasmuka, wa ta'aalaa jadduka, wa laa ilaaha ghayruk.",
+  },
+  taawwudh: {
+    name: "Ta'awwudh",
+    arabic: "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\nبِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ",
+    transliteration: "A'udhu billaahi minash-shaytaanir-rajeem.\nBismillaahir-Rahmaanir-Raheem.",
+  },
+  fatiha: {
+    name: "Al-Fatiha",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nالْحَمْدُ لِلّٰهِ رَبِّ الْعَالَمِينَ\nالرَّحْمٰنِ الرَّحِيمِ\nمَالِكِ يَوْمِ الدِّينِ\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\nاهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ\nصِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nAl-hamdu lillaahi Rabbil-'aalameen.\nAr-Rahmaanir-Raheem.\nMaaliki Yawmid-Deen.\nIyyaaka na'budu wa iyyaaka nasta'een.\nIhdinas-Siraatal-Mustaqeem.\nSiraatal-ladheena an'amta 'alayhim, ghayril-maghdoobi 'alayhim wa lad-daaalleen.",
+  },
+  ikhlas: {
+    name: "Al-Ikhlas",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nقُلْ هُوَ اللهُ أَحَدٌ\nاللهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nQul huwal-laahu ahad.\nAllaahus-Samad.\nLam yalid wa lam yuulad.\nWa lam yakul-lahu kufuwan ahad.",
+  },
+  kawthar: {
+    name: "Al-Kawthar",
+    arabic:
+      "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ\nإِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ\nفَصَلِّ لِرَبِّكَ وَانْحَرْ\nإِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ",
+    transliteration:
+      "Bismillaahir-Rahmaanir-Raheem.\nInnaa a'taynaakal-Kawthar.\nFasalli li-Rabbika wanhar.\nInna shaani'aka huwal-abtar.",
+  },
+  attahiyyatu: {
+    name: "Attahiyyatu",
+    arabic:
+      "التَّحِيَّاتُ لِلّٰهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+    transliteration:
+      "Attahiyyaatu lillaahi wassalawaatu wattayyibaat.\nAssalaamu 'alaika ayyuhan-Nabiyyu wa rahmatullaahi wa barakaatuh.\nAssalaamu 'alainaa wa 'alaa 'ibaadillaahis-saaliheen.\nAsh-hadu al-laa ilaaha illallaah, wa ash-hadu anna Muhammadan 'abduhu wa rasuuluh.",
+  },
+  allahummaSalli: {
+    name: "Allahumma Salli",
+    arabic:
+      "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    transliteration:
+      "Allaahumma salli 'alaa Muhammadin wa 'alaa aali Muhammad, kamaa sallayta 'alaa Ibraaheema wa 'alaa aali Ibraaheem, innaka Hameedun Majeed.",
+  },
+  allahummaBarik: {
+    name: "Allahumma Barik",
+    arabic:
+      "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+    transliteration:
+      "Allaahumma baarik 'alaa Muhammadin wa 'alaa aali Muhammad, kamaa baarakta 'alaa Ibraaheema wa 'alaa aali Ibraaheem, innaka Hameedun Majeed.",
+  },
+  rabbena: {
+    name: "Rabbena",
+    arabic:
+      "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ\nرَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+    transliteration:
+      "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar.\nRabbanaa ghfir lee wa li-waalidayya wa lil-mu'mineena yawma yaqoomul-hisaab.",
   },
 };

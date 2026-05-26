@@ -1,4 +1,4 @@
-import { TRANSLATIONS } from "@/constants/translations";
+import { TRANSLATIONS } from "@/constants/translations/translations";
 import { Language, Translations } from "@/types/language.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";

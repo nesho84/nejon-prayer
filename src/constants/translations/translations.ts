@@ -12,7 +12,6 @@ export const TRANSLATIONS = {
             Maghrib: "Maghrib",
             Isha: "Isha",
         },
-
         labels: {
             // Navigation
             home: "Home",
@@ -93,15 +92,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Medium",
             vibrationLong: "Long",
             remindLater: "Reminder timeout",
-            offsetOff: "Off",
             offsetOnTime: "On time",
             offsetMinutes: "minutes before",
             fridayReminder: "🕌 Friday Reminder",
             dailyReminders: "📖 Daily Reminders (Quotes)",
             batteryOptTitle: "Battery Optimization",
             batteryOptBody: "⚠️ Battery optimization is active. Notifications may be delayed or not delivered. Tap above to adjust in system settings.",
-            powerManagerTitle: "Power Manager",
-            powerManagerBody: "⚠️ Power manager is restricting background activity. Notifications may be delayed or not delivered. Tap above to adjust in system settings.",
             alarmAccessTitle: "Alarms & Reminders",
             alarmAccessBody: "⚠️ Alarms & reminders may be disabled. Tap above to verify.",
             // Settings States
@@ -140,7 +136,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Failed to load settings.",
             prayersError: "Prayer times could not be loaded. Please check your internet connection.",
             quranSurahsError: "Failed to load surahs. Please check your internet connection.",
-            noSurahsFound: "No surah found.",
             quranAyahsError: "Failed to load ayahs. Please check your internet connection.",
             // Prayer times Settings
             calendarTitle: "Prayer Times Calendar",
@@ -204,7 +199,6 @@ export const TRANSLATIONS = {
             Maghrib: "Maghrib",
             Isha: "Isha",
         },
-
         labels: {
             // Navigation
             home: "Startseite",
@@ -285,15 +279,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Mittel",
             vibrationLong: "Lang",
             remindLater: "Erinnerungs-Timeout",
-            offsetOff: "Aus",
             offsetOnTime: "Rechtzeitig",
             offsetMinutes: "Minuten zuvor",
             fridayReminder: "🕌 Jumu\'ah-Erinnerung",
             dailyReminders: "📖 Tägliche erinnerungen (Zitate)",
             batteryOptTitle: "Akkuoptimierung",
             batteryOptBody: "⚠️ Die Akkuoptimierung ist aktiv. Benachrichtigungen können verzögert erfolgen oder nicht zugestellt werden. Tippe oben, um die Systemeinstellungen anzupassen.",
-            powerManagerTitle: "Energieverwaltung",
-            powerManagerBody: "⚠️ Die Energieverwaltung beschränkt die Hintergrundaktivität. Benachrichtigungen können verzögert oder nicht zugestellt werden. Tippe oben, um dies in den Systemeinstellungen anzupassen.",
             alarmAccessTitle: "Alarme & Erinnerungen",
             alarmAccessBody: "⚠️ Alarme und Erinnerungen sind möglicherweise deaktiviert. Tippen Sie oben, um dies zu bestätigen.",
             // Settings States
@@ -332,7 +323,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Einstellungen konnten nicht geladen werden.",
             prayersError: "Gebetszeiten konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             quranSurahsError: "Surahs konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
-            noSurahsFound: "Keine Surah gefunden.",
             quranAyahsError: "Ayahs konnten nicht geladen werden. Bitte überprüfen Sie Ihre Internetverbindung.",
             // Prayer times Settings
             calendarTitle: "Gebetszeiten-Kalender",
@@ -396,7 +386,6 @@ export const TRANSLATIONS = {
             Maghrib: "Maghrib",
             Isha: "Isha",
         },
-
         labels: {
             // Navigation
             home: "Accueil",
@@ -477,15 +466,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Moyen",
             vibrationLong: "Long",
             remindLater: "Délai de rappel",
-            offsetOff: "Désactivé",
             offsetOnTime: "À l'heure",
             offsetMinutes: "minutes avant",
             fridayReminder: "🕌 Rappel du Vendredi",
             dailyReminders: "📖 Rappels quotidiens (Citations)",
             batteryOptTitle: "Optimisation de la batterie",
             batteryOptBody: "⚠️ L'optimisation de la batterie est active. Les notifications peuvent être retardées ou non livrées. Appuyez ci-dessus pour ajuster dans les paramètres système.",
-            powerManagerTitle: "Gestionnaire d'alimentation",
-            powerManagerBody: "⚠️ Le gestionnaire d'alimentation restreint l'activité en arrière-plan. Les notifications peuvent être retardées ou non livrées. Appuyez ci-dessus pour ajuster dans les paramètres système.",
             alarmAccessTitle: "Alarmes et rappels",
             alarmAccessBody: "⚠️ Les alarmes et rappels peuvent être désactivés. Appuyez ci-dessus pour vérifier.",
             // Settings States
@@ -524,7 +510,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Échec du chargement des paramètres.",
             prayersError: "Les horaires de prière n'ont pas pu être chargés. Veuillez vérifier votre connexion Internet.",
             quranSurahsError: "Échec du chargement des sourates. Veuillez vérifier votre connexion Internet.",
-            noSurahsFound: "Aucune sourate trouvée.",
             quranAyahsError: "Échec du chargement des versets. Veuillez vérifier votre connexion Internet.",
             // Prayer times Settings
             calendarTitle: "Calendrier des horaires de prière",
@@ -588,7 +573,6 @@ export const TRANSLATIONS = {
             Maghrib: "Akshami",
             Isha: "Jacia",
         },
-
         labels: {
             // Navigation
             home: "Kryefaqja",
@@ -669,15 +653,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Mesatar",
             vibrationLong: "Gjatë",
             remindLater: "Kohëzgjatja e kujtesës",
-            offsetOff: "Joaktiv",
             offsetOnTime: "Në kohë",
             offsetMinutes: "minuta më parë",
             fridayReminder: "🕌 Kujtesë për Xhuma",
             dailyReminders: "📖 Përkujtuesi ditor (Ajete)",
             batteryOptTitle: "Optimizimi i Baterisë",
             batteryOptBody: "⚠️ Optimizimi i baterisë është aktiv. Njoftimet mund të vonohen ose mos shfaqen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
-            powerManagerTitle: "Menaxhimi i energjisë",
-            powerManagerBody: "⚠️ Menaxhimi i energjisë kufizon aktivitetin në prapaskenë. Njoftimet mund të vonohen ose mos shfaqen. Shtyp më sipër për ta rregulluar në cilësimet e sistemit.",
             alarmAccessTitle: "Alarme dhe Kujtesa",
             alarmAccessBody: "⚠️ Alarmet dhe përkujtuesit mund të jenë të çaktivizuar. Shtyp më sipër për të verifikuar.",
             // Settings States
@@ -716,7 +697,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Cilësimet nuk mund të ngarkohen.",
             prayersError: "Kohët e lutjeve nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             quranSurahsError: "Suret nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
-            noSurahsFound: "Nuk u gjet asnjë Sure.",
             quranAyahsError: "Ajetet nuk mund të ngarkohen. Ju lutemi kontrolloni lidhjen tuaj të internetit.",
             // Prayer times Settings
             calendarTitle: "Kalendari i kohëve të Namazit",
@@ -780,7 +760,6 @@ export const TRANSLATIONS = {
             Maghrib: "Akšam",
             Isha: "Jacija",
         },
-
         labels: {
             home: "Početna",
             qibla: "Kibla",
@@ -852,15 +831,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Srednja",
             vibrationLong: "Duga",
             remindLater: "Tajmer podsjetnika",
-            offsetOff: "Isključeno",
             offsetOnTime: "Na vrijeme",
             offsetMinutes: "minuta ranije",
             fridayReminder: "🕌 Podsjetnik za Petak",
             dailyReminders: "📖 Dnevni podsjetnici (Citati)",
             batteryOptTitle: "Optimizacija baterije",
             batteryOptBody: "⚠️ Optimizacija baterije je aktivna. Obavještenja mogu biti odgođena ili nedostavljena. Dodirnite iznad za podešavanje u sistemskim postavkama.",
-            powerManagerTitle: "Upravljač napajanjem",
-            powerManagerBody: "⚠️ Upravljač napajanjem ograničava pozadinsku aktivnost. Obavještenja mogu biti odgođena ili nedostavljena. Dodirnite iznad za podešavanje u sistemskim postavkama.",
             alarmAccessTitle: "Alarmi i podsjetnici",
             alarmAccessBody: "⚠️ Alarmi i podsjetnici mogu biti onemogućeni. Dodirnite iznad za provjeru.",
             updatingSettings: "Ažuriranje postavki...",
@@ -895,7 +871,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Nije uspjelo učitavanje postavki.",
             prayersError: "Vremena namaza nisu mogla biti učitana. Molimo provjerite internet vezu.",
             quranSurahsError: "Nije uspjelo učitavanje sura. Molimo provjerite internet vezu.",
-            noSurahsFound: "Nije pronađena nijedna sura.",
             quranAyahsError: "Nije uspjelo učitavanje ajeta. Molimo provjerite internet vezu.",
             calendarTitle: "Kalendar vremena namaza",
             calendarSubtitle: "Pogledajte vremena namaza za odabrani datum",
@@ -954,7 +929,6 @@ export const TRANSLATIONS = {
             Maghrib: "Акшам",
             Isha: "Јацила",
         },
-
         labels: {
             home: "Почетна",
             qibla: "Кибла",
@@ -1026,15 +1000,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Средна",
             vibrationLong: "Долга",
             remindLater: "Тајмер на потсетник",
-            offsetOff: "Исклучено",
             offsetOnTime: "На време",
             offsetMinutes: "минути порано",
             fridayReminder: "🕌 Потсетник за Петок",
             dailyReminders: "📖 Дневни потсетници (Цитати)",
             batteryOptTitle: "Оптимизација на батерија",
             batteryOptBody: "⚠️ Оптимизацијата на батеријата е активна. Известувањата може да бидат одложени или недоставени. Допрете погоре за прилагодување во системските поставки.",
-            powerManagerTitle: "Менаџер на напојување",
-            powerManagerBody: "⚠️ Менаџерот на напојување ја ограничува активноста во позадина. Известувањата може да бидат одложени или недоставени. Допрете погоре за прилагодување во системските поставки.",
             alarmAccessTitle: "Аларми и потсетници",
             alarmAccessBody: "⚠️ Алармите и потсетниците може да бидат оневозможени. Допрете погоре за проверка.",
             updatingSettings: "Ажурирање поставки...",
@@ -1069,7 +1040,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Неуспешно вчитување на поставките.",
             prayersError: "Времињата на намаз не можеа да бидат вчитани. Проверете ја вашата интернет врска.",
             quranSurahsError: "Неуспешно вчитување на сурите. Проверете ја вашата интернет врска.",
-            noSurahsFound: "Не е пронајдена ниту една сура.",
             quranAyahsError: "Неуспешно вчитување на ајетите. Проверете ја вашата интернет врска.",
             calendarTitle: "Календар на времиња на намаз",
             calendarSubtitle: "Видете ги времињата на намаз за избраниот датум",
@@ -1128,7 +1098,6 @@ export const TRANSLATIONS = {
             Maghrib: "Akşam",
             Isha: "Yatsı",
         },
-
         labels: {
             // Navigation
             home: "Ana Sayfa",
@@ -1209,15 +1178,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "Orta",
             vibrationLong: "Uzun",
             remindLater: "Hatırlatma Erteleme Süresi",
-            offsetOff: "Kapalı",
             offsetOnTime: "Zamanında",
             offsetMinutes: "dakika önce",
             fridayReminder: "🕌 Cuma Hatırlatıcısı",
             dailyReminders: "📖 Günlük Hatırlatma (Ayetleri)",
             batteryOptTitle: "Pil Optimizasyonu",
             batteryOptBody: "⚠️ Pil optimizasyonu etkin. Bildirimler gecikebilir veya teslim edilmeyebilir. Sistem ayarlarında düzeltmek için yukarıya basın.",
-            powerManagerTitle: "Güç Yönetimi",
-            powerManagerBody: "⚠️ Güç yöneticisi arka plan etkinliğini kısıtlar. Bildirimler gecikebilir veya teslim edilmeyebilir. Sistem ayarlarında düzeltmek için yukarıya basın.",
             alarmAccessTitle: "Alarmlar ve Hatırlatıcılar",
             alarmAccessBody: "⚠️ Alarmlar ve hatırlatıcılar devre dışı olabilir. Lütfen doğrulamak için yukarıya basın.",
             // Settings States
@@ -1256,7 +1222,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "Ayarlar yüklenemedi.",
             prayersError: "Namaz vakitleri yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             quranSurahsError: "Sureler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
-            noSurahsFound: "Hiç sure bulunamadı.",
             quranAyahsError: "Ayetler yüklenemedi. Lütfen internet bağlantınızı kontrol edin.",
             // Prayer times Settings
             calendarTitle: "Namaz Vakitleri Takvimi",
@@ -1320,7 +1285,6 @@ export const TRANSLATIONS = {
             Maghrib: "المغرب",
             Isha: "العشاء",
         },
-
         labels: {
             // Navigation
             home: "الرئيسية",
@@ -1401,15 +1365,12 @@ export const TRANSLATIONS = {
             vibrationMedium: "متوسط",
             vibrationLong: "طويل",
             remindLater: "مدة التأجيل",
-            offsetOff: "إيقاف",
             offsetOnTime: "في الوقت",
             offsetMinutes: "دقائق قبل",
             fridayReminder: "🕌 تذكير الجمعة",
             dailyReminders: "📖 تذكير يومي (آيات)",
             batteryOptTitle: "تحسين البطارية",
             batteryOptBody: "⚠️ تحسين البطارية مفعل. قد تتأخر الإشعارات أو لا تصل. اضغط أعلاه لإصلاح ذلك في إعدادات النظام.",
-            powerManagerTitle: "مدير الطاقة",
-            powerManagerBody: "⚠️ مدير الطاقة يقيد النشاط في الخلفية. قد تتأخر الإشعارات أو لا تصل. اضغط أعلاه لإصلاح ذلك في إعدادات النظام.",
             alarmAccessTitle: "المنبهات والتذكيرات",
             alarmAccessBody: "⚠️ قد تكون المنبهات والتذكيرات معطلة. اضغط للتحقق.",
             // Settings States
@@ -1448,7 +1409,6 @@ export const TRANSLATIONS = {
             deviceSettingsError: "فشل في تحميل الإعدادات.",
             prayersError: "تعذر تحميل أوقات الصلاة. يرجى التحقق من اتصال الإنترنت.",
             quranSurahsError: "تعذر تحميل السور. يرجى التحقق من اتصال الإنترنت.",
-            noSurahsFound: "لم يتم العثور على أي سور.",
             quranAyahsError: "تعذر تحميل الآيات. يرجى التحقق من اتصال الإنترنت.",
             // Prayer times Settings
             calendarTitle: "تقويم أوقات الصلاة",

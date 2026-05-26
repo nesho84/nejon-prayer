@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { RAMAZANI_TRANSLATIONS } from "@/constants/ramazani";
+import { RAMAZANI_TRANSLATIONS } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
@@ -22,10 +22,13 @@ export default function RamadanScreen() {
     const language = useLanguageStore((state) => state.language);
     const ramazaniTr = RAMAZANI_TRANSLATIONS[language] ?? RAMAZANI_TRANSLATIONS.en;
 
-    // Add state to track both actions
+    // Local state - track actions
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [sharedId, setSharedId] = useState<number | null>(null);
 
+    // ------------------------------------------------------------
+    // Sections data
+    // ------------------------------------------------------------
     const SECTIONS: SectionType[] = useMemo(() => {
         return [
             { id: 1, icon: "⭐", title: ramazaniTr.title1, desc: ramazaniTr.desc1, },

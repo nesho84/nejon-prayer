@@ -1,4 +1,4 @@
-import { TRANSLATIONS } from "@/constants/translations";
+import { TRANSLATIONS } from "@/constants/translations/translations";
 
 export type Language = "en" | "de" | "fr" | "sq" | "bs" | "mk" | "tr" | "ar";
 

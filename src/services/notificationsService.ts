@@ -1,4 +1,4 @@
-import { QUOTES } from "@/constants/quotes";
+import { QUOTES } from "@/constants/translations/quranQuotes.tr";
 import { SOUNDS } from "@/constants/sounds";
 import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';

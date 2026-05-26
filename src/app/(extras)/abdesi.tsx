@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { ABDESI_TRANSLATIONS } from "@/constants/abdesi";
+import { ABDESI_TRANSLATIONS } from "@/constants/translations/abdesi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useState } from "react";

@@ -1,6 +1,6 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import PrayerNotifIcon from '@/components/PrayerNotifIcon';
-import { CELEBRATION_MESSAGES } from '@/constants/celebrations';
+import { CELEBRATION_MESSAGES } from '@/constants/translations/prayerTracking.tr';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';

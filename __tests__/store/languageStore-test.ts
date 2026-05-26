@@ -6,7 +6,7 @@ jest.mock('@/store/storage', () => ({
   },
 }));
 
-import { TRANSLATIONS } from '@/constants/translations';
+import { TRANSLATIONS } from '@/constants/translations/translations';
 import { useLanguageStore } from '@/store/languageStore';
 
 beforeEach(() => {

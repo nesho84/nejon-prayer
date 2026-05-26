@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { NAMAZI_SURAHS, NAMAZI_TRANSLATIONS } from "@/constants/namazi";
+import { NAMAZI_SURAHS, NAMAZI_TRANSLATIONS } from "@/constants/translations/namazi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -28,7 +28,7 @@ export default function NamaziScreen() {
     const language = useLanguageStore((state) => state.language);
     const namaziTr = NAMAZI_TRANSLATIONS[language] ?? NAMAZI_TRANSLATIONS.en;
 
-    // State for tabs content
+    // Local state - for tabs content
     const layout = useWindowDimensions();
     const [index, setIndex] = useState(0);
     const [routes] = useState([
@@ -37,7 +37,9 @@ export default function NamaziScreen() {
     ]);
     const [expandedSurahs, setExpandedSurahs] = useState<Set<string>>(new Set());
 
-    // Prayer tab data
+    // ------------------------------------------------------------
+    // Steps data - Namazi Tab
+    // ------------------------------------------------------------
     const STEPS: StepType[] = useMemo(() => {
         return [
             { id: 1, text: namaziTr.step1, image: require("../../../assets/images/namazi/step1.png") },
@@ -89,7 +91,7 @@ export default function NamaziScreen() {
     };
 
     // ------------------------------------------------------------
-    // Renders a collapsible block for a surah/dua with Arabic and transliteration
+    // Renders a collapsible block for a surah/dua with Arabic and transliteration (Namazi Tab)
     // ------------------------------------------------------------
     const renderSurahBlock = (stepId: number, key: string) => {
         const surah = NAMAZI_SURAHS[key];
@@ -211,7 +213,9 @@ export default function NamaziScreen() {
         </View>
     );
 
+    // ------------------------------------------------------------
     // Prayer table tab data
+    // ------------------------------------------------------------
     const prayerTableData: tableType[] = useMemo(() => {
         return [
             { name: tr.prayers.Fajr, sunnet: "2", farz: "2", sunnet2: "", vitri: "" },
@@ -222,7 +226,9 @@ export default function NamaziScreen() {
         ];
     }, [tr]);
 
+    // ------------------------------------------------------------
     // Detailed surah breakdown per rak'ah for each prayer
+    // ------------------------------------------------------------
     const prayerSurahsData = useMemo(() => {
         const { tableSunnetHeader: sun, tableFarzHeader: farz, tableVitriHeader: vitr, tableRekatetLabel: rek, selamiLabel: sel } = namaziTr;
         const { subhaneke: { name: sub }, taawwudh: { name: eudh }, fatiha: { name: fat }, kawthar: { name: kewt }, ikhlas: { name: ihl }, attahiyyatu: { name: att } } = NAMAZI_SURAHS;
@@ -274,7 +280,7 @@ export default function NamaziScreen() {
     const farzColumn = { ...borderLeft, backgroundColor: theme.overlay };
 
     // ------------------------------------------------------------
-    // PRAYER TABLE Tab Content
+    // REKATE TABLE Tab Content
     // ------------------------------------------------------------
     const renderRekatTab = () => (
         <ScrollView
@@ -293,7 +299,7 @@ export default function NamaziScreen() {
                 </Text>
             </AppCard>
 
-            {/* --- Prayer Table --- */}
+            {/* --- Rekate Table --- */}
             <AppCard style={[styles.tableCard, { backgroundColor: theme.card }]}>
                 {/* Header Row */}
                 <View style={[styles.tableRow, { borderBottomWidth: 2, borderBottomColor: theme.border }]}>
