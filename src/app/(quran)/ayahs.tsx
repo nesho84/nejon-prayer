@@ -279,6 +279,7 @@ export default function AyahsScreen() {
         }}
       />
 
+      {/* AYAHS List */}
       <FlashList
         ref={flashListRef}
         data={verses}

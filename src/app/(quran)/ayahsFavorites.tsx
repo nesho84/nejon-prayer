@@ -73,6 +73,7 @@ export default function AyahsFavoritesScreen() {
           <Text style={[styles.emptyDesc, { color: theme.text2 }]}>{tr.labels.ayahsFavoritesDesc}</Text>
         </View>
       ) : (
+        // AYAHS List
         <FlashList
           data={favoriteAyahs}
           keyExtractor={(item) => `${item.surahId}-${item.ayahId}`}

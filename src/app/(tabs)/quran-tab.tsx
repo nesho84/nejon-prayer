@@ -298,7 +298,7 @@ export default function QuranTabScreen() {
 
         </AppCard>
 
-        {/* SURAH list */}
+        {/* SURAH List */}
         <FlatList
           ref={flatListRef}
           data={filteredSurahs}

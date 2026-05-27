@@ -4,11 +4,12 @@ import { RAMAZANI_TRANSLATIONS } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface SectionType {
+interface ItemType {
     id: number;
     icon: string;
     title: string;
@@ -22,14 +23,15 @@ export default function RamadanScreen() {
     const language = useLanguageStore((state) => state.language);
     const ramazaniTr = RAMAZANI_TRANSLATIONS[language] ?? RAMAZANI_TRANSLATIONS.en;
 
-    // Local state - track actions
+    // Local state
+    const [currentItem, setCurrentItem] = useState(1);
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [sharedId, setSharedId] = useState<number | null>(null);
 
     // ------------------------------------------------------------
-    // Sections data
+    // Items data
     // ------------------------------------------------------------
-    const SECTIONS: SectionType[] = useMemo(() => {
+    const ITEMS: ItemType[] = useMemo(() => {
         return [
             { id: 1, icon: "⭐", title: ramazaniTr.title1, desc: ramazaniTr.desc1, },
             { id: 2, icon: "⚠️", title: ramazaniTr.title2, desc: ramazaniTr.desc2, },
@@ -52,14 +54,13 @@ export default function RamadanScreen() {
     // ------------------------------------------------------------
     // Progress tracking
     // ------------------------------------------------------------
-    const [currentSection, setCurrentSection] = useState(1);
     const handleScroll = useCallback((e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
         const { contentOffset: { y }, contentSize: { height: contentH }, layoutMeasurement: { height: layoutH } } = e.nativeEvent;
         const maxScroll = contentH - layoutH;
         if (maxScroll <= 0) return;
-        const section = Math.min(SECTIONS.length, Math.max(1, Math.ceil((y / maxScroll) * SECTIONS.length)));
-        setCurrentSection(section);
-    }, [SECTIONS.length]);
+        const s = Math.min(ITEMS.length, Math.max(1, Math.ceil((y / maxScroll) * ITEMS.length)));
+        setCurrentItem(s);
+    }, [ITEMS.length]);
 
     // ------------------------------------------------------------
     // Share text cross-platform
@@ -76,14 +77,9 @@ export default function RamadanScreen() {
                     subject: title,
                 }
             );
-
             if (result.action === Share.sharedAction) {
                 setSharedId(id);
-
-                // Reset shared state after timeout to allow re-sharing
-                setTimeout(() => {
-                    setSharedId(null);
-                }, 10000);
+                setTimeout(() => setSharedId(null), 10000);
             }
         } catch (err) {
             console.error("Share failed:", err);
@@ -97,17 +93,49 @@ export default function RamadanScreen() {
         try {
             const textToCopy = `${title}\n\n${message}`;
             await Clipboard.setStringAsync(textToCopy);
-
             setCopiedId(id);
-
-            // Reset copied state after timeout to allow re-copying
-            setTimeout(() => {
-                setCopiedId(null);
-            }, 2000);
+            setTimeout(() => setCopiedId(null), 2000);
         } catch (err) {
             console.error("❌ Copy failed:", err);
         }
     };
+
+    // ------------------------------------------------------------
+    // Render item with actions
+    // ------------------------------------------------------------
+    const renderItem = useCallback(({ item }: { item: ItemType }) => (
+        <AppCard style={[styles.itemCard, { backgroundColor: theme.card }]}>
+            <View style={styles.itemHeader}>
+                <Text style={styles.itemHeaderIcon}>{item.icon}</Text>
+                <Text style={[styles.itemHeaderTitle, { color: theme.text2 }]}>{item.title}</Text>
+            </View>
+
+            <Text style={[styles.itemDesc, { color: theme.textMuted }]}>{item.desc}</Text>
+
+            <View style={styles.actionsRow}>
+                {/* Copy button */}
+                <TouchableOpacity
+                    onPress={() => handleCopy(item.id, item.title, item.desc)}
+                    style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+                >
+                    <Feather name={copiedId === item.id ? "check" : "copy"} size={16} color={copiedId === item.id ? theme.success : theme.text2} />
+                    <Text style={[styles.actionText, { color: copiedId === item.id ? theme.success : theme.text2 }]}>
+                        {copiedId === item.id ? tr.buttons.copied : tr.buttons.copy}
+                    </Text>
+                </TouchableOpacity>
+                {/* Share button */}
+                <TouchableOpacity
+                    onPress={() => handleShare(item.id, item.title, item.desc)}
+                    style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+                >
+                    <Feather name={sharedId === item.id ? "check" : "share-2"} size={16} color={sharedId === item.id ? theme.success : theme.text2} />
+                    <Text style={[styles.actionText, { color: sharedId === item.id ? theme.success : theme.text2 }]}>
+                        {sharedId === item.id ? tr.buttons.shared : tr.buttons.share}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </AppCard>
+    ), [copiedId, sharedId, theme, tr]);
 
     return (
         <AppScreen>
@@ -115,107 +143,40 @@ export default function RamadanScreen() {
             {/* PROGRESS */}
             <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
                 <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[styles.progressFill, { backgroundColor: theme.violet, width: `${(currentSection / SECTIONS.length) * 100}%` as any }]} />
+                    <View style={[styles.progressFill, { backgroundColor: theme.violet, width: `${(currentItem / ITEMS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
-                    {currentSection} / {SECTIONS.length}
+                    {currentItem} / {ITEMS.length}
                 </Text>
             </View>
 
-            <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+            {/* ITEMS List */}
+            <FlashList
+                data={ITEMS}
+                keyExtractor={(item) => String(item.id)}
+                ListHeaderComponent={
+                    // HEADER
+                    <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.violet }]}>
+                        <Text style={styles.headerIcon}>🌙</Text>
+                        <Text style={[styles.headerTitle, { color: theme.text }]}>{ramazaniTr.headerTitle}</Text>
+                        <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>{ramazaniTr.headerSubtitle}</Text>
+                    </AppCard>
+                }
+                renderItem={renderItem}
+                contentContainerStyle={styles.itemsList}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
-                scrollEventThrottle={16}
-            >
+            />
 
-                {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.violet }]}>
-                    <Text style={[styles.headerIcon]}>🌙</Text>
-                    <Text style={[styles.headerTitle, { color: theme.text }]}>
-                        {ramazaniTr.headerTitle}
-                    </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-                        {ramazaniTr.headerSubtitle}
-                    </Text>
-                </AppCard>
-
-                {/* SECTIONS */}
-                {SECTIONS.map((item) => (
-                    <AppCard key={item.id} style={[styles.sectionCard, { backgroundColor: theme.card }]}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.iconText}>{item.icon}</Text>
-                            <Text style={[styles.sectionTitle, { color: theme.text2 }]}>
-                                {item.title}
-                            </Text>
-                        </View>
-                        <Text style={[styles.sectionDesc, { color: theme.placeholder }]}>
-                            {item.desc}
-                        </Text>
-
-                        {/* Action buttons */}
-                        <View style={styles.actionsRow}>
-                            {/* Copy button */}
-                            <TouchableOpacity
-                                onPress={() => handleCopy(item.id, item.title, item.desc)}
-                                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
-                            >
-                                <Feather
-                                    name={copiedId === item.id ? "check" : "copy"}
-                                    size={16}
-                                    color={copiedId === item.id ? theme.success : theme.text2}
-                                />
-                                <Text style={[
-                                    styles.actionText,
-                                    { color: copiedId === item.id ? theme.success : theme.text2 }
-                                ]}>
-                                    {copiedId === item.id ? tr.buttons.copied : tr.buttons.copy}
-                                </Text>
-                            </TouchableOpacity>
-
-                            {/* Share button */}
-                            <TouchableOpacity
-                                onPress={() => handleShare(item.id, item.title, item.desc)}
-                                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
-                            >
-                                <Feather
-                                    name={sharedId === item.id ? "check" : "share-2"}
-                                    size={16}
-                                    color={sharedId === item.id ? theme.success : theme.text2}
-                                />
-                                <Text style={[
-                                    styles.actionText,
-                                    { color: sharedId === item.id ? theme.success : theme.text2 }
-                                ]}>
-                                    {sharedId === item.id ? tr.buttons.shared : tr.buttons.share}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </AppCard>
-                ))}
-
-            </ScrollView>
         </AppScreen>
     );
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
-
     // Progress indicator
     progressWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 10,
         paddingHorizontal: 16,
         paddingVertical: 8,
@@ -225,7 +186,7 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 6,
         borderRadius: 3,
-        overflow: 'hidden',
+        overflow: "hidden",
     },
     progressFill: {
         height: 6,
@@ -234,9 +195,9 @@ const styles = StyleSheet.create({
     },
     progressText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: "600",
         minWidth: 40,
-        textAlign: 'right',
+        textAlign: "right",
     },
 
     // Header card
@@ -246,6 +207,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderLeftWidth: 2,
         borderRightWidth: 2,
+        marginHorizontal: 8,
+        marginTop: 12,
+        marginBottom: 10,
     },
     headerIcon: {
         fontSize: 40,
@@ -263,33 +227,38 @@ const styles = StyleSheet.create({
     },
 
     // Section cards
-    sectionCard: {
-        padding: 16,
+    itemsList: {
+        paddingBottom: 24,
     },
-    sectionHeader: {
+    itemCard: {
+        padding: 16,
+        marginHorizontal: 8,
+        marginBottom: 10,
+        gap: 10,
+    },
+    itemHeader: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 8,
         gap: 8,
     },
-    iconText: {
+    itemHeaderIcon: {
         fontSize: 16,
     },
-    sectionTitle: {
+    itemHeaderTitle: {
         flex: 1,
         fontSize: 18,
         fontWeight: "600",
     },
-    sectionDesc: {
+    itemDesc: {
         fontSize: 15,
-        lineHeight: 20,
+        lineHeight: 22,
         fontWeight: "400",
         textAlign: "justify",
-        marginBottom: 16,
     },
 
     // Action Buttons
     actionsRow: {
+        marginTop: 6,
         flexDirection: "row",
         gap: 8,
     },

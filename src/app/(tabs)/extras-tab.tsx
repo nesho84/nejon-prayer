@@ -32,7 +32,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.abdesDesc || "Step by step ablution guide",
             color: theme.secondary,
             bg: `${theme.secondary}20`,
-            icon: <MaterialCommunityIcons name="hand-wash-outline" size={32} color={theme.secondary} />
+            icon: <MaterialCommunityIcons name="shimmer" size={32} color={theme.secondary} />
         },
         {
             id: 2,
@@ -72,7 +72,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.quotesDesc || "Daily inspiration from Quran & Hadith",
             color: theme.danger,
             bg: `${theme.danger}20`,
-            icon: <MaterialCommunityIcons name="book-heart-outline" size={32} color={theme.accent2} />
+            icon: <MaterialCommunityIcons name="book-outline" size={32} color={theme.accent2} />
         },
         {
             id: 6,

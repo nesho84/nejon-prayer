@@ -4,9 +4,10 @@ import { QUOTES } from "@/constants/translations/islamicQuotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function QuotesScreen() {
   // Stores
@@ -14,16 +15,21 @@ export default function QuotesScreen() {
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
 
-  const quotes = useMemo(() => QUOTES[language as keyof typeof QUOTES] ?? QUOTES.en, [language]);
-
-  // Local state - track actions
+  // Local state
+  const [currentQuote, setCurrentQuote] = useState(1);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [sharedId, setSharedId] = useState<number | null>(null);
 
   // ------------------------------------------------------------
+  // Quotes data
+  // ------------------------------------------------------------
+  const quotes = useMemo(() => {
+    return QUOTES[language as keyof typeof QUOTES] ?? QUOTES.en;
+  }, [language]);
+
+  // ------------------------------------------------------------
   // Progress tracking
   // ------------------------------------------------------------
-  const [currentQuote, setCurrentQuote] = useState(1);
   const handleScroll = useCallback((e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
     const { contentOffset: { y }, contentSize: { height: contentH }, layoutMeasurement: { height: layoutH } } = e.nativeEvent;
     const maxScroll = contentH - layoutH;
@@ -63,97 +69,78 @@ export default function QuotesScreen() {
     }
   };
 
+  // ------------------------------------------------------------
+  // Render quote item with actions
+  // ------------------------------------------------------------
+  const renderItem = useCallback(({ item, index }: { item: string; index: number }) => (
+    <AppCard style={[styles.quoteCard, { backgroundColor: theme.card }]}>
+      <Text style={[styles.quoteText, { color: theme.text2 }]}>{item}</Text>
+
+      <View style={styles.actionsRow}>
+        {/* Copy button */}
+        <TouchableOpacity
+          onPress={() => handleCopy(index, item)}
+          style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+        >
+          <Feather name={copiedId === index ? "check" : "copy"} size={16} color={copiedId === index ? theme.success : theme.text2} />
+          <Text style={[styles.actionText, { color: copiedId === index ? theme.success : theme.text2 }]}>
+            {copiedId === index ? tr.buttons.copied : tr.buttons.copy}
+          </Text>
+        </TouchableOpacity>
+        {/* Share button */}
+        <TouchableOpacity
+          onPress={() => handleShare(index, item)}
+          style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+        >
+          <Feather name={sharedId === index ? "check" : "share-2"} size={16} color={sharedId === index ? theme.success : theme.text2} />
+          <Text style={[styles.actionText, { color: sharedId === index ? theme.success : theme.text2 }]}>
+            {sharedId === index ? tr.buttons.shared : tr.buttons.share}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </AppCard>
+  ), [copiedId, sharedId, theme, tr]);
+
   return (
     <AppScreen>
 
       {/* PROGRESS */}
       <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
         <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-          <View style={[styles.progressFill, { backgroundColor: theme.danger, width: `${(currentQuote / quotes.length) * 100}%` as any }]} />
+          <View style={[styles.progressFill, { backgroundColor: theme.accent2, width: `${(currentQuote / quotes.length) * 100}%` as any }]} />
         </View>
         <Text style={[styles.progressText, { color: theme.placeholder }]}>
           {currentQuote} / {quotes.length}
         </Text>
       </View>
 
-      <ScrollView
-        style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-        contentContainerStyle={styles.scrollContent}
+      {/* QUOTES List */}
+      <FlashList
+        data={quotes}
+        keyExtractor={(_, idx) => String(idx)}
+        ListHeaderComponent={
+          // HEADER
+          <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.accent2 }]}>
+            <Text style={styles.headerIcon}>📜</Text>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quotes}</Text>
+            <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>{tr.labels.quotesDesc}</Text>
+          </AppCard>
+        }
+        renderItem={renderItem}
+        contentContainerStyle={styles.quotesList}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
+      />
 
-        {/* HEADER */}
-        <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.danger }]}>
-          <Text style={styles.headerIcon}>📜</Text>
-          <Text style={[styles.headerTitle, { color: theme.text }]}>
-            {tr.labels.quotes}
-          </Text>
-          <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
-            {tr.labels.quotesDesc}
-          </Text>
-        </AppCard>
-
-        {/* QUOTES */}
-        {quotes.map((quote, index) => (
-          <AppCard key={index} style={[styles.quoteCard, { backgroundColor: theme.card }]}>
-            <Text style={[styles.quoteText, { color: theme.text2 }]}>
-              {quote}
-            </Text>
-            <View style={styles.actionsRow}>
-              <TouchableOpacity
-                onPress={() => handleCopy(index, quote)}
-                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
-              >
-                <Feather
-                  name={copiedId === index ? "check" : "copy"}
-                  size={16}
-                  color={copiedId === index ? theme.success : theme.text2}
-                />
-                <Text style={[styles.actionText, { color: copiedId === index ? theme.success : theme.text2 }]}>
-                  {copiedId === index ? tr.buttons.copied : tr.buttons.copy}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => handleShare(index, quote)}
-                style={[styles.actionButton, { backgroundColor: theme.card2 }]}
-              >
-                <Feather
-                  name={sharedId === index ? "check" : "share-2"}
-                  size={16}
-                  color={sharedId === index ? theme.success : theme.text2}
-                />
-                <Text style={[styles.actionText, { color: sharedId === index ? theme.success : theme.text2 }]}>
-                  {sharedId === index ? tr.buttons.shared : tr.buttons.share}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </AppCard>
-        ))}
-
-      </ScrollView>
     </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 12,
-    paddingBottom: 24,
-    paddingHorizontal: 8,
-    gap: 10,
-  },
-
   // Progress indicator
   progressWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -163,7 +150,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 6,
     borderRadius: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
     height: 6,
@@ -172,9 +159,9 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 40,
-    textAlign: 'right',
+    textAlign: "right",
   },
 
   // Header card
@@ -184,6 +171,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderLeftWidth: 2,
     borderRightWidth: 2,
+    marginHorizontal: 8,
+    marginTop: 12,
+    marginBottom: 10,
   },
   headerIcon: {
     fontSize: 40,
@@ -201,8 +191,13 @@ const styles = StyleSheet.create({
   },
 
   // Quote cards
+  quotesList: {
+    paddingBottom: 24,
+  },
   quoteCard: {
     padding: 16,
+    marginHorizontal: 8,
+    marginBottom: 10,
     gap: 16,
   },
   quoteText: {

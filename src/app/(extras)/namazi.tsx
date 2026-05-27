@@ -129,7 +129,7 @@ export default function NamaziScreen() {
             {/* PROGRESS (fixed below tabs) */}
             <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
                 <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[styles.progressFill, { backgroundColor: theme.primary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
+                    <View style={[styles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
                     {tr.labels.stepLabel} {currentStep} / {STEPS.length}
