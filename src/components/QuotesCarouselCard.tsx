@@ -1,4 +1,4 @@
-import { QUOTES } from "@/constants/translations/islamicQuotes";
+import { QUOTES } from "@/constants/translations/islamicQuotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language } from "@/types/language.types";

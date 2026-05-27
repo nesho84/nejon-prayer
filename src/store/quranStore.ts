@@ -89,8 +89,8 @@ export const useQuranStore = create<QuranState>()(
       khatamCount: 0,
 
       // Settings
-      arabicFontSize: 26,
-      translationFontSize: 18,
+      arabicFontSize: 19,
+      translationFontSize: 15,
       selectedEditions: DEFAULT_EDITIONS,
 
       // Favorites

@@ -115,7 +115,7 @@ export default function RamadanScreen() {
             {/* PROGRESS */}
             <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
                 <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[styles.progressFill, { backgroundColor: theme.accent, width: `${(currentSection / SECTIONS.length) * 100}%` as any }]} />
+                    <View style={[styles.progressFill, { backgroundColor: theme.violet, width: `${(currentSection / SECTIONS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
                     {currentSection} / {SECTIONS.length}
@@ -131,7 +131,7 @@ export default function RamadanScreen() {
             >
 
                 {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.accent }]}>
+                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.violet }]}>
                     <Text style={[styles.headerIcon]}>🌙</Text>
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
                         {ramazaniTr.headerTitle}

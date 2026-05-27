@@ -43,6 +43,13 @@ export default function ExtrasLayout() {
                 }}
             />
             <Stack.Screen
+                name="quotes"
+                options={{
+                    title: tr.labels.quotes,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
                 name="about"
                 options={{
                     title: tr.labels.about,

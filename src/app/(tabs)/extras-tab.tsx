@@ -23,16 +23,16 @@ export default function ExtrasTabScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
 
-    const features: MenuItem[] = [
+    const FEATURES: MenuItem[] = [
         {
             id: 1,
             href: "/(extras)/abdesi",
             type: 'internal',
             label: tr.labels.abdes,
             description: tr.labels.abdesDesc || "Step by step ablution guide",
-            color: "#06b6d4",
-            bg: "#06b6d426",
-            icon: <MaterialCommunityIcons name="hand-wash-outline" size={32} color="#06b6d4" />
+            color: theme.secondary,
+            bg: `${theme.secondary}20`,
+            icon: <MaterialCommunityIcons name="hand-wash-outline" size={32} color={theme.secondary} />
         },
         {
             id: 2,
@@ -40,9 +40,9 @@ export default function ExtrasTabScreen() {
             type: 'internal',
             label: tr.labels.namaz,
             description: tr.labels.namazDesc || "Learn how to perform Salah",
-            color: "#3b82f6",
-            bg: "#3b82f626",
-            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color="#3b82f6" />
+            color: theme.islamicGreen,
+            bg: `${theme.islamicGreen}20`,
+            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color={theme.islamicGreen} />
         },
         {
             id: 3,
@@ -50,19 +50,29 @@ export default function ExtrasTabScreen() {
             type: 'internal',
             label: tr.labels.tesbih,
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
-            color: "#8b5cf6",
-            bg: "#8b5cf626",
-            icon: <MaterialCommunityIcons name="counter" size={36} color="#8b5cf6" />
+            color: theme.pink,
+            bg: `${theme.pink}20`,
+            icon: <MaterialCommunityIcons name="counter" size={36} color={theme.pink} />
         },
         {
-            id: 5,
+            id: 4,
             href: "/(extras)/ramazani",
             type: 'internal',
             label: tr.labels.ramadan,
             description: tr.labels.ramadanDesc || "Digital prayer beads counter",
-            color: "#06b6d4",
-            bg: "#06b6d426",
-            icon: <Ionicons name="moon-outline" size={32} color="#06b6d4" />
+            color: theme.violet,
+            bg: `${theme.violet}25`,
+            icon: <Ionicons name="moon-outline" size={32} color={theme.violet} />
+        },
+        {
+            id: 5,
+            href: "/(extras)/quotes",
+            type: 'internal',
+            label: tr.labels.quotes,
+            description: tr.labels.quotesDesc || "Daily inspiration from Quran & Hadith",
+            color: theme.danger,
+            bg: `${theme.danger}20`,
+            icon: <MaterialCommunityIcons name="book-heart-outline" size={32} color={theme.accent2} />
         },
         {
             id: 6,
@@ -70,9 +80,9 @@ export default function ExtrasTabScreen() {
             type: 'internal',
             label: tr.labels.about,
             description: tr.labels.aboutDesc || "App information & credits",
-            color: "#2563eb",
-            bg: "#2563eb26",
-            icon: <MaterialCommunityIcons name="information-outline" size={32} color="#2563eb" />
+            color: theme.primary,
+            bg: `${theme.primary}17`,
+            icon: <MaterialCommunityIcons name="information-outline" size={34} color={theme.primary} />
         },
     ];
 
@@ -92,20 +102,20 @@ export default function ExtrasTabScreen() {
                     <Text style={[styles.headerTitle, { color: theme.text }]}>
                         {tr.labels.extrasTitle || "Explore Features"}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>
+                    <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
                         {tr.labels.extrasSubtitle || "Enhance your spiritual journey with these tools"}
                     </Text>
                 </AppCard>
 
                 {/* Feature List Card */}
                 <AppCard style={styles.listCard}>
-                    {features.map((item, index) => {
+                    {FEATURES.map((item, index) => {
 
                         // Renders each item in the list, wrapped in the appropriate Pressable/Link based on type
                         const renderItem = () => (
                             <View style={styles.listItem}>
                                 {/* Left: Icon */}
-                                <View style={[styles.itemIconContainer, { backgroundColor: item.bg }]}>
+                                <View style={[styles.itemIconContainer, { backgroundColor: item.bg, borderColor: theme.divider2 }]}>
                                     {item.icon}
                                 </View>
 
@@ -114,7 +124,7 @@ export default function ExtrasTabScreen() {
                                     <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>
                                         {item.label}
                                     </Text>
-                                    <Text style={[styles.itemDescription, { color: theme.text2 }]} numberOfLines={2}>
+                                    <Text style={[styles.itemDescription, { color: theme.textSecondary }]} numberOfLines={2}>
                                         {item.description}
                                     </Text>
                                 </View>
@@ -148,7 +158,7 @@ export default function ExtrasTabScreen() {
                                     </Pressable>
                                 )}
 
-                                {index < features.length - 1 && (
+                                {index < FEATURES.length - 1 && (
                                     <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
                                 )}
                             </View>
@@ -218,6 +228,7 @@ const styles = StyleSheet.create({
     itemIconContainer: {
         width: 56,
         height: 56,
+        borderWidth: 1,
         borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
