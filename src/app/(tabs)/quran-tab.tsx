@@ -252,14 +252,14 @@ export default function QuranTabScreen() {
             </View>
 
             {/* Right: Favorites + Settings */}
-            <View style={styles.topPanelIcons}>
+            <View style={styles.headerRightIcons}>
               <TouchableOpacity
                 delayPressIn={0}
                 delayPressOut={0}
                 activeOpacity={0.3}
                 onPress={() => router.navigate('/(quran)/ayahsFavorites')}
               >
-                <Ionicons name="bookmark-outline" size={24} color={theme.gold} />
+                <Ionicons name="bookmarks-outline" size={22} color={theme.textSecondary} />
               </TouchableOpacity>
               <TouchableOpacity
                 delayPressIn={0}
@@ -267,7 +267,7 @@ export default function QuranTabScreen() {
                 activeOpacity={0.3}
                 onPress={() => router.navigate('/(modals)/quranSettings')}
               >
-                <Ionicons name="settings-outline" size={24} color={theme.text2} />
+                <Ionicons name="settings-outline" size={24} color={theme.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -366,8 +366,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     lineHeight: 20,
   },
-  topPanelIcons: {
+  headerRightIcons: {
     marginLeft: 'auto',
+    // alignSelf: 'flex-start',
     marginRight: 4,
     flexDirection: 'row',
     alignItems: 'center',

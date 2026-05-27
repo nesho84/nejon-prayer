@@ -105,7 +105,7 @@ const QuranAyahRow = React.memo(({
               <Ionicons
                 name={isAyahFavorited ? "bookmark" : "bookmark-outline"}
                 size={22}
-                color={isAyahFavorited ? theme.info : theme.accent}
+                color={isAyahFavorited ? theme.linkHover : theme.accent}
               />
             </TouchableOpacity>
           </View>

@@ -37,13 +37,13 @@ interface NotificationsState {
 }
 
 const DEFAULT_NOTIFICATIONS_SETTINGS: NotifSettings = {
-  volume: 0.5,
+  volume: 0.1,
   vibration: 'short',
   snooze: 5,
 };
 
 const DEFAULT_PRAYER_SETTINGS: Record<PrayerType, PrayerSettings> = {
-  Fajr: { enabled: true, offset: -15, sound: SOUNDS.azan1_short },
+  Fajr: { enabled: true, offset: -10, sound: SOUNDS.azan2_fajr },
   Dhuhr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
   Asr: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },
   Maghrib: { enabled: true, offset: 0, sound: SOUNDS.azan1_short },

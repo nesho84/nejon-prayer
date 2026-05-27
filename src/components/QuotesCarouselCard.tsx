@@ -1,4 +1,4 @@
-import { QUOTES } from "@/constants/translations/quranQuotes.tr";
+import { QUOTES } from "@/constants/translations/islamicQuotes";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language } from "@/types/language.types";
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         opacity: 0.75,
         marginTop: 4,
-        marginBottom: 7,
+        marginBottom: 8,
     },
 
     dotsContainer: {

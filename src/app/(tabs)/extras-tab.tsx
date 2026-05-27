@@ -3,18 +3,19 @@ import AppTabScreen from "@/components/AppTabScreen";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
+import React from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface MenuItem {
     id: number;
     type: 'internal' | 'external';
-    href: any;
+    href: Href;
     label: string;
     description: string;
     color: string;
     bg: string;
-    icon: any;
+    icon: React.ReactNode;
 }
 
 export default function ExtrasTabScreen() {
@@ -25,7 +26,7 @@ export default function ExtrasTabScreen() {
     const features: MenuItem[] = [
         {
             id: 1,
-            href: "(extras)/abdesi",
+            href: "/(extras)/abdesi",
             type: 'internal',
             label: tr.labels.abdes,
             description: tr.labels.abdesDesc || "Step by step ablution guide",
@@ -35,7 +36,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 2,
-            href: "(extras)/namazi",
+            href: "/(extras)/namazi",
             type: 'internal',
             label: tr.labels.namaz,
             description: tr.labels.namazDesc || "Learn how to perform Salah",
@@ -45,7 +46,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 3,
-            href: "(extras)/tesbih",
+            href: "/(extras)/tesbih",
             type: 'internal',
             label: tr.labels.tesbih,
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
@@ -55,7 +56,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 5,
-            href: "(extras)/ramazani",
+            href: "/(extras)/ramazani",
             type: 'internal',
             label: tr.labels.ramadan,
             description: tr.labels.ramadanDesc || "Digital prayer beads counter",
@@ -65,7 +66,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 6,
-            href: "(extras)/about",
+            href: "/(extras)/about",
             type: 'internal',
             label: tr.labels.about,
             description: tr.labels.aboutDesc || "App information & credits",
@@ -141,7 +142,7 @@ export default function ExtrasTabScreen() {
                                     <Pressable
                                         style={({ pressed }) => [{ opacity: pressed ? 0.3 : 1 }]}
                                         android_ripple={{ color: theme.shadow, borderless: false }}
-                                        onPress={() => Linking.openURL(item.href)}
+                                        onPress={() => Linking.openURL(item.href as string)}
                                     >
                                         {renderItem()}
                                     </Pressable>

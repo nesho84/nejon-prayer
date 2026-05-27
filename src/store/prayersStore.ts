@@ -114,10 +114,10 @@ export const usePrayersStore = create<PrayersState>()(
             prayersError: !internetConnection ? tr.labels.noInternet : tr.labels.prayersError,
           });
 
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.warn("⚠️ Failed to load prayer times:", err);
           Sentry.captureException(err);
-          set({ prayersError: err.message || "An unexpected error occurred." });
+          set({ prayersError: err instanceof Error ? err.message : "An unexpected error occurred." });
         } finally {
           set({ isLoading: false });
         }

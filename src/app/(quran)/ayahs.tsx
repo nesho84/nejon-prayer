@@ -264,14 +264,7 @@ export default function AyahsScreen() {
           title: surahNameStr,
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 32 }}>
-              <TouchableOpacity
-                delayPressIn={0}
-                delayPressOut={0}
-                activeOpacity={0.3}
-                onPress={() => router.navigate('/(quran)/ayahsFavorites')}
-              >
-                <Ionicons name="bookmark-outline" size={24} color={theme.text2} />
-              </TouchableOpacity>
+              {/* Quran Settings Icon */}
               <TouchableOpacity
                 delayPressIn={0}
                 delayPressOut={0}

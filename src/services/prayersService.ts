@@ -99,7 +99,7 @@ export function getMethodForCountry(countryCode: string): number {
 }
 
 // ------------------------------------------------------------
-// TODO: Future — User Calculation Preferences (Advanced Settings)
+// @TODO: Future — User Calculation Preferences (Advanced Settings)
 // ------------------------------------------------------------
 // Allow advanced users to override the default calculation settings:
 //

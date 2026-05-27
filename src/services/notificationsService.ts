@@ -1,5 +1,5 @@
-import { QUOTES } from "@/constants/translations/quranQuotes.tr";
 import { SOUNDS } from "@/constants/sounds";
+import { QUOTES } from "@/constants/translations/islamicQuotes";
 import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';

@@ -4,6 +4,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import {
   BackHandler,
   Keyboard,
+  KeyboardEvent,
   Platform,
   Pressable,
   StyleSheet,
@@ -158,7 +159,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-    const onShow = (e: any) => keyboardHeight.value = withTiming(e.endCoordinates.height, { duration: 300 });
+    const onShow = (e: KeyboardEvent) => keyboardHeight.value = withTiming(e.endCoordinates.height, { duration: 300 });
     const onHide = () => keyboardHeight.value = withTiming(0, { duration: 250 });
 
     const subShow = Keyboard.addListener(showEvent, onShow);

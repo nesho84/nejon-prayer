@@ -1,13 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 
 interface Props {
   items: Item[];
   selectedValue: string | number;
   onValueChange: (value: string | number) => void;
   placeholder?: string;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
   textColor?: string;
   selectedColor?: string;
   backgroundColor?: string;

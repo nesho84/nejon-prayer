@@ -11,7 +11,7 @@ import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/
 import { toDateKey } from "@/utils/date";
 import { isTimePast } from "@/utils/time";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -64,9 +64,9 @@ export default function PrayersSettingsScreen() {
         try {
             const dateKey = toDateKey(date);
 
-            // Simulate a short random loading delay for better UX (0, 100, ..., 800 ms)
-            const randomDelay = Math.floor(Math.random() * 9) * 100;
-            // console.log(randomDelay);
+            // Simulate a short random loading delay for better UX
+            const randomDelay = Math.floor(Math.random() * 5) * 100; // 0-400ms
+            console.log(randomDelay);
             await new Promise((resolve) => setTimeout(resolve, randomDelay));
 
             const times = await usePrayersStore.getState().getPrayerTimesForDate(dateKey);
@@ -103,7 +103,7 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Handle date picker change
     // ------------------------------------------------------------
-    const onDateChange = (event: any, date?: Date) => {
+    const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
         // Android: always close the modal dialog immediately
         if (Platform.OS === 'android') {
             setShowDatePicker(false);

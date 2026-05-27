@@ -4,12 +4,12 @@ import { ABDESI_TRANSLATIONS } from "@/constants/translations/abdesi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface StepType {
     id: number;
     text: string;
-    image?: any;
+    image?: ImageSourcePropType;
 }
 
 export default function AbdesiScreen() {

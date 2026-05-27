@@ -33,9 +33,9 @@ export function useQuranSetup() {
             alwaysPauseOnInterruption: true,
           },
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Ignore "already initialized" error
-        if (err?.message?.includes('already been initialized')) {
+        if (err instanceof Error && err.message.includes('already been initialized')) {
           return;
         }
         console.error('❌ TrackPlayer setup failed:', err);

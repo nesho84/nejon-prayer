@@ -4,13 +4,13 @@ import { NAMAZI_SURAHS, NAMAZI_TRANSLATIONS } from "@/constants/translations/nam
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { TabBar, TabView } from 'react-native-tab-view';
 
 interface StepType {
     id: number;
     text: string;
-    image?: any;
+    image?: ImageSourcePropType;
 }
 
 interface tableType {

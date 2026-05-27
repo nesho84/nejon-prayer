@@ -90,14 +90,6 @@ export default function QiblaCompass({
     }, [latitude, longitude]);
 
     // ------------------------------------------------------------
-    // Get compass direction label (N, NE, E, etc.)
-    // ------------------------------------------------------------
-    const getCompassDirection = (angle: number) => {
-        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-        return dirs[Math.round(angle / 45) % 8];
-    };
-
-    // ------------------------------------------------------------
     // Smooth heading with moving average filter
     // ------------------------------------------------------------
     const smoothHeading = (newHeading: number) => {
