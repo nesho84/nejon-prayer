@@ -1,6 +1,6 @@
 import { Language } from "@/types/language.types";
 
-export const QUOTES = {
+export const QUOTES_TR = {
     // ------------------------------------------------------------
     // English
     // ------------------------------------------------------------

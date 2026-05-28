@@ -39,7 +39,7 @@ export type NamaziSurah = {
   transliteration: string;
 };
 
-export const NAMAZI_TRANSLATIONS: Record<Language, NamaziTranslations> = {
+export const NAMAZI_TR: Record<Language, NamaziTranslations> = {
   // ------------------------------------------------------------
   // English
   // ------------------------------------------------------------

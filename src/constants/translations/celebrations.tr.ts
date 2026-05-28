@@ -1,12 +1,12 @@
 import { Language } from "@/types/language.types";
 
-export type CelebrationVariant = {
+export type CelebrationTranslations = {
   emoji: string;
   title: string;
   message: string;
 };
 
-export const CELEBRATION_MESSAGES: Record<Language, CelebrationVariant[]> = {
+export const PRAYER_CELEBRATIONS_TR: Record<Language, CelebrationTranslations[]> = {
   // ------------------------------------------------------------
   // English
   // ------------------------------------------------------------

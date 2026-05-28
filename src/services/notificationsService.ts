@@ -1,5 +1,5 @@
 import { SOUNDS } from "@/constants/sounds";
-import { QUOTES } from "@/constants/translations/islamicQuotes.tr";
+import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { startSound, stopSound } from "@/services/soundService";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
@@ -440,7 +440,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
   // --- Special 2: Daily Quote at random times throughout the day
   if (config.specials.DailyQuote?.enabled) {
     // Get and Shuffle quotes for variety on each reschedule
-    const quotes = QUOTES[language] || QUOTES.en;
+    const quotes = QUOTES_TR[language] || QUOTES_TR.en;
     const shuffledQuotes = [...quotes].sort(() => Math.random() - 0.5);
 
     // Predefined times and shuffle them to avoid same order every day

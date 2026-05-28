@@ -1,8 +1,8 @@
-import { TRANSLATIONS } from "@/constants/translations/translations";
+import { GLOBAL_TR } from "@/constants/translations/global.tr";
 
 export type Language = "en" | "de" | "fr" | "sq" | "bs" | "mk" | "tr" | "ar";
 
-export type Translations = typeof TRANSLATIONS.en;
+export type Translations = typeof GLOBAL_TR.en;
 
 export const LANGUAGES = [
   { value: 'en' as Language, label: 'English', icon: '🇬🇧' },

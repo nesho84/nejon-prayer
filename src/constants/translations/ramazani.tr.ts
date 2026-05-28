@@ -20,7 +20,7 @@ export type RamazaniTranslations = {
   title15: string; desc15: string;
 };
 
-export const RAMAZANI_TRANSLATIONS: Record<Language, RamazaniTranslations> = {
+export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
   // ------------------------------------------------------------
   // English
   // ------------------------------------------------------------

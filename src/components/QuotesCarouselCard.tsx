@@ -1,4 +1,4 @@
-import { QUOTES } from "@/constants/translations/islamicQuotes.tr";
+import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language } from "@/types/language.types";
@@ -27,7 +27,7 @@ const QuotesCarouselCard = React.memo(() => {
     // Returns today's dynamic daily Quote for a given language
     // ------------------------------------------------------------
     const getDailyQuote = (language: Language = "en", random: boolean = false): string => {
-        const messages = QUOTES[language] || QUOTES["en"];
+        const messages = QUOTES_TR[language] || QUOTES_TR["en"];
         if (random) {
             const randomIndex = Math.floor(Math.random() * messages.length);
             return messages[randomIndex];

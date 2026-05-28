@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { QUOTES } from "@/constants/translations/islamicQuotes.tr";
+import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
@@ -24,7 +24,7 @@ export default function QuotesScreen() {
   // Quotes data
   // ------------------------------------------------------------
   const quotes = useMemo(() => {
-    return QUOTES[language as keyof typeof QUOTES] ?? QUOTES.en;
+    return QUOTES_TR[language as keyof typeof QUOTES_TR] ?? QUOTES_TR.en;
   }, [language]);
 
   // ------------------------------------------------------------

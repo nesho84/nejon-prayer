@@ -1,8 +1,8 @@
-import { TRANSLATIONS } from "@/constants/translations/translations";
+import { GLOBAL_TR } from "@/constants/translations/global.tr";
+import { mmkvStorage } from "@/store/storage";
 import { Language, Translations } from "@/types/language.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "@/store/storage";
 
 interface LanguageState {
   language: Language;
@@ -15,11 +15,11 @@ export const useLanguageStore = create<LanguageState>()(
   persist(
     (set) => ({
       language: "en",
-      tr: TRANSLATIONS.en,
+      tr: GLOBAL_TR.en,
       isReady: false,
 
       setLanguage: (language) => {
-        set({ language: language, tr: TRANSLATIONS[language] });
+        set({ language: language, tr: GLOBAL_TR[language] });
       },
     }),
     {
@@ -30,7 +30,7 @@ export const useLanguageStore = create<LanguageState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.tr = TRANSLATIONS[state.language];
+          state.tr = GLOBAL_TR[state.language];
           state.isReady = true;
         }
       },

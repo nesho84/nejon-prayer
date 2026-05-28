@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { ABDESI_TRANSLATIONS } from "@/constants/translations/abdesi.tr";
+import { ABDESI_TR } from "@/constants/translations/abdesi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useState } from "react";
@@ -17,7 +17,7 @@ export default function AbdesiScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
-    const abdesiTr = ABDESI_TRANSLATIONS[language] ?? ABDESI_TRANSLATIONS.en;
+    const abdesiTr = ABDESI_TR[language] ?? ABDESI_TR.en;
 
     // ------------------------------------------------------------
     // Steps data

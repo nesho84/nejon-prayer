@@ -15,7 +15,7 @@ export type AbdesiTranslations = {
   step10: string;
 };
 
-export const ABDESI_TRANSLATIONS: Record<Language, AbdesiTranslations> = {
+export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
   // ------------------------------------------------------------
   // English
   // ------------------------------------------------------------

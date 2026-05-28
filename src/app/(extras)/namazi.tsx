@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { NAMAZI_SURAHS, NAMAZI_TRANSLATIONS } from "@/constants/translations/namazi.tr";
+import { NAMAZI_SURAHS, NAMAZI_TR } from "@/constants/translations/namazi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -26,7 +26,7 @@ export default function NamaziScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
-    const namaziTr = NAMAZI_TRANSLATIONS[language] ?? NAMAZI_TRANSLATIONS.en;
+    const namaziTr = NAMAZI_TR[language] ?? NAMAZI_TR.en;
 
     // Local state - for tabs content
     const layout = useWindowDimensions();

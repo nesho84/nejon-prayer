@@ -1,6 +1,6 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import PrayerNotifIcon from '@/components/PrayerNotifIcon';
-import { CELEBRATION_MESSAGES } from '@/constants/translations/prayerTracking.tr';
+import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
@@ -56,7 +56,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
       // Haptic feedback for celebration
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // Get a random celebration message variant for the current language
-      const variants = CELEBRATION_MESSAGES[language] ?? CELEBRATION_MESSAGES['en'];
+      const variants = PRAYER_CELEBRATIONS_TR[language] ?? PRAYER_CELEBRATIONS_TR['en'];
       const variant = variants[Math.floor(Math.random() * variants.length)];
 
       // Show celebration modal

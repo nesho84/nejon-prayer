@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
-import { RAMAZANI_TRANSLATIONS } from "@/constants/translations/ramazani.tr";
+import { RAMAZANI_TR } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Feather } from "@expo/vector-icons";
@@ -21,7 +21,7 @@ export default function RamadanScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
-    const ramazaniTr = RAMAZANI_TRANSLATIONS[language] ?? RAMAZANI_TRANSLATIONS.en;
+    const ramazaniTr = RAMAZANI_TR[language] ?? RAMAZANI_TR.en;
 
     // Local state
     const [currentItem, setCurrentItem] = useState(1);
