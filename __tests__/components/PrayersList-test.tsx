@@ -2,6 +2,7 @@ import PrayersList from '@/components/PrayersList';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
+import { toDateKey } from '@/utils/date';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import React from 'react';
 
@@ -55,7 +56,7 @@ beforeEach(() => {
 
 describe('PrayersList', () => {
   it('renders all prayer rows with times', () => {
-    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate="2026-05-26" currentPrayerName={null} />);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
     expect(screen.getByText('Fajr')).toBeTruthy();
     expect(screen.getByText('Dhuhr')).toBeTruthy();
     expect(screen.getByText('Isha')).toBeTruthy();
@@ -66,8 +67,50 @@ describe('PrayersList', () => {
   it('marks a prayer as prayed on press', () => {
     const markPrayed = jest.fn(() => false);
     usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
-    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate="2026-05-26" currentPrayerName="Fajr" />);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName="Fajr" />);
     fireEvent.press(screen.getByText('Fajr'));
     expect(markPrayed).toHaveBeenCalledWith('Fajr');
+  });
+});
+
+describe('PrayersList — past / future / unmark logic', () => {
+  // Pin time to noon so Fajr (04:50) is past and Isha (21:15) is future
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-05-28T12:00:00'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('pressing a past prayer calls markPrayed', () => {
+    const markPrayed = jest.fn(() => false);
+    usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
+    fireEvent.press(screen.getByText('Fajr')); // 04:50 — past at noon
+    expect(markPrayed).toHaveBeenCalledWith('Fajr');
+  });
+
+  it('pressing a future prayer does nothing', () => {
+    const markPrayed = jest.fn(() => false);
+    usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
+    fireEvent.press(screen.getByText('Isha')); // 21:15 — future at noon
+    expect(markPrayed).not.toHaveBeenCalled();
+  });
+
+  it('pressing an already-prayed prayer calls unmarkPrayed', () => {
+    const unmarkPrayed = jest.fn();
+    const today = toDateKey();
+    usePrayersTrackingStore.setState({
+      tracking: { [today]: { Fajr: 'prayed' } },
+      celebratedDate: null,
+      markPrayed: jest.fn(() => false),
+      unmarkPrayed,
+    } as any);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={today} currentPrayerName={null} />);
+    fireEvent.press(screen.getByText('Fajr')); // already prayed → unmark
+    expect(unmarkPrayed).toHaveBeenCalledWith('Fajr');
   });
 });

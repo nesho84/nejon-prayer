@@ -75,6 +75,15 @@ const mockPrayerTimes = {
 
 const mockLocation = { lat: 51.5, lng: -0.1, city: 'London' } as any;
 
+beforeAll(() => {
+  jest.spyOn(console, 'log').mockImplementation(() => { });
+  jest.spyOn(console, 'error').mockImplementation(() => { });
+});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
+
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
@@ -89,16 +98,20 @@ beforeEach(() => {
 });
 
 describe('PrayerTimingsScreen', () => {
-  it('renders the header title', () => {
+  it('renders the header title', async () => {
     render(<PrayerTimingsScreen />);
-    expect(screen.getByText('Prayer Times')).toBeTruthy();
-    expect(screen.getByText('Tap to track your prayers')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('Prayer Times')).toBeTruthy();
+      expect(screen.getByText('Tap to track your prayers')).toBeTruthy();
+    });
   });
 
-  it('renders Cancel and Today footer buttons', () => {
+  it('renders Cancel and Today footer buttons', async () => {
     render(<PrayerTimingsScreen />);
-    expect(screen.getByText('Cancel')).toBeTruthy();
-    expect(screen.getByText('Today')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('Cancel')).toBeTruthy();
+      expect(screen.getByText('Today')).toBeTruthy();
+    });
   });
 
   it('displays prayer names and times after loading', async () => {
@@ -134,6 +147,25 @@ describe('PrayerTimingsScreen', () => {
       const todayBtn = screen.getByText('Today');
       // Re-rendered — Today is now the selected date so button is disabled
       expect(todayBtn).toBeTruthy();
+    });
+  });
+
+  it('navigating back one day fetches prayer times for yesterday', async () => {
+    const getPrayerTimesForDate = jest.spyOn(usePrayersStore.getState(), 'getPrayerTimesForDate')
+      .mockResolvedValue(mockPrayerTimes as any);
+
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Fajr')).toBeTruthy());
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('icon-chevron-back'));
+    });
+
+    await waitFor(() => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const expectedKey = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+      expect(getPrayerTimesForDate).toHaveBeenCalledWith(expectedKey);
     });
   });
 });

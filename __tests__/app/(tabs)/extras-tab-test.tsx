@@ -64,13 +64,13 @@ describe('ExtrasTabScreen', () => {
     const { router } = require('expo-router');
     render(<ExtrasTabScreen />);
     fireEvent.press(screen.getByText('Ablution'));
-    expect(router.navigate).toHaveBeenCalledWith('(extras)/abdesi');
+    expect(router.navigate).toHaveBeenCalledWith('/(extras)/abdesi');
   });
 
   it('navigates to tesbih route when Beads is pressed', () => {
     const { router } = require('expo-router');
     render(<ExtrasTabScreen />);
     fireEvent.press(screen.getByText('Beads'));
-    expect(router.navigate).toHaveBeenCalledWith('(extras)/tesbih');
+    expect(router.navigate).toHaveBeenCalledWith('/(extras)/tesbih');
   });
 });

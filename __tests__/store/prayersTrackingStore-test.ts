@@ -51,6 +51,36 @@ describe('prayersTrackingStore — markPrayed', () => {
     const result = store.markPrayed('Isha', PAST);
     expect(result).toBe(false);
   });
+
+  it('returns false when only 4 of 5 main prayers are done', () => {
+    const store = usePrayersTrackingStore.getState();
+    store.markPrayed('Fajr');
+    store.markPrayed('Dhuhr');
+    store.markPrayed('Asr');
+    const result = store.markPrayed('Maghrib');
+    expect(result).toBe(false);
+  });
+
+  it('returns true again after unmark + re-mark completes all 5', () => {
+    const store = usePrayersTrackingStore.getState();
+    store.markPrayed('Fajr');
+    store.markPrayed('Dhuhr');
+    store.markPrayed('Asr');
+    store.markPrayed('Maghrib');
+    store.markPrayed('Isha');
+    // Unmark one, then re-mark it — should return true again
+    usePrayersTrackingStore.getState().unmarkPrayed('Isha');
+    const result = usePrayersTrackingStore.getState().markPrayed('Isha');
+    expect(result).toBe(true);
+  });
+
+  it('preserves other days when marking today', () => {
+    usePrayersTrackingStore.getState().markPrayed('Fajr', '2026-01-15');
+    usePrayersTrackingStore.getState().markPrayed('Dhuhr');
+    const state = usePrayersTrackingStore.getState().tracking;
+    expect(state['2026-01-15']?.Fajr).toBe('prayed');
+    expect(state[TODAY]?.Dhuhr).toBe('prayed');
+  });
 });
 
 describe('prayersTrackingStore — unmarkPrayed', () => {
