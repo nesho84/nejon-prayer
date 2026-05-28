@@ -1,4 +1,5 @@
 import AppScreen from "@/components/AppScreen";
+import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -70,7 +71,7 @@ export default function AboutScreen() {
             />
 
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
@@ -193,9 +194,6 @@ export default function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
     scrollContent: {
         flexGrow: 1,
         justifyContent: 'space-between',

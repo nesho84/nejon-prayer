@@ -2,6 +2,7 @@ import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
 import PrayerIcon from "@/components/PrayerIcon";
+import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
@@ -148,19 +149,19 @@ export default function PrayersSettingsScreen() {
     // Fixed Footer with Close/Today buttons
     const FixedFooter = () => {
         return (
-            <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+            <View style={[globalStyles.modalFooter, { alignSelf: 'flex-end', backgroundColor: theme.card, borderTopColor: theme.divider }]}>
                 <TouchableOpacity
-                    style={[styles.button, styles.cancelButton]}
+                    style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
                     onPress={handleClose}
                 >
-                    <Text style={[styles.buttonText, { color: theme.text2 }]}>
+                    <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
                         {tr.buttons.cancel}
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={[
-                        styles.button,
+                        globalStyles.modalButton,
                         styles.todayButton,
                         { backgroundColor: isToday() ? theme.overlay : theme.accent2 }
                     ]}
@@ -168,7 +169,7 @@ export default function PrayersSettingsScreen() {
                     disabled={isToday()}
                 >
                     <Ionicons name="today" size={20} color={isToday() ? theme.placeholder : theme.text} />
-                    <Text style={[styles.buttonText, { color: isToday() ? theme.placeholder : theme.text }]}>
+                    <Text style={[globalStyles.modalButtonText, { color: isToday() ? theme.placeholder : theme.text }]}>
                         {tr.buttons.today}
                     </Text>
                 </TouchableOpacity>
@@ -185,7 +186,7 @@ export default function PrayersSettingsScreen() {
             footer={<FixedFooter />}
         >
 
-            <View style={styles.container}>
+            <View style={globalStyles.modalContainer}>
                 {/* Prayer Times Header */}
                 <View style={styles.headerContainer}>
                     <Text style={[styles.headerTitle, { color: theme.accent }]}>
@@ -267,7 +268,7 @@ export default function PrayersSettingsScreen() {
                     </View>
 
                     {/* Divider */}
-                    <View style={[styles.fullDivider, { backgroundColor: theme.divider2 }]} />
+                    <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2 }]} />
 
                     {/* Prayers List */}
                     <View style={styles.prayersRowContainer}>
@@ -349,11 +350,11 @@ export default function PrayersSettingsScreen() {
                                     {tr.labels.prayersError}
                                 </Text>
                                 <TouchableOpacity
-                                    style={[styles.button, { backgroundColor: theme.overlay, marginTop: 8 }]}
+                                    style={[globalStyles.modalButton, { backgroundColor: theme.overlay, marginTop: 8 }]}
                                     onPress={() => fetchPrayerTimesForDate(selectedDate)}
                                 >
                                     <Ionicons name="refresh" size={18} color={theme.text} />
-                                    <Text style={[styles.buttonText, { color: theme.text }]}>
+                                    <Text style={[globalStyles.modalButtonText, { color: theme.text }]}>
                                         {tr.buttons.retry || "Retry"}
                                     </Text>
                                 </TouchableOpacity>
@@ -368,15 +369,8 @@ export default function PrayersSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 14,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
 
-    // Header styles
+    // Header
     headerContainer: {
         alignItems: 'center',
         paddingHorizontal: 16,
@@ -449,10 +443,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         opacity: 0.7,
     },
-    fullDivider: {
-        height: 1.5,
-        width: '100%',
-    },
 
     // Prayers List
     prayersRowContainer: {
@@ -503,30 +493,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Footer styles
-    footer: {
-        alignSelf: 'flex-end',
-        flexDirection: 'row',
-        borderTopWidth: StyleSheet.hairlineWidth,
-        padding: 6,
-        gap: 6,
-    },
-    button: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10,
-        borderRadius: 8,
-        gap: 6,
-    },
-    cancelButton: {
-        backgroundColor: 'transparent',
-        borderWidth: StyleSheet.hairlineWidth,
-    },
+    // Footer
     todayButton: {},
-    buttonText: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
 });

@@ -1,5 +1,6 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import PrayerNotifIcon from '@/components/PrayerNotifIcon';
+import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
@@ -63,10 +64,10 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
       useModalStore.getState().show({
         type: 'alert',
         component: (
-          <View style={styles.celebrationContainer}>
-            <Text style={styles.celebrationEmoji}>{variant.emoji}</Text>
-            <Text style={[styles.celebrationTitle, { color: theme.text2 }]}>{variant.title}</Text>
-            <Text style={[styles.celebrationMessage, { color: theme.textMuted }]}>{variant.message}</Text>
+          <View style={globalStyles.bannerContainer}>
+            <Text style={globalStyles.bannerEmoji}>{variant.emoji}</Text>
+            <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{variant.title}</Text>
+            <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{variant.message}</Text>
           </View>
         ),
         buttons: [{
@@ -236,27 +237,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Celebration Modal
-  celebrationContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    gap: 6,
-  },
-  celebrationEmoji: {
-    fontSize: 44,
-    lineHeight: 56,
-  },
-  celebrationTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 4,
-  },
-  celebrationMessage: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
 });

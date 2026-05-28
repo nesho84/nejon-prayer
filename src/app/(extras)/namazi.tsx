@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { globalStyles } from "@/constants/styles";
 import { NAMAZI_SURAHS, NAMAZI_TR } from "@/constants/translations/namazi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -127,9 +128,9 @@ export default function NamaziScreen() {
         <View style={styles.namaziTab}>
 
             {/* PROGRESS (fixed below tabs) */}
-            <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
-                <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[styles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
+            <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
+                <View style={[globalStyles.progressTrack, { backgroundColor: theme.border }]}>
+                    <View style={[globalStyles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
                     {tr.labels.stepLabel} {currentStep} / {STEPS.length}
@@ -137,19 +138,19 @@ export default function NamaziScreen() {
             </View>
 
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={globalStyles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
             >
                 {/* HEADER */}
                 <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
-                    <Text style={[styles.headerIcon]}>🕌</Text>
-                    <Text style={[styles.headerTitle, { color: theme.text }]}>
+                    <Text style={globalStyles.headerIcon}>🕌</Text>
+                    <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
                         {namaziTr.headerTitle}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
+                    <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>
                         {namaziTr.headerSubtitle}
                     </Text>
                 </AppCard>
@@ -162,7 +163,7 @@ export default function NamaziScreen() {
                         onLayout={(e) => { stepLayouts.current[step.id] = e.nativeEvent.layout.y; }}
                     >
                         <View style={styles.stepCircleLeft}>
-                            <View style={[styles.stepNumberCircle, { backgroundColor: theme.islamicGreen }]}>
+                            <View style={[globalStyles.numberCircle, { backgroundColor: theme.islamicGreen }]}>
                                 <Text style={[styles.stepNumberText, { color: theme.card }]}>{step.id}</Text>
                             </View>
                             <Text style={[styles.stepText, { color: theme.text2 }]}>{step.text}</Text>
@@ -284,17 +285,17 @@ export default function NamaziScreen() {
     // ------------------------------------------------------------
     const renderRekatTab = () => (
         <ScrollView
-            style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={styles.scrollContent}
+            style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+            contentContainerStyle={globalStyles.scrollContent}
             showsVerticalScrollIndicator={false}
         >
             {/* HEADER */}
             <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.placeholder }]}>
-                <Text style={[styles.headerIcon]}>📝</Text>
-                <Text style={[styles.headerTitle, { color: theme.text }]}>
+                <Text style={globalStyles.headerIcon}>📝</Text>
+                <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
                     {namaziTr.tableTitle}
                 </Text>
-                <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>
+                <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>
                     {namaziTr.tableSubtitle}
                 </Text>
             </AppCard>
@@ -442,37 +443,7 @@ export default function NamaziScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
-
     // Progress indicator
-    progressWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    progressTrack: {
-        flex: 1,
-        height: 6,
-        borderRadius: 3,
-        overflow: 'hidden',
-    },
-    progressFill: {
-        height: 6,
-        borderRadius: 3,
-        opacity: 0.5,
-    },
     progressText: {
         fontSize: 12,
         fontWeight: '600',
@@ -488,21 +459,6 @@ const styles = StyleSheet.create({
         borderLeftWidth: 2,
         borderRightWidth: 2,
     },
-    headerIcon: {
-        fontSize: 40,
-        marginBottom: 8,
-    },
-    headerTitle: {
-        fontSize: 25,
-        fontWeight: "700",
-        marginBottom: 8,
-    },
-    headerSubtitle: {
-        fontSize: 13,
-        fontWeight: "400",
-        textAlign: "center",
-    },
-
     // Namazi steps tab
     namaziTab: {
         flex: 1,
@@ -514,15 +470,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 12,
-    },
-    stepNumberCircle: {
-        alignSelf: "flex-start",
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 2,
     },
     stepNumberText: {
         fontSize: 15,

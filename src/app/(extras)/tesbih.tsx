@@ -1,5 +1,6 @@
 import AppLoading from "@/components/AppLoading";
 import AppScreen from "@/components/AppScreen";
+import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -73,7 +74,7 @@ export default function TesbihScreen() {
     return (
         <AppScreen>
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[styles.scrollContent]}
                 showsVerticalScrollIndicator={false}
             >
@@ -200,9 +201,6 @@ export default function TesbihScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
     scrollContent: {
         flexGrow: 1,
         alignItems: 'center',

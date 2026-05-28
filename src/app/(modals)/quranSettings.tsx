@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
+import { globalStyles } from "@/constants/styles";
 import { QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
@@ -60,21 +61,21 @@ export default function QuranSettingsScreen() {
   // Fixed Footer with Cancel/Save buttons
   const FixedFooter = () => {
     return (
-      <View style={[styles.footer, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+      <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
         <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
+          style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
           onPress={handleCancel}
         >
-          <Text style={[styles.buttonText, { color: theme.text2 }]}>
+          <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
             {tr.buttons.cancel}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.saveButton, { backgroundColor: theme.overlay }]}
+          style={[globalStyles.modalButton, styles.saveButton, { backgroundColor: theme.overlay }]}
           onPress={handleSave}
         >
-          <Text style={[styles.buttonText, { color: theme.accent }]}>
+          <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
             {tr.buttons.save}
           </Text>
         </TouchableOpacity>
@@ -91,7 +92,7 @@ export default function QuranSettingsScreen() {
       footer={<FixedFooter />}
     >
 
-      <View style={styles.container}>
+      <View style={globalStyles.modalContainer}>
         {/* Header */}
         <View style={styles.headerContainer}>
           <Text style={[styles.headerTitle, { color: theme.accent }]}>
@@ -205,14 +206,6 @@ export default function QuranSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    paddingHorizontal: 8,
-    paddingTop: 12,
-    paddingBottom: 14,
-    gap: 10,
-  },
-
   // Header styles
   headerContainer: {
     alignItems: 'center',
@@ -274,32 +267,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Footer styles
-  footer: {
-    flexDirection: 'row',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    padding: 6,
-    gap: 6,
-  },
-  button: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: 8,
-    gap: 6,
-  },
-  cancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  saveButton: {},
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
   // Translator chips
   translatorCard: {
     paddingVertical: 18,
@@ -324,4 +291,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
   },
+
+  // Footer
+  saveButton: {},
 });

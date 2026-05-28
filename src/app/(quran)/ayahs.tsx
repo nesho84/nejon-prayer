@@ -2,6 +2,7 @@ import AppError from '@/components/AppError';
 import AppLoading from '@/components/AppLoading';
 import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
+import { globalStyles } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
@@ -171,10 +172,10 @@ export default function AyahsScreen() {
             useModalStore.getState().show({
               type: 'alert',
               component: (
-                <View style={styles.celebrationContainer}>
-                  <Text style={styles.celebrationEmoji}>📖</Text>
-                  <Text style={[styles.celebrationTitle, { color: theme.text2 }]}>{tr.labels.khatamCompleteTitle}</Text>
-                  <Text style={[styles.celebrationMessage, { color: theme.textMuted }]}>{tr.labels.khatamCompleteMessage}</Text>
+                <View style={globalStyles.bannerContainer}>
+                  <Text style={globalStyles.bannerEmoji}>📖</Text>
+                  <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.khatamCompleteTitle}</Text>
+                  <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.khatamCompleteMessage}</Text>
                 </View>
               ),
               buttons: [{
@@ -343,27 +344,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // Celebration Modal
-  celebrationContainer: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    gap: 6,
-  },
-  celebrationEmoji: {
-    fontSize: 44,
-    lineHeight: 56,
-  },
-  celebrationTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 4,
-  },
-  celebrationMessage: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
 });

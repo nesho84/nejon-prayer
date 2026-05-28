@@ -7,6 +7,7 @@ import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
 import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
+import { globalStyles } from "@/constants/styles";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -140,8 +141,8 @@ export default function HomeScreen() {
             {/* {__DEV__ && <NotificationTester seconds={10} />} */}
 
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={globalStyles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
@@ -214,7 +215,7 @@ export default function HomeScreen() {
                     </TouchableOpacity>
 
                     {/* Divider */}
-                    <View style={[styles.fullDivider, { backgroundColor: theme.divider2 }]} />
+                    <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2 }]} />
 
                     {/* Prayers List */}
                     <PrayersList
@@ -236,17 +237,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
-
     // Countdown Card
     countdownCard: {
         paddingVertical: 10,
@@ -310,11 +300,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    fullDivider: {
-        height: 1.5,
-        width: '100%',
-    },
-
     // Prayers Progress Card
     progressCard: {
         paddingVertical: 12,

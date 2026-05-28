@@ -1,8 +1,9 @@
-import { ScrollView, StyleSheet } from "react-native";
 import AppTabScreen from "@/components/AppTabScreen";
 import QiblaCompass from "@/components/QiblaCompass";
-import { useThemeStore } from "@/store/themeStore";
+import { globalStyles } from "@/constants/styles";
 import { useLocationStore } from "@/store/locationStore";
+import { useThemeStore } from "@/store/themeStore";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function QiblaScreen() {
     // Stores
@@ -14,7 +15,7 @@ export default function QiblaScreen() {
     return (
         <AppTabScreen>
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
@@ -35,9 +36,6 @@ export default function QiblaScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
     scrollContent: {
         flexGrow: 1,
         alignItems: 'center',

@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppTabScreen from "@/components/AppTabScreen";
+import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -89,8 +90,8 @@ export default function ExtrasTabScreen() {
     return (
         <AppTabScreen>
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={globalStyles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -172,17 +173,6 @@ export default function ExtrasTabScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
-
     // Header Hero Section
     headerCard: {
         alignItems: 'center',

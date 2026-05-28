@@ -4,6 +4,7 @@ import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
+import { globalStyles } from "@/constants/styles";
 import { AUDIO_EDITIONS, getSurahAudioUrl } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
@@ -230,7 +231,7 @@ export default function QuranTabScreen() {
 
   return (
     <AppTabScreen>
-      <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <View style={[globalStyles.container, { backgroundColor: theme.bg }]}>
 
         {/* Hero Header Section */}
         <AppCard style={styles.topPanel}>
@@ -325,10 +326,6 @@ export default function QuranTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
   // Single top panel AppCard
   topPanel: {
     marginTop: 12,

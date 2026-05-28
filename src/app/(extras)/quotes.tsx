@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { globalStyles } from "@/constants/styles";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -80,20 +81,20 @@ export default function QuotesScreen() {
         {/* Copy button */}
         <TouchableOpacity
           onPress={() => handleCopy(index, item)}
-          style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+          style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
         >
           <Feather name={copiedId === index ? "check" : "copy"} size={16} color={copiedId === index ? theme.success : theme.text2} />
-          <Text style={[styles.actionText, { color: copiedId === index ? theme.success : theme.text2 }]}>
+          <Text style={[globalStyles.actionText, { color: copiedId === index ? theme.success : theme.text2 }]}>
             {copiedId === index ? tr.buttons.copied : tr.buttons.copy}
           </Text>
         </TouchableOpacity>
         {/* Share button */}
         <TouchableOpacity
           onPress={() => handleShare(index, item)}
-          style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+          style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
         >
           <Feather name={sharedId === index ? "check" : "share-2"} size={16} color={sharedId === index ? theme.success : theme.text2} />
-          <Text style={[styles.actionText, { color: sharedId === index ? theme.success : theme.text2 }]}>
+          <Text style={[globalStyles.actionText, { color: sharedId === index ? theme.success : theme.text2 }]}>
             {sharedId === index ? tr.buttons.shared : tr.buttons.share}
           </Text>
         </TouchableOpacity>
@@ -105,9 +106,9 @@ export default function QuotesScreen() {
     <AppScreen>
 
       {/* PROGRESS */}
-      <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
-        <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-          <View style={[styles.progressFill, { backgroundColor: theme.accent2, width: `${(currentQuote / quotes.length) * 100}%` as any }]} />
+      <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
+        <View style={[globalStyles.progressTrack, { backgroundColor: theme.border }]}>
+          <View style={[globalStyles.progressFill, { backgroundColor: theme.accent2, width: `${(currentQuote / quotes.length) * 100}%` as any }]} />
         </View>
         <Text style={[styles.progressText, { color: theme.placeholder }]}>
           {currentQuote} / {quotes.length}
@@ -121,9 +122,9 @@ export default function QuotesScreen() {
         ListHeaderComponent={
           // HEADER
           <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.accent2 }]}>
-            <Text style={styles.headerIcon}>📜</Text>
-            <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quotes}</Text>
-            <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>{tr.labels.quotesDesc}</Text>
+            <Text style={globalStyles.headerIcon}>📜</Text>
+            <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{tr.labels.quotes}</Text>
+            <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{tr.labels.quotesDesc}</Text>
           </AppCard>
         }
         renderItem={renderItem}
@@ -138,25 +139,6 @@ export default function QuotesScreen() {
 
 const styles = StyleSheet.create({
   // Progress indicator
-  progressWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  progressTrack: {
-    flex: 1,
-    height: 6,
-    borderRadius: 3,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: 6,
-    borderRadius: 3,
-    opacity: 0.5,
-  },
   progressText: {
     fontSize: 12,
     fontWeight: "600",
@@ -175,21 +157,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 10,
   },
-  headerIcon: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  headerTitle: {
-    fontSize: 25,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    fontWeight: "400",
-    textAlign: "center",
-  },
-
   // Quote cards
   quotesList: {
     paddingBottom: 24,
@@ -211,17 +178,5 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row",
     gap: 8,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    gap: 6,
-  },
-  actionText: {
-    fontSize: 14,
-    fontWeight: "500",
   },
 });

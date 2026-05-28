@@ -1,3 +1,4 @@
+import { globalStyles } from "@/constants/styles";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -91,6 +92,7 @@ const QuranPlaying = React.memo(() => {
 
         <View style={[
           styles.container,
+          globalStyles.cardShadow,
           {
             opacity: pressed ? 0.7 : 1,
             backgroundColor: theme.card,
@@ -132,10 +134,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 16,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
   },
 
   // Left side with icon and text

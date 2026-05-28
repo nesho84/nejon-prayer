@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppScreen from "@/components/AppScreen";
+import { globalStyles } from "@/constants/styles";
 import { RAMAZANI_TR } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -116,20 +117,20 @@ export default function RamadanScreen() {
                 {/* Copy button */}
                 <TouchableOpacity
                     onPress={() => handleCopy(item.id, item.title, item.desc)}
-                    style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+                    style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
                 >
                     <Feather name={copiedId === item.id ? "check" : "copy"} size={16} color={copiedId === item.id ? theme.success : theme.text2} />
-                    <Text style={[styles.actionText, { color: copiedId === item.id ? theme.success : theme.text2 }]}>
+                    <Text style={[globalStyles.actionText, { color: copiedId === item.id ? theme.success : theme.text2 }]}>
                         {copiedId === item.id ? tr.buttons.copied : tr.buttons.copy}
                     </Text>
                 </TouchableOpacity>
                 {/* Share button */}
                 <TouchableOpacity
                     onPress={() => handleShare(item.id, item.title, item.desc)}
-                    style={[styles.actionButton, { backgroundColor: theme.card2 }]}
+                    style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
                 >
                     <Feather name={sharedId === item.id ? "check" : "share-2"} size={16} color={sharedId === item.id ? theme.success : theme.text2} />
-                    <Text style={[styles.actionText, { color: sharedId === item.id ? theme.success : theme.text2 }]}>
+                    <Text style={[globalStyles.actionText, { color: sharedId === item.id ? theme.success : theme.text2 }]}>
                         {sharedId === item.id ? tr.buttons.shared : tr.buttons.share}
                     </Text>
                 </TouchableOpacity>
@@ -141,9 +142,9 @@ export default function RamadanScreen() {
         <AppScreen>
 
             {/* PROGRESS */}
-            <View style={[styles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
-                <View style={[styles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[styles.progressFill, { backgroundColor: theme.violet, width: `${(currentItem / ITEMS.length) * 100}%` as any }]} />
+            <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
+                <View style={[globalStyles.progressTrack, { backgroundColor: theme.border }]}>
+                    <View style={[globalStyles.progressFill, { backgroundColor: theme.violet, width: `${(currentItem / ITEMS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
                     {currentItem} / {ITEMS.length}
@@ -157,9 +158,9 @@ export default function RamadanScreen() {
                 ListHeaderComponent={
                     // HEADER
                     <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.violet }]}>
-                        <Text style={styles.headerIcon}>🌙</Text>
-                        <Text style={[styles.headerTitle, { color: theme.text }]}>{ramazaniTr.headerTitle}</Text>
-                        <Text style={[styles.headerSubtitle, { color: theme.placeholder }]}>{ramazaniTr.headerSubtitle}</Text>
+                        <Text style={globalStyles.headerIcon}>🌙</Text>
+                        <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{ramazaniTr.headerTitle}</Text>
+                        <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{ramazaniTr.headerSubtitle}</Text>
                     </AppCard>
                 }
                 renderItem={renderItem}
@@ -174,25 +175,6 @@ export default function RamadanScreen() {
 
 const styles = StyleSheet.create({
     // Progress indicator
-    progressWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-    },
-    progressTrack: {
-        flex: 1,
-        height: 6,
-        borderRadius: 3,
-        overflow: "hidden",
-    },
-    progressFill: {
-        height: 6,
-        borderRadius: 3,
-        opacity: 0.5,
-    },
     progressText: {
         fontSize: 12,
         fontWeight: "600",
@@ -211,21 +193,6 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 10,
     },
-    headerIcon: {
-        fontSize: 40,
-        marginBottom: 8,
-    },
-    headerTitle: {
-        fontSize: 25,
-        fontWeight: "700",
-        marginBottom: 8,
-    },
-    headerSubtitle: {
-        fontSize: 13,
-        fontWeight: "400",
-        textAlign: "center",
-    },
-
     // Section cards
     itemsList: {
         paddingBottom: 24,
@@ -261,17 +228,5 @@ const styles = StyleSheet.create({
         marginTop: 6,
         flexDirection: "row",
         gap: 8,
-    },
-    actionButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 10,
-        gap: 6,
-    },
-    actionText: {
-        fontSize: 14,
-        fontWeight: "500",
     },
 });

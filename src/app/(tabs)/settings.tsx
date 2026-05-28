@@ -2,6 +2,7 @@ import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
 import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
+import { globalStyles } from "@/constants/styles";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -319,8 +320,8 @@ export default function SettingsScreen() {
             {localLoading && <AppLoading inline={true} text={tr.labels.updatingSettings} />}
 
             <ScrollView
-                style={[styles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={globalStyles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -649,17 +650,6 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-    scrollContainer: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        paddingTop: 12,
-        paddingBottom: 24,
-        paddingHorizontal: 8,
-        gap: 10,
-    },
-
     // Settings Card
     settingCard: {
         padding: 14,
