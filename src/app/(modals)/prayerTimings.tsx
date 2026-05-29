@@ -67,7 +67,7 @@ export default function PrayersSettingsScreen() {
 
             // Simulate a short random loading delay for better UX
             const randomDelay = Math.floor(Math.random() * 5) * 100; // 0-400ms
-            console.log(randomDelay);
+            // console.log(randomDelay);
             await new Promise((resolve) => setTimeout(resolve, randomDelay));
 
             const times = await usePrayersStore.getState().getPrayerTimesForDate(dateKey);

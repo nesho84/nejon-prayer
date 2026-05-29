@@ -16,16 +16,16 @@ import { Linking, Platform, StyleSheet, Switch, Text, TouchableOpacity, View } f
 import notifee from "react-native-notify-kit";
 import Sound from "react-native-sound";
 
-interface SoundsOptionType {
-    id: number;
-    name: string;
-    file: string;
-}
-
 interface TimeOptionType {
     label: string;
     prefix: string;
     offset: number;
+}
+
+interface SoundsOptionType {
+    id: number;
+    name: string;
+    file: string;
 }
 
 export default function PrayersSettingsScreen() {
@@ -52,6 +52,11 @@ export default function PrayersSettingsScreen() {
     const playTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const ModalSheetRef = useRef<ModalSheetRef>(null);
 
+    // Determine if this is a prayer or event
+    const isPrayer = MAIN_PRAYERS.includes(prayerName as PrayerName);
+    const isEvent = PRAYER_EVENTS.includes(prayerName as PrayerName);
+
+    // Time options data
     const TIME_OPTIONS: TimeOptionType[] = useMemo(() => {
         return [
             { prefix: '', label: tr.labels.offsetOnTime, offset: 0 },
@@ -64,8 +69,9 @@ export default function PrayersSettingsScreen() {
         ];
     }, [tr]);
 
+    // Sound options data
     const SOUND_OPTIONS: SoundsOptionType[] = useMemo(() => {
-        return [
+        const all = [
             { id: 1, name: tr.labels.noSound, file: '' }, // icon in the translations
             { id: 2, name: `Azan 1 (${tr.labels.short})`, file: SOUNDS.azan1_short },
             { id: 3, name: `Azan 2 (${tr.prayers.Fajr})`, file: SOUNDS.azan2_fajr },
@@ -75,7 +81,10 @@ export default function PrayersSettingsScreen() {
             { id: 7, name: 'Alarm 2', file: SOUNDS.alarm2 },
             { id: 8, name: 'Alarm 3', file: SOUNDS.alarm3 },
         ];
-    }, [tr]);
+
+        // Events (Imsak, Sunrise) don't have Azan, so only show no-sound/alarm options
+        return isPrayer ? all : all.filter(s => !s.name.toLowerCase().includes('azan'));
+    }, [tr, isPrayer]);
 
     // ------------------------------------------------------------
     // Load current settings from store
@@ -85,7 +94,7 @@ export default function PrayersSettingsScreen() {
 
         const prayerSettings = prayers?.[prayerName as PrayerType];
         const eventSettings = events?.[prayerName as PrayerEventType];
-        const current = prayerSettings || eventSettings || { enabled: false, offset: 0, sound: SOUNDS.azan1_short };
+        const current = prayerSettings || eventSettings || { enabled: false, offset: 0, sound: isPrayer ? SOUNDS.azan1_short : SOUNDS.alarm1 };
 
         setEnabled(current.enabled);
         setSelectedOffset(current.offset);
@@ -161,10 +170,6 @@ export default function PrayersSettingsScreen() {
             ModalSheetRef.current?.close();
             return;
         }
-
-        // Determine if this is a prayer or event
-        const isPrayer = MAIN_PRAYERS.includes(prayerName as PrayerName);
-        const isEvent = PRAYER_EVENTS.includes(prayerName as PrayerName);
 
         // Prepare settings object to save
         const settings = { enabled: enabled, offset: selectedOffset, sound: selectedSound };
