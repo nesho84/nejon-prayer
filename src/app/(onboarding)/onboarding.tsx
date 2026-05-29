@@ -1,6 +1,7 @@
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import CustomPicker from "@/components/CustomPicker";
+import { globalStyles } from "@/constants/styles";
 import { getUserLocation } from "@/services/locationService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -9,8 +10,9 @@ import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import notifee, { AuthorizationStatus } from "react-native-notify-kit";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
   // Stores
@@ -33,6 +35,9 @@ export default function OnboardingScreen() {
   const locationRef = useRef(location);
   const fullAddressRef = useRef(fullAddress);
   const timeZoneRef = useRef(timeZone);
+
+  // Safe area insets
+  const insets = useSafeAreaInsets();
 
   // ------------------------------------------------------------
   // 1️⃣ (Step 1) Handle language
@@ -143,7 +148,14 @@ export default function OnboardingScreen() {
 
   return (
     <AppLayout>
-      <View style={[styles.content, { backgroundColor: theme.bg }]}>
+      <ScrollView
+        style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
 
         {/* Step 1: Language */}
         {step === 1 && (
@@ -232,17 +244,17 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-      </View>
+      </ScrollView>
     </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
   content: {
-    flex: 1,
-    padding: 24,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 24,
   },
   banner: {
     marginBottom: 32,
