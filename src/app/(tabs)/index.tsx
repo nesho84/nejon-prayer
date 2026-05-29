@@ -1,7 +1,7 @@
 import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
+import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppTabScreen from "@/components/AppTabScreen";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
@@ -21,6 +21,7 @@ import { router } from "expo-router";
 import * as Updates from "expo-updates";
 import { useCallback, useEffect, useMemo } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
     // Stores
@@ -47,6 +48,9 @@ export default function HomeScreen() {
         remainingSeconds,
         totalSeconds
     } = useNextPrayer(prayerTimes);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -135,14 +139,17 @@ export default function HomeScreen() {
 
     // Main Content
     return (
-        <AppTabScreen>
+        <AppLayout>
 
             {/* Notifications Test */}
             {/* {__DEV__ && <NotificationTester seconds={10} />} */}
 
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={globalStyles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
@@ -232,7 +239,7 @@ export default function HomeScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppTabScreen >
+        </AppLayout >
     );
 }
 

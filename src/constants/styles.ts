@@ -22,8 +22,6 @@ export const globalStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 12,
-    paddingBottom: 24,
     paddingHorizontal: 8,
     gap: 10,
   },

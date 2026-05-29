@@ -94,8 +94,8 @@ const QuotesCarouselCard = React.memo(() => {
             <FlatList
                 ref={flatListRef}
                 data={quotes}
-                renderItem={renderQuoteCard}
                 keyExtractor={(_, idx) => idx.toString()}
+                renderItem={renderQuoteCard}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 scrollEventThrottle={16}

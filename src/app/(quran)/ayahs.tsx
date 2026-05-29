@@ -1,6 +1,6 @@
 import AppError from '@/components/AppError';
+import AppLayout from '@/components/AppLayout';
 import AppLoading from '@/components/AppLoading';
-import AppScreen from '@/components/AppScreen';
 import QuranAyahRow from '@/components/QuranAyahRow';
 import { globalStyles } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
@@ -14,6 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AyahsScreen() {
   const { surahId, surahName, readingMode } = useLocalSearchParams();
@@ -59,6 +60,9 @@ export default function AyahsScreen() {
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasScrolledRef = useRef(false);
   const userInteractedRef = useRef(false);
+
+  // Safe area insets
+  const insets = useSafeAreaInsets();
 
   // Arabic verses — always from local JSON
   const verses = getSurahById(surahIdNum)?.verses ?? [];
@@ -257,7 +261,7 @@ export default function AyahsScreen() {
   }
 
   return (
-    <AppScreen>
+    <AppLayout>
 
       {/* Top Navigation bar */}
       <Stack.Screen
@@ -288,7 +292,7 @@ export default function AyahsScreen() {
         renderItem={renderAyahItem}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        contentContainerStyle={styles.ayahList}
+        contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={renderFooter}
         onScrollBeginDrag={() => userInteractedRef.current = true}
@@ -300,15 +304,11 @@ export default function AyahsScreen() {
         }}
       />
 
-    </AppScreen>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  ayahList: {
-    paddingBottom: 24,
-  },
-
   // Footer Card
   footerCard: {
     flexDirection: "row",

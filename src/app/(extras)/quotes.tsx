@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import AppScreen from "@/components/AppScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
@@ -9,6 +9,7 @@ import { FlashList } from "@shopify/flash-list";
 import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
 import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function QuotesScreen() {
   // Stores
@@ -20,6 +21,9 @@ export default function QuotesScreen() {
   const [currentQuote, setCurrentQuote] = useState(1);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [sharedId, setSharedId] = useState<number | null>(null);
+
+  // Safe area insets
+  const insets = useSafeAreaInsets();
 
   // ------------------------------------------------------------
   // Quotes data
@@ -58,7 +62,7 @@ export default function QuotesScreen() {
   };
 
   // ------------------------------------------------------------
-  // Copy text (title + message)
+  // Copy text (title)
   // ------------------------------------------------------------
   const handleCopy = async (id: number, quote: string) => {
     try {
@@ -103,7 +107,7 @@ export default function QuotesScreen() {
   ), [copiedId, sharedId, theme, tr]);
 
   return (
-    <AppScreen>
+    <AppLayout>
 
       {/* PROGRESS */}
       <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
@@ -128,12 +132,12 @@ export default function QuotesScreen() {
           </AppCard>
         }
         renderItem={renderItem}
-        contentContainerStyle={styles.quotesList}
+        contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
       />
 
-    </AppScreen>
+    </AppLayout>
   );
 }
 
@@ -154,13 +158,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     borderRightWidth: 2,
     marginHorizontal: 8,
-    marginTop: 12,
     marginBottom: 10,
   },
   // Quote cards
-  quotesList: {
-    paddingBottom: 24,
-  },
   quoteCard: {
     padding: 16,
     marginHorizontal: 8,

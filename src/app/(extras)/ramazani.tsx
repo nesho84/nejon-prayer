@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import AppScreen from "@/components/AppScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { RAMAZANI_TR } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
@@ -9,6 +9,7 @@ import { FlashList } from "@shopify/flash-list";
 import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
 import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ItemType {
     id: number;
@@ -28,6 +29,9 @@ export default function RamadanScreen() {
     const [currentItem, setCurrentItem] = useState(1);
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [sharedId, setSharedId] = useState<number | null>(null);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Items data
@@ -110,7 +114,6 @@ export default function RamadanScreen() {
                 <Text style={styles.itemHeaderIcon}>{item.icon}</Text>
                 <Text style={[styles.itemHeaderTitle, { color: theme.text2 }]}>{item.title}</Text>
             </View>
-
             <Text style={[styles.itemDesc, { color: theme.textMuted }]}>{item.desc}</Text>
 
             <View style={styles.actionsRow}>
@@ -139,7 +142,7 @@ export default function RamadanScreen() {
     ), [copiedId, sharedId, theme, tr]);
 
     return (
-        <AppScreen>
+        <AppLayout>
 
             {/* PROGRESS */}
             <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
@@ -164,12 +167,12 @@ export default function RamadanScreen() {
                     </AppCard>
                 }
                 renderItem={renderItem}
-                contentContainerStyle={styles.itemsList}
+                contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
             />
 
-        </AppScreen>
+        </AppLayout>
     );
 }
 
@@ -190,13 +193,10 @@ const styles = StyleSheet.create({
         borderLeftWidth: 2,
         borderRightWidth: 2,
         marginHorizontal: 8,
-        marginTop: 12,
         marginBottom: 10,
     },
-    // Section cards
-    itemsList: {
-        paddingBottom: 24,
-    },
+
+    // Item cards
     itemCard: {
         padding: 16,
         marginHorizontal: 8,

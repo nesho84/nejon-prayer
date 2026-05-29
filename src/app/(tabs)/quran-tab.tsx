@@ -1,7 +1,7 @@
 import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
+import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppTabScreen from "@/components/AppTabScreen";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
 import { globalStyles } from "@/constants/styles";
@@ -15,6 +15,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
 export default function QuranTabScreen() {
@@ -46,6 +47,9 @@ export default function QuranTabScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const textInputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList<Surah>>(null);
+
+  // Safe area insets
+  const insets = useSafeAreaInsets();
 
   // Must match the height in QuranSurahRow styles
   const ROW_HEIGHT = 90;
@@ -230,8 +234,11 @@ export default function QuranTabScreen() {
   }
 
   return (
-    <AppTabScreen>
-      <View style={[globalStyles.container, { backgroundColor: theme.bg }]}>
+    <AppLayout>
+      <View style={[
+        globalStyles.container,
+        { paddingTop: insets.top, backgroundColor: theme.bg }
+      ]}>
 
         {/* Hero Header Section */}
         <AppCard style={styles.topPanel}>
@@ -305,7 +312,7 @@ export default function QuranTabScreen() {
           data={filteredSurahs}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderSurahItem}
-          contentContainerStyle={styles.surahList}
+          contentContainerStyle={[styles.surahList, { paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
           initialNumToRender={15}
           maxToRenderPerBatch={10}
@@ -321,14 +328,13 @@ export default function QuranTabScreen() {
         />
 
       </View>
-    </AppTabScreen>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
   // Single top panel AppCard
   topPanel: {
-    marginTop: 12,
     marginBottom: 12,
     marginHorizontal: 8,
     paddingTop: 24,
@@ -394,7 +400,6 @@ const styles = StyleSheet.create({
 
   // Surah list
   surahList: {
-    paddingBottom: 24,
     paddingHorizontal: 8,
     gap: 10,
   },

@@ -1,11 +1,12 @@
 import AppCard from "@/components/AppCard";
-import AppScreen from "@/components/AppScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { NAMAZI_SURAHS, NAMAZI_TR } from "@/constants/translations/namazi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TabBar, TabView } from 'react-native-tab-view';
 
 interface StepType {
@@ -37,6 +38,9 @@ export default function NamaziScreen() {
         { key: 'table', title: namaziTr.rekatetTab || "TABELA E REKATEVE" },
     ]);
     const [expandedSurahs, setExpandedSurahs] = useState<Set<string>>(new Set());
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Steps data - Namazi Tab
@@ -139,7 +143,10 @@ export default function NamaziScreen() {
 
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={globalStyles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: 12, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
@@ -286,7 +293,10 @@ export default function NamaziScreen() {
     const renderRekatTab = () => (
         <ScrollView
             style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-            contentContainerStyle={globalStyles.scrollContent}
+            contentContainerStyle={[
+                globalStyles.scrollContent,
+                { paddingTop: 12, paddingBottom: insets.bottom + 24 }
+            ]}
             showsVerticalScrollIndicator={false}
         >
             {/* HEADER */}
@@ -413,7 +423,7 @@ export default function NamaziScreen() {
     };
 
     return (
-        <AppScreen>
+        <AppLayout>
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}
@@ -438,7 +448,7 @@ export default function NamaziScreen() {
                     />
                 )}
             />
-        </AppScreen>
+        </AppLayout>
     );
 }
 

@@ -1,11 +1,13 @@
 import AppCard from "@/components/AppCard";
-import AppScreen from "@/components/AppScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { ABDESI_TR } from "@/constants/translations/abdesi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
-import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface StepType {
     id: number;
@@ -19,6 +21,12 @@ export default function AbdesiScreen() {
     const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
     const abdesiTr = ABDESI_TR[language] ?? ABDESI_TR.en;
+
+    // Local state
+    const [currentStep, setCurrentStep] = useState(1);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Steps data
@@ -41,7 +49,6 @@ export default function AbdesiScreen() {
     // ------------------------------------------------------------
     // Progress tracking
     // ------------------------------------------------------------
-    const [currentStep, setCurrentStep] = useState(1);
     const handleScroll = useCallback((e: { nativeEvent: { contentOffset: { y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => {
         const { contentOffset: { y }, contentSize: { height: contentH }, layoutMeasurement: { height: layoutH } } = e.nativeEvent;
         const maxScroll = contentH - layoutH;
@@ -50,10 +57,30 @@ export default function AbdesiScreen() {
         setCurrentStep(step);
     }, [STEPS.length]);
 
-    return (
-        <AppScreen>
+    // ------------------------------------------------------------
+    // Render item
+    // ------------------------------------------------------------
+    const renderItem = useCallback(({ item }: { item: StepType }) => (
+        <AppCard style={[styles.stepCard, { backgroundColor: theme.card }]}>
+            <View style={styles.stepHeader}>
+                <View style={[globalStyles.numberCircle, { backgroundColor: theme.secondary }]}>
+                    <Text style={[styles.stepNumber, { color: theme.card }]}>{item.id}</Text>
+                </View>
+                <Text style={[styles.stepText, { color: theme.text2 }]}>{item.text}</Text>
+            </View>
 
-            {/* PROGRESS (fixed below native Header) */}
+            {item.image && (
+                <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
+                    <Image source={item.image} style={styles.stepImage} />
+                </View>
+            )}
+        </AppCard>
+    ), [theme]);
+
+    return (
+        <AppLayout>
+
+            {/* PROGRESS */}
             <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
                 <View style={[globalStyles.progressTrack, { backgroundColor: theme.border }]}>
                     <View style={[globalStyles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
@@ -63,46 +90,25 @@ export default function AbdesiScreen() {
                 </Text>
             </View>
 
-            <ScrollView
-                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={globalStyles.scrollContent}
+            {/* STEPS List */}
+            <FlashList
+                data={STEPS}
+                keyExtractor={(item) => String(item.id)}
+                ListHeaderComponent={
+                    // HEADER
+                    <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
+                        <Text style={globalStyles.headerIcon}>✨</Text>
+                        <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{abdesiTr.headerTitle}</Text>
+                        <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{abdesiTr.headerSubtitle}</Text>
+                    </AppCard>
+                }
+                renderItem={renderItem}
+                contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
-                scrollEventThrottle={16}
-            >
+            />
 
-                {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
-                    <Text style={globalStyles.headerIcon}>✨</Text>
-                    <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
-                        {abdesiTr.headerTitle}
-                    </Text>
-                    <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>
-                        {abdesiTr.headerSubtitle}
-                    </Text>
-                </AppCard>
-
-                {/* STEPS */}
-                {STEPS.map((step) => (
-                    <AppCard key={step.id} style={[styles.stepCard, { backgroundColor: theme.card }]}>
-                        <View style={styles.stepHeader}>
-                            <View style={[globalStyles.numberCircle, { backgroundColor: theme.secondary }]}>
-                                <Text style={[styles.stepNumber, { color: theme.card }]}>{step.id}</Text>
-                            </View>
-                            <Text style={[styles.stepText, { color: theme.text2 }]}>{step.text}</Text>
-                        </View>
-
-                        {step.image && (
-                            <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
-                                <Image source={step.image} style={styles.stepImage} />
-                            </View>
-                        )}
-                    </AppCard>
-                ))}
-
-            </ScrollView>
-
-        </AppScreen>
+        </AppLayout>
     );
 }
 
@@ -122,10 +128,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderLeftWidth: 2,
         borderRightWidth: 2,
+        marginHorizontal: 8,
+        marginBottom: 10,
     },
+
     // Step cards
     stepCard: {
         padding: 16,
+        marginHorizontal: 8,
+        marginBottom: 10,
+        gap: 10,
     },
     stepHeader: {
         flexDirection: "row",

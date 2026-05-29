@@ -1,4 +1,4 @@
-import AppScreen from '@/components/AppScreen';
+import AppLayout from '@/components/AppLayout';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
@@ -22,15 +22,15 @@ beforeEach(() => {
   useThemeStore.setState({ theme: { bg: '#ffffff' } as any, resolvedTheme: 'light' as any });
 });
 
-describe('AppScreen', () => {
+describe('AppLayout', () => {
   it('renders children', () => {
-    render(<AppScreen><Text>Hello</Text></AppScreen>);
+    render(<AppLayout><Text>Hello</Text></AppLayout>);
     expect(screen.getByText('Hello')).toBeTruthy();
   });
 
   it('renders children in dark theme without crashing', () => {
     useThemeStore.setState({ theme: { bg: '#000000' } as any, resolvedTheme: 'dark' as any });
-    render(<AppScreen><Text>Dark</Text></AppScreen>);
+    render(<AppLayout><Text>Dark</Text></AppLayout>);
     expect(screen.getByText('Dark')).toBeTruthy();
   });
 });

@@ -1,5 +1,5 @@
+import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
 import { getUserLocation } from "@/services/locationService";
 import { useLanguageStore } from "@/store/languageStore";
@@ -142,7 +142,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <AppTabScreen>
+    <AppLayout>
       <View style={[styles.content, { backgroundColor: theme.bg }]}>
 
         {/* Step 1: Language */}
@@ -157,7 +157,6 @@ export default function OnboardingScreen() {
             </Text>
             <View style={styles.inputArea}>
               <CustomPicker
-                style={{ color: theme.text }}
                 items={LANGUAGES}
                 selectedValue={language}
                 onValueChange={handleLanguage}
@@ -234,7 +233,7 @@ export default function OnboardingScreen() {
         </View>
 
       </View>
-    </AppTabScreen>
+    </AppLayout>
   );
 }
 
@@ -264,11 +263,6 @@ const styles = StyleSheet.create({
   inputArea: {
     width: "100%",
     marginBottom: 24,
-  },
-  pickerButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
   },
   button: {
     paddingVertical: 14,

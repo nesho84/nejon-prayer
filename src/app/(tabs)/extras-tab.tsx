@@ -1,5 +1,5 @@
 import AppCard from "@/components/AppCard";
-import AppTabScreen from "@/components/AppTabScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -7,6 +7,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import React from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface MenuItem {
     id: number;
@@ -23,6 +24,9 @@ export default function ExtrasTabScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     const FEATURES: MenuItem[] = [
         {
@@ -88,10 +92,13 @@ export default function ExtrasTabScreen() {
     ];
 
     return (
-        <AppTabScreen>
+        <AppLayout>
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={globalStyles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -168,7 +175,7 @@ export default function ExtrasTabScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppTabScreen>
+        </AppLayout>
     );
 }
 

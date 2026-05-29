@@ -19,11 +19,6 @@
         "expo-channel-name": "production"
       }
     },
-    "splash": {
-      "image": "./assets/icons/splash-icon-dark.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "android": {
       "versionCode": 45,
       "package": "com.nejon.nejonprayer",
@@ -54,7 +49,9 @@
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
         "ITSAppUsesNonExemptEncryption": false,
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -73,6 +70,7 @@
     "plugins": [
       "./src/plugins/resBuild.js",
       "expo-router",
+      "expo-font",
       "@react-native-community/datetimepicker",
       [
         "expo-splash-screen",
@@ -85,6 +83,14 @@
             "image": "./assets/icons/splash-icon-light.png",
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": true,
+          "hidden": false,
+          "style": "light"
         }
       ],
       [

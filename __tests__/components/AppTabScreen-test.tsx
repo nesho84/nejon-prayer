@@ -1,4 +1,4 @@
-import AppTabScreen from '@/components/AppTabScreen';
+import AppLayout from '@/components/AppLayout';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
@@ -21,15 +21,15 @@ beforeEach(() => {
   useThemeStore.setState({ theme: { bg: '#ffffff' } as any, resolvedTheme: 'light' as any });
 });
 
-describe('AppTabScreen', () => {
+describe('AppLayout', () => {
   it('renders children', () => {
-    render(<AppTabScreen><Text>Tab Content</Text></AppTabScreen>);
+    render(<AppLayout><Text>Tab Content</Text></AppLayout>);
     expect(screen.getByText('Tab Content')).toBeTruthy();
   });
 
   it('renders children in dark theme without crashing', () => {
     useThemeStore.setState({ theme: { bg: '#000000' } as any, resolvedTheme: 'dark' as any });
-    render(<AppTabScreen><Text>Dark</Text></AppTabScreen>);
+    render(<AppLayout><Text>Dark</Text></AppLayout>);
     expect(screen.getByText('Dark')).toBeTruthy();
   });
 });

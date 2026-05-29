@@ -1,9 +1,10 @@
-import AppTabScreen from "@/components/AppTabScreen";
+import AppLayout from "@/components/AppLayout";
 import QiblaCompass from "@/components/QiblaCompass";
 import { globalStyles } from "@/constants/styles";
 import { useLocationStore } from "@/store/locationStore";
 import { useThemeStore } from "@/store/themeStore";
 import { ScrollView, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function QiblaScreen() {
     // Stores
@@ -12,11 +13,17 @@ export default function QiblaScreen() {
     const location = useLocationStore((state) => state.location);
     const timeZone = useLocationStore((state) => state.timeZone);
 
+    // Safe area insets
+    const insets = useSafeAreaInsets();
+
     return (
-        <AppTabScreen>
+        <AppLayout>
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -31,7 +38,7 @@ export default function QiblaScreen() {
                 />
 
             </ScrollView>
-        </AppTabScreen>
+        </AppLayout>
     );
 }
 
@@ -41,8 +48,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 24,
         gap: 16,
     },
 });

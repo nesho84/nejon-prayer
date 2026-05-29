@@ -1,4 +1,4 @@
-import AppScreen from '@/components/AppScreen';
+import AppLayout from '@/components/AppLayout';
 import QuranAyahRow from '@/components/QuranAyahRow';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
@@ -9,6 +9,7 @@ import { FlashList } from '@shopify/flash-list';
 import { router, Stack } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AyahsFavoritesScreen() {
   // Stores
@@ -20,6 +21,9 @@ export default function AyahsFavoritesScreen() {
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
   const toggleAyahFavorite = useQuranStore((state) => state.toggleAyahFavorite);
+
+  // Safe area insets
+  const insets = useSafeAreaInsets();
 
   // ------------------------------------------------------------
   // Render a single favorite ayah row
@@ -47,7 +51,7 @@ export default function AyahsFavoritesScreen() {
   ), [theme, arabicFontSize, translationFontSize, toggleAyahFavorite]);
 
   return (
-    <AppScreen>
+    <AppLayout>
 
       {/* Navigation bar */}
       <Stack.Screen
@@ -78,19 +82,16 @@ export default function AyahsFavoritesScreen() {
           data={favoriteAyahs}
           keyExtractor={(item) => `${item.surahId}-${item.ayahId}`}
           renderItem={renderItem}
-          contentContainerStyle={styles.ayahList}
+          contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
           showsVerticalScrollIndicator={false}
         />
       )}
 
-    </AppScreen>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  ayahList: {
-    paddingBottom: 24,
-  },
   emptyState: {
     flex: 1,
     alignItems: 'center',

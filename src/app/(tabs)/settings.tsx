@@ -1,6 +1,6 @@
 import AppCard from "@/components/AppCard";
+import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppTabScreen from "@/components/AppTabScreen";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -30,6 +30,7 @@ import {
     View
 } from "react-native";
 import notifee, { AuthorizationStatus } from "react-native-notify-kit";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
     // Stores
@@ -61,6 +62,9 @@ export default function SettingsScreen() {
 
     // Refs
     const saveTimeout = useRef<NodeJS.Timeout | number | null>(null);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Change theme
@@ -315,13 +319,16 @@ export default function SettingsScreen() {
 
     // Main Content
     return (
-        <AppTabScreen>
+        <AppLayout>
             {/* Inline Loading */}
             {localLoading && <AppLoading inline={true} text={tr.labels.updatingSettings} />}
 
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={globalStyles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -645,7 +652,7 @@ export default function SettingsScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppTabScreen>
+        </AppLayout>
     );
 }
 

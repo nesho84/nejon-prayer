@@ -10,6 +10,7 @@ export default function TabLayout() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
 
+    // Safe area insets
     const insets = useSafeAreaInsets();
 
     return (

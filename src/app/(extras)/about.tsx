@@ -1,4 +1,4 @@
-import AppScreen from "@/components/AppScreen";
+import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer';
 const CONTACT_EMAIL = 'mailto:support@nejon.net';
@@ -15,6 +16,9 @@ export default function AboutScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // ------------------------------------------------------------
     // Open external link
@@ -56,7 +60,7 @@ export default function AboutScreen() {
     };
 
     return (
-        <AppScreen>
+        <AppLayout>
 
             {/* Top Navigation bar */}
             <Stack.Screen
@@ -72,7 +76,10 @@ export default function AboutScreen() {
 
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: 12, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Hero: Logo + Title + Version */}
@@ -189,17 +196,11 @@ export default function AboutScreen() {
                 </View>
 
             </ScrollView>
-        </AppScreen>
+        </AppLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'space-between',
-        paddingBottom: 32,
-    },
-
     // Header
     headerIcon: {
         paddingHorizontal: 8,

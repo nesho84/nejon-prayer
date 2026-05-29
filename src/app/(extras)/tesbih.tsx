@@ -1,11 +1,12 @@
+import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppScreen from "@/components/AppScreen";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
 
 export default function TesbihScreen() {
@@ -16,6 +17,9 @@ export default function TesbihScreen() {
     const count = useTesbihStore((state) => state.count);
     const totalCount = useTesbihStore((state) => state.totalCount);
     const laps = useTesbihStore((state) => state.laps);
+
+    // Safe area insets
+    const insets = useSafeAreaInsets();
 
     // Calculate circle parameters
     const size = 315;
@@ -72,10 +76,13 @@ export default function TesbihScreen() {
     }
 
     return (
-        <AppScreen>
+        <AppLayout>
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
-                contentContainerStyle={[styles.scrollContent]}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { paddingTop: 12, gap: 16, paddingBottom: insets.bottom + 24 }
+                ]}
                 showsVerticalScrollIndicator={false}
             >
 
@@ -196,21 +203,11 @@ export default function TesbihScreen() {
                 </View>
 
             </ScrollView>
-        </AppScreen>
+        </AppLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        paddingTop: 12,
-        paddingBottom: 24,
-        gap: 16,
-    },
-
     // Instruction
     instruction: {
         alignSelf: "center",
