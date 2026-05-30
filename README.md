@@ -377,6 +377,7 @@ npm install @react-native-picker/picker@latest   # example
 
 # 4. Clear caches and verify
 rm -rf node_modules android package-lock.json
+npm cache clean --force
 npm install
 npx expo-doctor
 npx expo start -c
@@ -399,6 +400,7 @@ npx expo install --check
 
 # 3. Clear caches
 rm -rf node_modules android package-lock.json
+npm cache clean --force
 npm install && npx expo start -c
 ```
 
