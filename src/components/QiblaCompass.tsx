@@ -1,9 +1,8 @@
 import { useLanguageStore } from "@/store/languageStore";
 import { Ionicons } from '@expo/vector-icons';
-import { useIsFocused } from '@react-navigation/native';
-import { router } from "expo-router";
+import { router, useIsFocused } from 'expo-router';
 import { Accelerometer, Magnetometer } from 'expo-sensors';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 
 interface Props {

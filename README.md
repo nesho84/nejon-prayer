@@ -245,6 +245,32 @@ Xcode → **Window → Devices and Simulators → View Device Logs**
 
 ---
 
+## Common Build Errors
+
+### `Unable to delete file '...classes.jar'` (Windows file lock)
+
+**Symptom:**
+```
+Execution failed for task ':expo-modules-core:bundleLibCompileToJarDebug'.
+> Unable to delete file '...\classes.jar'
+```
+
+**Cause:** A Gradle daemon or Java process is holding a lock on a build artifact from a previous build.
+
+**Fix:**
+```bash
+# 1. Stop all Gradle daemons
+cd android && ./gradlew --stop && cd ..
+
+# 2. Kill any remaining Java processes (run in a regular terminal, not Git Bash)
+taskkill /F /IM java.exe
+
+# 3. Retry the build
+npx expo run:android
+```
+
+---
+
 ## OTA Updates (EAS Update)
 
 This app uses **EAS Update** to ship JS/asset changes without a full store release.

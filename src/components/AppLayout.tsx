@@ -1,8 +1,6 @@
 import { useThemeStore } from '@/store/themeStore';
-import * as NavigationBar from 'expo-navigation-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from 'react';
-import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Props {
@@ -16,14 +14,7 @@ export default function AppLayout({ children }: Props) {
 
     // Determine status bar and navigation bar styles based on the resolved theme
     const statusBarStyle = resolvedTheme === "dark" ? "light" : "dark";
-    const navigationBarStyle = resolvedTheme === "dark" ? "dark" : "light";
-
-    // Sync navigation bar style with theme changes on Android
-    useEffect(() => {
-        if (Platform.OS === 'android') {
-            NavigationBar.setStyle(navigationBarStyle);
-        }
-    }, [navigationBarStyle]);
+    const navigationBarStyle = resolvedTheme === "dark" ? "light" : "dark";
 
     return (
         <>
@@ -34,6 +25,7 @@ export default function AppLayout({ children }: Props) {
             >
                 {children}
             </SafeAreaView>
+            <NavigationBar style={navigationBarStyle} />
         </>
     );
 }
