@@ -156,7 +156,10 @@ export default function QuranTabScreen() {
     const index = surahs.findIndex(s => s.id === activeSurahId);
     if (index === -1) return;
 
-    flatListRef.current?.scrollToIndex({ index, animated });
+    flatListRef.current?.scrollToIndex({
+      index,
+      animated
+    });
   }, [activeSurahId, searchQuery, surahs]);
 
   // ------------------------------------------------------------
@@ -337,10 +340,10 @@ export default function QuranTabScreen() {
           removeClippedSubviews={true}
           onMomentumScrollBegin={() => textInputRef.current?.blur()}
           onScrollToIndexFailed={(info) => scrollToSurah(info)}
-          getItemLayout={(_, index) => ({
+          getItemLayout={(_, idx) => ({
             length: ROW_HEIGHT,
-            offset: (isLandscape ? headerHeight : 0) + (ROW_HEIGHT + ROW_GAP) * index,
-            index
+            offset: (isLandscape ? headerHeight : 0) + (ROW_HEIGHT + ROW_GAP) * idx,
+            index: idx
           })}
         />
 
