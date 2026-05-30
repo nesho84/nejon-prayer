@@ -19,7 +19,7 @@ interface Props {
   onToggleAyahFavorite: () => void;
 }
 
-// Main Component (memoized for FlatList performance)
+// Main Component
 const QuranAyahRow = React.memo(({
   surahId,
   surahName,

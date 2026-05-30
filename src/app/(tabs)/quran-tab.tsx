@@ -198,53 +198,9 @@ export default function QuranTabScreen() {
   }, []);
 
   // ------------------------------------------------------------
-  // Render surah row
+  // Header + Search bar - Fixed in portrait, scrollbale in landscape
   // ------------------------------------------------------------
-  const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
-    const isThisActive = activeSurahId === item.id;
-    return (
-      <QuranSurahRow
-        surah={item}
-        theme={theme}
-        tr={tr}
-        activeSurahId={activeSurahId}
-        // Only active row receives changed values
-        isPlaying={isThisActive && isPlaying}
-        isBufferingActive={isThisActive && isBufferingActive}
-        hasFinished={isThisActive && hasFinished}
-        hasError={isThisActive && !!playbackError}
-        currentProgress={isThisActive ? currentTime : 0}
-        totalDuration={isThisActive ? duration : 0}
-        rowHeight={ROW_HEIGHT}
-        onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
-        onStop={(surah) => handleStop(surah)}
-      />
-    );
-  }, [theme, tr, activeSurahId, isPlaying, hasFinished, playbackError, currentTime, duration]);
-
-  // Loading state
-  if (!isQuranReady) {
-    return <AppLoading text={tr.labels.loading} />;
-  }
-
-  // Error state
-  if (quranError) {
-    return (
-      <AppError
-        icon="cloud-offline-outline"
-        iconColor={theme.danger}
-        message={tr.labels.quranSurahsError}
-        buttonText={tr.buttons.retry}
-        buttonColor={theme.danger}
-        onPress={() => useQuranStore.getState().loadFullQuran()}
-      />
-    );
-  }
-
-  // ------------------------------------------------------------
-  // Header + Search bar
-  // ------------------------------------------------------------
-  const headerContent = (
+  const renderHeader = (
     <AppCard
       style={[styles.topPanel, isLandscape ? { marginHorizontal: 0, marginBottom: 4 } : {}]}
       onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
@@ -312,6 +268,50 @@ export default function QuranTabScreen() {
     </AppCard>
   );
 
+  // ------------------------------------------------------------
+  // Render surah row
+  // ------------------------------------------------------------
+  const renderSurahItem = useCallback(({ item }: { item: Surah }) => {
+    const active = activeSurahId === item.id;
+    return (
+      <QuranSurahRow
+        surah={item}
+        theme={theme}
+        tr={tr}
+        activeSurahId={activeSurahId}
+        // Only active row receives changed values
+        isPlaying={active && isPlaying}
+        isBufferingActive={active && isBufferingActive}
+        hasFinished={active && hasFinished}
+        hasError={active && !!playbackError}
+        currentProgress={active ? currentTime : 0}
+        totalDuration={active ? duration : 0}
+        rowHeight={ROW_HEIGHT}
+        onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
+        onStop={(surah) => handleStop(surah)}
+      />
+    );
+  }, [theme, tr, activeSurahId, isPlaying, hasFinished, playbackError, currentTime, duration]);
+
+  // Loading state
+  if (!isQuranReady) {
+    return <AppLoading text={tr.labels.loading} />;
+  }
+
+  // Error state
+  if (quranError) {
+    return (
+      <AppError
+        icon="cloud-offline-outline"
+        iconColor={theme.danger}
+        message={tr.labels.quranSurahsError}
+        buttonText={tr.buttons.retry}
+        buttonColor={theme.danger}
+        onPress={() => useQuranStore.getState().loadFullQuran()}
+      />
+    );
+  }
+
   return (
     <AppLayout>
       <View style={[
@@ -319,15 +319,15 @@ export default function QuranTabScreen() {
         { paddingTop: !isLandscape ? insets.top : 0, backgroundColor: theme.bg }
       ]}>
 
-        {/* Hero Header Section — fixed above list in portrait, scrolls with Surahs list in landscape */}
-        {!isLandscape && headerContent}
+        {/* Header Section */}
+        {!isLandscape && renderHeader}
 
         {/* SURAH List */}
         <FlatList
           ref={flatListRef}
           data={filteredSurahs}
           keyExtractor={(item) => String(item.id)}
-          ListHeaderComponent={isLandscape ? headerContent : null}
+          ListHeaderComponent={isLandscape ? renderHeader : null}
           renderItem={renderSurahItem}
           contentContainerStyle={[
             styles.surahList,
