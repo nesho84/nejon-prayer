@@ -77,6 +77,7 @@ export default function AbdesiScreen() {
         </AppCard>
     ), [theme]);
 
+    // Main Content
     return (
         <AppLayout>
 

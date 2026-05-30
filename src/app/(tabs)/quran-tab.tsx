@@ -14,7 +14,7 @@ import { Surah } from '@/types/quran.types';
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import TrackPlayer, { useProgress } from "react-native-track-player";
 
@@ -45,8 +45,13 @@ export default function QuranTabScreen() {
 
   // Local state / refs
   const [searchQuery, setSearchQuery] = useState("");
+  const [headerHeight, setHeaderHeight] = useState(0);
   const textInputRef = useRef<TextInput>(null);
   const flatListRef = useRef<FlatList<Surah>>(null);
+
+  // Orientation
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   // Safe area insets
   const insets = useSafeAreaInsets();
@@ -233,86 +238,98 @@ export default function QuranTabScreen() {
     );
   }
 
+  // ------------------------------------------------------------
+  // Header + Search bar
+  // ------------------------------------------------------------
+  const headerContent = (
+    <AppCard
+      style={[styles.topPanel, isLandscape ? { marginHorizontal: 0, marginBottom: 4 } : {}]}
+      onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+    >
+      {/* Quran title + subtitle + Favorites + Settings */}
+      <View style={styles.panelHeader}>
+        {/* Left: Icon */}
+        <View style={[styles.headerIconContainer, { backgroundColor: `${theme.gold}20` }]}>
+          <View style={{ position: 'absolute', top: 6 }}>
+            <Ionicons name="volume-medium" size={14} color={theme.gold} />
+          </View>
+          <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={theme.gold} />
+        </View>
+
+        {/* Center: Title and Subtitle */}
+        <View style={styles.headerTextCenter}>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
+          <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
+        </View>
+
+        {/* Right: Favorites + Settings */}
+        <View style={styles.headerRightIcons}>
+          <TouchableOpacity
+            delayPressIn={0}
+            delayPressOut={0}
+            activeOpacity={0.3}
+            onPress={() => router.navigate('/(quran)/ayahsFavorites')}
+          >
+            <Ionicons name="bookmarks-outline" size={22} color={theme.textSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            delayPressIn={0}
+            delayPressOut={0}
+            activeOpacity={0.3}
+            onPress={() => router.navigate('/(modals)/quranSettings')}
+          >
+            <Ionicons name="settings-outline" size={24} color={theme.textSecondary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+      {/* Reading / Khatam card */}
+      <QuranReadingCard />
+
+      {/* SEARCH bar */}
+      <View style={[styles.searchInputContainer, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+        <Ionicons name="search-outline" size={20} color={theme.text2} />
+        <TextInput
+          style={[styles.searchInput, { color: theme.text }]}
+          ref={textInputRef}
+          placeholder={tr.labels.searchPlaceholder ?? "Search..."}
+          placeholderTextColor={theme.placeholder}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          returnKeyType="search"
+          clearButtonMode="while-editing"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <Ionicons name="close-circle" size={18} color={theme.placeholder} />
+          </TouchableOpacity>
+        )}
+      </View>
+    </AppCard>
+  );
+
   return (
     <AppLayout>
       <View style={[
         globalStyles.container,
-        { paddingTop: insets.top, backgroundColor: theme.bg }
+        { paddingTop: !isLandscape ? insets.top : 0, backgroundColor: theme.bg }
       ]}>
 
-        {/* Hero Header Section */}
-        <AppCard style={styles.topPanel}>
-
-          {/* Quran title + subtitle + Favorites + Settings */}
-          <View style={styles.panelHeader}>
-            {/* Left: Icon */}
-            <View style={[styles.headerIconContainer, { backgroundColor: `${theme.gold}20` }]}>
-              <View style={{ position: 'absolute', top: 6 }}>
-                <Ionicons name="volume-medium" size={14} color={theme.gold} />
-              </View>
-              <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={theme.gold} />
-            </View>
-
-            {/* Center: Title and Subtitle */}
-            <View style={styles.headerTextCenter}>
-              <Text style={[styles.headerTitle, { color: theme.text }]}>{tr.labels.quran}</Text>
-              <Text style={[styles.headerSubtitle, { color: theme.text2 }]}>{tr.labels.quranDesc}</Text>
-            </View>
-
-            {/* Right: Favorites + Settings */}
-            <View style={styles.headerRightIcons}>
-              <TouchableOpacity
-                delayPressIn={0}
-                delayPressOut={0}
-                activeOpacity={0.3}
-                onPress={() => router.navigate('/(quran)/ayahsFavorites')}
-              >
-                <Ionicons name="bookmarks-outline" size={22} color={theme.textSecondary} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                delayPressIn={0}
-                delayPressOut={0}
-                activeOpacity={0.3}
-                onPress={() => router.navigate('/(modals)/quranSettings')}
-              >
-                <Ionicons name="settings-outline" size={24} color={theme.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-
-          {/* Reading / Khatam card */}
-          <QuranReadingCard />
-
-          {/* SEARCH bar */}
-          <View style={[styles.searchInputContainer, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-            <Ionicons name="search-outline" size={20} color={theme.text2} />
-            <TextInput
-              style={[styles.searchInput, { color: theme.text }]}
-              ref={textInputRef}
-              placeholder={tr.labels.searchPlaceholder ?? "Search..."}
-              placeholderTextColor={theme.placeholder}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              returnKeyType="search"
-              clearButtonMode="while-editing"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Ionicons name="close-circle" size={18} color={theme.placeholder} />
-              </TouchableOpacity>
-            )}
-          </View>
-
-        </AppCard>
+        {/* Hero Header Section — fixed above list in portrait, scrolls with Surahs list in landscape */}
+        {!isLandscape && headerContent}
 
         {/* SURAH List */}
         <FlatList
           ref={flatListRef}
           data={filteredSurahs}
           keyExtractor={(item) => String(item.id)}
+          ListHeaderComponent={isLandscape ? headerContent : null}
           renderItem={renderSurahItem}
-          contentContainerStyle={[styles.surahList, { paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[
+            styles.surahList,
+            { paddingTop: isLandscape ? insets.top : 0, paddingBottom: insets.bottom + 24 }
+          ]}
           showsVerticalScrollIndicator={false}
           initialNumToRender={15}
           maxToRenderPerBatch={10}
@@ -322,7 +339,7 @@ export default function QuranTabScreen() {
           onScrollToIndexFailed={(info) => scrollToSurah(info)}
           getItemLayout={(_, index) => ({
             length: ROW_HEIGHT,
-            offset: (ROW_HEIGHT + ROW_GAP) * index,
+            offset: (isLandscape ? headerHeight : 0) + (ROW_HEIGHT + ROW_GAP) * index,
             index
           })}
         />

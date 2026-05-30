@@ -422,6 +422,7 @@ export default function NamaziScreen() {
         }
     };
 
+    // Main Content
     return (
         <AppLayout>
             <TabView
@@ -432,7 +433,6 @@ export default function NamaziScreen() {
                 renderTabBar={(props) => (
                     <TabBar
                         {...props}
-                        indicatorStyle={{ backgroundColor: theme.islamicGreen, height: 3 }}
                         style={{
                             backgroundColor: theme.card,
                             elevation: 2,
@@ -441,6 +441,7 @@ export default function NamaziScreen() {
                             shadowOpacity: 0.1,
                             shadowRadius: 3,
                         }}
+                        indicatorStyle={{ backgroundColor: theme.islamicGreen, height: 3 }}
                         activeColor={theme.islamicGreen}
                         inactiveColor={theme.placeholder}
                         pressColor={theme.bg2}

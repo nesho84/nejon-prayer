@@ -75,6 +75,7 @@ export default function TesbihScreen() {
         return <AppLoading text={tr.labels.loading} />;
     }
 
+    // Main Content
     return (
         <AppLayout>
             <ScrollView

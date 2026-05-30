@@ -141,6 +141,7 @@ export default function RamadanScreen() {
         </AppCard>
     ), [copiedId, sharedId, theme, tr]);
 
+    // Main Content
     return (
         <AppLayout>
 

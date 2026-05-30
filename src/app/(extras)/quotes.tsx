@@ -106,6 +106,7 @@ export default function QuotesScreen() {
     </AppCard>
   ), [copiedId, sharedId, theme, tr]);
 
+  // Main Content
   return (
     <AppLayout>
 
