@@ -219,7 +219,7 @@ export default function AyahsScreen() {
             }
           }
           router.replace({
-            pathname: "/(quran)/ayahs",
+            pathname: "/quran/ayahs",
             params: {
               surahId: nextSurah.id,
               surahName: nextSurah.transliteration,

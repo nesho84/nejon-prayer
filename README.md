@@ -43,8 +43,9 @@ Press `a` to open on Android emulator, or `i` for iOS simulator.
 src/
 ├── app/                   # Expo Router screens
 │   ├── (tabs)/            # Main tab bar: Home, Quran, Qibla, Extras, Settings
-│   ├── (extras)/          # Wudu guide, Salah guide, Tesbih, Ramadan, About, Notifications
-│   ├── (quran)/           # Ayahs screen (per-surah verse list)
+│   ├── extras/            # Wudu guide, Tesbih, Ramadan, Quotes, About
+│   │   └── namazi/        # Salah guide (namazi-guide.tsx) + namazi-plus placeholder
+│   ├── quran/             # Ayahs screen, Bookmarked Ayahs (ayahs-fav.tsx)
 │   ├── (modals)/          # Bottom-sheet modals: prayer config, timings, Quran settings
 │   └── (onboarding)/      # First-launch location setup
 ├── components/            # Shared UI components

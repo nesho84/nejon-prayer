@@ -50,7 +50,7 @@ export default function QuranReadingCard() {
   // ------------------------------------------------------------
   const handlePress = () => {
     router.navigate({
-      pathname: "/(quran)/ayahs",
+      pathname: "/quran/ayahs",
       params: {
         surahId: surahId ?? FIRST_SURAH_ID,
         surahName: surahName ?? FIRST_SURAH_NAME,

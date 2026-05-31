@@ -227,7 +227,7 @@ export default function QuranTabScreen() {
             delayPressIn={0}
             delayPressOut={0}
             activeOpacity={0.3}
-            onPress={() => router.navigate('/(quran)/ayahsFavorites')}
+            onPress={() => router.navigate('/quran/ayahs-fav')}
           >
             <Ionicons name="bookmarks-outline" size={22} color={theme.textSecondary} />
           </TouchableOpacity>

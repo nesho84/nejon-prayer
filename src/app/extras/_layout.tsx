@@ -24,8 +24,7 @@ export default function ExtrasLayout() {
             <Stack.Screen
                 name="namazi"
                 options={{
-                    title: tr.labels.namaz,
-                    headerShown: true,
+                    headerShown: false,
                 }}
             />
             <Stack.Screen
@@ -57,15 +56,7 @@ export default function ExtrasLayout() {
                 }}
             />
 
-            {/* This screen is just a placeholder for handling 'react-native-track-player' playback notification press.
-            ...When a playback notification is pressed, it will redirect to the main page. */}
-            <Stack.Screen
-                name="notification.click"
-                options={{
-                    title: 'Playback Notification',
-                    headerShown: false,
-                }}
-            />
+
         </Stack>
     );
 }

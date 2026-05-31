@@ -47,21 +47,21 @@ export default function NamaziScreen() {
     // ------------------------------------------------------------
     const STEPS: StepType[] = useMemo(() => {
         return [
-            { id: 1, text: namaziTr.step1, image: require("../../../assets/images/namazi/step1.png") },
-            { id: 2, text: namaziTr.step2, image: require("../../../assets/images/namazi/step2.png") },
-            { id: 3, text: namaziTr.step3, image: require("../../../assets/images/namazi/step3.png") },
-            { id: 4, text: namaziTr.step4, image: require("../../../assets/images/namazi/step4.png") },
-            { id: 5, text: namaziTr.step5, image: require("../../../assets/images/namazi/step5.png") },
-            { id: 6, text: namaziTr.step6, image: require("../../../assets/images/namazi/step6.png") },
-            { id: 7, text: namaziTr.step7, image: require("../../../assets/images/namazi/step5.png") },
-            { id: 8, text: namaziTr.step8, image: require("../../../assets/images/namazi/step2.png") },
-            { id: 9, text: namaziTr.step9, image: require("../../../assets/images/namazi/step3.png") },
-            { id: 10, text: namaziTr.step10, image: require("../../../assets/images/namazi/step4.png") },
-            { id: 11, text: namaziTr.step11, image: require("../../../assets/images/namazi/step5.png") },
-            { id: 12, text: namaziTr.step12, image: require("../../../assets/images/namazi/step6.png") },
-            { id: 13, text: namaziTr.step13, image: require("../../../assets/images/namazi/step5.png") },
-            { id: 14, text: namaziTr.step14, image: require("../../../assets/images/namazi/step14.png") },
-            { id: 15, text: namaziTr.step15, image: require("../../../assets/images/namazi/step15.png") },
+            { id: 1, text: namaziTr.step1, image: require("../../../../assets/images/namazi/step1.png") },
+            { id: 2, text: namaziTr.step2, image: require("../../../../assets/images/namazi/step2.png") },
+            { id: 3, text: namaziTr.step3, image: require("../../../../assets/images/namazi/step3.png") },
+            { id: 4, text: namaziTr.step4, image: require("../../../../assets/images/namazi/step4.png") },
+            { id: 5, text: namaziTr.step5, image: require("../../../../assets/images/namazi/step5.png") },
+            { id: 6, text: namaziTr.step6, image: require("../../../../assets/images/namazi/step6.png") },
+            { id: 7, text: namaziTr.step7, image: require("../../../../assets/images/namazi/step5.png") },
+            { id: 8, text: namaziTr.step8, image: require("../../../../assets/images/namazi/step2.png") },
+            { id: 9, text: namaziTr.step9, image: require("../../../../assets/images/namazi/step3.png") },
+            { id: 10, text: namaziTr.step10, image: require("../../../../assets/images/namazi/step4.png") },
+            { id: 11, text: namaziTr.step11, image: require("../../../../assets/images/namazi/step5.png") },
+            { id: 12, text: namaziTr.step12, image: require("../../../../assets/images/namazi/step6.png") },
+            { id: 13, text: namaziTr.step13, image: require("../../../../assets/images/namazi/step5.png") },
+            { id: 14, text: namaziTr.step14, image: require("../../../../assets/images/namazi/step14.png") },
+            { id: 15, text: namaziTr.step15, image: require("../../../../assets/images/namazi/step15.png") },
         ];
     }, [namaziTr]);
 

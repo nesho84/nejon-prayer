@@ -36,8 +36,9 @@ const RootStack = () => {
       {/* Main app only after onboarding */}
       <Stack.Protected guard={onboardingComplete}>
         <Stack.Screen name="(tabs)" options={{ animation: "default" }} />
-        <Stack.Screen name="(extras)" options={{ animation: "ios_from_right" }} />
-        <Stack.Screen name="(quran)" options={{ animation: "ios_from_right" }} />
+        <Stack.Screen name="extras" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="quran" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="notification.click" options={{ headerShown: false }} />
         {/* Modal Screens */}
         <Stack.Screen
           name="(modals)"

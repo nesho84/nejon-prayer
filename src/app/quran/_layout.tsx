@@ -22,7 +22,7 @@ export default function QuranLayout() {
         }}
       />
       <Stack.Screen
-        name="ayahsFavorites"
+        name="ayahs-fav"
         options={{
           title: tr.labels.ayahsFavorites,
           headerShown: true,

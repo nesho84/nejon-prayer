@@ -31,7 +31,7 @@ export default function ExtrasTabScreen() {
     const FEATURES: MenuItem[] = [
         {
             id: 1,
-            href: "/(extras)/abdesi",
+            href: "/extras/abdesi",
             type: 'internal',
             label: tr.labels.abdes,
             description: tr.labels.abdesDesc || "Step by step ablution guide",
@@ -41,7 +41,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 2,
-            href: "/(extras)/namazi",
+            href: "/extras/namazi/namazi-guide",
             type: 'internal',
             label: tr.labels.namaz,
             description: tr.labels.namazDesc || "Learn how to perform Salah",
@@ -51,7 +51,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 3,
-            href: "/(extras)/tesbih",
+            href: "/extras/tesbih",
             type: 'internal',
             label: tr.labels.tesbih,
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
@@ -61,7 +61,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 4,
-            href: "/(extras)/ramazani",
+            href: "/extras/ramazani",
             type: 'internal',
             label: tr.labels.ramadan,
             description: tr.labels.ramadanDesc || "Digital prayer beads counter",
@@ -71,7 +71,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 5,
-            href: "/(extras)/quotes",
+            href: "/extras/quotes",
             type: 'internal',
             label: tr.labels.quotes,
             description: tr.labels.quotesDesc || "Daily inspiration from Quran & Hadith",
@@ -81,7 +81,7 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 6,
-            href: "/(extras)/about",
+            href: "/extras/about",
             type: 'internal',
             label: tr.labels.about,
             description: tr.labels.aboutDesc || "App information & credits",
