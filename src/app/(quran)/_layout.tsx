@@ -1,7 +1,6 @@
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Stack } from 'expo-router';
-import React from 'react';
 
 export default function QuranLayout() {
   // Stores
@@ -20,7 +19,6 @@ export default function QuranLayout() {
         options={{
           title: tr.labels.ayahs,
           headerShown: true,
-          animation: "slide_from_right",
         }}
       />
       <Stack.Screen
@@ -28,7 +26,6 @@ export default function QuranLayout() {
         options={{
           title: tr.labels.ayahsFavorites,
           headerShown: true,
-          animation: "slide_from_right",
         }}
       />
     </Stack>
