@@ -1,8 +1,7 @@
-import AbdesiScreen from '@/app/(extras)/abdesi';
+import AbdesiScreen from '@/app/extras/abdesi';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -16,7 +15,9 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
-jest.mock('@react-navigation/elements', () => ({ useHeaderHeight: () => 0 }));
+jest.mock('expo-navigation-bar', () => ({
+  NavigationBar: () => null,
+}));
 
 const mockTheme = {
   bg: '#fff', text: '#111', text2: '#555', placeholder: '#999',

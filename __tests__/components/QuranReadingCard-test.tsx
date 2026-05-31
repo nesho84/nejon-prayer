@@ -3,7 +3,6 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -58,7 +57,7 @@ describe('QuranReadingCard', () => {
     render(<QuranReadingCard />);
     fireEvent.press(screen.getByText('Continue Reading'));
     expect(router.navigate).toHaveBeenCalledWith(expect.objectContaining({
-      pathname: '/(quran)/ayahs',
+      pathname: '/quran/ayahs',
     }));
   });
 });

@@ -2,7 +2,6 @@ import ExtrasTabScreen from '@/app/(tabs)/extras-tab';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -64,13 +63,13 @@ describe('ExtrasTabScreen', () => {
     const { router } = require('expo-router');
     render(<ExtrasTabScreen />);
     fireEvent.press(screen.getByText('Ablution'));
-    expect(router.navigate).toHaveBeenCalledWith('/(extras)/abdesi');
+    expect(router.navigate).toHaveBeenCalledWith('/extras/abdesi');
   });
 
   it('navigates to tesbih route when Beads is pressed', () => {
     const { router } = require('expo-router');
     render(<ExtrasTabScreen />);
     fireEvent.press(screen.getByText('Beads'));
-    expect(router.navigate).toHaveBeenCalledWith('/(extras)/tesbih');
+    expect(router.navigate).toHaveBeenCalledWith('/extras/tesbih');
   });
 });

@@ -1,9 +1,8 @@
-import TesbihScreen from '@/app/(extras)/tesbih';
+import TesbihScreen from '@/app/extras/tesbih';
 import { useLanguageStore } from '@/store/languageStore';
 import { useTesbihStore } from '@/store/tesbihStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 import { Vibration } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -18,7 +17,9 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
-jest.mock('@react-navigation/elements', () => ({ useHeaderHeight: () => 0 }));
+jest.mock('expo-navigation-bar', () => ({
+  NavigationBar: () => null,
+}));
 jest.mock('react-native-svg', () => {
   const React = require('react');
   return {

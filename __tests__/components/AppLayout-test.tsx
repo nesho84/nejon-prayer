@@ -1,7 +1,6 @@
 import AppLayout from '@/components/AppLayout';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
 import { Text } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -16,7 +15,9 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 44, bottom: 34, left: 0, right: 0 }),
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
-jest.mock('@react-navigation/elements', () => ({ useHeaderHeight: () => 0 }));
+jest.mock('expo-navigation-bar', () => ({
+  NavigationBar: () => null,
+}));
 
 beforeEach(() => {
   useThemeStore.setState({ theme: { bg: '#ffffff' } as any, resolvedTheme: 'light' as any });

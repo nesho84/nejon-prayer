@@ -3,16 +3,17 @@ jest.mock('react-native', () => ({
     currentState: 'active',
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
   },
+  Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
 
-jest.mock('@react-navigation/native', () => ({
+jest.mock('expo-router', () => ({
   useIsFocused: jest.fn(),
 }));
 
 import useNextPrayer from '@/hooks/useNextPrayer';
 import { PrayerTimes } from '@/types/prayer.types';
-import { useIsFocused } from '@react-navigation/native';
 import { act, renderHook } from '@testing-library/react-native';
+import { useIsFocused } from 'expo-router';
 
 const mockIsFocused = useIsFocused as jest.Mock;
 

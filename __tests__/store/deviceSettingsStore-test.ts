@@ -1,5 +1,5 @@
 jest.mock('react-native', () => ({
-  Platform: { OS: 'android' },
+  Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
 
 jest.mock('expo-location', () => ({

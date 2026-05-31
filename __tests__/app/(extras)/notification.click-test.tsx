@@ -1,6 +1,5 @@
-import NotificationClick from '@/app/(extras)/notification.click';
+import NotificationClick from '@/app/notification.click';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('expo-router', () => ({
   Redirect: ({ href }: { href: string }) => {

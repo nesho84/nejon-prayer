@@ -1,6 +1,5 @@
 import QuranSurahRow from '@/components/QuranSurahRow';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -54,7 +53,7 @@ describe('QuranSurahRow', () => {
     render(<QuranSurahRow {...baseProps} />);
     fireEvent.press(screen.getByText('Al-Fatiha'));
     expect(router.navigate).toHaveBeenCalledWith(expect.objectContaining({
-      pathname: '/(quran)/ayahs',
+      pathname: '/quran/ayahs',
     }));
   });
 

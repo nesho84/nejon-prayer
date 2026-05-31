@@ -8,6 +8,7 @@ jest.mock('@/store/storage', () => ({
 
 jest.mock('react-native', () => ({
   Appearance: { getColorScheme: jest.fn(() => 'light') },
+  Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
 
 import { DARK_COLORS, LIGHT_COLORS } from '@/constants/colors';

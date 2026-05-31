@@ -1,8 +1,7 @@
-import AboutScreen from '@/app/(extras)/about';
+import AboutScreen from '@/app/extras/about';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import React from 'react';
 import { Linking } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -17,7 +16,9 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
-jest.mock('@react-navigation/elements', () => ({ useHeaderHeight: () => 0 }));
+jest.mock('expo-navigation-bar', () => ({
+  NavigationBar: () => null,
+}));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
 jest.mock('expo-constants', () => ({
   __esModule: true,

@@ -6,6 +6,7 @@ jest.mock('react-native', () => ({
   Appearance: {
     addChangeListener: jest.fn(() => ({ remove: jest.fn() })),
   },
+  Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
 
 jest.mock('@/store/themeStore', () => ({

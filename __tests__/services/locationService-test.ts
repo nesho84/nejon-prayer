@@ -20,6 +20,7 @@ jest.mock('@react-native-community/netinfo', () => ({
 jest.mock('react-native', () => ({
   Alert: { alert: jest.fn() },
   Linking: { openSettings: jest.fn() },
+  Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
 
 import { getUserLocation, hasLocationChanged } from '@/services/locationService';
