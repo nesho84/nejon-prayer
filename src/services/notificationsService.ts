@@ -394,7 +394,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     }
 
     // Prepare notification content
-    const title = tr.labels?.fridayTitle || 'Jumu\'ah Reminder';
+    const title = tr.labels?.fridayTitle || 'Jumu\'ah';
     const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
     const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 

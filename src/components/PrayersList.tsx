@@ -89,6 +89,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         const isPast = isTrackable && isToday && isTimePast(prayerTime);
         const isCurrent = isToday && currentPrayerName === prayerName;
         const isLast = index === arr.length - 1;
+        const isFriday = prayerTimesDate != null && new Date(prayerTimesDate).getDay() === 5; // 0=Sun, 1=Mon, ..., 5=Fri
         const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 
         return (
@@ -128,6 +129,15 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                   </Text>
                   {/* Prayer Name Icon */}
                   <PrayerIcon name={prayerName} size={18} color={isCurrent ? theme.accent : theme.text2} opacity={0.7} />
+
+                  {/* Xhumaja badge — Fridays only */}
+                  {prayerName === 'Dhuhr' && isFriday && (
+                    <View style={[styles.xhumaBadge, { borderColor: isCurrent ? theme.accent : theme.islamicGreen }]}>
+                      <Text style={[styles.xhumaBadgeText, { color: isCurrent ? theme.accent : theme.islamicGreen }]}>
+                        {tr.labels.jummah ?? 'Xhumaja'}
+                      </Text>
+                    </View>
+                  )}
                   {/* Horizontal Spacer */}
                   <View style={{ flex: 1 }} />
                   {/* Prayer Time */}
@@ -222,6 +232,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginRight: 4,
     letterSpacing: 0.5,
+  },
+  xhumaBadge: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  xhumaBadgeText: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
 
   // Notification Icon
