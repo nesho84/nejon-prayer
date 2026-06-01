@@ -13,6 +13,7 @@ export type AbdesiTranslations = {
   step8: string;
   step9: string;
   step10: string;
+  footerText: string;
 };
 
 export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
@@ -32,6 +33,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Wipe your ears with wet hands.",
     step9: "Wash your right foot, then your left foot up to the ankles three times.",
     step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
+    footerText: "This guide is based on reliable sources but may not be fully accurate. For specific steps and rules, it is recommended to consult scholars or authentic Islamic sources.",
   },
 
   // ------------------------------------------------------------
@@ -50,6 +52,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Wische mit nassen Händen über deine Ohren.",
     step9: "Wasche zuerst den rechten Fuß, dann den linken bis zu den Knöcheln drei Mal.",
     step10: "Sprich abschließend:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Ich bezeuge, dass es keinen Gott außer Allah gibt, der einzig ist, ohne Partner, und dass Muhammad sein Diener und Gesandter ist).",
+    footerText: "Dieser Leitfaden basiert auf zuverlässigen Quellen, kann jedoch nicht vollständig korrekt sein. Für spezifische Schritte und Regeln wird empfohlen, Gelehrte oder authentische islamische Quellen zu konsultieren.",
   },
 
   // ------------------------------------------------------------
@@ -68,6 +71,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Essuyez vos oreilles avec les mains humides.",
     step9: "Lavez votre pied droit, puis votre pied gauche jusqu'aux chevilles trois fois.",
     step10: "Enfin, dites :\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Je témoigne qu'il n'y a de dieu qu'Allah, l'Unique sans associé, et que Muhammad est Son serviteur et Messager).",
+    footerText: "Ce guide est basé sur des sources fiables mais peut ne pas être entièrement exact. Pour des étapes et des règles spécifiques, il est recommandé de consulter des savants ou des sources islamiques authentiques.",
   },
 
   // ------------------------------------------------------------
@@ -86,6 +90,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Me duar të lagura, fërko veshët.",
     step9: "Laj këmbën e djathtë, pastaj të majtën, deri mbi kyçe, nga 3 herë.",
     step10: "Thuaj në fund:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(Dëshmoj se nuk ka Zot tjetër përveç Allahut, i cili është i vetëm, dhe se Muhamedi është rob dhe i Dërguar i tij).",
+    footerText: "Ky udhëzues bazohet në burime të besueshme, por mund të mos jetë plotësisht i saktë. Për hapa dhe rregulla specifike, rekomandohet të konsultoheni me dijetarë ose burime autentike islame.",
   },
 
   // ------------------------------------------------------------
@@ -104,6 +109,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Potarite uši mokrim rukama.",
     step9: "Operite desno stopalo, zatim lijevo stopalo do gležnjeva tri puta.",
     step10: "Na kraju recite:\nEšhedu en la ilahe il-lallah vahdehu la šerike leh ve ešhedu enne Muhammeden abduhu ve resuluhu.\n\n(Svjedočim da nema boga osim Allaha, Jedinog bez sudruga, i da je Muhammed Njegov rob i Poslanik).",
+    footerText: "Ovaj vodič se temelji na pouzdanim izvorima, ali možda nije u potpunosti tačan. Za specifične korake i pravila, preporučuje se konsultovanje sa učenjacima ili autentičnim islamskim izvorima.",
   },
 
   // ------------------------------------------------------------
@@ -122,6 +128,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Потрчкајте ги ушите со влажни раце.",
     step9: "Измијте го десното стапало, потоа левото стапало до глуждовите три пати.",
     step10: "На крај речете:\nЕшхеду ен ла илахе ил-лаллах вахдеху ла шерике лех ве ешхеду ене Мухаммеден абдуху ве ресулуху.\n\n(Сведочам дека нема бог освен Аллах, Единствениот без соучесник, и дека Мухаммед е Негов роб и Пратеник).",
+    footerText: "Овој водич се темели на доверливи извори, но можеби не е целосно точен. За специфични чекори и правила, препорачливо е да се консултирате со учени луѓе или автентични исламски извори.",
   },
 
   // ------------------------------------------------------------
@@ -140,6 +147,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Islak ellerinizle kulaklarınızı mesh edin.",
     step9: "Sağ ayağınızı sonra sol ayağınızı bileklere kadar üç kez yıkayın.",
     step10: "Son olarak şunu söyleyin:\nEşhedü en la ilahe illallah vahdehu la şerike leh ve eşhedü enne Muhammeden abduhu ve resuluhu.\n\n(Allah'tan başka ilah olmadığına, O'nun bir olduğuna ve Muhammed'in O'nun kulu ve elçisi olduğuna şehadet ederim).",
+    footerText: "Bu rehber güvenilir kaynaklara dayanmakla birlikte tamamen doğru olmayabilir. Belirli adımlar ve kurallar için alimlerle veya otantik İslami kaynaklarla istişare edilmesi tavsiye edilir.",
   },
 
   // ------------------------------------------------------------
@@ -158,5 +166,6 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "امسح أذنيك بيدين مبللتين.",
     step9: "اغسل قدمك اليمنى ثم اليسرى إلى الكعبين ثلاث مرات.",
     step10: "ثم قل:\nأشهد أن لا إله إلا الله وحده لا شريك له، وأشهد أن محمدًا عبده ورسوله.\n\n(أشهد أن لا معبود بحق إلا الله، وأن محمدًا عبده ورسوله).",
+    footerText: "هذا الدليل مستند إلى مصادر موثوقة، لكنه قد لا يكون دقيقًا تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على خطوات وأحكام دقيقة.",
   },
 };

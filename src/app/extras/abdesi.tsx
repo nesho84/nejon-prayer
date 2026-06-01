@@ -104,6 +104,13 @@ export default function AbdesiScreen() {
                     </AppCard>
                 }
                 renderItem={renderItem}
+                ListFooterComponent={
+                    <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
+                        <Text style={[styles.footerText, { color: theme.placeholder }]}>
+                            {abdesiTr.footerText}
+                        </Text>
+                    </AppCard>
+                }
                 contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
@@ -169,5 +176,20 @@ const styles = StyleSheet.create({
         height: 141,
         borderRadius: 70.5,
         resizeMode: "cover",
+    },
+
+    // Footer card
+    footerCard: {
+        padding: 22,
+        borderLeftWidth: 4,
+        marginHorizontal: 8,
+        marginBottom: 10,
+    },
+    footerText: {
+        fontSize: 14,
+        lineHeight: 22,
+        fontWeight: "400",
+        fontStyle: "italic",
+        textAlign: "justify",
     },
 });

@@ -141,6 +141,13 @@ export default function NamaziPlusScreen() {
           </AppCard>
         }
         renderItem={renderItem}
+        ListFooterComponent={
+          <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
+            <Text style={[styles.footerText, { color: theme.placeholder }]}>
+              {namaziPlusTr.footerText}
+            </Text>
+          </AppCard>
+        }
         contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
@@ -218,5 +225,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     fontWeight: "400",
+  },
+
+  // Footer card
+  footerCard: {
+    padding: 22,
+    borderLeftWidth: 4,
+    marginHorizontal: 8,
+    marginBottom: 10,
+  },
+  footerText: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: "400",
+    fontStyle: "italic",
+    textAlign: "justify",
   },
 });

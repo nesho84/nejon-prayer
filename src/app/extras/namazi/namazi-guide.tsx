@@ -211,8 +211,8 @@ export default function NamaziGuideScreen() {
                     </AppCard>
                 ))}
 
-                {/* FOOTER NOTE */}
-                <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.islamicGreen }]}>
+                 {/* Footer Note */}
+                <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
                     <Text style={[styles.footerText, { color: theme.placeholder }]}>
                         {namaziTr.footerText}
                     </Text>

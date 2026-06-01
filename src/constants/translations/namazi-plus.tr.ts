@@ -21,6 +21,7 @@ export type NamaziPlusTranslations = {
   fieldForm: string;
   fieldStatus: string;
   fieldNotes: string;
+  footerText: string;
   prayers: Record<string, NamaziContent>;
 };
 
@@ -38,6 +39,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Form",
     fieldStatus: "Status",
     fieldNotes: "Notes",
+    footerText: "The information presented is based on reliable sources but may not be fully accurate. It is recommended to consult scholars or authentic Islamic sources for complete and accurate information.",
     prayers: {
       jumuah: {
         name: "Jumu'ah",
@@ -164,6 +166,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Form",
     fieldStatus: "Status",
     fieldNotes: "Hinweise",
+    footerText: "Die dargestellten Informationen basieren auf zuverlässigen Quellen, können aber nicht vollständig korrekt sein. Es wird empfohlen, Gelehrte oder authentische islamische Quellen für vollständige und genaue Informationen zu konsultieren.",
     prayers: {
       jumuah: {
         name: "Jumu'ah",
@@ -290,6 +293,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Forme",
     fieldStatus: "Statut",
     fieldNotes: "Notes",
+    footerText: "Les informations présentées sont basées sur des sources fiables mais peuvent ne pas être entièrement exactes. Il est recommandé de consulter des savants ou des sources islamiques authentiques pour des informations complètes et précises.",
     prayers: {
       jumuah: {
         name: "Jumu'ah",
@@ -416,6 +420,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Forma",
     fieldStatus: "Statusi",
     fieldNotes: "Shënime",
+    footerText: "Informacionet e paraqitura bazohen në burime të besueshme, por mund të mos jenë plotësisht të sakta. Rekomandohet të konsultoheni me dijetarë ose burime autentike islame për informacione të plota dhe të sakta.",
     prayers: {
       jumuah: {
         name: "Namazi i Xhumasë",
@@ -430,7 +435,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
         time: "Pas Jacisë deri para Sabahut — preferohet në fund të natës",
         description: "Namaz që mbyll namazin e natës",
         method: "3 rekate: ulje pas rekatit 2 me Tehijat pa selam, pastaj rekati 3 me lexim + dua Kunut para rukusë",
-        status: "Sunet i fortë i rekomanduar shumë — Profeti ﷺ nuk e la kurrë",
+        status: "Sunet i fortë — Profeti ﷺ nuk e la kurrë",
         rakats: 3,
       },
       taraweeh: {
@@ -439,7 +444,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
         description: "Namaz i veçantë i Ramazanit me xhemat",
         status: "Sunet i fortë — mëkat të braktisësh rregullisht pa arsye",
         rakats: 20,
-        notes: "Fëmijët dhe gratë mund të falin po ashtu",
+        notes: "Fëmijët dhe gratë mund të falen po ashtu",
       },
       eid: {
         name: "Namazi i Bajramit",
@@ -494,7 +499,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
         time: "Menjëherë pas marrëjes së abdesit",
         description: "2 rekate si falënderim pas abdesit",
         rakats: 2,
-        notes: "Profeti ﷺ premtoi xhenetin për atë që i fal me nijjet të pastër",
+        notes: "Profeti ﷺ premtoi xhenetin për atë që i fal me nijet të pastër",
       },
     },
   },
@@ -512,6 +517,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Forma",
     fieldStatus: "Status",
     fieldNotes: "Napomene",
+    footerText: "Prikazane informacije temelje se na pouzdanim izvorima, ali možda nisu u potpunosti tačne. Preporučuje se konsultovanje sa učenjacima ili autentičnim islamskim izvorima radi potpunih i tačnih informacija.",
     prayers: {
       jumuah: {
         name: "Džuma-namaz",
@@ -638,6 +644,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Форма",
     fieldStatus: "Статус",
     fieldNotes: "Белешки",
+    footerText: "Прикажаните информации се базираат на доверливи извори, но можеби не се целосно точни. Препорачливо е да се консултирате со учени луѓе или автентични исламски извори за целосни и точни информации.",
     prayers: {
       jumuah: {
         name: "Џума-намаз",
@@ -764,6 +771,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Form",
     fieldStatus: "Durum",
     fieldNotes: "Notlar",
+    footerText: "Sunulan bilgiler güvenilir kaynaklara dayanmakla birlikte tamamen doğru olmayabilir. Eksiksiz ve doğru bilgi için alimlerle veya otantik İslami kaynaklarla istişare edilmesi tavsiye edilir.",
     prayers: {
       jumuah: {
         name: "Cuma Namazı",
@@ -890,6 +898,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "الشكل",
     fieldStatus: "الحكم",
     fieldNotes: "ملاحظات",
+    footerText: "المعلومات المقدمة مستندة إلى مصادر موثوقة، غير أنها قد لا تكون دقيقة تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على معلومات كاملة ودقيقة.",
     prayers: {
       jumuah: {
         name: "صلاة الجمعة",

@@ -18,6 +18,7 @@ export type RamazaniTranslations = {
   title13: string; desc13: string;
   title14: string; desc14: string;
   title15: string; desc15: string;
+  footerText: string;
 };
 
 export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
@@ -57,6 +58,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Hasten and do not delay in breaking the fast after the sun has set so that you may earn the love of Allah. Break the fast with dates and water according to the Sunnah.",
     title15: "Continue After Ramadan",
     desc15: "Maintain the state of complete faith and piety, and performing good deeds even after the month of Ramadan, until you die. 'And worship your Lord until the truth (death) comes to you.' (Quran 15:99)",
+    footerText: "The tips presented are based on reliable sources but may not be fully accurate. It is recommended to consult scholars or authentic Islamic sources for complete and accurate information.",
   },
 
   // ------------------------------------------------------------
@@ -95,6 +97,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Beeilt euch und zögert nicht, das Fasten nach Sonnenuntergang zu brechen, damit ihr Allahs Liebe erlangt. Brecht das Fasten mit Datteln und Wasser gemäß der Sunna.",
     title15: "Nach dem Ramadan weitermachen",
     desc15: "Bewahrt den Zustand des vollkommenen Glaubens und der Frömmigkeit und vollbringt gute Taten auch nach dem Monat Ramadan bis zu eurem Tod. 'Und dient eurem Herrn, bis die Wahrheit (der Tod) zu euch kommt.' (Koran 15:99)",
+    footerText: "Die vorgestellten Tipps basieren auf zuverlässigen Quellen, können aber nicht vollständig korrekt sein. Es wird empfohlen, Gelehrte oder authentische islamische Quellen für vollständige und genaue Informationen zu konsultieren.",
   },
 
   // ------------------------------------------------------------
@@ -133,6 +136,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Hâtez-vous et ne tardez pas à rompre le jeûne après le coucher du soleil afin de mériter l'amour d'Allah. Rompez le jeûne avec des dattes et de l'eau conformément à la Sunna.",
     title15: "Continuer Après le Ramadan",
     desc15: "Maintenez l'état de foi complète et de piété, et l'accomplissement de bonnes actions même après le mois de Ramadan, jusqu'à la mort. 'Et adorez votre Seigneur jusqu'à ce que vous vienne la certitude (la mort).' (Coran 15:99)",
+    footerText: "Les conseils présentés sont basés sur des sources fiables mais peuvent ne pas être entièrement exacts. Il est recommandé de consulter des savants ou des sources islamiques authentiques pour des informations complètes et précises.",
   },
 
   // ------------------------------------------------------------
@@ -171,6 +175,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Shpejto dhe mos vono në prishjen e agjërimit pasi që dielli ka filluar së perënduari në mënyrë që të fitosh dashurinë e Allahut. Prish agjërimin me hurma dhe ujë sipas synetit.",
     title15: "Vazhdo Pas Ramazanit",
     desc15: "Ruaje gjendjen me iman të plotë dhe devotshmëri, dhe kryerjen e veprave të mira edhe pas muajit të Ramazanit, deri sa të vdesësh. 'Dhe adhuro Zotin tënd deri sa të vijë ty e vërteta (vdekja).' (Kur'an 15:99)",
+    footerText: "Këshillat e paraqitura bazohen në burime të besueshme, por mund të mos jenë plotësisht të sakta. Rekomandohet të konsultoheni me dijetarë ose burime autentike islame për informacione të plota dhe të sakta.",
   },
 
   // ------------------------------------------------------------
@@ -209,6 +214,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Pohitajte i ne odgađajte iftar nakon zalaska sunca kako biste zaslužili Allahovu ljubav. Prekinite post hurmama i vodom prema Sunnetu.",
     title15: "Nastaviti Nakon Ramazana",
     desc15: "Održite stanje potpunog imana i bogobojaznosti, te činjenja dobrih djela i nakon mjeseca Ramazana, sve do smrti. 'I obožavajte Gospodara svoga dok ti ne dođe smrt.' (Kur'an 15:99)",
+    footerText: "Prikazani savjeti temelje se na pouzdanim izvorima, ali možda nisu u potpunosti tačni. Preporučuje se konsultovanje sa učenjacima ili autentičnim islamskim izvorima radi potpunih i tačnih informacija.",
   },
 
   // ------------------------------------------------------------
@@ -247,6 +253,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Побрзајте и не одлагајте го ифтарот по зајдисонцето за да го заслужите Аллаховото задоволство. Прекинете го постот со урми и вода според Суннетот.",
     title15: "Продолжете по Рамазан",
     desc15: "Одржете го состојбата на целосен иман и богобојазност, и вршење на добри дела и по месецот Рамазан, до смртта. 'И обожавајте го својот Господар додека не ви дојде смртта.' (Куран 15:99)",
+    footerText: "Прикажаните совети се базираат на доверливи извори, но можеби не се целосно точни. Препорачливо е да се консултирате со учени луѓе или автентични исламски извори за целосни и точни информации.",
   },
 
   // ------------------------------------------------------------
@@ -285,6 +292,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Güneş batmaya başladığında orucunuzu bozmada gecikmeyin, böylece Allah'ın sevgisini kazanın. Sünnete uygun olarak hurma ve su ile orucunuzu açın.",
     title15: "Ramazan Sonrası Devam",
     desc15: "İmanınızı ve ibadetlerinizi tam tutun, ve Ramazan ayından sonra da iyi ameller yapmaya devam edin, ta ki ölünceye kadar. 'Ve Rabbine ibadet et, ta ki sana hak geldiği zamana kadar.' (Kuran 15:99)",
+    footerText: "Sunulan tavsiyeler güvenilir kaynaklara dayanmakla birlikte tamamen doğru olmayabilir. Eksiksiz ve doğru bilgi için alimlerle veya otantik İslami kaynaklarla istişare edilmesi tavsiye edilir.",
   },
 
   // ------------------------------------------------------------
@@ -322,6 +330,5 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     title14: "الإفطار",
     desc14: "بادِر بالإفطار بعد غروب الشمس ولا تؤخره، وأفطر على التمر والماء اتباعًا للسنة.",
     title15: "الاستمرار بعد رمضان",
-    desc15: "داوم على الطاعة والعمل الصالح بعد رمضان حتى تلقى الله. ﴿واعبد ربك حتى يأتيك اليقين﴾ (الحجر: 99)",
-  },
+    desc15: "داوم على الطاعة والعمل الصالح بعد رمضان حتى تلقى الله. ﴿واعبد ربك حتى يأتيك اليقين﴾ (الحجر: 99)",    footerText: "النصائح المقدمة مستندة إلى مصادر موثوقة، غير أنها قد لا تكون دقيقة تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على معلومات كاملة ودقيقة.",  },
 };

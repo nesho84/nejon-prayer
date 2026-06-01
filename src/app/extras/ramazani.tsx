@@ -168,6 +168,13 @@ export default function RamadanScreen() {
                     </AppCard>
                 }
                 renderItem={renderItem}
+                ListFooterComponent={
+                    <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
+                        <Text style={[styles.footerText, { color: theme.placeholder }]}>
+                            {ramazaniTr.footerText}
+                        </Text>
+                    </AppCard>
+                }
                 contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
@@ -229,5 +236,20 @@ const styles = StyleSheet.create({
         marginTop: 6,
         flexDirection: "row",
         gap: 8,
+    },
+
+    // Footer card
+    footerCard: {
+        padding: 22,
+        borderLeftWidth: 4,
+        marginHorizontal: 8,
+        marginBottom: 10,
+    },
+    footerText: {
+        fontSize: 14,
+        lineHeight: 22,
+        fontWeight: "400",
+        fontStyle: "italic",
+        textAlign: "justify",
     },
 });
