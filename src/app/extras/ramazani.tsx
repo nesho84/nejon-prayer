@@ -169,6 +169,7 @@ export default function RamadanScreen() {
                 }
                 renderItem={renderItem}
                 ListFooterComponent={
+                    // FOOTER
                     <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
                         <Text style={[styles.footerText, { color: theme.placeholder }]}>
                             {ramazaniTr.footerText}
