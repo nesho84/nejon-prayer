@@ -18,21 +18,6 @@ jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({
   NavigationBar: () => null,
 }));
-jest.mock('react-native-tab-view', () => ({
-  TabView: ({ renderScene, navigationState }: any) => {
-    const React = require('react');
-    const { View } = require('react-native');
-    return React.createElement(
-      View,
-      null,
-      navigationState.routes.map((route: any) =>
-        React.createElement(View, { key: route.key }, renderScene({ route }))
-      )
-    );
-  },
-  TabBar: () => null,
-}));
-
 const mockTheme = {
   bg: '#fff', bg2: '#f0f0f0', text: '#111', text2: '#555', textMuted: '#888',
   placeholder: '#999', card: '#f5f5f5', islamicGreen: '#1a8a00',
@@ -51,8 +36,8 @@ beforeEach(() => {
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
 });
 
-describe('NamaziScreen', () => {
-  it('renders the namazi tab header title', () => {
+describe('NamaziGuideScreen', () => {
+  it('renders the namazi screen header title', () => {
     render(<NamaziGuideScreen />);
     expect(screen.getByText('How to Pray')).toBeTruthy();
   });
@@ -69,11 +54,10 @@ describe('NamaziScreen', () => {
     expect(screen.getByText('Step 1 / 15')).toBeTruthy();
   });
 
-  it('renders prayer names in the rekate table tab', () => {
+  it('renders the footer note', () => {
     render(<NamaziGuideScreen />);
-    expect(screen.getAllByText('Fajr').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Dhuhr').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Isha').length).toBeGreaterThan(0);
+    const { NAMAZI_GUIDE_TR } = require('@/constants/translations/namazi-guide.tr');
+    expect(screen.getByText(NAMAZI_GUIDE_TR.en.footerText)).toBeTruthy();
   });
 
   it('expands surah block when its name is pressed', () => {

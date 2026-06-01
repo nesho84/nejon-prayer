@@ -125,9 +125,9 @@ const styles = StyleSheet.create({
     // Progress indicator
     progressText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontWeight: "600",
         minWidth: 62,
-        textAlign: 'right',
+        textAlign: "right",
     },
 
     // Header card
@@ -166,9 +166,9 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: "100%",
-        padding: 10,
         alignItems: "center",
         justifyContent: "center",
+        padding: 10,
         marginTop: 16,
         borderRadius: 16,
     },

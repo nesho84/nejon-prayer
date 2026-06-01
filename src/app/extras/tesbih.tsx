@@ -212,9 +212,9 @@ const styles = StyleSheet.create({
     // Instruction
     instruction: {
         alignSelf: "center",
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         paddingVertical: 6,
         paddingHorizontal: 12,
         marginVertical: 16,
@@ -224,16 +224,16 @@ const styles = StyleSheet.create({
     },
     instructionText: {
         fontSize: 14,
-        textAlign: 'center',
+        textAlign: "center",
         lineHeight: 20,
         opacity: 0.6,
     },
 
     // Presets
     presets: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        flexWrap: 'wrap',
+        flexDirection: "row",
+        justifyContent: "center",
+        flexWrap: "wrap",
         gap: 8,
     },
     presetBtn: {
@@ -244,16 +244,16 @@ const styles = StyleSheet.create({
     },
     presetText: {
         fontSize: 17,
-        fontWeight: '500',
+        fontWeight: "500",
         opacity: 0.6,
     },
 
     // Counter Circle
     circleContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
     },
     circleInnerContainer: {
         position: "relative",
@@ -276,9 +276,9 @@ const styles = StyleSheet.create({
 
     // Bottom Info Bar (LAP + LIMIT)
     infoCard: {
-        width: '100%',
+        width: "100%",
         flexDirection: "row",
-        justifyContent: 'center',
+        justifyContent: "center",
         gap: 16,
     },
     infoCardItem: {
@@ -296,29 +296,29 @@ const styles = StyleSheet.create({
     },
     infoCardValue: {
         fontSize: 18,
-        fontWeight: '600',
+        fontWeight: "600",
         opacity: 0.6,
     },
 
     // Bottom Controls (Pill)
     controls: {
-        width: '95%',
-        alignSelf: 'center',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-evenly',
+        width: "95%",
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-evenly",
         borderRadius: 40,
         paddingVertical: 14,
     },
     controlBtn: {
         width: 52,
         borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     controlValue: {
         fontSize: 20,
-        fontWeight: '600',
+        fontWeight: "600",
         marginHorizontal: 6,
         opacity: 0.6,
     },

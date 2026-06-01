@@ -30,6 +30,13 @@ export default function ExtrasLayout() {
                 }}
             />
             <Stack.Screen
+                name="namazi/namazi-table"
+                options={{
+                    title: tr.labels.namazTableItem,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
                 name="namazi/namazi-plus"
                 options={{
                     title: tr.labels.namazPlusItem,

@@ -1,7 +1,6 @@
 import { Language } from "@/types/language.types";
 
 export type NamaziTranslations = {
-  namaziTab: string;
   headerTitle: string;
   headerSubtitle: string;
   step1: string;
@@ -19,24 +18,7 @@ export type NamaziTranslations = {
   step13: string;
   step14: string;
   step15: string;
-  selamiLabel: string;
-  rakatLabel: string;
   footerText: string;
-  rekatetTab: string;
-  tableNameHeader: string;
-  tableRekatetLabel: string;
-  tableSunnetHeader: string;
-  tableFarzHeader: string;
-  tableVitriHeader: string;
-  tableTitle: string;
-  tableSubtitle: string;
-  tableFooter: string;
-};
-
-export type NamaziSurah = {
-  name: string;
-  arabic: string;
-  transliteration: string;
 };
 
 export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
@@ -44,7 +26,6 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
   // English
   // ------------------------------------------------------------
   en: {
-    namaziTab: "PRAYER",
     headerTitle: "How to Pray",
     headerSubtitle: "Basic guide to 2-rak'ah prayer",
 
@@ -78,25 +59,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
 
     step15: "Turn your head to the right and say: \n\n'Assalamu alaikum wa rahmatullah' \n\nThen turn left and say the same. \n\nThe prayer is complete. \nYou may make dua after the prayer.",
 
-    selamiLabel: "Salam",
-    rakatLabel: "Rakat",
     footerText: "This is a basic guide to praying 2 rak'ahs. For full details, the exact number of rak'ahs for each prayer, and specific rules, please consult scholars or see the prayer table.",
-    rekatetTab: "TABLE OF RAKAT",
-    tableNameHeader: "prayer",
-    tableRekatetLabel: "rakat",
-    tableSunnetHeader: "Sunnah",
-    tableFarzHeader: "Fard",
-    tableVitriHeader: "Witr",
-    tableTitle: "Table of rak'ahs",
-    tableSubtitle: "Prayer consists of parts called rak'ahs.",
-    tableFooter: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
   },
 
   // ------------------------------------------------------------
   // Deutsch
   // ------------------------------------------------------------
   de: {
-    namaziTab: "GEBET",
     headerTitle: "Wie man betet",
     headerSubtitle: "Grundlegende Anleitung zum 2-Rak'ah-Gebet",
     step1: "Stehe in Richtung Qibla und fasse die Absicht (Niyya) im Herzen.\n\nHebe die Hände, bis die Daumen die Ohrläppchen berühren und sage:\n\n'Allahu Akbar'\n(Allah ist der Größte).\n\nMänner: Finger natürlich gespreizt.\nFrauen: Hände bis zu den Schultern.",
@@ -114,25 +83,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "Sage 'Allahu Akbar' und wirf dich in Sajdah.\n\n7 Punkte müssen den Boden berühren: Stirn, Nase, beide Handflächen, beide Knie und Zehenspitzen beider Füße.\n\nMänner: Bauch angehoben, Oberschenkel von Unterschenkeln weg, Arme von den Seiten weg.\nFrauen: Körper kompakt.\n\nSage 3-mal:\n\n'Subhaana Rabbiyal A'laa.'\n(Gepriesen sei mein Herr, der Allerhöchste.)\n\nDann sage:\n\n'Allahu Akbar' und bleibe für das Qa'dah sitzen.",
     step14: "Nach der zweiten Sajdah des zweiten Rakats sage 'Allahu Akbar' und setze dich in Qa'dah (abschließendes Sitzen).\n\nRezitiere Tashahhud, Durood Ibrahim und Bittgebete.\n\nDer rechte Zeigefinger wird beim Glaubensbekenntnis erhoben.",
     step15: "Drehe deinen Kopf nach rechts und sage:\n\n'Assalamu alaikum wa rahmatullah'\n\nDann nach links und sage dasselbe.\n\nDas Gebet ist abgeschlossen.\nDu kannst nach dem Gebet Dua machen.",
-    selamiLabel: "Salam",
-    rakatLabel: "Rak'ah",
     footerText: "Dies ist eine kurze Anleitung zum Verrichten von zwei Rak'ahs. Für detaillierte Informationen, die genaue Anzahl der Rak'ahs für jedes Gebet und spezifische Regeln konsultieren Sie bitte Gelehrte oder die Gebetstabelle.",
-    rekatetTab: "TABELLE DER RAKAT",
-    tableNameHeader: "Gebet",
-    tableRekatetLabel: "Rakat",
-    tableSunnetHeader: "Sunna",
-    tableFarzHeader: "Pflicht",
-    tableVitriHeader: "Witr",
-    tableTitle: "Tabelle der Rak'ahs",
-    tableSubtitle: "Das Gebet besteht aus Teilen, die Rak'ahs genannt werden.",
-    tableFooter: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
   },
 
   // ------------------------------------------------------------
   // Français
   // ------------------------------------------------------------
   fr: {
-    namaziTab: "PRIÈRE",
     headerTitle: "Comment Prier",
     headerSubtitle: "Guide de base pour la prière de 2 rak'ahs",
     step1: "Tenez-vous face à la Qibla et faites l'intention dans votre cœur.\n\nLevez les mains jusqu'à ce que vos pouces touchent vos lobes d'oreilles et dites :\n\n'Allahu Akbar'\n(Allah est le Plus Grand).\n\nHommes : doigts naturellement écartés.\nFemmes : mains jusqu'aux épaules.",
@@ -150,25 +107,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "Dites 'Allahu Akbar' et prosternez-vous en Sajdah.\n\n7 points doivent toucher le sol : front, nez, les deux paumes, les deux genoux et les orteils des deux pieds.\n\nHommes : ventre relevé, cuisses éloignées des mollets, bras éloignés des côtés.\nFemmes : corps compact.\n\nDites 3 fois :\n\n'Subhaana Rabbiyal A'laa.'\n(Gloire à mon Seigneur, le Très Haut.)\n\nPuis dites :\n\n'Allahu Akbar' et restez assis pour le Qa'dah.",
     step14: "Après le second Sajdah du second Rak'ah, dites 'Allahu Akbar' et asseyez-vous en Qa'dah (position assise finale).\n\nRécitez le Tashahhud, le Durood Ibrahim et les invocations.\n\nL'index droit est levé lors du témoignage.",
     step15: "Tournez la tête vers la droite et dites :\n\n'Assalamu alaikum wa rahmatullah'\n\nPuis tournez vers la gauche et dites la même chose.\n\nLa prière est terminée.\nVous pouvez faire du dua après la prière.",
-    selamiLabel: "Salam",
-    rakatLabel: "Rak'ah",
     footerText: "Ceci est un guide de base pour prier 2 rak'ahs. Pour les détails complets, le nombre exact de rak'ahs pour chaque prière et les règles spécifiques, veuillez consulter des savants ou voir le tableau des prières.",
-    rekatetTab: "TABLEAU DES RAKAT",
-    tableNameHeader: "prière",
-    tableRekatetLabel: "rakat",
-    tableSunnetHeader: "Sunna",
-    tableFarzHeader: "Fard",
-    tableVitriHeader: "Witr",
-    tableTitle: "Tableau des rak'ahs",
-    tableSubtitle: "La prière est composée de parties appelées rak'ahs.",
-    tableFooter: "Chaque prière, qu'elle soit obligatoire ou sunna, est accomplie pour l'amour de Dieu et de nul autre.",
   },
 
   // ------------------------------------------------------------
   // Shqip
   // ------------------------------------------------------------
   sq: {
-    namaziTab: "NAMAZI",
     headerTitle: "Falja e Namazit",
     headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
 
@@ -201,25 +146,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
 
     step15: "Kthe kokën djathtas dhe thuaj: \n\n'Es-selamu alejkum ve rahmetullah' \n\nPastaj ktheje majtas dhe thuaj të njëjtën. \n\nNamazi përfundon. \nMund të bësh dua pas namazit.",
 
-    selamiLabel: "Selami",
-    rakatLabel: "Rekati",
     footerText: "Ky është një udhëzues bazik për namaz prej 2 rekatësh. Për detaje të plota, numrin e saktë të rekatëve për çdo namaz dhe rregulla specifike, ju lutemi konsultohuni me dijetarët ose shikoni tabelën e rekateve.",
-    rekatetTab: "TABELA E REKATEVE",
-    tableNameHeader: "namazi",
-    tableRekatetLabel: "rekate",
-    tableSunnetHeader: "Sunnet",
-    tableFarzHeader: "Farz",
-    tableVitriHeader: "Vitri",
-    tableTitle: "Tabela e rekateve",
-    tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
-    tableFooter: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër.",
   },
 
   // ------------------------------------------------------------
   // Bosanski
   // ------------------------------------------------------------
   bs: {
-    namaziTab: "NAMAZ",
     headerTitle: "Kako Klanjati",
     headerSubtitle: "Osnovni vodič za namaz od 2 rekata",
     step1: "Stanite okrenuti prema Kibli i učinite nijjet u srcu.\n\nPodignite ruke dok palčevi ne dodirnu ušne resice i recite:\n\n'Allahu Ekber'\n(Allah je Najveći).\n\nMuškarci: prsti prirodno raspoređeni.\nŽene: ruke do ramena.",
@@ -237,25 +170,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "Recite 'Allahu Ekber' i učinite sedždu.\n\n7 tačaka mora dodirnuti tlo: čelo, nos, oba dlana, oba koljena i prsti oba stopala.\n\nMuškarci: trbuh podignut, bedra odvojena od potkoljenica, ruke odvojene od strana.\nŽene: tijelo skupljeno.\n\nRecite 3 puta:\n\n'Subhane Rabbiyal E'ala.'\n(Slava mome Gospodaru, Previšnjem.)\n\nZatim recite:\n\n'Allahu Ekber' i ostanite sjediti za ka'de.",
     step14: "Nakon druge sedžde drugog rekata, recite 'Allahu Ekber' i sjednite u ka'de (konačno sjedenje).\n\nRecitujte Ettehijjatu, Salavat i dove.\n\nDesni kažiprst se podiže pri svjedočenju.",
     step15: "Okrenite glavu na desno i recite:\n\n'Esselamu alejkum ve rahmetullah'\n\nZatim okrenite na lijevo i recite isto.\n\nNamaz je završen.\nMožete učiti dovu nakon namaza.",
-    selamiLabel: "Selam",
-    rakatLabel: "Rekat",
     footerText: "Ovo je osnovni vodič za klanjanje 2 rekata. Za potpune detalje, tačan broj rekata za svaki namaz i specifična pravila, molimo konsultujte učenjake ili pogledajte tabelu namaza.",
-    rekatetTab: "TABELA REKATA",
-    tableNameHeader: "namaz",
-    tableRekatetLabel: "rekat",
-    tableSunnetHeader: "Sunnet",
-    tableFarzHeader: "Farz",
-    tableVitriHeader: "Vitr",
-    tableTitle: "Tabela rekata",
-    tableSubtitle: "Namaz se sastoji od dijelova koji se zovu rekati.",
-    tableFooter: "Svaki namaz, bio farz ili sunnet, obavlja se radi Allaha i niko drugog.",
   },
 
   // ------------------------------------------------------------
   // Македонски
   // ------------------------------------------------------------
   mk: {
-    namaziTab: "НАМАЗ",
     headerTitle: "Како да Клањате",
     headerSubtitle: "Основен водич за намаз од 2 рекати",
     step1: "Застанете свртени кон Кибла и направете ниет во срцето.\n\nПодигнете ги рацете додека палците не го допрат ушното ткиво и речете:\n\n'Аллаху Екбер'\n(Аллах е Највеликиот).\n\nМажи: прстите природно раширени.\nЖени: рацете до рамената.",
@@ -273,25 +194,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "Речете 'Аллаху Екбер' и учинете седжда.\n\n7 точки мора да го допрат тлото: чело, нос, двете дланки, двете колена и прстите на двете стапала.\n\nМажи: стомакот подигнат, бутовите одвоени од потколениците, рацете одвоени од страните.\nЖени: телото собрано.\n\nРечете 3 пати:\n\n'Субхане Рабиjал Е'ала.'\n(Слава на мојот Господар, Превисокиот.)\n\nПотоа речете:\n\n'Аллаху Екбер' и останете да седите за ка'де.",
     step14: "По втората седжда на вториот рекат, речете 'Аллаху Екбер' и седнете во ка'де (конечно седење).\n\nРецитирајте Еттехиjjату, Салават и дови.\n\nДесниот показалец се подига при сведочењето.",
     step15: "Свртете ја главата надесно и речете:\n\n'Есселаму алеjкум ве рахметулла'\n\nПотоа свртете налево и речете исто.\n\nНамазот е завршен.\nМожете да учите дова по намазот.",
-    selamiLabel: "Селам",
-    rakatLabel: "Рекат",
     footerText: "Ова е основен водич за клањање 2 рекати. За целосни детали, точниот број рекати за секој намаз и специфичните правила, консултирајте учени луѓе или погледајте ја табелата на намази.",
-    rekatetTab: "ТАБЕЛА НА РЕКАТИ",
-    tableNameHeader: "намаз",
-    tableRekatetLabel: "рекат",
-    tableSunnetHeader: "Сунет",
-    tableFarzHeader: "Фарз",
-    tableVitriHeader: "Витр",
-    tableTitle: "Табела на рекати",
-    tableSubtitle: "Намазот се состои од делови наречени рекати.",
-    tableFooter: "Секој намаз, фарз или сунет, се клања заради Аллах и никој друг.",
   },
 
   // ------------------------------------------------------------
   // Türkçe
   // ------------------------------------------------------------
   tr: {
-    namaziTab: "Namaz",
     headerTitle: "Namaz Kılma",
     headerSubtitle: "2 rekat namaz için temel rehber",
     step1: "Kıbleye dönün ve kalben niyet edin.\n\nElleriniz başparmaklar kulak memelerine gelecek şekilde kaldırın ve deyin:\n\n'Allahu Ekber'\n\nErkekler: Parmaklar doğal olarak açık, sıkılmamış.\nKadınlar: Eller omuz hizasına kadar kaldırılır.",
@@ -309,25 +218,13 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "'Allahu Ekber' deyin ve secdeye gidin.\n\nYedi organın yere temas etmesi gerekir: Alın, burun, iki avuç, iki diz ve ayak parmaklarının uçları.\n\nErkekler: Dirsekler kalkık, karnı uyluklardan uzak, kollar kaburga kemiklerinden uzak.\nKadınlar: Vücut toplanmış.\n\nÜç kez söyleyin:\n\n'Sübhane Rabbiyel A'lâ.'\n(Rabbim çok yüksektir.)\n\nSonra deyin:\n\n'Allahu Ekber' ve ka'de için oturun.",
     step14: "İkinci rekatın ikinci secdesinden sonra, 'Allahu Ekber' deyin ve oturun.\n\nEttehiyyatü, Allahümme Salli, Allahümme Barik ve Rabbena dualarını okuyun.\n\nSağ elin işaret parmağı şehadet getirilirken kaldırılır.",
     step15: "Sağa dönün ve selam vererek deyin:\n\n'Esselamu aleyküm ve rahmetullah'\n\nSonra sola dönün ve aynı şeyi söyleyin.\n\nNamaz tamamlanır.\nNamazdan sonra dua edebilirsiniz.",
-    selamiLabel: "Selam",
-    rakatLabel: "Rekat",
     footerText: "Bu, 2 rekat namaz için temel bir rehberdir. Detaylar, her namaz için doğru rekat sayısı ve özel kurallar için lütfen alimlere danışın veya rekat tablosuna bakın.",
-    rekatetTab: "Rekat Tablosu",
-    tableNameHeader: "Namaz",
-    tableRekatetLabel: "Rekat",
-    tableSunnetHeader: "Sünnet",
-    tableFarzHeader: "Farz",
-    tableVitriHeader: "Vitr",
-    tableTitle: "Rekat Tablosu",
-    tableSubtitle: "Namaz, rekat adı verilen bölümlerden oluşur.",
-    tableFooter: "Her namaz, farz veya sünnet olsun, Allah rızası için kılınır ve başka hiç kimse için değil.",
   },
 
   // ------------------------------------------------------------
   // Arabic
   // ------------------------------------------------------------
   ar: {
-    namaziTab: "الصلاة",
     headerTitle: "كيفية الصلاة",
     headerSubtitle: "دليل مبسط لصلاة ركعتين",
     step1: "قف متجهًا إلى القبلة وانْوِ الصلاة في قلبك.\n\nارفع يديك حتى تحاذي الإبهامان شحمتي الأذنين وقل:\n\n'الله أكبر'\n\nالرجال: الأصابع مفرقة طبيعيًا دون تشديد.\nالنساء: ترفع اليدان إلى مستوى الكتفين.",
@@ -345,19 +242,14 @@ export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
     step13: "قل: 'الله أكبر' واسجد.\n\nيجب أن تلامس الأرض سبعة أعضاء: الجبهة، الأنف، الكفان، الركبتان، وأطراف القدمين.\n\nالرجال: يبتعد البطن عن الفخذين والذراعان عن الجانبين.\nالنساء: يكون الجسد منضمًا.\n\nقل ثلاث مرات:\n\n'سبحان ربي الأعلى.'\n(تنزيهًا لربي الأعلى.)\n\nثم قل:\n\n'الله أكبر' وابقَ جالسًا للتشهد.",
     step14: "بعد السجدة الثانية من الركعة الثانية، قل: 'الله أكبر' واجلس للتشهد الأخير.\n\nاقرأ التشهد، والصلاة الإبراهيمية، والأدعية.\n\nتُرفع السبابة عند الشهادة.",
     step15: "سلِّم عن اليمين قائلاً:\n\n'السلام عليكم ورحمة الله'\n\nثم سلِّم عن اليسار كذلك.\n\nوبذلك تنتهي الصلاة.\nويمكنك الدعاء بعد الصلاة.",
-    selamiLabel: "السلام",
-    rakatLabel: "الركعة",
     footerText: "هذا دليل مبسط لصلاة ركعتين. لمعرفة التفاصيل الكاملة، وعدد الركعات لكل صلاة، والأحكام الخاصة، يُرجى الرجوع إلى العلماء أو الاطلاع على جدول الصلوات.",
-    rekatetTab: "جدول الركعات",
-    tableNameHeader: "الصلاة",
-    tableRekatetLabel: "الركعات",
-    tableSunnetHeader: "السنة",
-    tableFarzHeader: "الفرض",
-    tableVitriHeader: "الوتر",
-    tableTitle: "جدول الركعات",
-    tableSubtitle: "تتكون الصلاة من أجزاء تُسمى ركعات.",
-    tableFooter: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
   },
+};
+
+export type NamaziSurah = {
+  name: string;
+  arabic: string;
+  transliteration: string;
 };
 
 // ------------------------------------------------------------

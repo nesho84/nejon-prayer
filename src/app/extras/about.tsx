@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
 
     // Hero section
     heroSection: {
-        alignItems: 'center',
+        alignItems: "center",
         paddingTop: 36,
         paddingBottom: 24,
         gap: 10,
@@ -237,8 +237,8 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     actionCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         paddingHorizontal: 14,
         paddingVertical: 12,
         borderWidth: 1,
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     supportTextContainer: {
         flex: 1,
@@ -269,17 +269,17 @@ const styles = StyleSheet.create({
 
     // Bottom pill buttons
     buttonsSection: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         paddingHorizontal: 12,
         paddingTop: 32,
         gap: 10,
     },
     pillButton: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         gap: 8,
         paddingVertical: 14,
         borderWidth: 1,

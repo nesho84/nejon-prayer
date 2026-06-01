@@ -59,6 +59,7 @@ export default function ExtrasTabScreen() {
             icon: <MaterialCommunityIcons name="mosque-outline" size={32} color={theme.islamicGreen} />,
             subItems: [
                 { href: "/extras/namazi/namazi-guide", label: tr.labels.namazGuideItem || "Udhëzuesi i Namazit" },
+                { href: "/extras/namazi/namazi-table", label: tr.labels.namazTableItem || "Tabela e Rekateve" },
                 { href: "/extras/namazi/namazi-plus", label: tr.labels.namazPlusItem || "Namazet tjera" },
             ],
         },

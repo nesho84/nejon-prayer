@@ -189,18 +189,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-    // Footer card
-    footerCard: {
-        padding: 22,
-        borderLeftWidth: 4,
-        marginHorizontal: 8,
-        marginBottom: 10,
-    },
-    footerText: {
-        fontSize: 14,
-        lineHeight: 22,
-        fontWeight: "400",
-        fontStyle: "italic",
-        textAlign: "justify",
-    },
+  // Footer card
+  footerCard: {
+    padding: 22,
+    borderLeftWidth: 4,
+    marginHorizontal: 8,
+    marginBottom: 10,
+  },
+  footerText: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: "400",
+    fontStyle: "italic",
+    textAlign: "justify",
+  },
 });
