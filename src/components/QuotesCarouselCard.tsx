@@ -3,13 +3,26 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language } from "@/types/language.types";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useRef, useState } from "react";
-import { FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AppState, AppStateStatus, FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 
 // Constants for carousel behavior and appearance
-const MAX_QUOTES = 5;
-const PEEK = 12; // small visible edge of next/previous card
+const MAX_QUOTES = 7; // max quotes to show in carousel
+const INSET = 12; // inset from container edges
 const SPACING = 8; // space between cards
+const AUTO_SCROLL_INTERVAL = 10_000; // 10 seconds
+
+// ------------------------------------------------------------
+// Returns a quote for a given language (random or daily)
+// ------------------------------------------------------------
+const getDailyQuote = (language: Language = "en", random: boolean = false): string => {
+    const messages = QUOTES_TR[language] || QUOTES_TR["en"];
+    if (random) {
+        return messages[Math.floor(Math.random() * messages.length)];
+    }
+    // Stable per day
+    return messages[new Date().getDate() % messages.length];
+};
 
 const QuotesCarouselCard = React.memo(() => {
     // Stores
@@ -21,31 +34,24 @@ const QuotesCarouselCard = React.memo(() => {
     const [containerWidth, setContainerWidth] = useState<number | null>(null);
 
     // Refs
-    const flatListRef = useRef(null);
+    const flatListRef = useRef<FlatList>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const activeIndexRef = useRef(0);
+    const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
-    // ------------------------------------------------------------
-    // Returns today's dynamic daily Quote for a given language
-    // ------------------------------------------------------------
-    const getDailyQuote = (language: Language = "en", random: boolean = false): string => {
-        const messages = QUOTES_TR[language] || QUOTES_TR["en"];
-        if (random) {
-            const randomIndex = Math.floor(Math.random() * messages.length);
-            return messages[randomIndex];
-        }
-        // Stable per day
-        const todayIndex = new Date().getDate();
-        const index = todayIndex % messages.length;
-        return messages[index];
-    };
+    // Calculate item width based on container width and spacing
+    const itemWidth = containerWidth !== null ? containerWidth - INSET * 2 : 0;
 
     // ------------------------------------------------------------
     // Generate random quotes
     // ------------------------------------------------------------
     const quotes = useMemo(() => {
-        const arr = [];
+        const messages = QUOTES_TR[language] || QUOTES_TR["en"];
+        const limit = Math.min(MAX_QUOTES, messages.length);
+        const arr: string[] = [];
         const usedQuotes = new Set<string>();
 
-        while (arr.length < MAX_QUOTES) {
+        while (arr.length < limit) {
             const quote = getDailyQuote(language, true);
             if (!usedQuotes.has(quote)) {
                 usedQuotes.add(quote);
@@ -57,19 +63,94 @@ const QuotesCarouselCard = React.memo(() => {
     }, [language]);
 
     // ------------------------------------------------------------
-    // Handle horizontal scrolling
+    // Scroll to index
     // ------------------------------------------------------------
-    const handleScroll = (ev: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const offsetX = ev.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / (containerWidth! - PEEK * 2 + SPACING));
+    const scrollToIndex = useCallback((index: number) => {
+        flatListRef.current?.scrollToIndex({ index, animated: true });
+        activeIndexRef.current = index;
         setActiveIndex(index);
-    };
+    }, []);
 
     // ------------------------------------------------------------
-    // Create Quote Component for the Flatlist
+    // Start auto-scroll interval
     // ------------------------------------------------------------
-    const renderQuoteCard = ({ item: quote }: { item: string }) => (
-        <View style={{ width: containerWidth! - PEEK * 2, marginHorizontal: SPACING / 2 }}>
+    const startInterval = useCallback(() => {
+        if (intervalRef.current) return;
+        intervalRef.current = setInterval(() => {
+            const next = (activeIndexRef.current + 1) % quotes.length;
+            scrollToIndex(next);
+        }, AUTO_SCROLL_INTERVAL);
+    }, [scrollToIndex, quotes.length]);
+
+    // ------------------------------------------------------------
+    // Stop auto-scroll interval
+    // ------------------------------------------------------------
+    const stopInterval = useCallback(() => {
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    }, []);
+
+    // ------------------------------------------------------------
+    // Start/stop interval on mount/unmount and AppState changes
+    // ------------------------------------------------------------
+    useEffect(() => {
+        const sub = AppState.addEventListener("change", (nextState: AppStateStatus) => {
+            const wasActive = appStateRef.current === "active";
+            const isActive = nextState === "active";
+            appStateRef.current = nextState;
+            if (!wasActive && isActive) startInterval();
+            else if (wasActive && !isActive) stopInterval();
+        });
+
+        startInterval();
+
+        return () => {
+            stopInterval();
+            sub.remove();
+        };
+    }, [startInterval, stopInterval]);
+
+    // ------------------------------------------------------------
+    // Reset scroll position when language changes
+    // ------------------------------------------------------------
+    useEffect(() => {
+        scrollToIndex(0);
+    }, [language, scrollToIndex]);
+
+    // ------------------------------------------------------------
+    // Re-scroll to current index on rotation (containerWidth change)
+    // ------------------------------------------------------------
+    useEffect(() => {
+        if (containerWidth !== null) {
+            scrollToIndex(activeIndexRef.current);
+        }
+    }, [containerWidth, scrollToIndex]);
+
+    // ------------------------------------------------------------
+    // Handle horizontal scrolling
+    // ------------------------------------------------------------
+    const handleScroll = useCallback((ev: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const offsetX = ev.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / (itemWidth + SPACING));
+        activeIndexRef.current = index;
+        setActiveIndex(index);
+    }, [itemWidth]);
+
+    // ------------------------------------------------------------
+    // Reset interval on manual swipe so it doesn't cut off too soon
+    // ------------------------------------------------------------
+    const handleScrollBeginDrag = useCallback(() => {
+        stopInterval();
+        startInterval();
+    }, [stopInterval, startInterval]);
+
+    // ------------------------------------------------------------
+    // Create Quote Component for the FlatList
+    // ------------------------------------------------------------
+    const renderQuoteCard = useCallback(({ item: quote }: { item: string }) => (
+        <View style={{ width: itemWidth, marginHorizontal: SPACING / 2 }}>
             {/* Header with decoration Line */}
             <View style={styles.header}>
                 <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
@@ -81,41 +162,45 @@ const QuotesCarouselCard = React.memo(() => {
                 {quote}
             </Text>
         </View>
-    );
-
-    // Wait until layout is measured
-    if (!containerWidth) {
-        return <View onLayout={(e: LayoutChangeEvent) => setContainerWidth(e.nativeEvent.layout.width)} />;
-    }
+    ), [itemWidth, theme.accent, theme.text2]);
 
     return (
-        <>
-            {/* Quote Carousel */}
-            <FlatList
-                ref={flatListRef}
-                data={quotes}
-                keyExtractor={(_, idx) => idx.toString()}
-                renderItem={renderQuoteCard}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                scrollEventThrottle={16}
-                pagingEnabled={true}
-                onMomentumScrollEnd={handleScroll}
-                snapToInterval={containerWidth - PEEK * 2 + SPACING}
-                snapToAlignment="start"
-                decelerationRate="fast"
-            />
-
-            {/* Dots */}
-            <View style={styles.dotsContainer}>
-                {quotes.map((_, idx) => (
-                    <View
-                        key={idx}
-                        style={[styles.dot, { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight }]}
+        <View onLayout={(e: LayoutChangeEvent) => setContainerWidth(e.nativeEvent.layout.width)}>
+            {containerWidth !== null && (
+                <>
+                    {/* Quote Carousel */}
+                    <FlatList
+                        ref={flatListRef}
+                        data={quotes}
+                        keyExtractor={(_, idx) => idx.toString()}
+                        renderItem={renderQuoteCard}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        scrollEventThrottle={16}
+                        snapToInterval={itemWidth + SPACING}
+                        snapToAlignment="start"
+                        decelerationRate="fast"
+                        onMomentumScrollEnd={handleScroll}
+                        onScrollBeginDrag={handleScrollBeginDrag}
+                        getItemLayout={(_, idx) => ({
+                            length: itemWidth,
+                            offset: (itemWidth + SPACING) * idx,
+                            index: idx,
+                        })}
                     />
-                ))}
-            </View>
-        </>
+
+                    {/* Dots */}
+                    <View style={styles.dotsContainer}>
+                        {quotes.map((_, idx) => (
+                            <View
+                                key={idx}
+                                style={[styles.dot, { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight }]}
+                            />
+                        ))}
+                    </View>
+                </>
+            )}
+        </View>
     );
 });
 
@@ -131,17 +216,15 @@ const styles = StyleSheet.create({
         height: 1,
         opacity: 0.3,
     },
-
     quoteText: {
         fontSize: 14,
         lineHeight: 20,
-        textAlign: 'center',
-        fontStyle: 'italic',
+        textAlign: "center",
+        fontStyle: "italic",
         opacity: 0.75,
         marginTop: 4,
         marginBottom: 8,
     },
-
     dotsContainer: {
         flexDirection: "row",
         justifyContent: "center",

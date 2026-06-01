@@ -38,15 +38,10 @@ const RootStack = () => {
         <Stack.Screen name="(tabs)" options={{ animation: "default" }} />
         <Stack.Screen name="extras" options={{ animation: "ios_from_right" }} />
         <Stack.Screen name="quran" options={{ animation: "ios_from_right" }} />
-        <Stack.Screen name="notification.click" options={{ headerShown: false }} />
         {/* Modal Screens */}
-        <Stack.Screen
-          name="(modals)"
-          options={{
-            presentation: "transparentModal",
-            animation: "slide_from_bottom",
-          }}
-        />
+        <Stack.Screen name="(modals)" options={{ presentation: "transparentModal", animation: "slide_from_bottom" }} />
+        {/* Used by react-native-track-payer to handle native player notification clicks */}
+        <Stack.Screen name="notification.click" />
       </Stack.Protected>
     </Stack>
   );
