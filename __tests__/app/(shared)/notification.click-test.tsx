@@ -1,4 +1,4 @@
-import NotificationClick from '@/app/notification.click';
+import NotificationClick from '@/app/(shared)/notification.click';
 import { render, screen } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({

@@ -39,7 +39,7 @@ export type NamaziSurah = {
   transliteration: string;
 };
 
-export const NAMAZI_TR: Record<Language, NamaziTranslations> = {
+export const NAMAZI_GUIDE_TR: Record<Language, NamaziTranslations> = {
   // ------------------------------------------------------------
   // English
   // ------------------------------------------------------------
@@ -169,7 +169,7 @@ export const NAMAZI_TR: Record<Language, NamaziTranslations> = {
   // ------------------------------------------------------------
   sq: {
     namaziTab: "NAMAZI",
-    headerTitle: "Falja e namazit",
+    headerTitle: "Falja e Namazit",
     headerSubtitle: "Udhëzues bazik për namaz prej 2 rekatësh",
 
     step1: "Qëndro drejt Kibles dhe bëj nijetin me zemër. \n\nNgriji duart derisa gishti i madh të prekë veshin dhe thuaj: \n\n'Allahu Ekber' \n(Allahu është më i Madhi). \n\nPër burrat: Gishtat të hapur dhe jo të shtrënguar fort. \nPër gratë: Duart ngrihen deri në nivel të supit.",
@@ -324,7 +324,7 @@ export const NAMAZI_TR: Record<Language, NamaziTranslations> = {
   },
 
   // ------------------------------------------------------------
-  // العربية
+  // Arabic
   // ------------------------------------------------------------
   ar: {
     namaziTab: "الصلاة",

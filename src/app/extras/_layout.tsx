@@ -21,10 +21,19 @@ export default function ExtrasLayout() {
                     headerShown: true,
                 }}
             />
+            {/* Namazi Screen ('/namazi' folder) */}
             <Stack.Screen
-                name="namazi"
+                name="namazi/namazi-guide"
                 options={{
-                    headerShown: false,
+                    title: tr.labels.namazGuideItem,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="namazi/namazi-plus"
+                options={{
+                    title: tr.labels.namazPlusItem,
+                    headerShown: true,
                 }}
             />
             <Stack.Screen

@@ -5,9 +5,14 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+interface SubMenuItem {
+    href: Href;
+    label: string;
+}
 
 interface MenuItem {
     id: number;
@@ -18,6 +23,7 @@ interface MenuItem {
     color: string;
     bg: string;
     icon: React.ReactNode;
+    subItems?: SubMenuItem[];
 }
 
 export default function ExtrasTabScreen() {
@@ -27,6 +33,9 @@ export default function ExtrasTabScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+
+    // Accordion state
+    const [expandedId, setExpandedId] = useState<number | null>(null);
 
     const FEATURES: MenuItem[] = [
         {
@@ -44,10 +53,14 @@ export default function ExtrasTabScreen() {
             href: "/extras/namazi/namazi-guide",
             type: 'internal',
             label: tr.labels.namaz,
-            description: tr.labels.namazDesc || "Learn how to perform Salah",
+            description: tr.labels.namazDesc || "Mëso dhe praktiko Namazin",
             color: theme.islamicGreen,
             bg: `${theme.islamicGreen}20`,
-            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color={theme.islamicGreen} />
+            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color={theme.islamicGreen} />,
+            subItems: [
+                { href: "/extras/namazi/namazi-guide", label: tr.labels.namazGuideItem || "Udhëzuesi i Namazit" },
+                { href: "/extras/namazi/namazi-plus", label: tr.labels.namazPlusItem || "Namazet tjera" },
+            ],
         },
         {
             id: 3,
@@ -57,7 +70,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
             color: theme.pink,
             bg: `${theme.pink}20`,
-            icon: <MaterialCommunityIcons name="counter" size={36} color={theme.pink} />
+            icon: <MaterialCommunityIcons name="counter" size={36} color={theme.pink} />,
         },
         {
             id: 4,
@@ -120,7 +133,7 @@ export default function ExtrasTabScreen() {
                     {FEATURES.map((item, index) => {
 
                         // Renders each item in the list, wrapped in the appropriate Pressable/Link based on type
-                        const renderItem = () => (
+                        const renderItem = (chevron: 'chevron-forward' | 'chevron-down' = 'chevron-forward') => (
                             <View style={styles.listItem}>
                                 {/* Left: Icon */}
                                 <View style={[styles.itemIconContainer, { backgroundColor: item.bg, borderColor: theme.divider2 }]}>
@@ -138,17 +151,17 @@ export default function ExtrasTabScreen() {
                                 </View>
 
                                 {/* Right: Chevron right */}
-                                <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+                                <Ionicons name={chevron} size={20} color={theme.text2} />
                             </View>
                         );
 
                         return (
                             <View key={item.id}>
                                 {/* Internal Link */}
-                                {item.type === 'internal' && (
+                                {item.type === 'internal' && !item.subItems && (
                                     <Pressable
-                                        style={({ pressed }) => [{ opacity: pressed ? 0.3 : 1 }]}
-                                        android_ripple={{ color: theme.shadow, borderless: false }}
+                                        style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                                        android_ripple={{ color: theme.overlayLight, borderless: false }}
                                         onPress={() => router.navigate(item.href)}
                                     >
                                         {renderItem()}
@@ -158,16 +171,52 @@ export default function ExtrasTabScreen() {
                                 {/* External Link */}
                                 {item.type === 'external' && (
                                     <Pressable
-                                        style={({ pressed }) => [{ opacity: pressed ? 0.3 : 1 }]}
-                                        android_ripple={{ color: theme.shadow, borderless: false }}
+                                        style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                                        android_ripple={{ color: theme.overlayLight, borderless: false }}
                                         onPress={() => Linking.openURL(item.href as string)}
                                     >
                                         {renderItem()}
                                     </Pressable>
                                 )}
 
+                                {/* Sub-items accordion */}
+                                {item.subItems && (
+                                    <>
+                                        <Pressable
+                                            style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                                            android_ripple={{ color: theme.overlayLight, borderless: false }}
+                                            onPress={() => setExpandedId((prev) => (prev === item.id ? null : item.id))}
+                                        >
+                                            {renderItem(expandedId === item.id ? 'chevron-down' : 'chevron-forward')}
+                                        </Pressable>
+                                        {expandedId === item.id && (
+                                            <View style={[styles.subContainer, { opacity: 0.65 }]}>
+                                                <View style={[styles.itemDivider, { backgroundColor: theme.divider2 }]} />
+                                                {item.subItems.map((sub, subIndex) => (
+                                                    <View key={subIndex}>
+                                                        {subIndex > 0 && <View style={[styles.subItemDivider, { backgroundColor: theme.divider2 }]} />}
+                                                        <Pressable
+                                                            style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                                                            android_ripple={{ color: theme.overlayLight, borderless: false }}
+                                                            onPress={() => router.navigate(sub.href)}
+                                                        >
+                                                            <View style={styles.subRow}>
+                                                                <Ionicons name="return-down-forward" size={14} color={theme.textSecondary} />
+                                                                <Text style={[styles.subLabel, { color: theme.text2 }]} numberOfLines={1}>
+                                                                    {sub.label}
+                                                                </Text>
+                                                                <Ionicons name="chevron-forward" size={18} color={theme.text2} />
+                                                            </View>
+                                                        </Pressable>
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        )}
+                                    </>
+                                )}
+
                                 {index < FEATURES.length - 1 && (
-                                    <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+                                    <View style={[styles.itemDivider, { backgroundColor: theme.divider2 }]} />
                                 )}
                             </View>
                         );
@@ -243,8 +292,27 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         opacity: 0.7,
     },
-    divider: {
-        height: 1,
+    itemDivider: {
+        height: 2,
         marginHorizontal: 18,
+    },
+    subContainer: {
+        overflow: 'hidden',
+    },
+    subItemDivider: {
+        height: 0.5,
+        marginHorizontal: 16,
+    },
+    subRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingVertical: 14,
+        paddingLeft: 62,
+        paddingRight: 20,
+    },
+    subLabel: {
+        fontSize: 15,
+        flex: 1,
     },
 });

@@ -1,4 +1,4 @@
-import NamaziScreen from '@/app/extras/namazi/namazi-guide';
+import NamaziGuideScreen from '@/app/extras/namazi/namazi-guide';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
@@ -53,32 +53,32 @@ beforeEach(() => {
 
 describe('NamaziScreen', () => {
   it('renders the namazi tab header title', () => {
-    render(<NamaziScreen />);
+    render(<NamaziGuideScreen />);
     expect(screen.getByText('How to Pray')).toBeTruthy();
   });
 
   it('renders all 15 step numbers', () => {
-    render(<NamaziScreen />);
+    render(<NamaziGuideScreen />);
     for (let i = 1; i <= 15; i++) {
       expect(screen.getAllByText(String(i)).length).toBeGreaterThan(0);
     }
   });
 
   it('renders progress indicator at step 1 of 15', () => {
-    render(<NamaziScreen />);
+    render(<NamaziGuideScreen />);
     expect(screen.getByText('Step 1 / 15')).toBeTruthy();
   });
 
   it('renders prayer names in the rekate table tab', () => {
-    render(<NamaziScreen />);
+    render(<NamaziGuideScreen />);
     expect(screen.getAllByText('Fajr').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Dhuhr').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Isha').length).toBeGreaterThan(0);
   });
 
   it('expands surah block when its name is pressed', () => {
-    render(<NamaziScreen />);
-    const { NAMAZI_SURAHS } = require('@/constants/translations/namazi.tr');
+    render(<NamaziGuideScreen />);
+    const { NAMAZI_SURAHS } = require('@/constants/translations/namazi-guide.tr');
     const subhanekeName = NAMAZI_SURAHS.subhaneke.name;
     // Collapsed by default: down chevron visible
     expect(screen.getAllByText('▼').length).toBeGreaterThan(0);
