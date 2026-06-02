@@ -32,6 +32,7 @@ const QuotesCarouselCard = React.memo(() => {
     // Local state
     const [activeIndex, setActiveIndex] = useState(0);
     const [containerWidth, setContainerWidth] = useState<number | null>(null);
+    const [cardHeight, setCardHeight] = useState(0);
 
     // Refs
     const flatListRef = useRef<FlatList>(null);
@@ -150,17 +151,25 @@ const QuotesCarouselCard = React.memo(() => {
     // Create Quote Component for the FlatList
     // ------------------------------------------------------------
     const renderQuoteCard = useCallback(({ item: quote }: { item: string }) => (
-        <View style={{ width: itemWidth, marginHorizontal: SPACING / 2 }}>
+        <View style={{ width: itemWidth, marginHorizontal: SPACING / 2, height: cardHeight || undefined }}
+            onLayout={(e) => {
+                const h = e.nativeEvent.layout.height;
+                setCardHeight(prev => h > prev ? h : prev);
+            }}
+        >
             {/* Header with decoration Line */}
             <View style={styles.header}>
                 <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
-                <Ionicons name="book-outline" size={18} color={theme.accent} />
+                <Ionicons name="book-outline" size={17} color={theme.accent} />
                 <View style={[styles.decorativeLine, { backgroundColor: theme.accent }]} />
             </View>
+
             {/* Quote Text */}
-            <Text style={[styles.quoteText, { color: theme.text2 }]} adjustsFontSizeToFit>
-                {quote}
-            </Text>
+            <View style={styles.textContainer}>
+                <Text style={[styles.quoteText, { color: theme.text2, opacity: 0.65 }]}>
+                    {quote}
+                </Text>
+            </View>
         </View>
     ), [itemWidth, theme.accent, theme.text2]);
 
@@ -216,15 +225,21 @@ const styles = StyleSheet.create({
         height: 1,
         opacity: 0.3,
     },
-    quoteText: {
-        fontSize: 14,
-        lineHeight: 20,
-        textAlign: "center",
-        fontStyle: "italic",
-        opacity: 0.75,
-        marginTop: 4,
-        marginBottom: 8,
+
+    textContainer: {
+        flex: 1,
+        justifyContent: "center",
+        paddingTop: 3,
+        paddingBottom: 6,
     },
+    quoteText: {
+        fontSize: 12,
+        lineHeight: 18,
+        fontStyle: "italic",
+        textAlign: "center",
+        opacity: 0.75,
+    },
+
     dotsContainer: {
         flexDirection: "row",
         justifyContent: "center",

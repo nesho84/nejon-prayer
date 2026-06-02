@@ -185,8 +185,8 @@ export default function HomeScreen() {
                 {/* 3.1 QURAN Playing... CARD */}
                 <QuranPlaying />
 
-                {/* 4. PRAYERS CARD */}
-                <AppCard style={styles.prayersCard}>
+                {/* 4. PRAYERS LIST CARD */}
+                <AppCard style={styles.prayersListCard}>
 
                     {/* Prayers Date Header */}
                     <TouchableOpacity
@@ -252,13 +252,13 @@ const styles = StyleSheet.create({
 
     // Quotes Card
     quotesCard: {
-        paddingTop: 8,
-        paddingBottom: 10,
+        paddingTop: 6,
+        paddingBottom: 9,
         paddingHorizontal: 12,
     },
 
-    // Prayers Card
-    prayersCard: {
+    // Prayers List Card
+    prayersListCard: {
         overflow: 'hidden',
     },
 
@@ -307,6 +307,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
     // Prayers Progress Card
     progressCard: {
         paddingVertical: 12,
