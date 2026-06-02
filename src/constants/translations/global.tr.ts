@@ -700,7 +700,7 @@ export const GLOBAL_TR = {
             namaz: "Namazi",
             namazDesc: "Mëso dhe praktiko Namazin",
             namazGuideItem: "Udhëzues i Namazit",
-            namazTableItem: "Tabela e Rekateve",
+            namazTableItem: "Tabela e rekateve",
             namazPlusItem: "Namazet tjera",
             tesbih: "Tesbih",
             tesbihDesc: "Numërues digjital për tesbih",

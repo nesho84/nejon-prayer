@@ -120,13 +120,13 @@ export default function NamaziTableScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.placeholder }]}>
+                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
                     <Text style={globalStyles.headerIcon}>📝</Text>
                     <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
-                        {namaziTr.tableTitle}
+                        {namaziTr.headerTitle}
                     </Text>
                     <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>
-                        {namaziTr.tableSubtitle}
+                        {namaziTr.headerSubtitle}
                     </Text>
                 </AppCard>
 

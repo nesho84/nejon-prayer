@@ -4,8 +4,8 @@ import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Href, router, useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { Href, router } from "expo-router";
+import React, { useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,13 +37,9 @@ export default function ExtrasTabScreen() {
     // Local state
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
-    // Reset expanded item when leaving the screen
-    useFocusEffect(
-        useCallback(() => {
-            return () => setExpandedId(null); // runs on blur (leaving the screen)
-        }, [])
-    );
-
+    // ------------------------------------------------------------
+    // Features data
+    // ------------------------------------------------------------
     const FEATURES: MenuItem[] = [
         {
             id: 1,

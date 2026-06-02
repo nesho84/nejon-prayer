@@ -1,8 +1,8 @@
 import { Language } from "@/types/language.types";
 
 export type NamaziTableTranslations = {
-  tableTitle: string;
-  tableSubtitle: string;
+  headerTitle: string;
+  headerSubtitle: string;
   tableRekatetLabel: string;
   tableNameHeader: string;
   tableSunnetHeader: string;
@@ -18,6 +18,10 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
   // English
   // ------------------------------------------------------------
   en: {
+    headerTitle: "Table of rak'ahs",
+    headerSubtitle: "Overview of prayer rak'ahs",
+    footerText: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
+
     selamiLabel: "Salam",
     rakatLabel: "Rakat",
     tableNameHeader: "prayer",
@@ -25,15 +29,15 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sunnah",
     tableFarzHeader: "Fard",
     tableVitriHeader: "Witr",
-    tableTitle: "Table of rak'ahs",
-    tableSubtitle: "Prayer consists of parts called rak'ahs.",
-    footerText: "Every prayer, whether obligatory or sunnah, is performed for the sake of God and no one else.",
   },
 
   // ------------------------------------------------------------
   // Deutsch
   // ------------------------------------------------------------
   de: {
+    headerTitle: "Tabelle der Rak'ahs",
+    headerSubtitle: "Überblick über die Rak'ahs des Gebets",
+    footerText: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
     selamiLabel: "Salam",
     rakatLabel: "Rak'ah",
     tableNameHeader: "Gebet",
@@ -41,15 +45,15 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sunna",
     tableFarzHeader: "Pflicht",
     tableVitriHeader: "Witr",
-    tableTitle: "Tabelle der Rak'ahs",
-    tableSubtitle: "Das Gebet besteht aus Teilen, die Rak'ahs genannt werden.",
-    footerText: "Jedes Gebet, ob Pflichtgebet oder Sunna-Gebet, wird um Gottes willen und um niemand anderen willen verrichtet.",
   },
 
   // ------------------------------------------------------------
   // Français
   // ------------------------------------------------------------
   fr: {
+    headerTitle: "Tableau des rak'ahs",
+    headerSubtitle: "Aperçu des rak'ahs de la prière",
+    footerText: "Chaque prière, qu'elle soit obligatoire ou sunna, est accomplie pour l'amour de Dieu et de nul autre.",
     selamiLabel: "Salam",
     rakatLabel: "Rak'ah",
     tableNameHeader: "prière",
@@ -57,15 +61,16 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sunna",
     tableFarzHeader: "Fard",
     tableVitriHeader: "Witr",
-    tableTitle: "Tableau des rak'ahs",
-    tableSubtitle: "La prière est composée de parties appelées rak'ahs.",
-    footerText: "Chaque prière, qu'elle soit obligatoire ou sunna, est accomplie pour l'amour de Dieu et de nul autre.",
   },
 
   // ------------------------------------------------------------
   // Shqip
   // ------------------------------------------------------------
   sq: {
+    headerTitle: "Tabela e rekateve",
+    headerSubtitle: "Pasqyrë e rekateve të namazit",
+    footerText: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër.",
+
     selamiLabel: "Selami",
     rakatLabel: "Rekati",
     tableNameHeader: "namazi",
@@ -73,15 +78,15 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sunnet",
     tableFarzHeader: "Farz",
     tableVitriHeader: "Vitri",
-    tableTitle: "Tabela e rekateve",
-    tableSubtitle: "Namazi përbëhet nga pjesët e quajtura rekate.",
-    footerText: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër.",
   },
 
   // ------------------------------------------------------------
   // Bosanski
   // ------------------------------------------------------------
   bs: {
+    headerTitle: "Tabela rekata",
+    headerSubtitle: "Pregled rekata namaza",
+    footerText: "Svaki namaz, bio farz ili sunnet, obavlja se radi Allaha i niko drugog.",
     selamiLabel: "Selam",
     rakatLabel: "Rekat",
     tableNameHeader: "namaz",
@@ -89,15 +94,16 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sunnet",
     tableFarzHeader: "Farz",
     tableVitriHeader: "Vitr",
-    tableTitle: "Tabela rekata",
-    tableSubtitle: "Namaz se sastoji od dijelova koji se zovu rekati.",
-    footerText: "Svaki namaz, bio farz ili sunnet, obavlja se radi Allaha i niko drugog.",
   },
 
   // ------------------------------------------------------------
   // Македонски
   // ------------------------------------------------------------
   mk: {
+    headerTitle: "Табела на рекати",
+    headerSubtitle: "Преглед на рекатите на намазот",
+    footerText: "Секој намаз, фарз или сунет, се клања заради Аллах и никој друг.",
+
     selamiLabel: "Селам",
     rakatLabel: "Рекат",
     tableNameHeader: "намаз",
@@ -105,15 +111,15 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Сунет",
     tableFarzHeader: "Фарз",
     tableVitriHeader: "Витр",
-    tableTitle: "Табела на рекати",
-    tableSubtitle: "Намазот се состои од делови наречени рекати.",
-    footerText: "Секој намаз, фарз или сунет, се клања заради Аллах и никој друг.",
   },
 
   // ------------------------------------------------------------
   // Türkçe
   // ------------------------------------------------------------
   tr: {
+    headerTitle: "Rekat Tablosu",
+    headerSubtitle: "Namaz rekatlarına genel bakış",
+    footerText: "Her namaz, farz veya sünnet olsun, Allah rızası için kılınır ve başka hiç kimse için değil.",
     selamiLabel: "Selam",
     rakatLabel: "Rekat",
     tableNameHeader: "Namaz",
@@ -121,15 +127,15 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "Sünnet",
     tableFarzHeader: "Farz",
     tableVitriHeader: "Vitr",
-    tableTitle: "Rekat Tablosu",
-    tableSubtitle: "Namaz, rekat adı verilen bölümlerden oluşur.",
-    footerText: "Her namaz, farz veya sünnet olsun, Allah rızası için kılınır ve başka hiç kimse için değil.",
   },
 
   // ------------------------------------------------------------
   // Arabic
   // ------------------------------------------------------------
   ar: {
+    headerTitle: "جدول الركعات",
+    headerSubtitle: "نظرة عامة على ركعات الصلاة",
+    footerText: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
     selamiLabel: "السلام",
     rakatLabel: "الركعة",
     tableNameHeader: "الصلاة",
@@ -137,8 +143,5 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
     tableSunnetHeader: "السنة",
     tableFarzHeader: "الفرض",
     tableVitriHeader: "الوتر",
-    tableTitle: "جدول الركعات",
-    tableSubtitle: "تتكون الصلاة من أجزاء تُسمى ركعات.",
-    footerText: "كل صلاة، سواء كانت فرضًا أو سنة، تُؤدّى خالصةً لله وحده.",
   },
 };

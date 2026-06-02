@@ -32,6 +32,7 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
   en: {
     headerTitle: "Other Prayers",
     headerSubtitle: "Guide to voluntary and special prayers",
+
     fieldDesc: "Description",
     fieldTime: "Time",
     fieldRakats: "Rakats",
@@ -39,7 +40,9 @@ export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {
     fieldForm: "Form",
     fieldStatus: "Status",
     fieldNotes: "Notes",
+
     footerText: "The information presented is based on reliable sources but may not be fully accurate. It is recommended to consult scholars or authentic Islamic sources for complete and accurate information.",
+
     prayers: {
       jumuah: {
         name: "Jumu'ah",

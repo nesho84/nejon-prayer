@@ -160,7 +160,7 @@ export default function NamaziGuideScreen() {
             {/* PROGRESS */}
             <View style={[globalStyles.progressWrapper, { backgroundColor: theme.statusbar, borderBottomColor: theme.divider2 }]}>
                 <View style={[globalStyles.progressTrack, { backgroundColor: theme.border }]}>
-                    <View style={[globalStyles.progressFill, { backgroundColor: theme.secondary, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
+                    <View style={[globalStyles.progressFill, { backgroundColor: theme.islamicGreen, width: `${(currentStep / STEPS.length) * 100}%` as any }]} />
                 </View>
                 <Text style={[styles.progressText, { color: theme.placeholder }]}>
                     {tr.labels.stepLabel} {currentStep} / {STEPS.length}

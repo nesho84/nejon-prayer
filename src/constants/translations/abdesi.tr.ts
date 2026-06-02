@@ -23,6 +23,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
   en: {
     headerTitle: "Performing Wudu",
     headerSubtitle: "How to perform Wudu step by step",
+
     step1: "Make your intention in your heart to perform ablution (wudu), and before starting, say 'Bismillah'.",
     step2: "Wash your hands up to the wrists.",
     step3: "Rinse your mouth three times.",
@@ -33,6 +34,7 @@ export const ABDESI_TR: Record<Language, AbdesiTranslations> = {
     step8: "Wipe your ears with wet hands.",
     step9: "Wash your right foot, then your left foot up to the ankles three times.",
     step10: "Finally, say:\nEshhedu en la ilahe il-lallah vahdehu la sherike leh ve eshhedu enne Muhammeden abduhu ve resuluhu.\n\n(I bear witness that there is no god but Allah, the One without partner, and that Muhammad is His servant and Messenger).",
+
     footerText: "This guide is based on reliable sources but may not be fully accurate. For specific steps and rules, it is recommended to consult scholars or authentic Islamic sources.",
   },
 

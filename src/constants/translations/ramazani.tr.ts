@@ -28,6 +28,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
   en: {
     headerTitle: "Ramadan Guidance",
     headerSubtitle: "Essential Tips for a Blessed Ramadan",
+
     title1: "Pure Intentions",
     desc1: "Fast Ramadan with faith and determination to seek the reward of Allah Almighty, with the aim of forgiveness of past sins.",
     title2: "Preserve the Fast",
@@ -58,6 +59,7 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     desc14: "Hasten and do not delay in breaking the fast after the sun has set so that you may earn the love of Allah. Break the fast with dates and water according to the Sunnah.",
     title15: "Continue After Ramadan",
     desc15: "Maintain the state of complete faith and piety, and performing good deeds even after the month of Ramadan, until you die. 'And worship your Lord until the truth (death) comes to you.' (Quran 15:99)",
+
     footerText: "The tips presented are based on reliable sources but may not be fully accurate. It is recommended to consult scholars or authentic Islamic sources for complete and accurate information.",
   },
 
@@ -330,5 +332,6 @@ export const RAMAZANI_TR: Record<Language, RamazaniTranslations> = {
     title14: "الإفطار",
     desc14: "بادِر بالإفطار بعد غروب الشمس ولا تؤخره، وأفطر على التمر والماء اتباعًا للسنة.",
     title15: "الاستمرار بعد رمضان",
-    desc15: "داوم على الطاعة والعمل الصالح بعد رمضان حتى تلقى الله. ﴿واعبد ربك حتى يأتيك اليقين﴾ (الحجر: 99)",    footerText: "النصائح المقدمة مستندة إلى مصادر موثوقة، غير أنها قد لا تكون دقيقة تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على معلومات كاملة ودقيقة.",  },
+    desc15: "داوم على الطاعة والعمل الصالح بعد رمضان حتى تلقى الله. ﴿واعبد ربك حتى يأتيك اليقين﴾ (الحجر: 99)", footerText: "النصائح المقدمة مستندة إلى مصادر موثوقة، غير أنها قد لا تكون دقيقة تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على معلومات كاملة ودقيقة.",
+  },
 };

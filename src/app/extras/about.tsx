@@ -8,6 +8,7 @@ import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CONTACT_EMAIL = 'mailto:support@nejon.net';
+const HELP_EMAIL = 'mailto:help@nejon.net';
 
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer';
 const MORE_APPS_GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/developer?id=Neshat%20Ademi';
@@ -71,7 +72,7 @@ export default function AboutScreen() {
                 options={{
                     title: tr.labels.about,
                     headerRight: () => (
-                        <TouchableOpacity onPress={openAppInfo} style={styles.headerIcon} activeOpacity={0.3}>
+                        <TouchableOpacity onPress={openAppInfo} style={styles.infoIcon} activeOpacity={0.3}>
                             <MaterialCommunityIcons name="information-outline" size={22} color={theme.text} />
                         </TouchableOpacity>
                     ),
@@ -115,7 +116,6 @@ export default function AboutScreen() {
                         <View style={[styles.fullDivider, { backgroundColor: theme.bg }]} />
 
                         {/* Rate the App */}
-                        {/* onPress={() => openLink(APPLE_STORE_URL)} // TODO: Apple App Store */}
                         <TouchableOpacity style={styles.cardRow} onPress={() => openLink(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
                             <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                                 <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
@@ -175,9 +175,11 @@ export default function AboutScreen() {
                 {/* FIXED BOTTOM — Plain text links */}
                 <View style={[styles.bottomLinks, { paddingBottom: insets.bottom + 12 }]}>
                     <TouchableOpacity onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
-                        <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy Policy</Text>
+                        <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy</Text>
                     </TouchableOpacity>
-                    <View style={[styles.bottomDot, { backgroundColor: theme.textMuted }]} />
+                    <TouchableOpacity onPress={() => Linking.openURL(HELP_EMAIL)} activeOpacity={0.6}>
+                        <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Help</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => openLink("https://nejon.net")} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>nejon.net</Text>
                     </TouchableOpacity>
@@ -190,7 +192,7 @@ export default function AboutScreen() {
 
 const styles = StyleSheet.create({
     // Header
-    headerIcon: {
+    infoIcon: {
         paddingHorizontal: 8,
         paddingVertical: 4,
     },
@@ -204,6 +206,7 @@ const styles = StyleSheet.create({
     heroSection: {
         alignItems: "center",
         paddingTop: 32,
+        paddingBottom: 12,
         gap: 8,
     },
     logo: {
@@ -223,14 +226,13 @@ const styles = StyleSheet.create({
         fontWeight: "400",
     },
 
-    // Scrollable area
+    // Cards - Scrollable area
     scrollArea: {
         flex: 1,
     },
     scrollContent: {
         flexGrow: 1,
         justifyContent: "center",
-        paddingVertical: 8,
     },
 
     // Action cards
@@ -242,7 +244,8 @@ const styles = StyleSheet.create({
     cardRow: {
         flexDirection: "row",
         alignItems: "center",
-        paddingHorizontal: 14,
+        paddingLeft: 14,
+        paddingRight: 18,
         paddingVertical: 13,
         gap: 12,
     },
@@ -276,19 +279,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+        paddingTop: 12,
         marginBottom: 12,
-        gap: 12,
+        gap: 28,
     },
     bottomLinkText: {
         fontSize: 14,
-        fontWeight: "400",
+        fontWeight: "700",
         opacity: 0.7,
-    },
-    bottomDot: {
-        width: 3,
-        height: 3,
-        borderRadius: 2,
-        opacity: 0.35,
-        alignSelf: "center",
     },
 });
