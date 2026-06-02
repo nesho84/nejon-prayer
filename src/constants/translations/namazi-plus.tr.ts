@@ -1,6 +1,6 @@
 import { Language } from "@/types/language.types";
 
-export type NamaziContent = {
+export type NamaziPlusContent = {
   name: string;
   time?: string;
   description: string;
@@ -22,7 +22,7 @@ export type NamaziPlusTranslations = {
   fieldStatus: string;
   fieldNotes: string;
   footerText: string;
-  prayers: Record<string, NamaziContent>;
+  prayers: Record<string, NamaziPlusContent>;
 };
 
 export const NAMAZI_PLUS_TR: Record<Language, NamaziPlusTranslations> = {

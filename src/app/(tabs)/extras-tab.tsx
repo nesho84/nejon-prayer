@@ -4,8 +4,8 @@ import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Href, router } from "expo-router";
-import React, { useState } from "react";
+import { Href, router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -34,8 +34,15 @@ export default function ExtrasTabScreen() {
     // Safe area insets
     const insets = useSafeAreaInsets();
 
-    // Accordion state
+    // Local state
     const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    // Reset expanded item when leaving the screen
+    useFocusEffect(
+        useCallback(() => {
+            return () => setExpandedId(null); // runs on blur (leaving the screen)
+        }, [])
+    );
 
     const FEATURES: MenuItem[] = [
         {
@@ -184,7 +191,7 @@ export default function ExtrasTabScreen() {
                                 {item.subItems && (
                                     <>
                                         <Pressable
-                                            style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                                            style={({ pressed }) => [{ opacity: pressed ? 0.65 : 1 }]}
                                             android_ripple={{ color: theme.overlayLight, borderless: false }}
                                             onPress={() => setExpandedId((prev) => (prev === item.id ? null : item.id))}
                                         >

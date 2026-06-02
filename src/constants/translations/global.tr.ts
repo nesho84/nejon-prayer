@@ -155,6 +155,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Recommend Nejon Prayer",
             contactUs: "Contact Us",
             contactUsDesc: "Feedback & bug reports",
+            moreApps: "More Apps",
+            moreAppsDesc: "More apps by Nejon",
             // Quran Settings
             quranArabic: "Arabic",
             quranSettingsTitle: "Quran Settings",
@@ -349,6 +351,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Empfehle Nejon Prayer",
             contactUs: "Kontakt",
             contactUsDesc: "Feedback & Fehlermeldungen",
+            moreApps: "Weitere Apps",
+            moreAppsDesc: "Weitere Apps von Nejon",
             // Quran Settings
             quranArabic: "Arabisch",
             quranSettingsTitle: "Koran-Einstellungen",
@@ -543,6 +547,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Recommander Nejon Prayer",
             contactUs: "Nous contacter",
             contactUsDesc: "Retours et signalements de bugs",
+            moreApps: "Plus d'applications",
+            moreAppsDesc: "Plus d'apps de Nejon",
             // Quran Settings
             quranArabic: "Arabe",
             quranSettingsTitle: "Paramètres du Coran",
@@ -737,6 +743,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Rekomando Nejon Prayer",
             contactUs: "Na Kontakto",
             contactUsDesc: "Reagime & raporte gabimesh",
+            moreApps: "Më shumë Apps",
+            moreAppsDesc: "Aplikacione tjera nga Nejon",
             // Quran Settings
             quranArabic: "Arabisht",
             quranSettingsTitle: "Cilësimet e Kur'anit",
@@ -916,6 +924,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Preporuči Nejon Prayer",
             contactUs: "Kontaktirajte nas",
             contactUsDesc: "Povratne informacije i prijave grešaka",
+            moreApps: "Više aplikacija",
+            moreAppsDesc: "Više aplikacija od Nejon",
             quranArabic: "Arapski",
             quranSettingsTitle: "Postavke Kur'ana",
             quranSettingsSubtitle: "Prilagodite iskustvo čitanja Kur'ana",
@@ -1092,6 +1102,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Препорачај Nejon Prayer",
             contactUs: "Контактирајте не",
             contactUsDesc: "Повратни информации и пријави грешки",
+            moreApps: "Повеќе апликации",
+            moreAppsDesc: "Повеќе апликации од Nejon",
             quranArabic: "Арапски",
             quranSettingsTitle: "Поставки на Куран",
             quranSettingsSubtitle: "Прилагодете го искуството на читање на Куранот",
@@ -1283,6 +1295,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "Nejon Prayer'ı önerin",
             contactUs: "Bize Ulaşın",
             contactUsDesc: "Geri bildirim & hata bildirimi",
+            moreApps: "Daha Fazla Uygulama",
+            moreAppsDesc: "Nejon'un diğer uygulamaları",
             // Quran Settings
             quranArabic: "Arapça",
             quranSettingsTitle: "Kur'an Ayarları",
@@ -1477,6 +1491,8 @@ export const GLOBAL_TR = {
             shareAppDesc: "أوصِ بتطبيق Nejon Prayer",
             contactUs: "اتصل بنا",
             contactUsDesc: "ملاحظات وإبلاغ عن أخطاء",
+            moreApps: "المزيد من التطبيقات",
+            moreAppsDesc: "المزيد من تطبيقات Nejon",
             // Quran Settings
             quranArabic: "العربية",
             quranSettingsTitle: "إعدادات القرآن",

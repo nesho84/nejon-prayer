@@ -1,7 +1,7 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
-import { NAMAZI_PLUS_TR, NamaziContent } from "@/constants/translations/namazi-plus.tr";
+import { NAMAZI_PLUS_TR, NamaziPlusContent } from "@/constants/translations/namazi-plus.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ItemType {
   key: string;
-  prayer: NamaziContent;
+  prayer: NamaziPlusContent;
 }
 
 export default function NamaziPlusScreen() {
