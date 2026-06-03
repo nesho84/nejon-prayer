@@ -61,10 +61,12 @@ export default function SettingsScreen() {
     const [tempVolume, setTempVolume] = useState(Number(notifSettings?.volume ?? 1.0));
 
     // Refs
-    const saveTimeout = useRef<NodeJS.Timeout | number | null>(null);
+    const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = insets.top + 4;
+    const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
     // Change theme
@@ -327,7 +329,7 @@ export default function SettingsScreen() {
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[
                     globalStyles.scrollContent,
-                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                    { paddingTop: topInset, paddingBottom: bottomInset }
                 ]}
                 showsVerticalScrollIndicator={false}
             >

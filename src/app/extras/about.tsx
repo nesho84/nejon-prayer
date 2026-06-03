@@ -24,6 +24,7 @@ export default function AboutScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
     // Open external link
@@ -173,7 +174,7 @@ export default function AboutScreen() {
                 </ScrollView>
 
                 {/* FIXED BOTTOM — Plain text links */}
-                <View style={[styles.bottomLinks, { paddingBottom: insets.bottom + 12 }]}>
+                <View style={[styles.bottomLinks, { paddingBottom: bottomInset }]}>
                     <TouchableOpacity onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy</Text>
                     </TouchableOpacity>

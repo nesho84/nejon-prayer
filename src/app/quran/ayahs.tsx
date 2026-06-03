@@ -63,6 +63,8 @@ export default function AyahsScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = 12;
+  const bottomInset = insets.bottom + 12;
 
   // Arabic verses — always from local JSON
   const verses = getSurahById(surahIdNum)?.verses ?? [];
@@ -292,7 +294,7 @@ export default function AyahsScreen() {
         renderItem={renderAyahItem}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
+        contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={renderFooter}
         onScrollBeginDrag={() => userInteractedRef.current = true}

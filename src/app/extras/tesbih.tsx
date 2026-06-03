@@ -20,6 +20,8 @@ export default function TesbihScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = 12;
+    const bottomInset = insets.bottom + 12;
 
     // Calculate circle parameters
     const size = 315;
@@ -82,7 +84,7 @@ export default function TesbihScreen() {
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[
                     globalStyles.scrollContent,
-                    { paddingTop: 12, gap: 16, paddingBottom: insets.bottom + 24 }
+                    { gap: 16, paddingTop: topInset, paddingBottom: bottomInset }
                 ]}
                 showsVerticalScrollIndicator={false}
             >

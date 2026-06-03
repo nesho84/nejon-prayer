@@ -216,7 +216,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
 
       {/* Dimmed backdrop — pointer events disabled, tap handled by Pressable below */}
       <Animated.View
-        style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }, backdropStyle]}
         pointerEvents="none"
       />
 
@@ -234,7 +234,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
 
         {/* Tap outside sheet to dismiss */}
         {!staticMode && (
-          <Pressable style={StyleSheet.absoluteFillObject} onPress={animatedClose} />
+          <Pressable style={StyleSheet.absoluteFill} onPress={animatedClose} />
         )}
 
         <GestureDetector gesture={gesture}>

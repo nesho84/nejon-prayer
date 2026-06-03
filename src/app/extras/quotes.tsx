@@ -24,6 +24,8 @@ export default function QuotesScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = 12;
+  const bottomInset = insets.bottom + 12;
 
   // ------------------------------------------------------------
   // Quotes data
@@ -141,7 +143,7 @@ export default function QuotesScreen() {
             </Text>
           </AppCard>
         }
-        contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
+        contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
       />

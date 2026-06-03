@@ -27,6 +27,8 @@ export default function NamaziPlusScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = 12;
+  const bottomInset = insets.bottom + 12;
 
   // ------------------------------------------------------------
   // Items data
@@ -149,7 +151,7 @@ export default function NamaziPlusScreen() {
             </Text>
           </AppCard>
         }
-        contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
+        contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
       />

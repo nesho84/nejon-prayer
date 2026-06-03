@@ -55,6 +55,8 @@ export default function QuranTabScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = insets.top + 4;
+  const bottomInset = insets.bottom + 12;
 
   // Must match the height in QuranSurahRow styles
   const ROW_HEIGHT = 90;
@@ -316,7 +318,7 @@ export default function QuranTabScreen() {
     <AppLayout>
       <View style={[
         globalStyles.container,
-        { paddingTop: !isLandscape ? insets.top : 0, backgroundColor: theme.bg }
+        { paddingTop: !isLandscape ? topInset : 0, backgroundColor: theme.bg }
       ]}>
 
         {/* Header Section */}
@@ -331,7 +333,7 @@ export default function QuranTabScreen() {
           renderItem={renderSurahItem}
           contentContainerStyle={[
             styles.surahList,
-            { paddingTop: isLandscape ? insets.top : 0, paddingBottom: insets.bottom + 24 }
+            { paddingTop: isLandscape ? topInset : 0, paddingBottom: bottomInset }
           ]}
           showsVerticalScrollIndicator={false}
           initialNumToRender={15}

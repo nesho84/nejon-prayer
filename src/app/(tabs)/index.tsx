@@ -51,6 +51,8 @@ export default function HomeScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = insets.top + 4;
+    const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
     // Load prayer times on mount
@@ -148,7 +150,7 @@ export default function HomeScreen() {
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[
                     globalStyles.scrollContent,
-                    { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+                    { paddingTop: topInset, paddingBottom: bottomInset }
                 ]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={

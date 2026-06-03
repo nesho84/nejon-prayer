@@ -27,6 +27,8 @@ export default function AbdesiScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = 12;
+    const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
     // Steps data
@@ -112,7 +114,7 @@ export default function AbdesiScreen() {
                         </Text>
                     </AppCard>
                 }
-                contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
+                contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
             />

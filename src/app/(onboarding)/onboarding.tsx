@@ -38,6 +38,8 @@ export default function OnboardingScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = insets.top + 4;
+  const bottomInset = insets.bottom + 12;
 
   // ------------------------------------------------------------
   // 1️⃣ (Step 1) Handle language
@@ -152,7 +154,7 @@ export default function OnboardingScreen() {
         style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top, paddingBottom: insets.bottom + 24 }
+          { paddingTop: topInset, paddingBottom: bottomInset }
         ]}
         showsVerticalScrollIndicator={false}
       >

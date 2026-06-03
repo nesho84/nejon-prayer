@@ -1,7 +1,6 @@
 import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
 import {
   Modal,
   Pressable,
@@ -18,7 +17,10 @@ export default function ModalProvider() {
   // Modal store
   const { visible, options, hide } = useModalStore();
 
+  // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = insets.top + 4;
+  const bottomInset = insets.bottom;
 
   if (!options && !visible) return null;
 
@@ -88,7 +90,7 @@ export default function ModalProvider() {
         onRequestClose={handleDismiss}
       >
         <View style={styles.overlay}>
-          <Pressable style={StyleSheet.absoluteFillObject} onPress={handleDismiss} />
+          <Pressable style={StyleSheet.absoluteFill} onPress={handleDismiss} />
           <View style={[styles.alertContainer, { backgroundColor: theme.bg2, shadowColor: theme.black }, options.containerStyle]}>
             {renderCloseIcon()}
             {options.title && (
@@ -122,7 +124,7 @@ export default function ModalProvider() {
         onRequestClose={() => hide('cancel')}
       >
         <View style={styles.overlay}>
-          <Pressable style={StyleSheet.absoluteFillObject} onPress={() => hide('cancel')} />
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => hide('cancel')} />
           <View style={[styles.alertContainer, { backgroundColor: theme.bg2, shadowColor: theme.black }, options.containerStyle]}>
             {renderCloseIcon()}
             {options.title && (
@@ -154,7 +156,7 @@ export default function ModalProvider() {
         statusBarTranslucent
         onRequestClose={handleDismiss}
       >
-        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: topInset, paddingBottom: bottomInset }]}>
           {renderCloseIcon()}
           {options.title && (
             <Text style={[styles.title, { color: theme.text }, options.titleStyle]}>

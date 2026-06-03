@@ -24,6 +24,8 @@ export default function AyahsFavoritesScreen() {
 
   // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = 12;
+  const bottomInset = insets.bottom + 12;
 
   // ------------------------------------------------------------
   // Render a single favorite ayah row
@@ -82,7 +84,7 @@ export default function AyahsFavoritesScreen() {
           data={favoriteAyahs}
           keyExtractor={(item) => `${item.surahId}-${item.ayahId}`}
           renderItem={renderItem}
-          contentContainerStyle={{ paddingTop: 12, paddingBottom: insets.bottom + 24 }}
+          contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
           showsVerticalScrollIndicator={false}
         />
       )}

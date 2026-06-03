@@ -26,6 +26,8 @@ export default function NamaziTableScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = 12;
+    const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
     // Prayer table data
@@ -115,7 +117,7 @@ export default function NamaziTableScreen() {
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[
                     globalStyles.scrollContent,
-                    { paddingTop: 12, paddingBottom: insets.bottom + 24 }
+                    { paddingTop: topInset, paddingBottom: bottomInset }
                 ]}
                 showsVerticalScrollIndicator={false}
             >
