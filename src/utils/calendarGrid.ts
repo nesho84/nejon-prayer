@@ -15,20 +15,27 @@ export const getCurrentWeekDays = (): Date[] => {
 };
 
 // ------------------------------------------------------------
-// Internal: Returns grid items for the current month (empty padding + day entries)
+// Internal: Returns grid items for the current month (including leading days from the previous month)
 // ------------------------------------------------------------
 const getCurrentMonthGridItems = () => {
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const offset = (firstDay.getDay() + 6) % 7;
-  return [
-    ...Array.from({ length: offset }, (_, i) => ({ empty: true as const, key: `empty-${i}` })),
-    ...Array.from({ length: daysInMonth }, (_, i) => {
-      const date = new Date(today.getFullYear(), today.getMonth(), i + 1);
-      return { empty: false as const, date, key: toDateKey(date) };
-    }),
-  ];
+
+  const prevMonthLastDay = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+
+  const leadingDays = Array.from({ length: offset }, (_, i) => {
+    const date = new Date(today.getFullYear(), today.getMonth() - 1, prevMonthLastDay - offset + i + 1);
+    return { empty: false as const, isPrevMonth: true as const, date, key: toDateKey(date) };
+  });
+
+  const currentDays = Array.from({ length: daysInMonth }, (_, i) => {
+    const date = new Date(today.getFullYear(), today.getMonth(), i + 1);
+    return { empty: false as const, isPrevMonth: false as const, date, key: toDateKey(date) };
+  });
+
+  return [...leadingDays, ...currentDays];
 };
 
 // ------------------------------------------------------------

@@ -17,7 +17,7 @@ interface PrayersTrackingState {
 }
 
 // Keep tracking data for 31 days to prevent infinite growth of storage
-const KEEP_DAYS = 31;
+const KEEP_DAYS = 37;
 
 // Remove entries older than KEEP_DAYS from the tracking record
 export const cleanOldEntries = (tracking: TrackingRecord): TrackingRecord => {
