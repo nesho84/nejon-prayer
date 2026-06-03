@@ -1,4 +1,5 @@
 import AppLayout from "@/components/AppLayout";
+import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -24,6 +25,7 @@ export default function AboutScreen() {
 
     // Safe area insets
     const insets = useSafeAreaInsets();
+    const topInset = 12;
     const bottomInset = insets.bottom + 12;
 
     // ------------------------------------------------------------
@@ -67,24 +69,29 @@ export default function AboutScreen() {
 
     return (
         <AppLayout>
+            <ScrollView
+                style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
+                contentContainerStyle={[
+                    globalStyles.scrollContent,
+                    { gap: 16, paddingTop: topInset, paddingBottom: bottomInset }
+                ]}
+                showsVerticalScrollIndicator={false}
+            >
 
-            {/* Top Navigation bar */}
-            <Stack.Screen
-                options={{
-                    title: tr.labels.about,
-                    headerRight: () => (
-                        <TouchableOpacity onPress={openAppInfo} style={styles.infoIcon} activeOpacity={0.3}>
-                            <MaterialCommunityIcons name="information-outline" size={22} color={theme.text} />
-                        </TouchableOpacity>
-                    ),
-                }}
-            />
+                {/* Top Navigation bar */}
+                <Stack.Screen
+                    options={{
+                        title: tr.labels.about,
+                        headerRight: () => (
+                            <TouchableOpacity onPress={openAppInfo} style={styles.infoIcon} activeOpacity={0.3}>
+                                <MaterialCommunityIcons name="information-outline" size={22} color={theme.text} />
+                            </TouchableOpacity>
+                        ),
+                    }}
+                />
 
-            {/* Outer container: fills screen between header and safe area */}
-            <View style={[styles.outerContainer, { backgroundColor: theme.bg }]}>
-
-                {/* FIXED TOP — Logo + Title + Version */}
-                <View style={styles.heroSection}>
+                {/* Logo + Title + Version */}
+                <View style={styles.logoSection}>
                     <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
                     <Text style={[styles.title, { color: theme.text2 }]}>
                         {Constants?.expoConfig?.name}
@@ -94,87 +101,83 @@ export default function AboutScreen() {
                     </Text>
                 </View>
 
-                {/* SCROLLABLE MIDDLE — Action Cards */}
-                <ScrollView
-                    style={styles.scrollArea}
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
+                {/* Action Cards */}
+                <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
+                    {/* Support / PayPal */}
+                    <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.supportDesc}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
 
-                        {/* Support / PayPal */}
-                        <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')} activeOpacity={0.3}>
-                            <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                                <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
-                            </View>
-                            <View style={styles.cardTextContainer}>
-                                <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.supportDesc}</Text>
-                                <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
-                            </View>
-                            <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
-                        </TouchableOpacity>
+                    {/* Divider */}
+                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
-                        <View style={[styles.fullDivider, { backgroundColor: theme.bg }]} />
+                    {/* Rate the App */}
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openLink(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.rateApp}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
 
-                        {/* Rate the App */}
-                        <TouchableOpacity style={styles.cardRow} onPress={() => openLink(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
-                            <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                                <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
-                            </View>
-                            <View style={styles.cardTextContainer}>
-                                <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.rateApp}</Text>
-                                <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
-                            </View>
-                            <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
-                        </TouchableOpacity>
+                    {/* Divider */}
+                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
-                        <View style={[styles.fullDivider, { backgroundColor: theme.bg }]} />
+                    {/* Share with a Friend */}
+                    <TouchableOpacity style={styles.cardRow} onPress={handleShare} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.shareApp}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.shareAppDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="share-variant-outline" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
 
-                        {/* Share with a Friend */}
-                        <TouchableOpacity style={styles.cardRow} onPress={handleShare} activeOpacity={0.3}>
-                            <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                                <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
-                            </View>
-                            <View style={styles.cardTextContainer}>
-                                <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.shareApp}</Text>
-                                <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.shareAppDesc}</Text>
-                            </View>
-                            <MaterialCommunityIcons name="share-variant-outline" size={16} color={theme.textMuted} />
-                        </TouchableOpacity>
+                    {/* Divider */}
+                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
-                        <View style={[styles.fullDivider, { backgroundColor: theme.bg }]} />
+                    {/* Contact Us */}
+                    <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL(CONTACT_EMAIL)} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.contactUs}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.contactUsDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
 
-                        {/* Contact Us */}
-                        <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL(CONTACT_EMAIL)} activeOpacity={0.3}>
-                            <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                                <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
-                            </View>
-                            <View style={styles.cardTextContainer}>
-                                <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.contactUs}</Text>
-                                <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.contactUsDesc}</Text>
-                            </View>
-                            <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
-                        </TouchableOpacity>
+                    {/* Divider */}
+                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
-                        <View style={[styles.fullDivider, { backgroundColor: theme.bg }]} />
+                    {/* More Apps */}
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openLink(MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialCommunityIcons name="view-grid-outline" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.moreApps}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.moreAppsDesc}</Text>
+                        </View>
+                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
+                </View>
 
-                        {/* More Apps by Nejon */}
-                        <TouchableOpacity style={styles.cardRow} onPress={() => openLink(MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
-                            <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                                <MaterialCommunityIcons name="view-grid-outline" size={22} color={theme.primary} />
-                            </View>
-                            <View style={styles.cardTextContainer}>
-                                <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.moreApps}</Text>
-                                <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.moreAppsDesc}</Text>
-                            </View>
-                            <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
-                        </TouchableOpacity>
-
-                    </View>
-                </ScrollView>
-
-                {/* FIXED BOTTOM — Plain text links */}
-                <View style={[styles.bottomLinks, { paddingBottom: bottomInset }]}>
+                {/* Bottom links */}
+                <View style={styles.bottomLinks}>
                     <TouchableOpacity onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy</Text>
                     </TouchableOpacity>
@@ -186,28 +189,23 @@ export default function AboutScreen() {
                     </TouchableOpacity>
                 </View>
 
-            </View>
+            </ScrollView>
         </AppLayout>
     );
 }
 
 const styles = StyleSheet.create({
-    // Header
+    // Native Header
     infoIcon: {
         paddingHorizontal: 8,
         paddingVertical: 4,
     },
 
-    // Outer container
-    outerContainer: {
-        flex: 1,
-    },
-
     // Hero section — fixed top
-    heroSection: {
+    logoSection: {
         alignItems: "center",
-        paddingTop: 32,
-        paddingBottom: 12,
+        marginTop: 24,
+        marginBottom: 16,
         gap: 8,
     },
     logo: {
@@ -227,15 +225,6 @@ const styles = StyleSheet.create({
         fontWeight: "400",
     },
 
-    // Cards - Scrollable area
-    scrollArea: {
-        flex: 1,
-    },
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: "center",
-    },
-
     // Action cards
     cardGroup: {
         marginHorizontal: 14,
@@ -249,9 +238,6 @@ const styles = StyleSheet.create({
         paddingRight: 18,
         paddingVertical: 13,
         gap: 12,
-    },
-    fullDivider: {
-        height: 3,
     },
     iconContainer: {
         width: 44,
@@ -274,14 +260,17 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         opacity: 0.6,
     },
+    cardDivider: {
+        height: 3,
+    },
 
-    // Fixed bottom links
+    // Bottom links
     bottomLinks: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        paddingTop: 12,
-        marginBottom: 12,
+        marginTop: 32,
+        marginBottom: 24,
         gap: 28,
     },
     bottomLinkText: {

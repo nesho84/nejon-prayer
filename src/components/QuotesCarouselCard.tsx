@@ -10,7 +10,7 @@ import { AppState, AppStateStatus, FlatList, LayoutChangeEvent, NativeScrollEven
 const MAX_QUOTES = 7; // max quotes to show in carousel
 const INSET = 12; // inset from container edges
 const SPACING = 8; // space between cards
-const AUTO_SCROLL_INTERVAL = 10_000; // 10 seconds
+const AUTO_SCROLL_INTERVAL = 15_000; // 10 seconds
 
 // ------------------------------------------------------------
 // Returns a quote for a given language (random or daily)
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
         paddingBottom: 6,
     },
     quoteText: {
-        fontSize: 12,
+        fontSize: 13,
         lineHeight: 18,
         fontStyle: "italic",
         textAlign: "center",
