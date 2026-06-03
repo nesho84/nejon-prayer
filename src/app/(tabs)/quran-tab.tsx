@@ -336,9 +336,9 @@ export default function QuranTabScreen() {
             { paddingTop: isLandscape ? topInset : 0, paddingBottom: bottomInset }
           ]}
           showsVerticalScrollIndicator={false}
-          initialNumToRender={15}
+          initialNumToRender={10}
           maxToRenderPerBatch={10}
-          windowSize={7}
+          windowSize={21}
           removeClippedSubviews={true}
           onMomentumScrollBegin={() => textInputRef.current?.blur()}
           onScrollToIndexFailed={(info) => scrollToSurah(info)}

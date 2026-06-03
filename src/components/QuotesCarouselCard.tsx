@@ -185,6 +185,8 @@ const QuotesCarouselCard = React.memo(() => {
                         renderItem={renderQuoteCard}
                         horizontal
                         showsHorizontalScrollIndicator={false}
+                        initialNumToRender={7}
+                        maxToRenderPerBatch={7}
                         scrollEventThrottle={16}
                         snapToInterval={itemWidth + SPACING}
                         snapToAlignment="start"
