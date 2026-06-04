@@ -59,12 +59,6 @@ const YEARLY: YearlyPrayerTimes = { [TODAY]: PRAYER_TIMES };
 
 const TR_MOCK = { labels: { locationSet: 'Set location', noInternet: 'No internet', prayersError: 'Error', locationError: 'Location error' } };
 
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-  jest.spyOn(console, 'warn').mockImplementation(() => { });
-  jest.spyOn(console, 'error').mockImplementation(() => { });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   usePrayersStore.setState({

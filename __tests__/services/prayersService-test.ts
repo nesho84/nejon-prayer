@@ -54,14 +54,7 @@ describe('getMethodForCountry', () => {
 // ------------------------------------------------------------
 describe('getYearlyPrayerTimes', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
-    jest.spyOn(console, 'log').mockImplementation(() => { });
     global.fetch = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it('converts Aladhan date format "DD-MM-YYYY" to ISO "YYYY-MM-DD"', async () => {

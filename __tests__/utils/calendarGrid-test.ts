@@ -54,9 +54,9 @@ describe('getCurrentMonthRows', () => {
     // March 2024 starts on Friday (offset = 4)
     jest.setSystemTime(new Date(2024, 2, 1));
     const rows = getCurrentMonthRows();
-    expect(rows[0][0].empty).toBe(true);
-    const empties = rows.flat().filter(item => item.empty);
-    expect(empties).toHaveLength(4);
+    expect(rows[0][0].isPrevMonth).toBe(true);
+    const leading = rows.flat().filter(item => item.isPrevMonth);
+    expect(leading).toHaveLength(4);
   });
 
   it('has no padding when month starts on Monday', () => {
@@ -70,8 +70,8 @@ describe('getCurrentMonthRows', () => {
     // September 2024 starts on Sunday (offset = 6)
     jest.setSystemTime(new Date(2024, 8, 1));
     const rows = getCurrentMonthRows();
-    const empties = rows.flat().filter(item => item.empty);
-    expect(empties).toHaveLength(6);
+    const leading = rows.flat().filter(item => item.isPrevMonth);
+    expect(leading).toHaveLength(6);
   });
 
   it('first real day entry has date 1', () => {
@@ -84,7 +84,7 @@ describe('getCurrentMonthRows', () => {
     // Feb 2024 — leap year, 29 days
     jest.setSystemTime(new Date(2024, 1, 15));
     const rows = getCurrentMonthRows();
-    const days = rows.flat().filter(item => !item.empty);
+    const days = rows.flat().filter(item => !item.isPrevMonth);
     expect(days).toHaveLength(29);
     expect(days[days.length - 1].date?.getDate()).toBe(29);
   });

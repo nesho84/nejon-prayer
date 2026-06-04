@@ -48,12 +48,6 @@ const PRAYER_TIMES: PrayerTimes = {
 
 const TR_MOCK = {};
 
-beforeAll(() => {
-  jest.spyOn(console, 'warn').mockImplementation(() => { });
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-  jest.spyOn(console, 'error').mockImplementation(() => { });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   useNotificationsStore.setState({

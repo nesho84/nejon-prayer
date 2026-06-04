@@ -113,11 +113,6 @@ describe('hasLocationChanged', () => {
 });
 
 describe('getUserLocation', () => {
-  beforeAll(() => {
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
-    jest.spyOn(console, 'log').mockImplementation(() => { });
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
   });

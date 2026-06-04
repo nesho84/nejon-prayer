@@ -23,10 +23,6 @@ const mockAddEventListener = AppState.addEventListener as jest.Mock;
 
 let mockSyncDeviceSettings: jest.Mock;
 
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   mockSyncDeviceSettings = jest.fn();

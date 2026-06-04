@@ -4,7 +4,6 @@ import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
@@ -28,9 +27,10 @@ jest.mock('@/store/storage', () => ({
 jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
+  const Icon = ({ name }: { name: string }) => React.createElement('View', { testID: `icon-${name}` });
   return {
-    MaterialCommunityIcons: ({ name }: { name: string }) =>
-      React.createElement('View', { testID: `icon-${name}` }),
+    MaterialCommunityIcons: Icon,
+    Ionicons: Icon,
   };
 });
 

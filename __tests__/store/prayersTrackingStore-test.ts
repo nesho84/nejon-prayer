@@ -134,25 +134,27 @@ describe('cleanOldEntries', () => {
     expect(cleanOldEntries(tracking)).toEqual(tracking);
   });
 
-  it('keeps an entry from exactly 31 days ago (boundary — equal to cutoff)', () => {
-    const tracking = { '2026-04-21': { Asr: 'prayed' as const } };
+  it('keeps an entry from exactly 37 days ago (boundary — equal to cutoff)', () => {
+    // 37 days before 2026-05-22 = 2026-04-15
+    const tracking = { '2026-04-15': { Asr: 'prayed' as const } };
     expect(cleanOldEntries(tracking)).toEqual(tracking);
   });
 
-  it('removes an entry from 32 days ago', () => {
-    const tracking = { '2026-04-20': { Maghrib: 'prayed' as const } };
+  it('removes an entry from 38 days ago', () => {
+    // 38 days before 2026-05-22 = 2026-04-14
+    const tracking = { '2026-04-14': { Maghrib: 'prayed' as const } };
     expect(cleanOldEntries(tracking)).toEqual({});
   });
 
   it('removes old entries and keeps recent ones', () => {
     const tracking = {
       '2025-12-01': { Fajr: 'prayed' as const },
-      '2026-04-20': { Dhuhr: 'prayed' as const },
-      '2026-04-21': { Asr: 'prayed' as const },
+      '2026-04-14': { Dhuhr: 'prayed' as const },
+      '2026-04-15': { Asr: 'prayed' as const },
       '2026-05-22': { Isha: 'prayed' as const },
     };
     expect(cleanOldEntries(tracking)).toEqual({
-      '2026-04-21': { Asr: 'prayed' },
+      '2026-04-15': { Asr: 'prayed' },
       '2026-05-22': { Isha: 'prayed' },
     });
   });

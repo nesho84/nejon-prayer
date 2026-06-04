@@ -70,7 +70,8 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "silent": true
   },
   "private": true,
   "expo": {

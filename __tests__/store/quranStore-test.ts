@@ -36,11 +36,6 @@ const mockLanguageGetState = (useLanguageStore as any).getState as jest.Mock;
 const MOCK_SURAH = { id: 1, name: 'Al-Fatiha', verses: [{ id: 1, text: 'Bismillah' }] };
 const MOCK_AYAHS = [{ id: 1, text: 'Ayah 1' }, { id: 2, text: 'Ayah 2' }];
 
-beforeAll(() => {
-  jest.spyOn(console, 'error').mockImplementation(() => { });
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   useQuranStore.setState({

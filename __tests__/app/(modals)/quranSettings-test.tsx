@@ -3,7 +3,6 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -75,7 +74,6 @@ describe('QuranSettingsScreen', () => {
   });
 
   it('does not update the store when Save is pressed with no changes', () => {
-    jest.spyOn(console, 'log').mockImplementation(() => { });
     render(<QuranSettingsScreen />);
     fireEvent.press(screen.getByText('Save'));
     expect(useQuranStore.getState().arabicFontSize).toBe(24);

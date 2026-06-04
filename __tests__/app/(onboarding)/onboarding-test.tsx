@@ -3,7 +3,6 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useOnboardingStore } from '@/store/onboardingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -46,14 +45,6 @@ const mockTheme = {
   bg: '#fff', text: '#111', text2: '#555', textMuted: '#999',
   primary: '#007AFF', danger: '#FF3B30', divider: '#eee', white: '#fff', card: '#f5f5f5',
 } as any;
-
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-});
-
-afterAll(() => {
-  jest.restoreAllMocks();
-});
 
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });

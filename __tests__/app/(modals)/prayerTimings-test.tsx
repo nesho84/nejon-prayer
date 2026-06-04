@@ -5,7 +5,6 @@ import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import React from 'react';
 
 // --- Core mocks ---
 jest.mock('@/store/storage', () => ({
@@ -74,15 +73,6 @@ const mockPrayerTimes = {
 };
 
 const mockLocation = { lat: 51.5, lng: -0.1, city: 'London' } as any;
-
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => { });
-  jest.spyOn(console, 'error').mockImplementation(() => { });
-});
-
-afterAll(() => {
-  jest.restoreAllMocks();
-});
 
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });

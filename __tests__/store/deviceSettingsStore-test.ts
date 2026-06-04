@@ -31,10 +31,6 @@ const mockNetInfo = NetInfo.fetch as jest.Mock;
 const mockGetSettings = notifee.getNotificationSettings as jest.Mock;
 const mockBatteryOpt = notifee.isBatteryOptimizationEnabled as jest.Mock;
 
-beforeAll(() => {
-  jest.spyOn(console, 'warn').mockImplementation(() => { });
-});
-
 beforeEach(() => {
   jest.clearAllMocks();
   useDeviceSettingsStore.setState({

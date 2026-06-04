@@ -4,7 +4,6 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 // --- Core mocks ---
 jest.mock('@/store/storage', () => ({
@@ -128,7 +127,6 @@ describe('PrayerNotificationScreen', () => {
 
   it('does not call setPrayer when Save is pressed with unchanged values', () => {
     const setPrayerSpy = jest.spyOn(useNotificationsStore.getState(), 'setPrayer');
-    jest.spyOn(console, 'log').mockImplementation(() => { });
     render(<PrayerNotificationScreen />);
     fireEvent.press(screen.getByText('Save'));
     expect(setPrayerSpy).not.toHaveBeenCalled();

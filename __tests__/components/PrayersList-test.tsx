@@ -4,7 +4,6 @@ import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { toDateKey } from '@/utils/date';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
@@ -42,6 +41,7 @@ const mockTheme = {
 };
 const mockTr = {
   prayers: { Imsak: 'Imsak', Fajr: 'Fajr', Sunrise: 'Sunrise', Dhuhr: 'Dhuhr', Asr: 'Asr', Maghrib: 'Maghrib', Isha: 'Isha' },
+  labels: { jummah: 'Xhumaja' },
 };
 const mockPrayerTimes = {
   Imsak: '04:30', Fajr: '04:50', Sunrise: '06:15',
