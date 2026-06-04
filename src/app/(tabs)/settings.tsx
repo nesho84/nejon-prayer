@@ -14,7 +14,9 @@ import { SpecialType } from "@/types/notification.types";
 import { Theme, THEMES } from "@/types/theme.types";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Slider from '@react-native-community/slider';
+import * as Application from "expo-application";
 import * as Haptics from "expo-haptics";
+import * as IntentLauncher from "expo-intent-launcher";
 import { useRef, useState } from "react";
 import {
     ActivityIndicator,
@@ -280,10 +282,25 @@ export default function SettingsScreen() {
     };
 
     // ------------------------------------------------------------
-    // Open Battery settings
+    // Open Battery Optimization settings
     // ------------------------------------------------------------
     const openBatteryOptimizationSettings = async () => {
         if (Platform.OS === "android") {
+            const packageName = Application.applicationId ?? "";
+            const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
+
+            if (batteryOptimizationEnabled) {
+                try {
+                    await IntentLauncher.startActivityAsync(
+                        "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+                        { data: `package:${packageName}` }
+                    );
+                    return;
+                } catch {
+                    // fallthrough...
+                }
+            }
+
             await notifee.openBatteryOptimizationSettings();
         } else {
             Linking.openSettings();
@@ -340,7 +357,7 @@ export default function SettingsScreen() {
                         {tr.labels.theme}
                     </Text>
                     <CustomPicker
-                        style={styles.picker}
+                        style={styles.selectPicker}
                         items={THEMES}
                         selectedValue={themeMode}
                         onValueChange={(value) => handleTheme(value as Theme)}
@@ -358,7 +375,7 @@ export default function SettingsScreen() {
                         {tr.labels.language}
                     </Text>
                     <CustomPicker
-                        style={styles.picker}
+                        style={styles.selectPicker}
                         items={LANGUAGES}
                         selectedValue={language}
                         onValueChange={(value) => handleLanguage(value as Language)}
@@ -588,8 +605,9 @@ export default function SettingsScreen() {
                             </View>
                         </View>
 
-                        {/* ------ Friday Reminder + Daily Reminder ------ */}
+                        {/* ------ Friday Reminder + Daily Quote Reminder ------ */}
                         <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                            {/* Firday Reminder */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr.labels.fridayReminder}
@@ -602,7 +620,9 @@ export default function SettingsScreen() {
                                     thumbColor={specials.Friday.enabled ? theme.border : theme.border}
                                 />
                             </View>
+                            {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                            {/* Daily Quote Reminder */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr.labels.dailyReminders}
@@ -617,11 +637,12 @@ export default function SettingsScreen() {
                             </View>
                         </View>
 
-                        {/* ------ Battery Optimization + Alarm ------ */}
+                        {/* ------ Battery & Alarms ------ */}
                         <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                            {/* Battery Optimization */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.batteryOptTitle} {batteryOptimization ? "" : "✅"}
+                                    {tr.labels.batteryOptTitle} {batteryOptimization ? "" : " ✅"}
                                 </Text>
                                 <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
                                     <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
@@ -632,21 +653,21 @@ export default function SettingsScreen() {
                                     {tr.labels.batteryOptBody}
                                 </Text>
                             }
-                            {(!alarmPermission && batteryOptimization) &&
-                                <>
-                                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                                    <View style={styles.statusRow}>
-                                        <Text style={[styles.statusText, { color: theme.text }]}>
-                                            {tr.labels.alarmAccessTitle}
-                                        </Text>
-                                        <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
-                                            <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
-                                        </Pressable>
-                                    </View>
-                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
-                                        {tr.labels.alarmAccessBody}
-                                    </Text>
-                                </>
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                            {/* Alarm & reminders */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr.labels.alarmAccessTitle} {!alarmPermission ? "" : " ✅"}
+                                </Text>
+                                <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                    <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
+                                </Pressable>
+                            </View>
+                            {!alarmPermission &&
+                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                    {tr.labels.alarmAccessBody}
+                                </Text>
                             }
                         </View>
 
@@ -654,7 +675,7 @@ export default function SettingsScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppLayout>
+        </AppLayout >
     );
 }
 
@@ -679,10 +700,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 20,
     },
-    picker: {
+    selectPicker: {
         width: '100%',
         marginTop: 8,
     },
+
     divider: {
         width: "100%",
         borderWidth: 1,
@@ -730,7 +752,6 @@ const styles = StyleSheet.create({
         gap: 6,
         marginVertical: 6,
     },
-
     presetBtn: {
         width: 30,
         height: 30,
@@ -750,7 +771,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-
     presetText: {
         fontSize: 16,
         fontWeight: '600',
@@ -773,16 +793,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 20,
-    },
-    errorButton: {
-        backgroundColor: '#FF3B30',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    errorButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
     },
 });
