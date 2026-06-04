@@ -19,7 +19,7 @@ import { PrayerCountdown } from "@/types/prayer.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as Updates from "expo-updates";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -38,7 +38,10 @@ export default function HomeScreen() {
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
 
-    // Next prayer countdown state
+    // Local State
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    // Prayers countdown state
     const {
         prevPrayer,
         currentPrayerName,
@@ -84,9 +87,13 @@ export default function HomeScreen() {
     }, []);
 
     // ------------------------------------------------------------
-    // Handle prayer times refresh
+    // Handle pull-to-refresh
     // ------------------------------------------------------------
-    const handlePrayersRefresh = useCallback(async () => {
+    const handleOnRefresh = useCallback(async () => {
+        // Trigger re-render for any child components using refreshKey
+        setRefreshKey((prev) => prev + 1);
+
+        // Reload prayer times
         try {
             await usePrayersStore.getState().loadPrayerTimes();
         } catch (err) {
@@ -134,7 +141,7 @@ export default function HomeScreen() {
                 message={prayersError || tr.labels.prayersError}
                 buttonText={tr.buttons.retry}
                 buttonColor={theme.danger}
-                onPress={handlePrayersRefresh}
+                onPress={handleOnRefresh}
             />
         );
     }
@@ -156,7 +163,7 @@ export default function HomeScreen() {
                 refreshControl={
                     <RefreshControl
                         refreshing={prayersLoading}
-                        onRefresh={handlePrayersRefresh}
+                        onRefresh={handleOnRefresh}
                         tintColor={theme.accent}
                         colors={[theme.accent]}
                     />
@@ -181,7 +188,7 @@ export default function HomeScreen() {
 
                 {/* 3. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
-                    <QuotesCarouselCard />
+                    <QuotesCarouselCard refreshKey={refreshKey} />
                 </AppCard>
 
                 {/* 3.1 QURAN Playing... CARD */}

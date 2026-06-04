@@ -15,10 +15,8 @@ const PrayerProgressCard = React.memo(() => {
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
 
-  // Prayers store
-  // Re-renders when new day's prayer times load — keeps today in sync after midnight
+  // Prayers store (keeps today in sync after midnight)
   const prayerTimesDate = usePrayersStore((state) => state.prayerTimesDate);
-
   // Prayers Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);
 
@@ -37,6 +35,9 @@ const PrayerProgressCard = React.memo(() => {
     router.navigate(`/(modals)/prayerTimings?date=${dateKey}`);
   };
 
+  // ------------------------------------------------------------
+  // ormatted date string badge based on current view and month rows
+  // ------------------------------------------------------------
   const formattedBadge = useMemo(() => {
     // Week view — always just current month/year
     if (progressView === 'week') {
@@ -77,9 +78,9 @@ const PrayerProgressCard = React.memo(() => {
   const renderDayCell = (
     dateKey: string,
     dateNumber: number,
-    opts: { isEmpty?: boolean; isPrevMonth?: boolean } = {}
+    options: { isEmpty?: boolean; isPrevMonth?: boolean } = {}
   ) => {
-    const { isEmpty = false, isPrevMonth = false } = opts;
+    const { isEmpty = false, isPrevMonth = false } = options;
     const isFuture = !isEmpty && !isPrevMonth && dateKey > today;
     const isToday = dateKey === today;
     const isPast = !isFuture && !isEmpty;

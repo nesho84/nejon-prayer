@@ -6,6 +6,10 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState, AppStateStatus, FlatList, LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 
+interface Props {
+    refreshKey?: number; // Optional (e.g., on pull-to-refresh)
+}
+
 // Constants for carousel behavior and appearance
 const MAX_QUOTES = 7; // max quotes to show in carousel
 const INSET = 12; // inset from container edges
@@ -24,7 +28,7 @@ const getDailyQuote = (language: Language = "en", random: boolean = false): stri
     return messages[new Date().getDate() % messages.length];
 };
 
-const QuotesCarouselCard = React.memo(() => {
+const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const language = useLanguageStore((state) => state.language);
@@ -47,7 +51,7 @@ const QuotesCarouselCard = React.memo(() => {
     // Generate random quotes
     // ------------------------------------------------------------
     const quotes = useMemo(() => {
-        const messages = QUOTES_TR[language] || QUOTES_TR["en"];
+        const messages = QUOTES_TR[language] || QUOTES_TR['en'];
         const limit = Math.min(MAX_QUOTES, messages.length);
         const arr: string[] = [];
         const usedQuotes = new Set<string>();
@@ -61,7 +65,7 @@ const QuotesCarouselCard = React.memo(() => {
         }
 
         return arr;
-    }, [language]);
+    }, [refreshKey, language]);
 
     // ------------------------------------------------------------
     // Scroll to index
@@ -114,11 +118,11 @@ const QuotesCarouselCard = React.memo(() => {
     }, [startInterval, stopInterval]);
 
     // ------------------------------------------------------------
-    // Reset scroll position when language changes
+    // Reset scroll position when language changes or quotes are refreshed
     // ------------------------------------------------------------
     useEffect(() => {
         scrollToIndex(0);
-    }, [language, scrollToIndex]);
+    }, [scrollToIndex, refreshKey, language]);
 
     // ------------------------------------------------------------
     // Re-scroll to current index on rotation (containerWidth change)
