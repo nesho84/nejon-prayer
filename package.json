@@ -1,6 +1,6 @@
 {
   "name": "nejon-prayer",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-community/datetimepicker": "9.1.0",
