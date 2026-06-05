@@ -87,7 +87,7 @@ export default function QuranSettingsScreen() {
   return (
     <ModalSheet
       ref={ModalSheetRef}
-      size="xlx"
+      size="xxl"
       colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
       footer={<FixedFooter />}
     >

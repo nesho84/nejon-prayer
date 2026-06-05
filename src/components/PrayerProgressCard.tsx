@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    gap: 8,
+    gap: 6,
   },
   monthBadgeText: {
     fontSize: 13,

@@ -100,7 +100,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                 styles.prayerRow,
                 {
                   backgroundColor: isCurrent ? theme.accentLight : theme.card,
-                  borderColor: isCurrent ? theme.accentLight : theme.borderCard
+                  borderColor: isCurrent ? theme.accentLight : theme.borderCard,
                 }
               ]}
             >
@@ -120,8 +120,8 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                   <Ionicons
                     name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
                     size={21}
-                    color={isPrayed ? theme.accent2 : theme.text2}
-                    style={{ opacity: isPrayed ? 1 : 0.45 }}
+                    color={isPrayed ? theme.islamicGreen : theme.text2}
+                    style={{ opacity: isPrayed ? 0.75 : 0.45 }}
                   />
                   {/* Prayer Name Text */}
                   <Text style={[styles.prayerNameText, { color: isCurrent ? theme.accent : theme.text2 }]}>
@@ -132,8 +132,17 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
 
                   {/* Xhumaja badge — Fridays only */}
                   {prayerName === 'Dhuhr' && isFriday && (
-                    <View style={[styles.xhumaBadge, { borderColor: isCurrent ? theme.accent : theme.islamicGreen }]}>
-                      <Text style={[styles.xhumaBadgeText, { color: isCurrent ? theme.accent : theme.islamicGreen }]}>
+                    <View style={[
+                      styles.xhumaBadge,
+                      {
+                        backgroundColor: isCurrent ? theme.accentLight : theme.surfaceBg,
+                        borderColor: isCurrent ? theme.accentLight : theme.borderCard
+                      }
+                    ]}>
+                      <Text style={[
+                        styles.xhumaBadgeText,
+                        { color: isCurrent ? theme.accent : theme.islamicGreen, opacity: isCurrent ? 1 : 0.8 }
+                      ]}>
                         {tr.labels.jummah ?? 'Xhumaja'}
                       </Text>
                     </View>
@@ -146,26 +155,17 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                   </Text>
                 </TouchableOpacity>
               ) : (
-                <View style={styles.prayerRowLeft}>
+                <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
                   {/* Left: Dash placeholder */}
-                  <Ionicons
-                    name="remove"
-                    size={21}
-                    color={theme.text2}
-                    style={{ opacity: 0.3 }}
-                  />
+                  <Ionicons name="remove" size={21} color={theme.text2} style={{ opacity: 0.3 }} />
                   {/* Prayer Name Text */}
-                  <Text style={[styles.prayerNameText, { color: theme.text2, opacity: 0.5 }]}>
-                    {tr.prayers[prayerName] || prayerName}
-                  </Text>
+                  <Text style={[styles.prayerNameText, { color: theme.text2 }]}>{tr.prayers[prayerName] || prayerName}</Text>
                   {/* Prayer Name Icon */}
-                  <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.5} />
+                  <PrayerIcon name={prayerName} size={18} color={theme.text2} />
                   {/* Horizontal Spacer */}
                   <View style={{ flex: 1 }} />
                   {/* Prayer Time */}
-                  <Text style={[styles.prayerTimeText, { color: theme.text2, opacity: 0.5 }]}>
-                    {prayerTime}
-                  </Text>
+                  <Text style={[styles.prayerTimeText, { color: theme.text2 }]}>{prayerTime}</Text>
                 </View>
               )}
 
@@ -233,15 +233,18 @@ const styles = StyleSheet.create({
     marginRight: 4,
     letterSpacing: 0.5,
   },
+
+  // Xhumaja Badge (Fridays only)
   xhumaBadge: {
     borderWidth: 1,
     borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    gap: 8,
   },
   xhumaBadgeText: {
-    fontSize: 9.5,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '600',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },

@@ -663,7 +663,7 @@ export const GLOBAL_TR = {
             prayerNotifBody: "Koha për Namaz",
             prayerRemindBody: "Kujtesë për Namaz",
             eventNotifBody: "Kujtesë për",
-            fridayTitle: "Xhuma",
+            fridayTitle: "E Xhuma",
             fridayBody: "Sot është e xhuma. Gjej kohë për namaz.",
             dailyQuoteTitle: "Përkujtues ditor",
             notificationSettings: "Cilësimet e njoftimeve",
