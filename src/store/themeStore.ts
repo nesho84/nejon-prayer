@@ -1,9 +1,9 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { mmkvStorage } from "@/store/storage";
 import { DARK_COLORS, LIGHT_COLORS } from "@/constants/colors";
+import { mmkvStorage } from "@/store/storage";
 import { ThemeColors } from "@/types/theme.types";
 import { Appearance } from "react-native";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type ThemeMode = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
@@ -26,7 +26,7 @@ export const useThemeStore = create<ThemeState>()(
       isReady: false,
 
       setTheme: (themeMode) => {
-        const systemTheme = Appearance.getColorScheme() || "light";
+        const systemTheme = (Appearance.getColorScheme() || "light") as ResolvedTheme;
         const resolved: ResolvedTheme = themeMode === "system" ? systemTheme : themeMode;
 
         set({
@@ -58,7 +58,7 @@ export const useThemeStore = create<ThemeState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Resolve theme based on persisted mode
-          const systemTheme = Appearance.getColorScheme() || "light";
+          const systemTheme = (Appearance.getColorScheme() || "light") as ResolvedTheme;
           const resolved: ResolvedTheme = state.themeMode === "system" ? systemTheme : state.themeMode;
           // Set resolved theme and theme colors
           state.resolvedTheme = resolved;

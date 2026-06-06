@@ -12,7 +12,7 @@ import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/
 import { toDateKey } from "@/utils/date";
 import { isTimePast } from "@/utils/time";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -104,13 +104,11 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Handle date picker change
     // ------------------------------------------------------------
-    const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
-        // Android: always close the modal dialog immediately
-        if (Platform.OS === 'android') {
-            setShowDatePicker(false);
-        }
+    const onDateChange = (event: DateTimePickerChangeEvent, date?: Date) => {
+        if (!date) return;
 
-        if (event.type === 'dismissed' || !date) return;
+        // Android: always close the modal dialog immediately
+        if (Platform.OS === 'android') setShowDatePicker(false);
 
         // Only update if the date actually changed
         if (
@@ -122,9 +120,7 @@ export default function PrayersSettingsScreen() {
         }
 
         // iOS: close only after a valid date is confirmed
-        if (Platform.OS === 'ios') {
-            setShowDatePicker(false);
-        }
+        if (Platform.OS === 'ios') setShowDatePicker(false);
     };
 
     // ------------------------------------------------------------
@@ -235,9 +231,10 @@ export default function PrayersSettingsScreen() {
                                 value={selectedDate}
                                 mode="date"
                                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                onChange={onDateChange}
                                 minimumDate={new Date(new Date().getFullYear(), 0, 1)}
                                 maximumDate={new Date(new Date().getFullYear(), 11, 31)}
+                                onValueChange={onDateChange}
+                                onDismiss={() => setShowDatePicker(false)}
                             />
                         )}
 
