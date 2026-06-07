@@ -73,6 +73,7 @@
       "expo-router",
       "expo-font",
       "@react-native-community/datetimepicker",
+      "react-native-notify-kit",
       [
         "expo-splash-screen",
         {
