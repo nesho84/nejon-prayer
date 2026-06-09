@@ -30,6 +30,7 @@ const ALADHAN_LATITUDE_ADJUSTMENT = 2;
 // Country → Aladhan calculation method mapping
 // Based on the closest Islamic authority per region.
 // Falls back to MWL (3) for unlisted countries.
+// Only countries with a non-MWL method are listed explicitly.
 // ------------------------------------------------------------
 const COUNTRY_METHOD_MAP: Record<string, number> = {
     // North Africa
@@ -41,28 +42,29 @@ const COUNTRY_METHOD_MAP: Record<string, number> = {
     MA: 21, // Morocco
     // Middle East
     SA: 4,  // Saudi Arabia — Umm Al-Qura
-    AE: 16, // UAE — Dubai
+    AE: 16, // UAE — IACAD (Dubai)
     KW: 9,  // Kuwait
     QA: 10, // Qatar
     BH: 8,  // Bahrain — Gulf Region
-    OM: 8,  // Oman
-    IQ: 3,  // Iraq — MWL
-    SY: 3,  // Syria
+    OM: 8,  // Oman — Gulf Region
     JO: 23, // Jordan
-    LB: 3,  // Lebanon
-    PS: 3,  // Palestine
-    YE: 3,  // Yemen
     IR: 7,  // Iran — Tehran
+    SY: 5,  // Syria — Egyptian
+    LB: 5,  // Lebanon — Egyptian
+    // East Africa (Horn)
+    SO: 5,  // Somalia — Egyptian
+    DJ: 5,  // Djibouti — Egyptian
     // South Asia
     PK: 1,  // Pakistan — Karachi
-    IN: 1,  // India
-    BD: 1,  // Bangladesh
-    AF: 1,  // Afghanistan
+    IN: 1,  // India — Karachi
+    BD: 1,  // Bangladesh — Karachi
+    AF: 1,  // Afghanistan — Karachi
     // Southeast Asia
     MY: 17, // Malaysia — JAKIM
-    SG: 11, // Singapore
+    BN: 17, // Brunei — JAKIM
+    SG: 11, // Singapore — MUIS
     ID: 20, // Indonesia — Kemenag
-    // Turkey & Balkans + Europe (Turkish/Diyanet community)
+    // Turkey & Balkans
     TR: 13, // Turkey — Diyanet
     AT: 13, // Austria
     DE: 13, // Germany
@@ -76,26 +78,29 @@ const COUNTRY_METHOD_MAP: Record<string, number> = {
     ME: 13, // Montenegro
     RS: 13, // Serbia
     // Western Europe
+    GB: 15, // UK — Moonsighting Committee Worldwide
     FR: 12, // France — UOIF
     PT: 22, // Portugal
     // Russia & Central Asia
     RU: 14, // Russia
     KZ: 14, // Kazakhstan
     UZ: 1,  // Uzbekistan — Karachi
-    TJ: 1,  // Tajikistan
-    TM: 1,  // Turkmenistan
-    KG: 1,  // Kyrgyzstan
+    TJ: 1,  // Tajikistan — Karachi
+    TM: 1,  // Turkmenistan — Karachi
+    KG: 1,  // Kyrgyzstan — Karachi
     // North America
     US: 2,  // USA — ISNA
-    CA: 2,  // Canada
-    // Oceania
-    AU: 3,  // Australia — MWL
-    NZ: 3,  // New Zealand
+    CA: 2,  // Canada — ISNA
 };
 
-// Helper to get calculation method for a given country code, with fallback
-export function getMethodForCountry(countryCode: string): number {
-    return COUNTRY_METHOD_MAP[countryCode] ?? 3; // fallback to MWL
+// Get calculation method for a given country code, with safe fallback
+export function getMethodForCountry(countryCode: string | null | undefined): number {
+    if (!countryCode) return 3; // fallback to MWL
+
+    const normalizedCode = countryCode.trim().toUpperCase();
+
+    // Explicitly return mapped ID, or fallback to MWL (3)
+    return COUNTRY_METHOD_MAP[normalizedCode] ?? 3;
 }
 
 // ------------------------------------------------------------

@@ -186,20 +186,19 @@ export default function HomeScreen() {
                     />
                 </AppCard>
 
-                {/* 3. QUOTES Carousel CARD */}
+                {/* 2. QUOTES Carousel CARD */}
                 <AppCard style={styles.quotesCard}>
                     <QuotesCarouselCard refreshKey={refreshKey} />
                 </AppCard>
 
-                {/* 3.1 QURAN Playing... CARD */}
+                {/* 3. QURAN Playing... CARD */}
                 <QuranPlaying />
 
-                {/* 4. PRAYERS LIST CARD */}
-                <AppCard style={styles.prayersListCard}>
-
+                {/* 4. PRAYERS LIST/TIMES CARD */}
+                <AppCard style={styles.prayersListContainer}>
                     {/* Prayers Date Header */}
                     <TouchableOpacity
-                        style={[styles.prayersDateHeader, { backgroundColor: 'rgba(0,0,0,0.02)' }]}
+                        style={[styles.prayersListHeader, { backgroundColor: 'rgba(0,0,0,0.02)' }]}
                         delayPressIn={0}
                         delayPressOut={0}
                         activeOpacity={0.3}
@@ -210,20 +209,18 @@ export default function HomeScreen() {
                         <View style={styles.calendarLeftIcon}>
                             <Ionicons name="calendar-outline" size={22} color={theme.text} style={{ opacity: 0.6 }} />
                         </View>
-
-                        {/* Center: Date & Timezone Container */}
-                        <View style={styles.dateContainer}>
-                            <Text style={[styles.dateHeaderText, { color: theme.text2 }]}>
+                        {/* Center: Date & Location/Timezone */}
+                        <View style={styles.dateLocationRow}>
+                            <Text style={[styles.dateInfoText, { color: theme.text2, opacity: 0.9 }]}>
                                 {formattedDateHeader}
                             </Text>
-                            <View style={styles.locationInfo}>
+                            <View style={styles.locationInfoRow}>
                                 <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginTop: 0.7 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                     {timeZone?.location || "Location"}
                                 </Text>
                             </View>
                         </View>
-
                         {/* Right: Chevron icon */}
                         <View style={styles.chevronRightIcon}>
                             <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.5 }} />
@@ -239,7 +236,6 @@ export default function HomeScreen() {
                         prayerTimesDate={prayerTimesDate}
                         currentPrayerName={currentPrayerName}
                     />
-
                 </AppCard>
 
                 {/* 5. PRAYER PROGRESS CARD */}
@@ -248,7 +244,7 @@ export default function HomeScreen() {
                 </AppCard>
 
             </ScrollView>
-        </AppLayout >
+        </AppLayout>
     );
 }
 
@@ -267,33 +263,34 @@ const styles = StyleSheet.create({
     },
 
     // Prayers List Card
-    prayersListCard: {
+    prayersListContainer: {
         overflow: 'hidden',
     },
-
-    // Prayer Card - Date Header
-    prayersDateHeader: {
+    // Prayer List - Header
+    prayersListHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 10,
         paddingHorizontal: 12,
     },
-    dateContainer: {
+    calendarLeftIcon: {
+        width: 32,
+        height: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dateLocationRow: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    dateHeaderText: {
-        fontSize: 15,
+    dateInfoText: {
+        fontSize: 14,
         fontWeight: '500',
         marginBottom: 4,
     },
-    prayersTimezoneInfo: {
-        fontSize: 12,
-        opacity: 0.7,
-    },
-    locationInfo: {
+    locationInfoRow: {
         flexDirection: 'row',
         alignItems: 'center',
         maxWidth: '100%',
@@ -303,12 +300,6 @@ const styles = StyleSheet.create({
     locationInfoText: {
         fontSize: 13,
         letterSpacing: 0.3,
-    },
-    calendarLeftIcon: {
-        width: 32,
-        height: 32,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     chevronRightIcon: {
         width: 32,

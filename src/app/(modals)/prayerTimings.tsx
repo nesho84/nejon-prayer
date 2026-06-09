@@ -170,13 +170,13 @@ export default function PrayersSettingsScreen() {
                     style={[
                         globalStyles.modalButton,
                         styles.todayButton,
-                        { backgroundColor: isToday() ? theme.overlay : theme.accent2 }
+                        { backgroundColor: theme.overlay, opacity: isToday() ? 0.6 : 1 }
                     ]}
                     onPress={() => setSelectedDate(new Date())}
                     disabled={isToday()}
                 >
-                    <Ionicons name="today" size={20} color={isToday() ? theme.placeholder : theme.text} />
-                    <Text style={[globalStyles.modalButtonText, { color: isToday() ? theme.placeholder : theme.text }]}>
+                    <Ionicons name="today" size={16} color={isToday() ? theme.placeholder : theme.accent} />
+                    <Text style={[globalStyles.modalButtonText, { color: isToday() ? theme.placeholder : theme.accent }]}>
                         {tr.buttons.today}
                     </Text>
                 </TouchableOpacity>
@@ -261,16 +261,16 @@ export default function PrayersSettingsScreen() {
                 </AppCard>
 
                 {/* PRAYER TIMES CARD */}
-                <AppCard style={styles.prayersCard}>
-                    {/* Timezone Container */}
-                    <View style={styles.timezoneContainer}>
-                        <View style={styles.timezoneInfo}>
-                            <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginTop: 2 }} />
-                            <Text style={[styles.timezoneTitle, { color: theme.text2 }]}>
+                <AppCard style={styles.prayersListContainer}>
+                    {/* Location & Timezone */}
+                    <View style={[styles.prayersListHeader, { backgroundColor: 'rgba(0,0,0,0.02)' }]}>
+                        <View style={styles.locationInfoRow}>
+                            <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginTop: 3 }} />
+                            <Text style={[styles.locationInfoText, { color: theme.text2 }]}>
                                 {timeZone?.location || ""}
                             </Text>
                         </View>
-                        <Text style={[styles.timezoneSubtitle, { color: theme.text2 }]}>
+                        <Text style={[styles.timezoneInfoText, { color: theme.text2 }]}>
                             {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
                         </Text>
                     </View>
@@ -377,8 +377,7 @@ export default function PrayersSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-
-    // Header
+    // Header styles
     headerContainer: {
         alignItems: 'center',
         paddingHorizontal: 16,
@@ -423,31 +422,30 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Prayers Card
-    prayersCard: {
+    // Prayers List Card
+    prayersListContainer: {
         overflow: 'hidden',
     },
-
-    // Prayer Card - Date Header
-    timezoneContainer: {
+    // Prayer List - Header
+    prayersListHeader: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
         paddingHorizontal: 12,
     },
-    timezoneInfo: {
+    locationInfoRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 4,
+        marginBottom: 6,
         gap: 8,
     },
-    timezoneTitle: {
+    locationInfoText: {
         fontSize: 17,
-        fontWeight: '600',
+        fontWeight: '500',
     },
-    timezoneSubtitle: {
+    timezoneInfoText: {
         fontSize: 13,
         opacity: 0.7,
     },

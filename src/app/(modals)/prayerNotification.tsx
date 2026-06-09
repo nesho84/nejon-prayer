@@ -223,7 +223,11 @@ export default function PrayersSettingsScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[globalStyles.modalButton, styles.saveButton, { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }]}
+                    style={[
+                        globalStyles.modalButton,
+                        styles.saveButton,
+                        { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }
+                    ]}
                     onPress={handleSave}
                     disabled={!notificationPermission}
                 >

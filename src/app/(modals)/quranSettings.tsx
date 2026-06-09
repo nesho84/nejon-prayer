@@ -72,7 +72,11 @@ export default function QuranSettingsScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[globalStyles.modalButton, styles.saveButton, { backgroundColor: theme.overlay }]}
+          style={[
+            globalStyles.modalButton,
+            styles.saveButton,
+            { backgroundColor: theme.overlay }
+          ]}
           onPress={handleSave}
         >
           <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
