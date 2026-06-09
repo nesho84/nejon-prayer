@@ -671,7 +671,7 @@ export const GLOBAL_TR = {
             notificationTime: "Koha e njoftimit",
             notificationSound: "Zëri i njoftimit",
             noSound: "🔕  Pa zë",
-            notificationsDisabled: "Njoftimet janë Çaktivizuar",
+            notificationsDisabled: "Njoftimet janë çaktivizuar",
             notificationsDisabledMessage: "Për të marrë kujtesa lutjesh, ju lutemi aktivizoni njoftimet në cilësimet e sistemit.",
             // Notifications settings
             volume: "Volumi i zërit",

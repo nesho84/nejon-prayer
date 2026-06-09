@@ -14,7 +14,7 @@ import { isTimePast } from "@/utils/time";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function PrayersSettingsScreen() {
@@ -127,6 +127,17 @@ export default function PrayersSettingsScreen() {
     // Check if selected date is today
     // ------------------------------------------------------------
     const isToday = () => isSelectedToday;
+
+    // ------------------------------------------------------------
+    // Handle marking/unmarking prayers as prayed
+    // ------------------------------------------------------------
+    const handleMark = useCallback((prayerName: PrayerName, isPrayed: boolean, isPast: boolean) => {
+        if (!isPast) return;
+
+        isPrayed
+            ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
+            : markPrayed(prayerName as PrayerName, selectedDateKey);
+    }, [markPrayed, unmarkPrayed, selectedDateKey]);
 
     // ------------------------------------------------------------
     // Handle close
@@ -282,60 +293,60 @@ export default function PrayersSettingsScreen() {
 
                                 return (
                                     <View key={prayerName}>
-                                        {/* Prayer row */}
+                                        {/* Mark/unmark area (trackable) or plain view (non-trackable) */}
                                         <View style={styles.prayerRow}>
                                             {isTrackable ? (
                                                 <TouchableOpacity
-                                                    style={styles.prayerRowContent}
+                                                    style={styles.prayerRowLeft}
                                                     activeOpacity={0.3}
                                                     delayPressIn={0}
                                                     delayPressOut={0}
                                                     hitSlop={8}
                                                     onPress={() => {
-                                                        if (!isPast) return;
-                                                        isPrayed
-                                                            ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
-                                                            : markPrayed(prayerName as PrayerName, selectedDateKey);
+                                                        handleMark(prayerName as PrayerName, isPrayed, isPast);
                                                     }}
                                                 >
+                                                    {/* Left: Tracking circle */}
                                                     <Ionicons
                                                         name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
                                                         size={21}
-                                                        color={isPrayed ? theme.accent2 : theme.text2}
-                                                        style={{ opacity: isPrayed ? 1 : 0.45 }}
+                                                        color={isPrayed ? theme.islamicGreen : theme.text2}
+                                                        style={{ opacity: isPrayed ? 0.8 : 0.4 }}
                                                     />
+                                                    {/* Prayer Name Text */}
                                                     <Text style={[styles.prayerNameText, { color: theme.text }]}>
                                                         {tr.prayers[prayerName] || prayerName}
                                                     </Text>
+                                                    {/* Prayer Name Icon */}
                                                     <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.7} />
+                                                    {/* Horizontal Spacer */}
                                                     <View style={{ flex: 1 }} />
+                                                    {/* Prayer Time */}
                                                     <Text style={[styles.prayerTimeText, { color: theme.text }]}>
                                                         {prayerTime}
                                                     </Text>
                                                 </TouchableOpacity>
                                             ) : (
-                                                <View style={[styles.prayerRowContent, { opacity: 0.5 }]}>
-                                                    <Ionicons
-                                                        name="remove"
-                                                        size={21}
-                                                        color={theme.text2}
-                                                        style={{ opacity: 0.3 }}
-                                                    />
+                                                <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
+                                                    {/* Left: Dash placeholder */}
+                                                    <Ionicons name="remove" size={21} color={theme.placeholder} />
+                                                    {/* Prayer Name Text */}
                                                     <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
                                                         {tr.prayers[prayerName] || prayerName}
                                                     </Text>
-                                                    <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.5} />
+                                                    {/* Prayer Name Icon */}
+                                                    <PrayerIcon name={prayerName} size={18} color={theme.text2} />
+                                                    {/* Horizontal Spacer */}
                                                     <View style={{ flex: 1 }} />
-                                                    <Text style={[styles.prayerTimeText, { color: theme.text2 }]}>
-                                                        {prayerTime}
-                                                    </Text>
+                                                    {/* Prayer Time */}
+                                                    <Text style={[styles.prayerTimeText, { color: theme.text2 }]}>{prayerTime}</Text>
                                                 </View>
                                             )}
                                         </View>
 
                                         {/* Prayer Divider */}
                                         {!isLast && (
-                                            <View style={[styles.prayerDivider, { backgroundColor: theme.divider2 }]} />
+                                            <View style={[styles.prayerDivider, { backgroundColor: theme.borderCard }]} />
                                         )}
                                     </View>
                                 );
@@ -450,7 +461,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'stretch',
     },
-    prayerRowContent: {
+    prayerRowLeft: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
@@ -461,11 +472,13 @@ const styles = StyleSheet.create({
     prayerNameText: {
         fontSize: 16,
         fontWeight: '500',
+        lineHeight: 24,
     },
     prayerTimeText: {
         fontSize: 16,
         fontWeight: '600',
-        letterSpacing: 0.3,
+        marginRight: 4,
+        letterSpacing: 0.5,
     },
     prayerDivider: {
         height: 1,

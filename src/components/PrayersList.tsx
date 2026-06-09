@@ -121,7 +121,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                     name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
                     size={21}
                     color={isPrayed ? theme.islamicGreen : theme.text2}
-                    style={{ opacity: isPrayed ? 0.75 : 0.45 }}
+                    style={{ opacity: isPrayed ? 0.8 : 0.4 }}
                   />
                   {/* Prayer Name Text */}
                   <Text style={[styles.prayerNameText, { color: isCurrent ? theme.accent : theme.text2 }]}>
@@ -157,9 +157,11 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
               ) : (
                 <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
                   {/* Left: Dash placeholder */}
-                  <Ionicons name="remove" size={21} color={theme.text2} style={{ opacity: 0.3 }} />
+                  <Ionicons name="remove" size={21} color={theme.placeholder} />
                   {/* Prayer Name Text */}
-                  <Text style={[styles.prayerNameText, { color: theme.text2 }]}>{tr.prayers[prayerName] || prayerName}</Text>
+                  <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
+                    {tr.prayers[prayerName] || prayerName}
+                  </Text>
                   {/* Prayer Name Icon */}
                   <PrayerIcon name={prayerName} size={18} color={theme.text2} />
                   {/* Horizontal Spacer */}
@@ -208,7 +210,6 @@ const styles = StyleSheet.create({
   prayerRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    justifyContent: 'flex-start',
     paddingVertical: 4,
     paddingHorizontal: 4,
     borderWidth: 1.3,
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   prayerNameText: {
     fontSize: 16,
     fontWeight: '500',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   prayerTimeText: {
     fontSize: 16,
