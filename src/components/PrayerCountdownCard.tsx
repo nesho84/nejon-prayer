@@ -50,7 +50,7 @@ const PrayerCountdownCard = React.memo(({
   const strokeDashoffset = Math.max(circumference * (1 - progress), strokeWidth); // New
 
   return (
-    <View style={styles.row}>
+    <View style={styles.container}>
 
       {/* LEFT: Previous prayer */}
       <View style={styles.sideColumn}>
@@ -134,9 +134,11 @@ const PrayerCountdownCard = React.memo(({
 export default PrayerCountdownCard;
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     gap: 10,
   },
   circleWrapper: {

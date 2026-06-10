@@ -40,7 +40,7 @@ export const usePrayersStore = create<PrayersState>()(
 
       // Load prayer times (uses existing location)
       loadPrayerTimes: async () => {
-        set({ isLoading: true, prayersError: null, prayersOutdated: false });
+        set({ prayersError: null, prayersOutdated: false });
 
         try {
           const location = useLocationStore.getState().location;
@@ -66,7 +66,7 @@ export const usePrayersStore = create<PrayersState>()(
             const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
             if (todaysTimes) {
               set({ prayerTimes: todaysTimes, prayerTimesDate: todayKey, prayersOutdated: false });
-              console.log('💾 [prayersStore] Prayer times loaded from storage yearly data');
+              console.log('💾 [prayersStore] Prayer times loaded from storage');
               return;
             }
           }
@@ -168,7 +168,7 @@ export const usePrayersStore = create<PrayersState>()(
 
     }),
     {
-      name: 'prayers-storage-v3',
+      name: 'prayers-storage-v4',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         prayerTimes: state.prayerTimes,

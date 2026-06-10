@@ -224,6 +224,8 @@ export default PrayerProgressCard;
 
 const styles = StyleSheet.create({
   container: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
     gap: 10,
   },
 

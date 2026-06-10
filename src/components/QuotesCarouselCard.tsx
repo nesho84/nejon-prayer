@@ -249,11 +249,11 @@ const styles = StyleSheet.create({
     dotsContainer: {
         flexDirection: "row",
         justifyContent: "center",
-        gap: 6,
+        gap: 5,
     },
     dot: {
-        width: 6,
-        height: 6,
+        width: 5.5,
+        height: 5.5,
         borderRadius: 3,
     },
 });
