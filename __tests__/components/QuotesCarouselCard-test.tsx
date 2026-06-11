@@ -2,7 +2,6 @@ import QuotesCarouselCard from '@/components/QuotesCarouselCard';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -31,9 +30,17 @@ describe('QuotesCarouselCard', () => {
   it('renders quotes after layout is measured', () => {
     const { getByTestId, UNSAFE_getAllByType } = render(<QuotesCarouselCard />);
     const { View } = require('react-native');
+
     // fire onLayout to set containerWidth
-    const rootView = UNSAFE_getAllByType(View)[0];
-    fireEvent(rootView, 'layout', { nativeEvent: { layout: { width: 300 } } });
+    const views = UNSAFE_getAllByType(View);
+    const layoutView = views.find(v => v.props.onLayout);
+
+    if (!layoutView) {
+      throw new Error('onLayout View not found');
+    }
+
+    fireEvent(layoutView, 'layout', { nativeEvent: { layout: { width: 300 } } });
+
     // After layout, FlatList should be rendered
     expect(screen.getAllByTestId('icon-book-outline').length).toBeGreaterThan(0);
   });
