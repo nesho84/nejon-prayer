@@ -16,3 +16,10 @@ export const keyToDate = (dateKey: string): Date => {
   return new Date(y, m - 1, d);
 };
 
+// ------------------------------------------------------------
+// Formats a YYYY-MM-DD date key into a more human-friendly format like "DD.MM.YYYY"
+// ------------------------------------------------------------
+export const formatDateKey = (dateKey: string): string => {
+  const [y, m, d] = dateKey.split('-');
+  return `${d}.${m}.${y}`;
+};

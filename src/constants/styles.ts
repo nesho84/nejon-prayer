@@ -148,7 +148,7 @@ export const globalStyles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Card shadow
+  // AppCard shadow
   cardShadow: {
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

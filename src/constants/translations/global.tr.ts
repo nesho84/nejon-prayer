@@ -60,6 +60,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Please allow location access to detect your city and display the correct prayer times.",
             gpsOfflineWarningTitle: "No Internet Connection",
             gpsOfflineWarningMessage: "Without internet, GPS may take several minutes and only works outdoors.\n\nFor faster results, connect to internet first.",
+            // Holidays
+            daysUntil: "in",
+            days: "days",
             // Compass
             compasAligned: "Aligned with Qibla",
             compasNotAligned: "Rotate until arrow points upward",
@@ -256,6 +259,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Bitte erlauben Sie den Standortzugriff, um Ihre Stadt zu erkennen und genaue Gebetszeiten anzuzeigen.",
             gpsOfflineWarningTitle: "Keine Internetverbindung",
             gpsOfflineWarningMessage: "Ohne Internet kann GPS mehrere Minuten dauern und funktioniert nur im Freien.\n\nUm schnellere Ergebnisse zu erzielen, stellen Sie zuerst eine Verbindung zum Internet her.",
+            // Holidays
+            daysUntil: "in",
+            days: "Tage",
             // Compass
             compasAligned: "Auf Qibla ausgerichtet",
             compasNotAligned: "Drehen, bis der Pfeil nach oben zeigt",
@@ -452,6 +458,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Veuillez autoriser l'accès à la localisation pour détecter votre ville et afficher les horaires de prière corrects.",
             gpsOfflineWarningTitle: "Pas de connexion Internet",
             gpsOfflineWarningMessage: "Sans Internet, le GPS peut prendre plusieurs minutes et ne fonctionne qu'en extérieur.\n\nPour des résultats plus rapides, connectez-vous d'abord à Internet.",
+            // Holidays
+            daysUntil: "dans",
+            days: "jours",
             // Compass
             compasAligned: "Aligné avec la Qibla",
             compasNotAligned: "Tournez jusqu'à ce que la flèche pointe vers le haut",
@@ -648,6 +657,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Ju lutemi lejoni qasjen e lokacionit për të përcaktuar qytetin tuaj dhe për të shfaqur oraret e sakta të lutjeve.",
             gpsOfflineWarningTitle: "Nuk ka lidhje interneti",
             gpsOfflineWarningMessage: "Pa internet, GPS-i mund të zgjasë disa minuta dhe funksionon vetëm jashtë.\n\nPër rezultate më të shpejta, lidheni së pari me internet.",
+            // Holidays
+            daysUntil: "pas",
+            days: "ditë",
             // Compass
             compasAligned: "I rreshtuar me Kiblën",
             compasNotAligned: "Rrotullo derisa shigjeta të tregojë nga lart",
@@ -839,6 +851,10 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Molimo dozvolite pristup lokaciji za detekciju vašeg grada i prikaz ispravnih vremena namaza.",
             gpsOfflineWarningTitle: "Nema internet veze",
             gpsOfflineWarningMessage: "Bez interneta, GPS može potrajati nekoliko minuta i radi samo na otvorenom.\n\nZa brže rezultate, prvo se povežite na internet.",
+            // Holidays
+            daysUntil: "za",
+            days: "dana",
+            // Compass
             compasAligned: "Poravnato s Kiblom",
             compasNotAligned: "Okrenite dok strelica ne pokazuje prema gore",
             compassWarning1: "Držite uređaj ravno",
@@ -1017,6 +1033,10 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Дозволете пристап до локацијата за откривање на вашиот град и приказ на точните времиња на намаз.",
             gpsOfflineWarningTitle: "Нема интернет врска",
             gpsOfflineWarningMessage: "Без интернет, GPS може да потрае неколку минути и работи само на отворено.\n\nЗа побрзи резултати, прво поврзете се на интернет.",
+            // Holidays
+            daysUntil: "za",
+            days: "дена",
+            // Compass
             compasAligned: "Порамнето со Кибла",
             compasNotAligned: "Вртете додека стрелката не покажува нагоре",
             compassWarning1: "Држете го уредот рамно",
@@ -1200,6 +1220,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "Lütfen konum erişimine izin verin, böylece şehrinizi belirleyebilir ve doğru namaz vakitlerini gösterebiliriz.",
             gpsOfflineWarningTitle: "İnternet Bağlantısı Yok",
             gpsOfflineWarningMessage: "İnternet olmadan GPS birkaç dakika sürebilir ve sadece dışarıda çalışır.\n\nDaha hızlı sonuçlar için önce internete bağlanın.",
+            // Holidays
+            daysUntil: "in",
+            days: "gün",
             // Compass
             compasAligned: "Kıble ile hizalanmış",
             compasNotAligned: "Yukarıdaki oku gösterecek şekilde cihazı döndürün",
@@ -1396,6 +1419,9 @@ export const GLOBAL_TR = {
             locationDeniedMessage: "يرجى السماح بالوصول إلى الموقع لاكتشاف مدينتك وعرض أوقات الصلاة الصحيحة.",
             gpsOfflineWarningTitle: "لا يوجد اتصال بالإنترنت",
             gpsOfflineWarningMessage: "بدون إنترنت قد يستغرق GPS عدة دقائق ولا يعمل إلا في الأماكن المفتوحة.\n\nلنتائج أسرع، اتصل بالإنترنت أولًا.",
+            // Holidays
+            daysUntil: "في",
+            days: "أيام",
             // Compass
             compasAligned: "متجه نحو القبلة",
             compasNotAligned: "قم بتدوير الجهاز حتى يشير السهم للأعلى",

@@ -15,8 +15,8 @@ const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon
 const MORE_APPS_GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/developer?id=Neshat%20Ademi';
 // const MORE_APPS_GOOGLE_PLAY_URL = 'https://play.google.com/store/search?q=nejon&c=apps'; // Alternative search URL
 
-// const MORE_APPS_APP_STORE_URL = 'https://apps.apple.com/developer/nejon/'; // TODO: Add correct App Store developer page URL
 // const APPLE_STORE_URL = 'https://apps.apple.com/app/nejon-prayer/idXXXXXXXXX'; // TODO: Add Apple App Store URL
+// const MORE_APPS_APP_STORE_URL = 'https://apps.apple.com/developer/nejon/'; // TODO: Add correct App Store developer page URL
 
 export default function AboutScreen() {
     // Stores

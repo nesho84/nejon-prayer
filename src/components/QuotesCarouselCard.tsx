@@ -178,43 +178,47 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
     ), [itemWidth, theme.accent, theme.text2]);
 
     return (
-        <View onLayout={(e: LayoutChangeEvent) => setContainerWidth(e.nativeEvent.layout.width)}>
-            {containerWidth !== null && (
-                <>
-                    {/* Quote Carousel */}
-                    <FlatList
-                        ref={flatListRef}
-                        data={quotes}
-                        keyExtractor={(_, idx) => idx.toString()}
-                        renderItem={renderQuoteCard}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        initialNumToRender={7}
-                        maxToRenderPerBatch={7}
-                        scrollEventThrottle={16}
-                        snapToInterval={itemWidth + SPACING}
-                        snapToAlignment="start"
-                        decelerationRate="fast"
-                        onMomentumScrollEnd={handleScroll}
-                        onScrollBeginDrag={handleScrollBeginDrag}
-                        getItemLayout={(_, idx) => ({
-                            length: itemWidth,
-                            offset: (itemWidth + SPACING) * idx,
-                            index: idx,
-                        })}
-                    />
+        <View style={[styles.container, { backgroundColor: theme.card }]}>
 
-                    {/* Dots */}
-                    <View style={styles.dotsContainer}>
-                        {quotes.map((_, idx) => (
-                            <View
-                                key={idx}
-                                style={[styles.dot, { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight }]}
-                            />
-                        ))}
-                    </View>
-                </>
-            )}
+            <View onLayout={(e: LayoutChangeEvent) => setContainerWidth(e.nativeEvent.layout.width)}>
+                {containerWidth !== null && (
+                    <>
+                        {/* Quote Carousel */}
+                        <FlatList
+                            ref={flatListRef}
+                            data={quotes}
+                            keyExtractor={(_, idx) => idx.toString()}
+                            renderItem={renderQuoteCard}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            initialNumToRender={7}
+                            maxToRenderPerBatch={7}
+                            scrollEventThrottle={16}
+                            snapToInterval={itemWidth + SPACING}
+                            snapToAlignment="start"
+                            decelerationRate="fast"
+                            onMomentumScrollEnd={handleScroll}
+                            onScrollBeginDrag={handleScrollBeginDrag}
+                            getItemLayout={(_, idx) => ({
+                                length: itemWidth,
+                                offset: (itemWidth + SPACING) * idx,
+                                index: idx,
+                            })}
+                        />
+
+                        {/* Dots */}
+                        <View style={styles.dotsContainer}>
+                            {quotes.map((_, idx) => (
+                                <View
+                                    key={idx}
+                                    style={[styles.dot, { backgroundColor: idx === activeIndex ? theme.accent : theme.accentLight }]}
+                                />
+                            ))}
+                        </View>
+                    </>
+                )}
+            </View>
+
         </View>
     );
 });
@@ -222,6 +226,18 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
 export default QuotesCarouselCard;
 
 const styles = StyleSheet.create({
+    container: {
+        paddingTop: 6,
+        paddingBottom: 9,
+        paddingHorizontal: 12,
+        // Card Shadow
+        borderRadius: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+
     header: {
         flexDirection: "row",
         alignItems: "center",

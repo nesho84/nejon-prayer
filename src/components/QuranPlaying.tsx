@@ -1,4 +1,3 @@
-import { globalStyles } from "@/constants/styles";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -92,30 +91,36 @@ const QuranPlaying = React.memo(() => {
 
         <View style={[
           styles.container,
-          globalStyles.cardShadow,
           {
-            opacity: pressed ? 0.7 : 1,
             backgroundColor: theme.card,
-            borderColor: theme.divider
+            borderColor: theme.divider,
+            opacity: pressed ? 0.7 : 1,
           }
-        ]}
-        >
+        ]}>
           {/* Left */}
           <View style={styles.leftContainer}>
-            <Ionicons name="play-circle" size={18} color={theme.accent} />
-            <Text style={[styles.surahText, { color: theme.accent }]} numberOfLines={1}>
+            <Ionicons
+              name={isPlaying ? "play-circle" : "pause-circle"}
+              size={18}
+              color={isPlaying ? theme.accent : theme.accent2}
+            />
+            <Text style={[styles.surahText, { color: isPlaying ? theme.accent : theme.accent2 }]} numberOfLines={1}>
               {activeSurahName ?? "Quran is playing..."}
             </Text>
           </View>
 
           {/* Center */}
           <View style={styles.waveformContainer}>
-            <WaveformBars color={theme.accent} isActive={isActive} isPlaying={isPlaying} />
+            <WaveformBars color={isPlaying ? theme.accent : theme.accent2} isActive={isActive} isPlaying={isPlaying} />
           </View>
 
           {/* Right */}
           <View style={styles.rightContainer}>
-            <Ionicons name="chevron-forward-outline" size={18} color={theme.accent} />
+            <Ionicons
+              name="chevron-forward-outline"
+              size={18}
+              color={isPlaying ? theme.accent : theme.accent2}
+            />
           </View>
         </View>
 
@@ -133,7 +138,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 8,
     paddingHorizontal: 20,
+    // Card Shadow
     borderRadius: 16,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
 
   // Left side with icon and text
@@ -145,6 +155,7 @@ const styles = StyleSheet.create({
   },
   surahText: {
     fontSize: 14,
+    lineHeight: 16,
     fontWeight: "500",
     flexShrink: 1,
   },

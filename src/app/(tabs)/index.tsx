@@ -2,6 +2,7 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
+import IslamicHolidaysCard from "@/components/IslamicHolidaysCard";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
@@ -171,7 +172,7 @@ export default function HomeScreen() {
             >
 
                 {/* 1. COUNTDOWN CARD */}
-                <AppCard style={styles.countdownCard}>
+                <AppCard>
                     <PrayerCountdownCard
                         prevPrayer={prevPrayer}
                         nextPrayerName={nextPrayerName}
@@ -179,22 +180,21 @@ export default function HomeScreen() {
                         prayerCountdown={prayerCountdown as PrayerCountdown}
                         remainingSeconds={remainingSeconds}
                         totalSeconds={totalSeconds}
-                        size={158}
+                        size={155}
                         strokeWidth={6}
                         strokeColor={theme.border}
                         color={theme.accent}
                     />
                 </AppCard>
 
-                {/* 2. QUOTES Carousel CARD */}
-                <AppCard style={styles.quotesCard}>
-                    <QuotesCarouselCard refreshKey={refreshKey} />
-                </AppCard>
-
-                {/* 3. QURAN Playing... CARD */}
+                {/* 2. QUOTES Carousel CARD (Dynamic) */}
+                <QuotesCarouselCard refreshKey={refreshKey} />
+                {/* 3. Islamic HOLIDAYS Card (Dynamic) */}
+                <IslamicHolidaysCard />
+                {/* 4. QURAN Playing... CARD (Dynamic) */}
                 <QuranPlaying />
 
-                {/* 4. PRAYERS LIST/TIMES CARD */}
+                {/* 5. PRAYERS TIMES/LIST CARD */}
                 <AppCard style={styles.prayersListContainer}>
                     {/* Prayers Date Header */}
                     <TouchableOpacity
@@ -215,7 +215,7 @@ export default function HomeScreen() {
                                 {formattedDateHeader}
                             </Text>
                             <View style={styles.locationInfoRow}>
-                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginTop: 0.7 }} />
+                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginTop: 0.8 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                     {timeZone?.location || "Location"}
                                 </Text>
@@ -238,8 +238,8 @@ export default function HomeScreen() {
                     />
                 </AppCard>
 
-                {/* 5. PRAYER PROGRESS CARD */}
-                <AppCard style={styles.progressCard}>
+                {/* 6. PRAYER PROGRESS CARD */}
+                <AppCard>
                     <PrayerProgressCard />
                 </AppCard>
 
@@ -249,12 +249,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    // Countdown Card
-    countdownCard: {
-        paddingVertical: 10,
-        paddingHorizontal: 8,
-    },
-
     // Quotes Card
     quotesCard: {
         paddingTop: 6,
@@ -307,10 +301,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-
-    // Prayers Progress Card
-    progressCard: {
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-    }
 });
