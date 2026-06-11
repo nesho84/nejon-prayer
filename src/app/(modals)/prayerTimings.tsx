@@ -265,8 +265,8 @@ export default function PrayersSettingsScreen() {
                     {/* Location & Timezone */}
                     <View style={[styles.prayersListHeader, { backgroundColor: 'rgba(0,0,0,0.02)' }]}>
                         <View style={styles.locationInfoRow}>
-                            <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginTop: 3 }} />
-                            <Text style={[styles.locationInfoText, { color: theme.text2 }]}>
+                            <Ionicons name="globe-outline" size={17} color={theme.accent} />
+                            <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                 {timeZone?.location || ""}
                             </Text>
                         </View>
@@ -444,6 +444,7 @@ const styles = StyleSheet.create({
     locationInfoText: {
         fontSize: 17,
         fontWeight: '500',
+        includeFontPadding: false,
     },
     timezoneInfoText: {
         fontSize: 13,

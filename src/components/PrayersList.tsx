@@ -1,15 +1,17 @@
 import PrayerIcon from '@/components/PrayerIcon';
-import PrayerNotifIcon from '@/components/PrayerNotifIcon';
 import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
+import { useNotificationsStore } from "@/store/notificationsStore";
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
+import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/date';
 import { isTimePast } from '@/utils/time';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useCallback } from 'react';
@@ -25,7 +27,11 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
+
   const language = useLanguageStore((state) => state.language);
+  const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+  const prayers = useNotificationsStore((state) => state.prayers);
+  const events = useNotificationsStore((state) => state.events);
   // Prayers Tracking store
   const tracking = usePrayersTrackingStore((state) => state.tracking);
   const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
@@ -79,6 +85,22 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
       });
     }
   }, [markPrayed, unmarkPrayed, celebratedDate, setCelebrated, theme]);
+
+  // ------------------------------------------------------------
+  // Renders the correct prayer notification icon based on the prayer settings and permission
+  // ------------------------------------------------------------
+  const renderNotifIcon = (prayerName: string, size: number, color: string) => {
+    // Use prayer settings if available, fall back to event settings (Imsak, Sunrise)
+    const settings = prayers?.[prayerName as PrayerType] || events?.[prayerName as PrayerEventType];
+
+    if (!notificationPermission || !settings?.enabled) {
+      return <MaterialCommunityIcons name="bell-off-outline" size={size} color={color} style={{ opacity: 0.3, paddingBottom: 1 }} />;
+    }
+    if (settings.offset === 0) {
+      return <MaterialCommunityIcons name="bell-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
+    }
+    return <MaterialCommunityIcons name="bell-cog-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
+  };
 
   return (
     <View style={styles.container}>
@@ -183,7 +205,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                 }}
               >
                 <View style={[styles.notifIcon, { backgroundColor: theme.surfaceBg }]}>
-                  <PrayerNotifIcon prayerName={prayerName} size={20} color={theme.text2} />
+                  {renderNotifIcon(prayerName, 20, theme.text2)}
                 </View>
               </TouchableOpacity>
             </View>
