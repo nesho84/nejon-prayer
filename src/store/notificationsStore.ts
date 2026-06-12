@@ -18,6 +18,7 @@ import { toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { useIslamicHolidaysStore } from './islamicHolidaysStore';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -58,6 +59,10 @@ const DEFAULT_EVENT_SETTINGS: Record<PrayerEventType, EventSettings> = {
 const DEFAULT_SPECIAL_SETTINGS: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
   DailyQuote: { enabled: true },
+  ramadan_start: { enabled: true },
+  laylat_qadr: { enabled: true },
+  eid_fitr: { enabled: true },
+  eid_adha: { enabled: true },
 };
 
 export const useNotificationsStore = create<NotificationsState>()(
@@ -78,6 +83,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
+        const holidayDates = useIslamicHolidaysStore.getState().holidayDates;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
 
@@ -101,6 +107,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           prayers,
           events,
           specials,
+          holidayDates,
           language,
           volume: notifSettings.volume,
           vibration: notifSettings.vibration,
@@ -131,6 +138,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           await scheduleNotificationsService({
             prayerTimes,
             tomorrowPrayerTimes,
+            holidayDates,
             config: { notifSettings, prayers, events, specials },
             language,
             tr
@@ -234,7 +242,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
     }),
     {
-      name: 'notifications-storage',
+      name: 'notifications-storage-v1',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         notifSettings: state.notifSettings,

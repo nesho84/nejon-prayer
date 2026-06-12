@@ -9,6 +9,7 @@ import {
   testDailyQuoteNotification,
   testEventNotification,
   testFridayNotification,
+  testIslamicHolidayNotification,
   testPrayerNotification,
   testPrayerReminderNotification,
 } from "./notifTest";
@@ -19,6 +20,7 @@ const TEST_FUNCTIONS = [
   { label: "Prayer Reminder", func: testPrayerReminderNotification },
   { label: "Friday", func: testFridayNotification },
   { label: "Daily Quote", func: testDailyQuoteNotification },
+  { label: "Islamic Holiday", func: testIslamicHolidayNotification },
 ] as const;
 
 interface Props {
@@ -87,6 +89,7 @@ const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
     borderRadius: 8,
+    marginTop: 48,
     marginHorizontal: 8,
     overflow: "hidden",
   },

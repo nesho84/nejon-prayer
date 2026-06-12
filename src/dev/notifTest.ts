@@ -299,6 +299,57 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
 }
 
 // ------------------------------------------------------------
+// Debug utility: schedule a test Islamic Holiday notification
+// ------------------------------------------------------------
+export async function testIslamicHolidayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+    try {
+        const triggerTime = Date.now() + seconds * 1000;
+
+        const title = "» Ramazani «";
+        const body = "Muaji i shenjtë i Ramazanit · 08.02.2027";
+
+        await notifee.createTriggerNotification(
+            {
+                id: `special-islamic-holiday-test-${Date.now()}`,
+                title: title,
+                body: body,
+                data: {
+                    type: "special",
+                    subType: "islamic-holiday",
+                },
+                android: {
+                    channelId: `nejonprayer-vib-off`,
+                    smallIcon: "ic_stat_prayer",
+                    color: AndroidColor.GREEN,
+                    style: { type: AndroidStyle.INBOX, lines: [body] },
+                    actions: [{ title: "OK", pressAction: { id: "OK" } }],
+                    pressAction: { id: "default", launchActivity: "default" },
+                    fullScreenAction: { id: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
+                    autoCancel: false,
+                    ongoing: true,
+                },
+                ios: {
+                    categoryId: "special-category",
+                    interruptionLevel: "active",
+                },
+            },
+            {
+                type: TriggerType.TIMESTAMP,
+                timestamp: triggerTime,
+                alarmManager: options.hasAlarm,
+            }
+        );
+
+        const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
+        console.log(`🔔 Test Islamic holiday notification scheduled in ${remainingSeconds}s`);
+    } catch (err) {
+        console.error("❌ Failed to schedule test Islamic holiday notification:", err);
+    }
+}
+
+// ------------------------------------------------------------
 // Debug utility: log all channels and scheduled notifications
 // ------------------------------------------------------------
 export async function debugChannelsAndScheduled() {

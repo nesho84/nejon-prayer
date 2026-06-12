@@ -158,7 +158,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                       styles.xhumaBadge,
                       {
                         backgroundColor: isCurrent ? theme.accentLight : theme.surfaceBg,
-                        borderColor: isCurrent ? theme.accentLight : theme.borderCard
+                        borderColor: isCurrent ? theme.accentLight : theme.divider2,
                       }
                     ]}>
                       <Text style={[

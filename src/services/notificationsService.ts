@@ -1,17 +1,22 @@
 import { SOUNDS } from "@/constants/sounds";
+import { ISLAMIC_HOLIDAYS_TR } from "@/constants/translations/islamic-holidays.tr";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { startSound, stopSound } from "@/services/soundService";
+import { ISLAMIC_HOLIDAYS, IslamicHolidayDates } from "@/types/islamic-holidays.types";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
-import { toDateKey } from '@/utils/date';
+import { formatDateKey, toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
-import notifee, { AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType } from 'react-native-notify-kit';
+import notifee, {
+  AndroidCategory, AndroidColor, AndroidImportance, AndroidNotificationSetting, AndroidStyle, AndroidVisibility, AuthorizationStatus, EventType, RepeatFrequency, TriggerType
+} from 'react-native-notify-kit';
 
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
   tomorrowPrayerTimes?: PrayerTimes | null;
+  holidayDates?: IslamicHolidayDates | null;
   config: {
     notifSettings: NotifSettings;
     prayers: Record<PrayerType, PrayerSettings>;
@@ -277,7 +282,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 
     const formatted = triggerTime.toLocaleString('en-GB');
     const offsetInfo = offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset} min)` : '';
-    console.log(`⏰ Scheduled ${tr.prayers?.[prayer]} at ${formatted}${offsetInfo}`);
+    console.log(`⏰ Scheduled ${title} at ${formatted}${offsetInfo}`);
   }
 }
 
@@ -346,7 +351,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 
     const formatted = triggerTime.toLocaleString('en-GB');
     const offsetInfo = offset !== 0 ? ` (${offset > 0 ? '+' : ''}${offset} min)` : '';
-    console.log(`⏰ Scheduled ${tr.prayers?.[event]} at ${formatted}${offsetInfo}`);
+    console.log(`⏰ Scheduled ${title} at ${formatted}${offsetInfo}`);
   }
 }
 
@@ -354,7 +359,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 // SPECIAL SCHEDULE: Special Notifications (Friday, DailyQuotes, etc.)
 // ------------------------------------------------------------
 async function scheduleSpecialNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, language, tr, hasAlarm } = params;
+  const { config, prayerTimes, holidayDates, language, tr, hasAlarm } = params;
 
   // --- Special 1: Friday reminder (1 hour before Dhuhr)
   if (config.specials.Friday?.enabled) {
@@ -434,10 +439,82 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       }
     );
 
-    console.log(`🕌 Scheduled '${tr.labels.fridayTitle}' at ${triggerTime.toLocaleString('en-GB')}`);
+    console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
-  // --- Special 2: Daily Quote at random times throughout the day
+  // --- Special 2: Islamic Holiday Reminders
+  if (holidayDates) {
+    for (const holiday of ISLAMIC_HOLIDAYS) {
+      if (!config.specials[holiday.type]?.enabled) continue;
+
+      const gregorianDate = holidayDates[holiday.type];
+
+      if (!gregorianDate) {
+        console.warn(`[IslamicHoliday] Gregorian date not available for ${holiday.type}`);
+        continue;
+      }
+
+      // Build trigger date — N days before holiday at 09:00
+      const [y, m, d] = gregorianDate.split("-");
+      const triggerTime = new Date(Number(y), Number(m) - 1, Number(d), 9, 0, 0, 0);
+      triggerTime.setDate(triggerTime.getDate() - holiday.reminderDaysBefore);
+
+      // Skip if reminder date already passed
+      if (toDateKey(triggerTime) < toDateKey()) {
+        console.warn(`[IslamicHoliday] Reminder for ${holiday.type} already passed, skipping`);
+        continue;
+      }
+
+      // Get localized name and description and format date
+      const { name, description } = ISLAMIC_HOLIDAYS_TR[holiday.type][language];
+      const formattedDate = formatDateKey(gregorianDate);
+
+      // Prepare notification content
+      const title = `» ${name} «`;
+      const body = `${description} · ${formattedDate}`;
+      const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
+
+      // Create notification
+      await notifee.createTriggerNotification(
+        {
+          id: `special-${holiday.type}`,
+          title: title,
+          body: body,
+          data: {
+            type: 'special',
+            subType: 'islamic-holiday',
+            holidayType: holiday.type,
+            scheduledFor: triggerTime.toLocaleString('en-GB'),
+          },
+          android: {
+            channelId: `nejonprayer-vib-${vibration}`,
+            smallIcon: 'ic_stat_prayer',
+            color: AndroidColor.GREEN,
+            style: { type: AndroidStyle.INBOX, lines: [body] },
+            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+            pressAction: { id: 'default', launchActivity: 'default' },
+            lightUpScreen: true,
+            showTimestamp: true,
+            autoCancel: false,
+            ongoing: true,
+          },
+          ios: {
+            categoryId: 'special-category',
+            interruptionLevel: 'active',
+          },
+        },
+        {
+          type: TriggerType.TIMESTAMP,
+          timestamp: triggerTime.getTime(),
+          alarmManager: hasAlarm,
+        }
+      );
+
+      console.log(`🌙 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
+    }
+  }
+
+  // --- Special 3: Daily Quote at random times throughout the day
   if (config.specials.DailyQuote?.enabled) {
     // Get and Shuffle quotes for variety on each reschedule
     const quotes = QUOTES_TR[language] || QUOTES_TR.en;
@@ -527,7 +604,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       scheduledCount++;
     }
 
-    console.log(`📜 Scheduled ${scheduledCount} daily quotes`);
+    console.log(`📜 Scheduled (${scheduledCount}) ${tr.labels?.dailyQuoteTitle}`);
   }
 }
 

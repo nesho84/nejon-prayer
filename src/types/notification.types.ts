@@ -1,6 +1,8 @@
+import { IslamicHolidayType } from "./islamic-holidays.types";
+
 export type PrayerType = 'Fajr' | 'Dhuhr' | 'Asr' | 'Maghrib' | 'Isha';
 export type PrayerEventType = 'Imsak' | 'Sunrise';
-export type SpecialType = 'Friday' | 'DailyQuote';
+export type SpecialType = 'Friday' | IslamicHolidayType | 'DailyQuote';
 
 export interface NotifSettings {
   volume: number; // 0.0 to 1.0
