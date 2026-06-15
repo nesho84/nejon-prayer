@@ -301,7 +301,7 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
 // ------------------------------------------------------------
 // Debug utility: schedule a test Islamic Holiday notification
 // ------------------------------------------------------------
-export async function testIslamicHolidayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function testHolidayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
     try {
         const triggerTime = Date.now() + seconds * 1000;
 
@@ -310,12 +310,12 @@ export async function testIslamicHolidayNotification({ options, notifSettings, s
 
         await notifee.createTriggerNotification(
             {
-                id: `special-islamic-holiday-test-${Date.now()}`,
+                id: `special-holiday-test-${Date.now()}`,
                 title: title,
                 body: body,
                 data: {
                     type: "special",
-                    subType: "islamic-holiday",
+                    subType: "holiday",
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,

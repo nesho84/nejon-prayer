@@ -1,9 +1,9 @@
-import { ISLAMIC_HOLIDAYS_TR } from "@/constants/translations/islamic-holidays.tr";
-import { useIslamicHolidaysStore } from "@/store/islamicHolidaysStore";
+import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
+import { getNextHoliday } from "@/services/holidaysService";
+import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { UpcomingIslamicHoliday } from "@/types/islamic-holidays.types";
-import { formatDateKey } from "@/utils/date";
+import { formatDateKey, toDateKey } from "@/utils/date";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -23,30 +23,30 @@ const IslamicHolidaysCard = React.memo(() => {
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
-  const holidayDates = useIslamicHolidaysStore((state) => state.holidayDates);
+  const holidayDates = useHolidaysStore((state) => state.holidayDates);
 
   // ------------------------------------------------------------
   // Detect next upcoming holiday within its showFromDays window
   // ------------------------------------------------------------
-  // const upcoming = useMemo(() => {
-  //   if (!holidayDates) return null;
-  //   return getNextIslamicHoliday(holidayDates, toDateKey());
-  // }, [holidayDates]);
-
-  // ------------------------------------------------------------
-  // TEMP: Hardcoded upcoming holiday for testing card UI
-  // ------------------------------------------------------------
   const upcoming = useMemo(() => {
     if (!holidayDates) return null;
-    return { type: "eid_adha", gregorianDate: "2026-06-15", daysUntil: 7 } as UpcomingIslamicHoliday;
+    return getNextHoliday(holidayDates, toDateKey());
   }, [holidayDates]);
+
+  // ------------------------------------------------------------
+  // TEMP: For testing card UI
+  // ------------------------------------------------------------
+  // const upcoming = useMemo(() => {
+  //   if (!holidayDates) return null;
+  //   return { type: "ramadan_start", gregorianDate: "2026-06-15", daysUntil: 7 } as UpcomingHoliday;
+  // }, [holidayDates]);
 
   // Nothing upcoming — render nothing
   if (!upcoming) return null;
 
   // Desctructure translations and metadata for the upcoming holiday
   const meta = HOLIDAY_META[upcoming.type];
-  const holidayTr = ISLAMIC_HOLIDAYS_TR[upcoming.type][language];
+  const holidayTr = HOLIDAYS_TR[upcoming.type][language];
 
   // Format date "2027-02-08" → "08.02.2027"
   const formattedDate = formatDateKey(upcoming.gregorianDate);

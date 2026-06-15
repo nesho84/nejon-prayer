@@ -1,6 +1,6 @@
 import { createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { useIslamicHolidaysStore } from '@/store/islamicHolidaysStore';
+import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
@@ -16,7 +16,7 @@ export function useNotificationsSync() {
   const notificationsReady = useNotificationsStore((state) => state.isReady);
   const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
   const prayerTimes = usePrayersStore((state) => state.prayerTimes);
-  const holidayDates = useIslamicHolidaysStore((state) => state.holidayDates);
+  const holidayDates = useHolidaysStore((state) => state.holidayDates);
   const language = useLanguageStore((state) => state.language);
 
   // Ref to prevent race conditions

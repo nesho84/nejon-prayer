@@ -1,12 +1,12 @@
-import { IslamicHolidayType } from "@/types/islamic-holidays.types";
+import { HolidayType } from "@/types/holiday.types";
 import { Language } from "@/types/language.types";
 
-export type IslamicHolidayTranslations = {
+export type HolidayTranslations = {
   name: string;
   description: string;
 };
 
-export const ISLAMIC_HOLIDAYS_TR: Record<IslamicHolidayType, Record<Language, IslamicHolidayTranslations>> = {
+export const HOLIDAYS_TR: Record<HolidayType, Record<Language, HolidayTranslations>> = {
   ramadan_start: {
     en: { name: "Ramadan", description: "The holy month of fasting" },
     de: { name: "Ramadan", description: "Der heilige Fastenmonat" },

@@ -9,7 +9,7 @@ import {
   testDailyQuoteNotification,
   testEventNotification,
   testFridayNotification,
-  testIslamicHolidayNotification,
+  testHolidayNotification,
   testPrayerNotification,
   testPrayerReminderNotification,
 } from "./notifTest";
@@ -20,7 +20,7 @@ const TEST_FUNCTIONS = [
   { label: "Prayer Reminder", func: testPrayerReminderNotification },
   { label: "Friday", func: testFridayNotification },
   { label: "Daily Quote", func: testDailyQuoteNotification },
-  { label: "Islamic Holiday", func: testIslamicHolidayNotification },
+  { label: "Islamic Holiday", func: testHolidayNotification },
 ] as const;
 
 interface Props {

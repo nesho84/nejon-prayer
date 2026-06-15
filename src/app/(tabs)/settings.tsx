@@ -231,25 +231,6 @@ export default function SettingsScreen() {
     };
 
     // ------------------------------------------------------------
-    // Toggle Special Notification (Friday, DailyQuote, etc.)
-    // ------------------------------------------------------------
-    const handleSpecialNotification = async (type: SpecialType, value: boolean) => {
-        setLocalLoading(true);
-        try {
-            // Save special notification settings
-            useNotificationsStore.getState().setSpecial(type, { enabled: value });
-
-            console.log(`📳 ${type} Reminder changed to: ${value ? 'enabled' : 'disabled'}`);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        } catch (err) {
-            console.error("Friday Reminder change error:", err);
-            Alert.alert(tr.labels.error, tr.labels.specialNotificationError);
-        } finally {
-            setLocalLoading(false);
-        }
-    };
-
-    // ------------------------------------------------------------
     // Change Notification snozee timeout
     // ------------------------------------------------------------
     const handleSnooze = async (value: number) => {
@@ -265,6 +246,25 @@ export default function SettingsScreen() {
         } catch (err) {
             console.error("Snooze timeout change error:", err);
             Alert.alert(tr.labels.error, tr.labels.snoozeError);
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Toggle Special Notification (Friday, Holidays, DailyQuote, etc.)
+    // ------------------------------------------------------------
+    const handleSpecialNotification = async (type: SpecialType, value: boolean) => {
+        setLocalLoading(true);
+        try {
+            // Save special notification settings
+            useNotificationsStore.getState().setSpecial(type, { enabled: value });
+
+            console.log(`📳 ${type} Reminder changed to: ${value ? 'enabled' : 'disabled'}`);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } catch (err) {
+            console.error("Friday Reminder change error:", err);
+            Alert.alert(tr.labels.error, tr.labels.specialNotificationError);
         } finally {
             setLocalLoading(false);
         }
@@ -613,26 +613,45 @@ export default function SettingsScreen() {
                                     {tr.labels.fridayReminder}
                                 </Text>
                                 <Switch
-                                    value={specials.Friday.enabled}
+                                    value={specials.Friday?.enabled}
                                     onValueChange={(value) => handleSpecialNotification('Friday', value)}
                                     disabled={localLoading}
                                     trackColor={{ false: theme.card, true: theme.primary }}
-                                    thumbColor={specials.Friday.enabled ? theme.border : theme.border}
+                                    thumbColor={specials.Friday?.enabled ? theme.border : theme.border}
                                 />
                             </View>
+
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
                             {/* Daily Quote Reminder */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr.labels.dailyReminders}
                                 </Text>
                                 <Switch
-                                    value={specials.DailyQuote.enabled}
+                                    value={specials.DailyQuote?.enabled}
                                     onValueChange={(value) => handleSpecialNotification('DailyQuote', value)}
                                     disabled={localLoading}
                                     trackColor={{ false: theme.card, true: theme.primary }}
-                                    thumbColor={specials.DailyQuote.enabled ? theme.border : theme.border}
+                                    thumbColor={specials.DailyQuote?.enabled ? theme.border : theme.border}
+                                />
+                            </View>
+
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                            {/* Islamic Holidays Reminder */}
+                            <View style={styles.statusRow}>
+                                <Text style={[styles.statusText, { color: theme.text }]}>
+                                    {tr.labels.holidayReminders}
+                                </Text>
+                                <Switch
+                                    value={specials.Holidays?.enabled}
+                                    onValueChange={(value) => handleSpecialNotification('Holidays', value)}
+                                    disabled={localLoading}
+                                    trackColor={{ false: theme.card, true: theme.primary }}
+                                    thumbColor={specials.Holidays?.enabled ? theme.border : theme.border}
                                 />
                             </View>
                         </View>

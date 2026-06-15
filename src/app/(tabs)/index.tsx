@@ -2,7 +2,7 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import IslamicHolidaysCard from "@/components/IslamicHolidaysCard";
+import HolidaysCard from "@/components/HolidaysCard";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
@@ -190,7 +190,7 @@ export default function HomeScreen() {
                 {/* 2. QUOTES Carousel CARD (Dynamic) */}
                 <QuotesCarouselCard refreshKey={refreshKey} />
                 {/* 3. Islamic HOLIDAYS Card (Dynamic) */}
-                <IslamicHolidaysCard />
+                <HolidaysCard />
                 {/* 4. QURAN Playing... CARD (Dynamic) */}
                 <QuranPlaying />
 

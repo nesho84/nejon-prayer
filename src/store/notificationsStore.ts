@@ -18,7 +18,7 @@ import { toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { useIslamicHolidaysStore } from './islamicHolidaysStore';
+import { useHolidaysStore } from './holidaysStore';
 
 interface NotificationsState {
   notifSettings: NotifSettings;
@@ -59,10 +59,7 @@ const DEFAULT_EVENT_SETTINGS: Record<PrayerEventType, EventSettings> = {
 const DEFAULT_SPECIAL_SETTINGS: Record<SpecialType, SpecialSettings> = {
   Friday: { enabled: true },
   DailyQuote: { enabled: true },
-  ramadan_start: { enabled: true },
-  laylat_qadr: { enabled: true },
-  eid_fitr: { enabled: true },
-  eid_adha: { enabled: true },
+  Holidays: { enabled: true },
 };
 
 export const useNotificationsStore = create<NotificationsState>()(
@@ -83,7 +80,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
-        const holidayDates = useIslamicHolidaysStore.getState().holidayDates;
+        const holidayDates = useHolidaysStore.getState().holidayDates;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
 

@@ -1,9 +1,4 @@
-import {
-  ISLAMIC_HOLIDAYS,
-  IslamicHolidayDates,
-  IslamicHolidayType,
-  UpcomingIslamicHoliday
-} from "@/types/islamic-holidays.types";
+import { HolidayDates, HOLIDAYS, HolidayType, UpcomingHoliday } from "@/types/holiday.types";
 
 interface AladhanGToHResponse {
   data: {
@@ -55,7 +50,7 @@ async function getCurrentHijriYear(): Promise<number> {
 
     return parseInt(result.data.hijri.year);
   } catch (err) {
-    console.warn("❌ [islamicHolidaysService] Failed to fetch Hijri year:", err);
+    console.warn("❌ [holidaysService] Failed to fetch Hijri year:", err);
     throw err;
   } finally {
     clearTimeout(timeout);
@@ -100,13 +95,13 @@ async function hijriToGregorian(hijriDay: number, hijriMonth: number, hijriYear:
 
     // If date already passed, re-fetch for next Hijri year
     if (isoDate < today) {
-      // console.log(`🔄 [islamicHolidaysService] ${dd}-${mm}-${hijriYear} already passed, fetching for ${hijriYear + 1}`);
+      console.log(`🔄 [holidaysService] ${dd}-${mm}-${hijriYear} already passed, fetching for ${hijriYear + 1}`);
       return hijriToGregorian(hijriDay, hijriMonth, hijriYear + 1);
     }
 
     return isoDate;
   } catch (err) {
-    console.warn(`❌ [islamicHolidaysService] Failed to convert ${dd}-${mm}-${hijriYear}:`, err);
+    console.warn(`❌ [holidaysService] Failed to convert ${dd}-${mm}-${hijriYear}:`, err);
     throw err;
   } finally {
     clearTimeout(timeout);
@@ -116,24 +111,24 @@ async function hijriToGregorian(hijriDay: number, hijriMonth: number, hijriYear:
 // ------------------------------------------------------------
 // Fetch all Islamic holiday Gregorian dates — called once per year
 // ------------------------------------------------------------
-export async function fetchIslamicHolidayDates(): Promise<IslamicHolidayDates> {
+export async function fetchHolidayDates(): Promise<HolidayDates> {
   try {
     const hijriYear = await getCurrentHijriYear();
 
     const entries = await Promise.all(
-      ISLAMIC_HOLIDAYS.map(async (holiday) => {
+      HOLIDAYS.map(async (holiday) => {
         const gregorianDate = await hijriToGregorian(holiday.hijriDay, holiday.hijriMonth, hijriYear);
-        return [holiday.type, gregorianDate] as [IslamicHolidayType, string];
+        return [holiday.type, gregorianDate] as [HolidayType, string];
       })
     );
 
-    const holidayDates = Object.fromEntries(entries) as IslamicHolidayDates;
+    const holidayDates = Object.fromEntries(entries) as HolidayDates;
 
-    console.log("✅ [islamicHolidaysService] Fetched Islamic holiday dates:", holidayDates);
+    console.log("✅ [holidaysService] Fetched Islamic holiday dates:", holidayDates);
 
     return holidayDates;
   } catch (err) {
-    console.warn("❌ [islamicHolidaysService] Failed to fetch holiday dates:", err);
+    console.warn("❌ [holidaysService] Failed to fetch holiday dates:", err);
     throw err;
   }
 }
@@ -142,10 +137,10 @@ export async function fetchIslamicHolidayDates(): Promise<IslamicHolidayDates> {
 // Detect next upcoming holiday within its showFromDays window
 // Returns null if no holiday is approaching soon
 // ------------------------------------------------------------
-export function getNextIslamicHoliday(holidayDates: IslamicHolidayDates, today: string): UpcomingIslamicHoliday | null {
-  let closest: UpcomingIslamicHoliday | null = null;
+export function getNextHoliday(holidayDates: HolidayDates, today: string): UpcomingHoliday | null {
+  let closest: UpcomingHoliday | null = null;
 
-  for (const holiday of ISLAMIC_HOLIDAYS) {
+  for (const holiday of HOLIDAYS) {
     const gregorianDate = holidayDates[holiday.type];
     const diffTime = new Date(gregorianDate).getTime() - new Date(today).getTime();
     const daysUntil = Math.ceil(diffTime / (1000 * 60 * 60 * 24));

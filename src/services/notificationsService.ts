@@ -1,8 +1,8 @@
 import { SOUNDS } from "@/constants/sounds";
-import { ISLAMIC_HOLIDAYS_TR } from "@/constants/translations/islamic-holidays.tr";
+import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { startSound, stopSound } from "@/services/soundService";
-import { ISLAMIC_HOLIDAYS, IslamicHolidayDates } from "@/types/islamic-holidays.types";
+import { HOLIDAYS, HolidayDates } from "@/types/holiday.types";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
@@ -16,7 +16,7 @@ import notifee, {
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
   tomorrowPrayerTimes?: PrayerTimes | null;
-  holidayDates?: IslamicHolidayDates | null;
+  holidayDates?: HolidayDates | null;
   config: {
     notifSettings: NotifSettings;
     prayers: Record<PrayerType, PrayerSettings>;
@@ -361,7 +361,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 async function scheduleSpecialNotifications(params: ScheduleParams) {
   const { config, prayerTimes, holidayDates, language, tr, hasAlarm } = params;
 
-  // --- Special 1: Friday reminder (1 hour before Dhuhr)
+  // --- Special 1: Friday reminder (1 hour before Dhuhr) ---
   if (config.specials.Friday?.enabled) {
     const dhuhrTime = prayerTimes?.Dhuhr;
 
@@ -442,15 +442,13 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
-  // --- Special 2: Islamic Holiday Reminders
-  if (holidayDates) {
-    for (const holiday of ISLAMIC_HOLIDAYS) {
-      if (!config.specials[holiday.type]?.enabled) continue;
-
-      const gregorianDate = holidayDates[holiday.type];
+  // --- Special 2: Islamic Holiday Reminders ---
+  if (config.specials.Holidays?.enabled) {
+    for (const holiday of HOLIDAYS) {
+      const gregorianDate = holidayDates?.[holiday.type];
 
       if (!gregorianDate) {
-        console.warn(`[IslamicHoliday] Gregorian date not available for ${holiday.type}`);
+        console.warn(`[HolidayReminder] Gregorian date not available for ${holiday.type}`);
         continue;
       }
 
@@ -461,12 +459,12 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
       // Skip if reminder date already passed
       if (toDateKey(triggerTime) < toDateKey()) {
-        console.warn(`[IslamicHoliday] Reminder for ${holiday.type} already passed, skipping`);
+        console.warn(`[HolidayReminder] Reminder for ${holiday.type} already passed, skipping`);
         continue;
       }
 
       // Get localized name and description and format date
-      const { name, description } = ISLAMIC_HOLIDAYS_TR[holiday.type][language];
+      const { name, description } = HOLIDAYS_TR[holiday.type][language];
       const formattedDate = formatDateKey(gregorianDate);
 
       // Prepare notification content
@@ -514,7 +512,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     }
   }
 
-  // --- Special 3: Daily Quote at random times throughout the day
+  // --- Special 3: Daily Quote at random times throughout the day ---
   if (config.specials.DailyQuote?.enabled) {
     // Get and Shuffle quotes for variety on each reschedule
     const quotes = QUOTES_TR[language] || QUOTES_TR.en;

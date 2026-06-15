@@ -1,7 +1,7 @@
 import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
-import { useIslamicHolidaysSync } from "@/hooks/useIslamicHolidaysSync";
+import { useHolidaysSync } from "@/hooks/useHolidaysSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
@@ -59,7 +59,7 @@ function RootLayout() {
   useNotificationsSync();
   usePrayerTimesSync();
   useQuranSetup();
-  useIslamicHolidaysSync();
+  useHolidaysSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
