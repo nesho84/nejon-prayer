@@ -163,7 +163,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                     ]}>
                       <Text style={[
                         styles.xhumaBadgeText,
-                        { color: isCurrent ? theme.accent : theme.islamicGreen, opacity: isCurrent ? 1 : 0.8 }
+                        { color: isCurrent ? theme.accent : theme.islamicGreen, opacity: isCurrent ? 1 : 0.9 }
                       ]}>
                         {tr.labels.jummah ?? 'Xhumaja'}
                       </Text>

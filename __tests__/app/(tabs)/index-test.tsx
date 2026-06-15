@@ -66,7 +66,7 @@ jest.mock('@/components/PrayerCountdownCard', () => () => null);
 jest.mock('@/components/PrayerProgressCard', () => () => null);
 jest.mock('@/components/PrayersList', () => () => null);
 jest.mock('@/components/QuotesCarouselCard', () => () => null);
-jest.mock('@/components/IslamicHolidaysCard', () => () => null);
+jest.mock('@/components/HolidaysCard', () => () => null);
 jest.mock('@/components/QuranPlaying', () => () => null);
 jest.mock('@/components/AppLoading', () => {
   const React = require('react');
