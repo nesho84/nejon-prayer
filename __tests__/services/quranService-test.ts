@@ -8,7 +8,7 @@ const MOCK_AYAHS: Ayah[] = [
 
 describe('fetchAyahsFromApi', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    globalThis.fetch = jest.fn();
   });
 
   afterEach(() => {
@@ -16,7 +16,7 @@ describe('fetchAyahsFromApi', () => {
   });
 
   it('returns parsed ayahs on a successful response', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ data: { ayahs: MOCK_AYAHS } }),
     });
@@ -26,20 +26,20 @@ describe('fetchAyahsFromApi', () => {
   });
 
   it('calls the correct API URL', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ data: { ayahs: MOCK_AYAHS } }),
     });
 
     await fetchAyahsFromApi(2, 'de.bubenheim');
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       'https://api.alquran.cloud/v1/surah/2/de.bubenheim',
       expect.objectContaining({ signal: expect.any(AbortSignal) })
     );
   });
 
   it('throws on non-OK HTTP response', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 404 });
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 404 });
     await expect(fetchAyahsFromApi(1, 'en.sahih')).rejects.toThrow('HTTP error! status: 404');
   });
 });

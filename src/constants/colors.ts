@@ -29,6 +29,9 @@ export const LIGHT_COLORS = {
     brown: "#92400e",
     gray: "#808080",
     green: "#50C878",
+    teal: "#0d9488",
+    indigo: "#4f46e5",
+    orange: "#ea580c",
 
     // Surfaces & Borders
     card: "#f3f3f3",
@@ -103,6 +106,9 @@ export const DARK_COLORS = {
     brown: "#d97706",
     gray: "#808080",
     green: "#009000",
+    teal: "#2dd4bf",
+    indigo: "#818cf8",
+    orange: "#fb923c",
 
     // Surfaces & Borders
     card: "#1f2937",

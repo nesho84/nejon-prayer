@@ -54,11 +54,11 @@ describe('getMethodForCountry', () => {
 // ------------------------------------------------------------
 describe('getYearlyPrayerTimes', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    globalThis.fetch = jest.fn();
   });
 
   it('converts Aladhan date format "DD-MM-YYYY" to ISO "YYYY-MM-DD"', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () =>
         makeAladhanResponse('01-03-2026', {
@@ -72,7 +72,7 @@ describe('getYearlyPrayerTimes', () => {
   });
 
   it('strips timezone suffix from prayer times e.g. "06:10 (CET)" → "06:10"', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () =>
         makeAladhanResponse('15-01-2026', {
@@ -88,7 +88,7 @@ describe('getYearlyPrayerTimes', () => {
   });
 
   it('returns all 7 prayer keys for a day', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () =>
         makeAladhanResponse('10-06-2026', {
@@ -108,12 +108,12 @@ describe('getYearlyPrayerTimes', () => {
   });
 
   it('throws on non-OK HTTP response', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 });
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 });
     await expect(getYearlyPrayerTimes(VALID_LOCATION, 2026, 'AT')).rejects.toThrow('HTTP error! status: 500');
   });
 
   it('throws when API response is missing data field', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (globalThis.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ status: 'ok' }), // no data field
     });
