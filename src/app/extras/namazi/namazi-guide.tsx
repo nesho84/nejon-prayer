@@ -175,7 +175,7 @@ export default function NamaziGuideScreen() {
                 keyExtractor={(item) => String(item.id)}
                 ListHeaderComponent={
                     // HEADER
-                    <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
+                    <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
                         <Text style={globalStyles.headerIcon}>🕌</Text>
                         <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{namaziTr.headerTitle}</Text>
                         <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{namaziTr.headerSubtitle}</Text>
@@ -206,17 +206,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         minWidth: 62,
         textAlign: "right",
-    },
-
-    // Header card
-    headerCard: {
-        alignItems: "center",
-        paddingVertical: 22,
-        paddingHorizontal: 16,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
-        marginHorizontal: 8,
-        marginBottom: 10,
     },
 
     // Step cards

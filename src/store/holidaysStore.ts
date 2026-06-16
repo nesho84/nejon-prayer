@@ -1,13 +1,13 @@
-import { fetchHolidayDates } from '@/services/holidaysService';
+import { getYearlyHolidays } from '@/services/holidaysService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { mmkvStorage } from '@/store/storage';
-import { HolidayDates } from '@/types/holiday.types';
+import { YearlyHolidays } from '@/types/holiday.types';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface HolidaysState {
-  holidayDates: HolidayDates | null;
+  yearlyHolidays: YearlyHolidays | null;
   fetchedYear: number | null;
   isLoading: boolean;
   isReady: boolean;
@@ -17,12 +17,12 @@ interface HolidaysState {
 export const useHolidaysStore = create<HolidaysState>()(
   persist(
     (set, get) => ({
-      holidayDates: null,
+      yearlyHolidays: null,
       fetchedYear: null,
       isLoading: false,
       isReady: false,
 
-      // Load Islamic holiday Gregorian dates — called once per year
+      // Load all known holidays for current + next Hijri year — once per year
       loadHolidays: async () => {
         try {
           const internetConnection = useDeviceSettingsStore.getState().internetConnection;
@@ -31,17 +31,17 @@ export const useHolidaysStore = create<HolidaysState>()(
           const now = new Date();
           const currentYear = now.getFullYear();
 
-          const { holidayDates, fetchedYear } = get();
+          const { yearlyHolidays, fetchedYear } = get();
 
           // Already fetched for this year — skip
-          if (holidayDates && fetchedYear === currentYear) {
-            console.log('💾 [holidaysStore] Islamic Holidays loaded from storage ');
+          if (yearlyHolidays && fetchedYear === currentYear) {
+            console.log('💾 [holidaysStore] Holidays loaded from storage');
             return;
           }
 
           // OFFLINE: No internet connection — use cached data if available
           if (!internetConnection) {
-            console.log('💾 [holidaysStore] Offline — using storage holiday dates');
+            console.log('💾 [holidaysStore] Offline — using storage holidays');
             return;
           }
 
@@ -50,16 +50,16 @@ export const useHolidaysStore = create<HolidaysState>()(
 
           // ONLINE: Need to fetch — first time, new year, or cache miss
           try {
-            const dates = await fetchHolidayDates();
+            const holidays = await getYearlyHolidays();
 
             set({
-              holidayDates: dates,
+              yearlyHolidays: holidays,
               fetchedYear: currentYear,
             });
 
-            console.log('🌐 [holidaysStore] Islamic holiday dates fetched & stored');
+            console.log('🌐 [holidaysStore] Yearly holidays fetched & stored');
           } catch (err) {
-            console.warn('⚠️ [holidaysStore] Failed to fetch Islamic holiday dates:', err);
+            console.warn('⚠️ [holidaysStore] Failed to fetch yearly holidays:', err);
             Sentry.captureException(err);
           }
 
@@ -73,10 +73,10 @@ export const useHolidaysStore = create<HolidaysState>()(
 
     }),
     {
-      name: 'holidays-storage-v1',
+      name: 'holidays-storage-v2',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
-        holidayDates: state.holidayDates,
+        yearlyHolidays: state.yearlyHolidays,
         fetchedYear: state.fetchedYear,
       }),
       onRehydrateStorage: () => (state) => {

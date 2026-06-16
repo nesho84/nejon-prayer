@@ -80,7 +80,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
-        const holidayDates = useHolidaysStore.getState().holidayDates;
+        const yearlyHolidays = useHolidaysStore.getState().yearlyHolidays;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
 
@@ -104,7 +104,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           prayers,
           events,
           specials,
-          holidayDates,
+          yearlyHolidays,
           language,
           volume: notifSettings.volume,
           vibration: notifSettings.vibration,
@@ -135,7 +135,7 @@ export const useNotificationsStore = create<NotificationsState>()(
           await scheduleNotificationsService({
             prayerTimes,
             tomorrowPrayerTimes,
-            holidayDates,
+            yearlyHolidays,
             config: { notifSettings, prayers, events, specials },
             language,
             tr
@@ -239,7 +239,7 @@ export const useNotificationsStore = create<NotificationsState>()(
       },
     }),
     {
-      name: 'notifications-storage-v1',
+      name: 'notifications-storage-v2',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         notifSettings: state.notifSettings,

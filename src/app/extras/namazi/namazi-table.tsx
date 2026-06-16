@@ -122,7 +122,7 @@ export default function NamaziTableScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* HEADER */}
-                <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
+                <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
                     <Text style={globalStyles.headerIcon}>📝</Text>
                     <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
                         {namaziTr.headerTitle}
@@ -233,15 +233,6 @@ export default function NamaziTableScreen() {
 }
 
 const styles = StyleSheet.create({
-    // Header card
-    headerCard: {
-        alignItems: "center",
-        paddingVertical: 22,
-        paddingHorizontal: 16,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
-    },
-
     // Table styles
     tableCard: {
         padding: 0,

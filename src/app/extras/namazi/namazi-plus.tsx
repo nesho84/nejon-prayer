@@ -136,7 +136,7 @@ export default function NamaziPlusScreen() {
         keyExtractor={(item) => String(item.key)}
         ListHeaderComponent={
           // HEADER
-          <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
+          <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
             <Text style={globalStyles.headerIcon}>🕌</Text>
             <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{namaziPlusTr.headerTitle}</Text>
             <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{namaziPlusTr.headerSubtitle}</Text>
@@ -167,17 +167,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     minWidth: 40,
     textAlign: "right",
-  },
-
-  // Header card
-  headerCard: {
-    alignItems: "center",
-    paddingVertical: 22,
-    paddingHorizontal: 16,
-    borderLeftWidth: 2,
-    borderRightWidth: 2,
-    marginHorizontal: 8,
-    marginBottom: 10,
   },
 
   // Item cards

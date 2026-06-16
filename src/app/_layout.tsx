@@ -58,8 +58,8 @@ function RootLayout() {
   useDeviceSettingsSync();
   useNotificationsSync();
   usePrayerTimesSync();
-  useQuranSetup();
   useHolidaysSync();
+  useQuranSetup();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

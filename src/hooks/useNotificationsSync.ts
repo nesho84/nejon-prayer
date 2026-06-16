@@ -16,7 +16,7 @@ export function useNotificationsSync() {
   const notificationsReady = useNotificationsStore((state) => state.isReady);
   const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
   const prayerTimes = usePrayersStore((state) => state.prayerTimes);
-  const holidayDates = useHolidaysStore((state) => state.holidayDates);
+  const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
   const language = useLanguageStore((state) => state.language);
 
   // Ref to prevent race conditions
@@ -64,7 +64,7 @@ export function useNotificationsSync() {
     syncNotifications();
 
     return () => { cancelled = true; };
-  }, [deviceSettingsReady, notificationsReady, prayerTimes, holidayDates, notificationPermission, language]);
+  }, [deviceSettingsReady, notificationsReady, prayerTimes, yearlyHolidays, notificationPermission, language]);
 
   // ------------------------------------------------------------
   // Notifee - FOREGROUND event handler

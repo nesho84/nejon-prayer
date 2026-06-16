@@ -99,7 +99,7 @@ export default function AbdesiScreen() {
                 keyExtractor={(item) => String(item.id)}
                 ListHeaderComponent={
                     // HEADER
-                    <AppCard style={[styles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
+                    <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.secondary }]}>
                         <Text style={globalStyles.headerIcon}>✨</Text>
                         <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{abdesiTr.headerTitle}</Text>
                         <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{abdesiTr.headerSubtitle}</Text>
@@ -130,17 +130,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         minWidth: 62,
         textAlign: "right",
-    },
-
-    // Header card
-    headerCard: {
-        alignItems: "center",
-        paddingVertical: 22,
-        paddingHorizontal: 16,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
-        marginHorizontal: 8,
-        marginBottom: 10,
     },
 
     // Step cards

@@ -1,8 +1,9 @@
 import { SOUNDS } from "@/constants/sounds";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
+import { getHolidayDate } from "@/services/holidaysService";
 import { startSound, stopSound } from "@/services/soundService";
-import { HOLIDAYS, HolidayDates } from "@/types/holiday.types";
+import { HOLIDAY_CONFIG, UPCOMING_HOLIDAYS, YearlyHolidays } from "@/types/holiday.types";
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
@@ -16,7 +17,7 @@ import notifee, {
 interface ScheduleParams {
   prayerTimes: PrayerTimes;
   tomorrowPrayerTimes?: PrayerTimes | null;
-  holidayDates?: HolidayDates | null;
+  yearlyHolidays?: YearlyHolidays | null;
   config: {
     notifSettings: NotifSettings;
     prayers: Record<PrayerType, PrayerSettings>;
@@ -359,7 +360,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 // SPECIAL SCHEDULE: Special Notifications (Friday, DailyQuotes, etc.)
 // ------------------------------------------------------------
 async function scheduleSpecialNotifications(params: ScheduleParams) {
-  const { config, prayerTimes, holidayDates, language, tr, hasAlarm } = params;
+  const { config, prayerTimes, yearlyHolidays, language, tr, hasAlarm } = params;
 
   // --- Special 1: Friday reminder (1 hour before Dhuhr) ---
   if (config.specials.Friday?.enabled) {
@@ -442,46 +443,56 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
-  // --- Special 2: Islamic Holiday Reminders ---
-  if (config.specials.Holidays?.enabled) {
-    for (const holiday of HOLIDAYS) {
-      const gregorianDate = holidayDates?.[holiday.type];
+  // --- Special 2: Islamic Holidays Reminders (Olny 4 Holidays: Most important ones!) ---
+  if (config.specials.Holidays?.enabled && yearlyHolidays) {
+    // Loop only the surfaced holidays (Ramadan, Laylat al-Qadr, 2 Eids)
+    for (const name of UPCOMING_HOLIDAYS) {
+      // Display/notification behavior (showFromDays, reminderDaysBefore)
+      const holidayConfig = HOLIDAY_CONFIG[name];
+      if (!holidayConfig) continue;
+
+      // Localized name + description for this holiday
+      const translations = (HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en).holidays[name];
+      if (!translations) continue;
+
+      // Next upcoming Gregorian date for this holiday (today or later)
+      const gregorianDate = getHolidayDate(yearlyHolidays, name, toDateKey());
 
       if (!gregorianDate) {
-        console.warn(`[HolidayReminder] Gregorian date not available for ${holiday.type}`);
+        console.warn(`[HolidayReminder] Gregorian date not available for ${name}`);
         continue;
       }
 
-      // Build trigger date — N days before holiday at 09:00
+      // Build trigger date — N days before holiday at 09:00 ----
       const [y, m, d] = gregorianDate.split("-");
       const triggerTime = new Date(Number(y), Number(m) - 1, Number(d), 9, 0, 0, 0);
-      triggerTime.setDate(triggerTime.getDate() - holiday.reminderDaysBefore);
+      triggerTime.setDate(triggerTime.getDate() - holidayConfig.reminderDaysBefore);
 
-      // Skip if reminder date already passed
+      // Skip if reminder date already passed ----
       if (toDateKey(triggerTime) < toDateKey()) {
-        console.warn(`[HolidayReminder] Reminder for ${holiday.type} already passed, skipping`);
+        console.warn(`[HolidayReminder] Reminder for ${name} already passed, skipping`);
         continue;
       }
 
       // Get localized name and description and format date
-      const { name, description } = HOLIDAYS_TR[holiday.type][language];
+      const { name: holidayName, description } = translations;
       const formattedDate = formatDateKey(gregorianDate);
 
       // Prepare notification content
-      const title = `» ${name} «`;
+      const title = `» ${holidayName} «`;
       const body = `${description} · ${formattedDate}`;
       const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 
       // Create notification
       await notifee.createTriggerNotification(
         {
-          id: `special-${holiday.type}`,
+          id: `special-${name}`,
           title: title,
           body: body,
           data: {
             type: 'special',
             subType: 'islamic-holiday',
-            holidayType: holiday.type,
+            holidayType: name,
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {

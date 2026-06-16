@@ -90,6 +90,16 @@ export default function ExtrasTabScreen() {
         },
         {
             id: 5,
+            href: "/extras/holidays",
+            type: 'internal',
+            label: tr.labels.holidays,
+            description: tr.labels.holidaysDesc || "Islamic holidays calendar",
+            color: theme.gray,
+            bg: `${theme.gray}25`,
+            icon: <Ionicons name="calendar-outline" size={32} color={theme.gray} />
+        },
+        {
+            id: 6,
             href: "/extras/quotes",
             type: 'internal',
             label: tr.labels.quotes,
@@ -99,7 +109,7 @@ export default function ExtrasTabScreen() {
             icon: <MaterialCommunityIcons name="book-outline" size={32} color={theme.accent2} />
         },
         {
-            id: 6,
+            id: 7,
             href: "/extras/about",
             type: 'internal',
             label: tr.labels.about,
@@ -239,8 +249,8 @@ const styles = StyleSheet.create({
     headerCard: {
         alignItems: 'center',
         justifyContent: 'center',
+        paddingVertical: 24,
         paddingHorizontal: 16,
-        paddingVertical: 32,
     },
     headerIconContainer: {
         width: 80,
@@ -258,9 +268,9 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
     },
     headerSubtitle: {
-        fontSize: 15,
+        fontSize: 14,
         textAlign: 'center',
-        lineHeight: 22,
+        lineHeight: 18,
         opacity: 0.7,
     },
 

@@ -1,53 +1,65 @@
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
-import { getNextHoliday } from "@/services/holidaysService";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { formatDateKey, toDateKey } from "@/utils/date";
+import { HolidayName, UpcomingHoliday } from "@/types/holiday.types";
+import { ThemeColors } from "@/types/theme.types";
+import { formatDateKey } from "@/utils/date";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+export type HolidayMeta = {
+  icon: (size: number, color: string) => React.ReactNode;
+  color: keyof ThemeColors;
+};
+
 // ------------------------------------------------------------
-// Icon and accent color per holiday type
+// Icon and accent color per holiday
 // ------------------------------------------------------------
-const HOLIDAY_META = {
-  ramadan_start: { icon: 'shield-moon-outline', color: 'islamicGreen' },
-  laylat_qadr: { icon: 'book-outline', color: 'islamicGreen' },
-  eid_fitr: { icon: 'creation-outline', color: 'accent' },
-  eid_adha: { icon: 'sheep', color: 'accent2' },
-} as const;
+export const HOLIDAY_META: Record<HolidayName, HolidayMeta> = {
+  hijri_new_year: { icon: (size, color) => <MaterialCommunityIcons name="calendar-star" size={size} color={color} />, color: 'islamicGreen' },
+  ashura: { icon: (size, color) => <MaterialCommunityIcons name="water-outline" size={size} color={color} />, color: 'info' },
+  regaib: { icon: (size, color) => <MaterialCommunityIcons name="star-outline" size={size} color={color} />, color: 'gold' },
+  isra_miraj: { icon: (size, color) => <MaterialCommunityIcons name="shimmer" size={size} color={color} />, color: 'violet' },
+  laylat_baraat: { icon: (size, color) => <MaterialCommunityIcons name="star-crescent" size={size} color={color} />, color: 'accent' },
+  ramadan_start: { icon: (size, color) => <MaterialCommunityIcons name="star-crescent" size={size} color={color} />, color: 'islamicGreen' },
+  laylat_qadr: { icon: (size, color) => <MaterialCommunityIcons name="book-outline" size={size} color={color} />, color: 'gold' },
+  eid_fitr: { icon: (size, color) => <MaterialCommunityIcons name="creation-outline" size={size} color={color} />, color: 'accent' },
+  arafah: { icon: (size, color) => <MaterialCommunityIcons name="nature-people" size={size} color={color} />, color: 'secondary' },
+  eid_adha: { icon: (size, color) => <MaterialCommunityIcons name="sheep" size={size} color={color} />, color: 'pink' },
+};
 
 const IslamicHolidaysCard = React.memo(() => {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
-  const holidayDates = useHolidaysStore((state) => state.holidayDates);
+  const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
+  const holidaysTr = HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en;
 
   // ------------------------------------------------------------
   // Detect next upcoming holiday within its showFromDays window
   // ------------------------------------------------------------
-  const upcoming = useMemo(() => {
-    if (!holidayDates) return null;
-    return getNextHoliday(holidayDates, toDateKey());
-  }, [holidayDates]);
+  // const upcoming = useMemo(() => {
+  //   if (!yearlyHolidays) return null;
+  //   return getNextHoliday(yearlyHolidays, toDateKey());
+  // }, [yearlyHolidays]);
 
   // ------------------------------------------------------------
   // TEMP: For testing card UI
   // ------------------------------------------------------------
-  // const upcoming = useMemo(() => {
-  //   if (!holidayDates) return null;
-  //   return { type: "ramadan_start", gregorianDate: "2026-06-15", daysUntil: 7 } as UpcomingHoliday;
-  // }, [holidayDates]);
+  const upcoming = useMemo(() => {
+    if (!yearlyHolidays) return null;
+    return { name: "ramadan_start", gregorianDate: "2026-06-15", daysUntil: 3 } as UpcomingHoliday;
+  }, [yearlyHolidays]);
 
   // Nothing upcoming — render nothing
   if (!upcoming) return null;
 
-  // Desctructure translations and metadata for the upcoming holiday
-  const meta = HOLIDAY_META[upcoming.type];
-  const holidayTr = HOLIDAYS_TR[upcoming.type][language];
-
+  // Metadata + translations — both complete records, clean access
+  const meta = HOLIDAY_META[upcoming.name];
+  const holidayTr = holidaysTr.holidays[upcoming.name];
   // Format date "2027-02-08" → "08.02.2027"
   const formattedDate = formatDateKey(upcoming.gregorianDate);
 
@@ -56,7 +68,7 @@ const IslamicHolidaysCard = React.memo(() => {
 
       {/* Left - Icon Box */}
       <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
-        <MaterialCommunityIcons name={meta.icon} size={35} color={theme[meta.color]} />
+        {meta.icon(35, theme[meta.color])}
       </View>
 
       {/* Middle — name, desc. and date */}

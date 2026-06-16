@@ -59,6 +59,15 @@ export const globalStyles = StyleSheet.create({
   },
 
   // Header
+  headerCard: {
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderLeftWidth: 2,
+    borderRightWidth: 2,
+    marginHorizontal: 8,
+    marginBottom: 10,
+  },
   headerIcon: {
     fontSize: 40,
     marginBottom: 8,

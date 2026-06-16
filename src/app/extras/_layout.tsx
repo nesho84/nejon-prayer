@@ -58,6 +58,13 @@ export default function ExtrasLayout() {
                 }}
             />
             <Stack.Screen
+                name="holidays"
+                options={{
+                    title: tr.labels.holidays,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
                 name="quotes"
                 options={{
                     title: tr.labels.quotes,
