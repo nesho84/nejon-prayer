@@ -58,34 +58,33 @@ export default function QuranSettingsScreen() {
     ModalSheetRef.current?.close();
   };
 
-  // Fixed Footer with Cancel/Save buttons
-  const FixedFooter = () => {
-    return (
-      <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-        <TouchableOpacity
-          style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-          onPress={handleCancel}
-        >
-          <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
-            {tr.buttons.cancel}
-          </Text>
-        </TouchableOpacity>
+  // Fixed Footer with Cancel/Save buttons — a plain element, not a component
+  // declared in render (avoids re-creating a component type every render)
+  const fixedFooter = (
+    <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+      <TouchableOpacity
+        style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
+        onPress={handleCancel}
+      >
+        <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
+          {tr.buttons.cancel}
+        </Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            globalStyles.modalButton,
-            styles.saveButton,
-            { backgroundColor: theme.overlay }
-          ]}
-          onPress={handleSave}
-        >
-          <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
-            {tr.buttons.save}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+      <TouchableOpacity
+        style={[
+          globalStyles.modalButton,
+          styles.saveButton,
+          { backgroundColor: theme.overlay }
+        ]}
+        onPress={handleSave}
+      >
+        <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
+          {tr.buttons.save}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   // Main Content
   return (
@@ -93,7 +92,7 @@ export default function QuranSettingsScreen() {
       ref={ModalSheetRef}
       size="xxl"
       colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
-      footer={<FixedFooter />}
+      footer={fixedFooter}
     >
 
       <View style={globalStyles.modalContainer}>

@@ -106,6 +106,8 @@ export default function QiblaCompass({
     useEffect(() => {
         if (latitude && longitude) {
             const dist = calculateDistance(latitude, longitude, KAABA_LAT, KAABA_LNG);
+            // Intentional: store computed distance when coordinates change.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setDistanceToKaaba(Math.round(dist));
         }
     }, [latitude, longitude]);
@@ -180,12 +182,15 @@ export default function QiblaCompass({
 
         const aligned = diff < 5; // Within 5 degrees
 
+        // Intentional: update alignment state in response to heading changes.
+        /* eslint-disable react-hooks/set-state-in-effect */
         if (aligned && !isAligned) {
             Vibration.vibrate(100); // Haptic feedback
             setIsAligned(true);
         } else if (!aligned && isAligned) {
             setIsAligned(false);
         }
+        /* eslint-enable react-hooks/set-state-in-effect */
     }, [compassHeading, qiblaDirection, isAligned, isFocused]);
 
     // ------------------------------------------------------------

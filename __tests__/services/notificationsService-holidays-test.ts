@@ -116,7 +116,7 @@ describe('scheduleNotificationsService — Islamic holiday reminders', () => {
 
     const [notification, trigger] = call!;
     expect(notification.title).toBe('» Ramadan «');
-    expect(notification.body).toBe('The holy month of fasting · 25.06.2026');
+    expect(notification.body).toBe('First day of Ramadan fasting · 25.06.2026');
     expect(notification.data).toMatchObject({
       type: 'special',
       subType: 'islamic-holiday',

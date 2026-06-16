@@ -6,15 +6,6 @@ export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  centeredFlex: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
 
   // Scroll containers
   scrollContainer: {

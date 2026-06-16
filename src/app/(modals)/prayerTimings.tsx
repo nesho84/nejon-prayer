@@ -85,6 +85,8 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     useEffect(() => {
         if (location) {
+            // Intentional: refetch prayer times when the selected date/location changes.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             fetchPrayerTimesForDate(selectedDate);
         }
     }, [selectedDate, location]);
@@ -153,36 +155,35 @@ export default function PrayersSettingsScreen() {
         ? (Object.entries(prayerTimesByDate) as PrayerTimeEntry[])
         : [];
 
-    // Fixed Footer with Close/Today buttons
-    const FixedFooter = () => {
-        return (
-            <View style={[globalStyles.modalFooter, { alignSelf: 'flex-end', backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-                <TouchableOpacity
-                    style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-                    onPress={handleClose}
-                >
-                    <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
-                        {tr.buttons.cancel}
-                    </Text>
-                </TouchableOpacity>
+    // Fixed Footer with Close/Today buttons — a plain element, not a component
+    // declared in render (avoids re-creating a component type every render)
+    const fixedFooter = (
+        <View style={[globalStyles.modalFooter, { alignSelf: 'flex-end', backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+            <TouchableOpacity
+                style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
+                onPress={handleClose}
+            >
+                <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
+                    {tr.buttons.cancel}
+                </Text>
+            </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[
-                        globalStyles.modalButton,
-                        styles.todayButton,
-                        { backgroundColor: theme.overlay, opacity: isToday() ? 0.6 : 1 }
-                    ]}
-                    onPress={() => setSelectedDate(new Date())}
-                    disabled={isToday()}
-                >
-                    <Ionicons name="today" size={16} color={isToday() ? theme.placeholder : theme.accent} />
-                    <Text style={[globalStyles.modalButtonText, { color: isToday() ? theme.placeholder : theme.accent }]}>
-                        {tr.buttons.today}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        );
-    };
+            <TouchableOpacity
+                style={[
+                    globalStyles.modalButton,
+                    styles.todayButton,
+                    { backgroundColor: theme.overlay, opacity: isToday() ? 0.6 : 1 }
+                ]}
+                onPress={() => setSelectedDate(new Date())}
+                disabled={isToday()}
+            >
+                <Ionicons name="today" size={16} color={isToday() ? theme.placeholder : theme.accent} />
+                <Text style={[globalStyles.modalButtonText, { color: isToday() ? theme.placeholder : theme.accent }]}>
+                    {tr.buttons.today}
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     // Main Content
     return (
@@ -190,7 +191,7 @@ export default function PrayersSettingsScreen() {
             ref={ModalSheetRef}
             size="xxl"
             colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
-            footer={<FixedFooter />}
+            footer={fixedFooter}
         >
 
             <View style={globalStyles.modalContainer}>

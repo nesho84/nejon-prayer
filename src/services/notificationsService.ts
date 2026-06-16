@@ -366,81 +366,81 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
   if (config.specials.Friday?.enabled) {
     const dhuhrTime = prayerTimes?.Dhuhr;
 
+    // Strict HH:mm validation
+    const match = dhuhrTime?.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+
+    // Guard the Friday reminder ONLY. A missing/invalid Dhuhr time must skip
+    // just this block — NOT the holiday & daily-quote specials below. (A bare
+    // `return` here would exit scheduleSpecialNotifications entirely.)
     if (!dhuhrTime) {
       console.warn('[FridayReminder] Dhuhr time not available');
-      return;
-    }
-
-    // Strict HH:mm validation
-    const match = dhuhrTime.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
-    if (!match) {
+    } else if (!match) {
       console.warn('[FridayReminder] Invalid Dhuhr format:', dhuhrTime);
-      return;
-    }
+    } else {
+      const hour = Number(match[1]);
+      const minute = Number(match[2]);
+      const now = new Date();
+      const currentDay = now.getDay(); // 0=Sun ... 5=Fri
 
-    const hour = Number(match[1]);
-    const minute = Number(match[2]);
-    const now = new Date();
-    const currentDay = now.getDay(); // 0=Sun ... 5=Fri
+      // Calculate upcoming Friday ----
+      const triggerTime = new Date(now);
+      const daysUntilFriday = currentDay === 5 ? 0 : (5 - currentDay + 7) % 7;
+      triggerTime.setDate(now.getDate() + daysUntilFriday);
+      triggerTime.setHours(hour, minute, 0, 0);
 
-    // Calculate upcoming Friday ----
-    const triggerTime = new Date(now);
-    const daysUntilFriday = currentDay === 5 ? 0 : (5 - currentDay + 7) % 7;
-    triggerTime.setDate(now.getDate() + daysUntilFriday);
-    triggerTime.setHours(hour, minute, 0, 0);
+      // Subtract 1 hour safely ----
+      triggerTime.setTime(triggerTime.getTime() - 60 * 60 * 1000);
+      // Handle "already passed today" case with grace window
+      const GRACE_MS = 60 * 1000; // 1 minute tolerance
 
-    // Subtract 1 hour safely ----
-    triggerTime.setTime(triggerTime.getTime() - 60 * 60 * 1000);
-    // Handle "already passed today" case with grace window
-    const GRACE_MS = 60 * 1000; // 1 minute tolerance
-
-    if (daysUntilFriday === 0 && triggerTime.getTime() < now.getTime() - GRACE_MS) {
-      // Too far in the past → schedule next week
-      triggerTime.setDate(triggerTime.getDate() + 7);
-    }
-
-    // Prepare notification content
-    const title = `» ${tr.labels?.fridayTitle || 'Jumu\'ah'} «`;
-    const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
-    const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
-
-    // Create Friday reminder notification
-    await notifee.createTriggerNotification(
-      {
-        id: `special-friday`,
-        title: title,
-        body: body,
-        data: {
-          type: 'special',
-          subType: 'friday-reminder',
-          scheduledFor: triggerTime.toLocaleString('en-GB'),
-        },
-        android: {
-          channelId: `nejonprayer-vib-${vibration}`,
-          smallIcon: 'ic_stat_prayer',
-          color: AndroidColor.GREEN,
-          style: { type: AndroidStyle.INBOX, lines: [body] },
-          actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-          pressAction: { id: 'default', launchActivity: 'default' },
-          lightUpScreen: true,
-          showTimestamp: true,
-          autoCancel: false,
-          ongoing: true,
-        },
-        ios: {
-          categoryId: 'special-category',
-          interruptionLevel: 'active',
-        },
-      },
-      {
-        type: TriggerType.TIMESTAMP,
-        timestamp: triggerTime.getTime(),
-        alarmManager: hasAlarm,
-        repeatFrequency: RepeatFrequency.WEEKLY,
+      if (daysUntilFriday === 0 && triggerTime.getTime() < now.getTime() - GRACE_MS) {
+        // Too far in the past → schedule next week
+        triggerTime.setDate(triggerTime.getDate() + 7);
       }
-    );
 
-    console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
+      // Prepare notification content
+      const title = `» ${tr.labels?.fridayTitle || 'Jumu\'ah'} «`;
+      const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
+      const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
+
+      // Create Friday reminder notification
+      await notifee.createTriggerNotification(
+        {
+          id: `special-friday`,
+          title: title,
+          body: body,
+          data: {
+            type: 'special',
+            subType: 'friday-reminder',
+            scheduledFor: triggerTime.toLocaleString('en-GB'),
+          },
+          android: {
+            channelId: `nejonprayer-vib-${vibration}`,
+            smallIcon: 'ic_stat_prayer',
+            color: AndroidColor.GREEN,
+            style: { type: AndroidStyle.INBOX, lines: [body] },
+            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+            pressAction: { id: 'default', launchActivity: 'default' },
+            lightUpScreen: true,
+            showTimestamp: true,
+            autoCancel: false,
+            ongoing: true,
+          },
+          ios: {
+            categoryId: 'special-category',
+            interruptionLevel: 'active',
+          },
+        },
+        {
+          type: TriggerType.TIMESTAMP,
+          timestamp: triggerTime.getTime(),
+          alarmManager: hasAlarm,
+          repeatFrequency: RepeatFrequency.WEEKLY,
+        }
+      );
+
+      console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
+    }
   }
 
   // --- Special 2: Islamic Holidays Reminders (Olny 4 Holidays: Most important ones!) ---
@@ -449,7 +449,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     for (const name of UPCOMING_HOLIDAYS) {
       // Display/notification behavior (showFromDays, reminderDaysBefore)
       const holidayConfig = HOLIDAY_CONFIG[name];
-      if (!holidayConfig) continue;
 
       // Localized name + description for this holiday
       const translations = (HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en).holidays[name];
@@ -582,7 +581,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           body: body,
           data: {
             type: 'special',
-            subtype: 'daily-quote',
+            subType: 'daily-quote',
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {

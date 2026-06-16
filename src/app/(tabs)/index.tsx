@@ -249,13 +249,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    // Quotes Card
-    quotesCard: {
-        paddingTop: 6,
-        paddingBottom: 9,
-        paddingHorizontal: 12,
-    },
-
     // Prayers List Card
     prayersListContainer: {
         overflow: 'hidden',

@@ -44,12 +44,6 @@ export default function QiblaScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        gap: 16,
-    },
-});
+// Placeholder for future styles — kept intentionally
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const styles = StyleSheet.create({});

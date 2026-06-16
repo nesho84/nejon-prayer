@@ -50,11 +50,13 @@ export const useHolidaysStore = create<HolidaysState>()(
 
           // ONLINE: Need to fetch — first time, new year, or cache miss
           try {
-            const holidays = await getYearlyHolidays();
+            const { holidays, complete } = await getYearlyHolidays();
 
             set({
               yearlyHolidays: holidays,
-              fetchedYear: currentYear,
+              // Only lock the year on a complete fetch; partial results stay
+              // visible but trigger a refetch on the next launch
+              fetchedYear: complete ? currentYear : null,
             });
 
             console.log('🌐 [holidaysStore] Yearly holidays fetched & stored');

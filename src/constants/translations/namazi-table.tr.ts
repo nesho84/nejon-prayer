@@ -68,7 +68,7 @@ export const NAMAZI_TABLE_TR: Record<Language, NamaziTableTranslations> = {
   // ------------------------------------------------------------
   sq: {
     headerTitle: "Tabela e rekateve",
-    headerSubtitle: "Pasqyrë e rekateve të namazit",
+    headerSubtitle: "Pasqyra e rekateve të namazit",
     footerText: "Çdo namaz, qoftë farz ose sunnet, falet për hir të Zotit dhe askujt tjetër.",
 
     selamiLabel: "Selami",

@@ -96,9 +96,12 @@ export default function PrayersSettingsScreen() {
         const eventSettings = events?.[prayerName as PrayerEventType];
         const current = prayerSettings || eventSettings || { enabled: false, offset: 0, sound: isPrayer ? SOUNDS.azan1_short : SOUNDS.alarm1 };
 
+        // Intentional: seed local form state from the store when the prayer param changes.
+        /* eslint-disable react-hooks/set-state-in-effect */
         setEnabled(current.enabled);
         setSelectedOffset(current.offset);
         setSelectedSound(current.sound ?? SOUNDS.azan1_short);
+        /* eslint-enable react-hooks/set-state-in-effect */
     }, [prayerName, prayers, events]);
 
     // ------------------------------------------------------------
@@ -209,35 +212,34 @@ export default function PrayersSettingsScreen() {
     // Dont render if no valid prayer name in params
     if (!prayerName) return null;
 
-    // Fixed Footer with Cancel/Save buttons
-    const FixedFooter = () => {
-        return (
-            <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-                <TouchableOpacity
-                    style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-                    onPress={handleCancel}
-                >
-                    <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
-                        {tr.buttons.cancel}
-                    </Text>
-                </TouchableOpacity>
+    // Fixed Footer with Cancel/Save buttons — a plain element, not a component
+    // declared in render (avoids re-creating a component type every render)
+    const fixedFooter = (
+        <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+            <TouchableOpacity
+                style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
+                onPress={handleCancel}
+            >
+                <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
+                    {tr.buttons.cancel}
+                </Text>
+            </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[
-                        globalStyles.modalButton,
-                        styles.saveButton,
-                        { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }
-                    ]}
-                    onPress={handleSave}
-                    disabled={!notificationPermission}
-                >
-                    <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
-                        {tr.buttons.save}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        );
-    };
+            <TouchableOpacity
+                style={[
+                    globalStyles.modalButton,
+                    styles.saveButton,
+                    { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }
+                ]}
+                onPress={handleSave}
+                disabled={!notificationPermission}
+            >
+                <Text style={[globalStyles.modalButtonText, { color: theme.accent }]}>
+                    {tr.buttons.save}
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     // Main Content
     return (
@@ -245,7 +247,7 @@ export default function PrayersSettingsScreen() {
             ref={ModalSheetRef}
             size="full" // default
             colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}
-            footer={<FixedFooter />}
+            footer={fixedFooter}
         >
 
             <View style={globalStyles.modalContainer}>

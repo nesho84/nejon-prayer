@@ -425,12 +425,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 10,
   },
-  emptyContainer: {
-    paddingTop: 60,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 15,
-    fontWeight: "400",
-  },
 });

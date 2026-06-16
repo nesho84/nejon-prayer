@@ -10,10 +10,11 @@ Nejon Prayer is a React Native / Expo app for Muslim daily practice. Its main fe
 - **Quran reader** — Arabic text with transliteration loaded locally from a bundled JSON. Translations fetched per-surah from [alquran.cloud](https://alquran.cloud/api). Audio playback via `react-native-track-player`.
 - **Qibla compass** — bearing to Mecca using `expo-sensors`.
 - **Tesbih (dhikr counter)** — digital prayer bead counter with configurable target and lap tracking.
+- **Islamic holidays** — yearly Islamic holiday dates (Hijri-based) with a next-holiday card on the home screen, a full list screen, and optional reminders for the four major holidays.
 - **Guides** — step-by-step Wudu (abdest) and Salah (namaz) guides, Ramadan tips.
 - **Settings** — language, theme, notification volume, sounds, location refresh.
 
-**Supported languages:** English, German (`de`), Albanian (`sq`), Turkish (`tr`)
+**Supported languages:** English, German (`de`), French (`fr`), Albanian (`sq`), Bosnian (`bs`), Macedonian (`mk`), Turkish (`tr`), Arabic (`ar`)
 
 ---
 
@@ -43,7 +44,7 @@ Press `a` to open on Android emulator, or `i` for iOS simulator.
 src/
 ├── app/                   # Expo Router screens
 │   ├── (tabs)/            # Main tab bar: Home, Quran, Qibla, Extras, Settings
-│   ├── extras/            # Wudu guide, Tesbih, Ramadan, Quotes, About
+│   ├── extras/            # Wudu guide, Tesbih, Ramadan, Quotes, Islamic holidays, About
 │   │   └── namazi/        # Salah guide (namazi-guide.tsx) + namazi-plus placeholder
 │   ├── quran/             # Ayahs screen, Bookmarked Ayahs (ayahs-fav.tsx)
 │   ├── (modals)/          # Bottom-sheet modals: prayer config, timings, Quran settings
@@ -84,6 +85,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `prayersTrackingStore` | Per-prayer mark-as-prayed, rolling 30-day history |
 | `notificationsStore` | Per-prayer notification config, scheduling, background sync |
 | `quranStore` | Full Quran data, ayahs cache, reading position, player state, settings |
+| `holidaysStore` | Yearly Islamic holiday dates cache (fetched once per year) |
 | `themeStore` | Light / dark / system theme |
 | `languageStore` | Active language + translation strings |
 | `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
@@ -97,6 +99,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useDeviceSettingsSync` | Polls permissions and network state |
 | `usePrayerTimesSync` | Triggers prayer times reload on location/date change |
 | `useNotificationsSync` | Creates notification channels, reschedules on prayer times or settings change |
+| `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
 
@@ -105,6 +108,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | API | Used For | Call Frequency |
 |---|---|---|
 | `api.aladhan.com/v1/calendar/{year}` | Yearly prayer times by GPS coordinates | Once per year per location |
+| `api.aladhan.com/v1/islamicHolidaysByHijriYear/{year}` (+ `gToH`) | Islamic holiday dates | Once per year |
 | `api.alquran.cloud/v1/surah/{id}/{edition}` | Quran translation text | Per surah, on demand |
 
 Prayer calculation method is auto-selected by latitude:
@@ -201,13 +205,13 @@ eas login
 
 ## Testing
 
-The project uses **Jest** with the `jest-expo` preset and **@testing-library/react-native**. Tests are scoped to pure utility functions — no component rendering or native module mocking required.
+The project uses **Jest** with the `jest-expo` preset and **@testing-library/react-native**. The `__tests__/` directory mirrors `src/` and covers utils, stores, services, hooks, components, and screens.
 
 ```bash
 npm test
 ```
 
-Tests cover date formatting, time comparisons, calendar grid generation, and prayer tracking logic. All test files live under `__tests__/`.
+When adding a store, service, hook, component, or screen, add the matching test under the parallel `__tests__/` path.
 
 > **Note:** `react-test-renderer` is pinned in `devDependencies` to match the exact `react` version. Do not upgrade it independently — it must always match `react`.
 

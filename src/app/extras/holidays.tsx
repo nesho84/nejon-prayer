@@ -1,18 +1,21 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
-import { HOLIDAY_META } from "@/components/HolidaysCard";
 import { globalStyles } from "@/constants/styles";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { ALL_HOLIDAYS, HolidayName } from "@/types/holiday.types";
+import { ALL_HOLIDAYS, HOLIDAY_META, HolidayName } from "@/types/holiday.types";
+import { ThemeColors } from "@/types/theme.types";
 import { formatDateKey, toDateKey } from "@/utils/date";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+type MCIcon = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type ThemeKey = keyof ThemeColors;
 
 interface HolidayItem {
     key: string;
@@ -51,9 +54,10 @@ export default function HolidaysScreen() {
     }, [yearlyHolidays]);
 
     const AVAILABLE_YEARS = useMemo(() => {
+        const currentYear = new Date().getFullYear();
         const allDates = Object.values(ALL_DATES).flat();
         return [...new Set(allDates.map(d => parseInt(d.substring(0, 4))))]
-            .filter(y => y <= new Date().getFullYear() + 1)
+            .filter(y => y >= currentYear && y <= currentYear + 1)
             .sort();
     }, [ALL_DATES]);
 
@@ -102,18 +106,23 @@ export default function HolidaysScreen() {
         const isShared = sharedKey === item.key;
 
         return (
-            <AppCard style={[styles.itemCard, { backgroundColor: theme.card, opacity: item.isPast ? 0.4 : 1 }]}>
+            <AppCard
+                testID={`holiday-${item.key}`}
+                style={[styles.itemCard, { backgroundColor: theme.card, opacity: item.isPast ? 0.45 : 1 }]}
+            >
                 <View style={styles.itemRow}>
                     {/* Left — icon box */}
                     <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
-                        {meta.icon(30, theme[meta.color])}
+                        <MaterialCommunityIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />
                     </View>
+
                     {/* Middle — name, desc, date */}
                     <View style={styles.middleRow}>
-                        <Text style={[styles.itemName, { color: theme[meta.color] }]}>{itemTr.name}</Text>
+                        <Text style={[styles.itemName, { color: theme[meta.color as ThemeKey] }]}>{itemTr.name}</Text>
                         <Text style={[styles.itemDesc, { color: theme.textMuted }]}>{itemTr.description}</Text>
                         <Text style={[styles.itemDate, { color: theme.placeholder }]}>{formattedDate}</Text>
                     </View>
+
                     {/* Right — share icon */}
                     <TouchableOpacity
                         onPress={() => handleShare(item.key, itemTr.name, formattedDate)}
@@ -138,7 +147,7 @@ export default function HolidaysScreen() {
                 ListHeaderComponent={
                     // HEADER
                     <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.gray }]}>
-                        <Text style={globalStyles.headerIcon}>🌙</Text>
+                        <Text style={globalStyles.headerIcon}>✨</Text>
                         <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{holidaysTr.headerTitle}</Text>
                         <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{holidaysTr.headerSubtitle}</Text>
                         {/* Year badges */}

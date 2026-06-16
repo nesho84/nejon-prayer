@@ -1,6 +1,7 @@
-// ============================================================
-// Holiday names — ONE type, all 10 holidays
-// ============================================================
+
+// Default icon size
+const S = 30;
+
 export type HolidayName =
   | "hijri_new_year"
   | "ashura"
@@ -13,9 +14,6 @@ export type HolidayName =
   | "arafah"
   | "eid_adha";
 
-// ============================================================
-// Shared types
-// ============================================================
 export type HijriDate = { month: number; day: number };
 
 export type HolidayConfig = { showFromDays: number; reminderDaysBefore: number };
@@ -23,21 +21,20 @@ export type HolidayConfig = { showFromDays: number; reminderDaysBefore: number }
 // Normalized once in the service: { ramadan_start: ["2027-02-08", "2028-01-28"], ... }
 export type YearlyHolidays = Partial<Record<HolidayName, string[]>>;
 
-// Single holiday occurrence — mirrors PrayerEntry
-export interface HolidayEntry {
-  name: HolidayName;
-  gregorianDate: string; // "YYYY-MM-DD"
-}
-
 export interface UpcomingHoliday {
   name: HolidayName;
   gregorianDate: string;
   daysUntil: number; // always >= 1, never 0
 }
 
-// ============================================================
-// Lists (name arrays, like ALL_PRAYERS / MAIN_PRAYERS)
-// ============================================================
+// Metadata for icons and colors
+export type HolidayMeta = {
+  icon: string;
+  size: number;
+  color: string;
+};
+
+// All known holidays with their Hijri dates a
 export const ALL_HOLIDAYS: HolidayName[] = [
   "hijri_new_year",
   "ashura",
@@ -58,11 +55,6 @@ export const UPCOMING_HOLIDAYS: HolidayName[] = [
   "eid_fitr",
   "eid_adha",
 ];
-
-// ============================================================
-// Data keyed by name — every constant is a COMPLETE Record<HolidayName>
-// (like PrayerTimes covers every PrayerName — no Partial, no casts)
-// ============================================================
 
 // Hijri date for each holiday
 export const HOLIDAY_HIJRI_DATES: Record<HolidayName, HijriDate> = {
@@ -90,4 +82,18 @@ export const HOLIDAY_CONFIG: Record<HolidayName, HolidayConfig> = {
   eid_fitr: { showFromDays: 7, reminderDaysBefore: 2 },
   arafah: { showFromDays: 3, reminderDaysBefore: 1 },
   eid_adha: { showFromDays: 7, reminderDaysBefore: 2 },
+};
+
+// Icon, size and accent color per holiday
+export const HOLIDAY_META: Record<HolidayName, HolidayMeta> = {
+  hijri_new_year: { icon: 'calendar-star', size: S, color: 'orange' },
+  ashura: { icon: 'water-outline', size: S, color: 'teal' },
+  regaib: { icon: 'star-outline', size: S, color: 'violet' },
+  isra_miraj: { icon: 'shimmer', size: S, color: 'indigo' },
+  laylat_baraat: { icon: 'moon-new', size: S, color: 'info' },
+  ramadan_start: { icon: 'star-crescent', size: S, color: 'islamicGreen' },
+  laylat_qadr: { icon: 'book-outline', size: S, color: 'gold' },
+  eid_fitr: { icon: 'creation-outline', size: S, color: 'secondary' },
+  arafah: { icon: 'nature-people', size: S, color: 'brown' },
+  eid_adha: { icon: 'sheep', size: S, color: 'accent' },
 };

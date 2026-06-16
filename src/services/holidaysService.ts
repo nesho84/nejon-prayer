@@ -55,7 +55,7 @@ async function fetchHolidaysForHijriYear(hijriYear: number): Promise<AladhanHoli
 // year ahead. Returns a map keyed by HolidayName:
 // { ramadan_start: ["2027-02-08", "2028-01-28"], ... }
 // ------------------------------------------------------------
-export async function getYearlyHolidays(): Promise<YearlyHolidays> {
+export async function getYearlyHolidays(): Promise<{ holidays: YearlyHolidays; complete: boolean }> {
   let timeout: ReturnType<typeof setTimeout> | undefined;
 
   try {
@@ -70,6 +70,10 @@ export async function getYearlyHolidays(): Promise<YearlyHolidays> {
 
     const gToHRes = await fetch(`https://api.aladhan.com/v1/gToH/${dd}-${mm}-${yyyy}`, { signal: controller.signal });
 
+    // gToH network call resolved — clear its 10s abort timer now so it can't
+    // fire (a no-op) while the three year fetches below run on their own timeouts.
+    clearTimeout(timeout);
+
     if (!gToHRes.ok) {
       throw new Error(`HTTP error! status: ${gToHRes.status}`);
     }
@@ -79,11 +83,24 @@ export async function getYearlyHolidays(): Promise<YearlyHolidays> {
 
     // Fetch all holidays for the previous, current and next Hijri year
     // (prev covers Jan–Jun holidays that fall in the current Gregorian year)
-    const [prevYear, thisYear, nextYear] = await Promise.all([
+    const results = await Promise.allSettled([
       fetchHolidaysForHijriYear(hijriYear - 1),
       fetchHolidaysForHijriYear(hijriYear),
       fetchHolidaysForHijriYear(hijriYear + 1),
     ]);
+
+    // If every year failed, treat it as a hard failure — don't cache an empty map
+    if (results.every((r) => r.status === "rejected")) {
+      throw new Error("All Hijri-year holiday fetches failed");
+    }
+
+    const [prevYear, thisYear, nextYear] = results.map((r) =>
+      r.status === "fulfilled" ? r.value : []
+    );
+
+    // Complete only when all three Hijri years resolved — drives whether the
+    // store locks in the year or retries on next launch
+    const complete = results.every((r) => r.status === "fulfilled");
 
     // Normalize into a map keyed by HolidayName, matching by Hijri month/day
     const yearlyHolidays: YearlyHolidays = {};
@@ -115,7 +132,7 @@ export async function getYearlyHolidays(): Promise<YearlyHolidays> {
 
     console.log(`✅ [holidaysService] Normalized holidays for Hijri ${hijriYear - 1}-${hijriYear + 1} (Gregorian ${currentGregorianYear}-${currentGregorianYear + 1})`);
 
-    return yearlyHolidays;
+    return { holidays: yearlyHolidays, complete };
 
   } catch (err) {
     console.warn("❌ [holidaysService] Failed to fetch yearly holidays:", err);
@@ -141,8 +158,6 @@ export function getNextHoliday(yearlyHolidays: YearlyHolidays, today: string): U
 
   for (const name of UPCOMING_HOLIDAYS) {
     const config = HOLIDAY_CONFIG[name];
-    if (!config) continue;
-
     const gregorianDate = getHolidayDate(yearlyHolidays, name, today);
     if (!gregorianDate) continue;
 

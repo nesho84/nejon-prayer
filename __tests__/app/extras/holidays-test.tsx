@@ -111,7 +111,7 @@ describe('HolidaysScreen', () => {
 
     const past = screen.getByTestId('holiday-ramadan_start');
     const upcoming = screen.getByTestId('holiday-eid_adha');
-    expect(StyleSheet.flatten(past.props.style).opacity).toBe(0.4);
+    expect(StyleSheet.flatten(past.props.style).opacity).toBe(0.45);
     expect(StyleSheet.flatten(upcoming.props.style).opacity).toBe(1);
   });
 

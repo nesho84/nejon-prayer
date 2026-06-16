@@ -6,16 +6,16 @@ export function useHolidaysSync() {
   // Wait for device settings to finish their first sync so that
   // internetConnection is accurate before we attempt to fetch.
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
-  const isReady = useHolidaysStore((state) => state.isReady);
-  const loadHolidays = useHolidaysStore((state) => state.loadHolidays);
+  const holidaysReady = useHolidaysStore((state) => state.isReady);
 
   // ------------------------------------------------------------
   // Fetch Islamic holiday dates once per year on app start
   // The fetchedYear guard in the store prevents unnecessary refetches
   // ------------------------------------------------------------
   useEffect(() => {
-    if (!isReady || !deviceSettingsReady) return;
+    if (!deviceSettingsReady || !holidaysReady) return;
 
-    loadHolidays();
-  }, [deviceSettingsReady, isReady]);
+    useHolidaysStore.getState().loadHolidays();
+
+  }, [deviceSettingsReady, holidaysReady]);
 }
