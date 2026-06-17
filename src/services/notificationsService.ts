@@ -362,7 +362,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
 async function scheduleSpecialNotifications(params: ScheduleParams) {
   const { config, prayerTimes, yearlyHolidays, language, tr, hasAlarm } = params;
 
-  // --- Special 1: Friday reminder (1 hour before Dhuhr) ---
+  // --- Special 1: Friday reminder (1h before Dhuhr, or a fixed fallback time) ---
   if (config.specials.Friday?.enabled) {
     // Fallback reminder time when Dhuhr is unavailable/invalid (keeps Friday independent of prayer data)
     const FALLBACK_HOUR = 11;
@@ -656,7 +656,7 @@ export async function handleNotificationEvent(
     case EventType.DELIVERED:
       // Notification was delivered and shown to user
       console.log(`✅ ${prefix} Notification delivered`);
-      // Background sync handled in index.ts
+      // Background sync handled in index.js
 
       // Actions based on notification type
       if (notifType == 'prayer' || notifType == 'prayer-event') {
@@ -675,7 +675,7 @@ export async function handleNotificationEvent(
         case 'done':
           // "✓ Prayed" action button pressed (prayers only)
           console.log(`🕌 ${prefix} Notification "Prayed" pressed`);
-          // Background tracking handled in index.ts and foreground in useNotificationsSync
+          // Background tracking handled in index.js and foreground in useNotificationsSync
           await cancelDisplayedNotification(notification.id);
           break;
 

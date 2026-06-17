@@ -64,7 +64,7 @@ const COUNTRY_METHOD_MAP: Record<string, number> = {
     BN: 17, // Brunei — JAKIM
     SG: 11, // Singapore — MUIS
     ID: 20, // Indonesia — Kemenag
-    // Turkey & Balkans
+    // Diyanet method (13) — Turkey, Balkans & European diaspora
     TR: 13, // Turkey — Diyanet
     AT: 13, // Austria
     DE: 13, // Germany

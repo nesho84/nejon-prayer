@@ -52,7 +52,7 @@ function getNextPrayer(prayerTimes: PrayerTimes | null): { name: PrayerName; tim
 
 // ------------------------------------------------------------
 // Current prayer period — the prayer whose window is currently active.
-// Returns the prayer just before nextPrayerName in PRAYER_ORDER, or null
+// Returns the prayer just before nextPrayerName in MAIN_PRAYERS, or null
 // if next is Fajr (nothing has started yet today).
 // ------------------------------------------------------------
 function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, nextPrayerTime: Date): PrayerEntry | null {
@@ -80,7 +80,7 @@ function getCurrentPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName, 
 }
 
 // ------------------------------------------------------------
-// Previous prayer — the one that just passed in FULL_DAY_ORDER.
+// Previous prayer — the one that just passed in ALL_PRAYERS.
 // Used only for the countdown card left side-column display.
 // ------------------------------------------------------------
 function getPrevPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {
@@ -94,7 +94,7 @@ function getPrevPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): Pr
 }
 
 // ------------------------------------------------------------
-// Prayer after next — the one coming after nextPrayerName in FULL_DAY_ORDER.
+// Prayer after next — the one coming after nextPrayerName in ALL_PRAYERS.
 // Used only for the countdown card right side-column display.
 // ------------------------------------------------------------
 function getAfterNextPrayer(prayerTimes: PrayerTimes, nextPrayerName: PrayerName): PrayerEntry | null {

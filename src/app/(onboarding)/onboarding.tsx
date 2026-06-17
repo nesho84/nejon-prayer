@@ -143,7 +143,7 @@ export default function OnboardingScreen() {
     }
   }
 
-  // Loadng state
+  // Loading state
   if (localLoading) {
     return <AppLoading />;
   }

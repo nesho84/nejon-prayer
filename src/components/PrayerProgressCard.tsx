@@ -36,7 +36,7 @@ const PrayerProgressCard = React.memo(() => {
   };
 
   // ------------------------------------------------------------
-  // ormatted date string badge based on current view and month rows
+  // Formatted date string badge based on current view and month rows
   // ------------------------------------------------------------
   const formattedBadge = useMemo(() => {
     // Week view — always just current month/year

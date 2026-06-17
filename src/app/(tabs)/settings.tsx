@@ -1,4 +1,5 @@
 import AppCard from "@/components/AppCard";
+import NotificationsTester from "@/debug/NotificationsTester";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import CustomPicker from "@/components/CustomPicker";
@@ -231,7 +232,7 @@ export default function SettingsScreen() {
     };
 
     // ------------------------------------------------------------
-    // Change Notification snozee timeout
+    // Change Notification snooze timeout
     // ------------------------------------------------------------
     const handleSnooze = async (value: number) => {
         if (notifSettings?.snooze === value) return; // no change
@@ -496,6 +497,13 @@ export default function SettingsScreen() {
                             <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.card, opacity: 0.7, zIndex: 10, borderRadius: 12 }]} />
                         )}
 
+                        {/* ------ Notification Tester (dev only) ------ */}
+                        {__DEV__ && (
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                <NotificationsTester seconds={10} />
+                            </View>
+                        )}
+
                         {/* ------ Sound Volume ------ */}
                         <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
                             <View style={styles.statusRow}>
@@ -607,7 +615,7 @@ export default function SettingsScreen() {
 
                         {/* ------ Friday Reminder + Daily Quote Reminder ------ */}
                         <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-                            {/* Firday Reminder */}
+                            {/* Friday Reminder */}
                             <View style={styles.statusRow}>
                                 <Text style={[styles.statusText, { color: theme.text }]}>
                                     {tr.labels.fridayReminder}

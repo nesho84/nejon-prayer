@@ -12,7 +12,7 @@ import {
   testHolidayNotification,
   testPrayerNotification,
   testPrayerReminderNotification,
-} from "./notifTest";
+} from "./notificationsTests";
 
 const TEST_FUNCTIONS = [
   { label: "Prayer", func: testPrayerNotification },
@@ -27,7 +27,7 @@ interface Props {
   seconds?: number;
 }
 
-export default function NotificationTester({ seconds = 10 }: Props) {
+export default function NotificationsTester({ seconds = 10 }: Props) {
   const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
   const location = useLocationStore((state) => state.location);
@@ -89,8 +89,6 @@ const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
     borderRadius: 8,
-    marginTop: 48,
-    marginHorizontal: 8,
     overflow: "hidden",
   },
   header: {

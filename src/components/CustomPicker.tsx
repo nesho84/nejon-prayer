@@ -62,7 +62,7 @@ export default function CustomPicker({
       >
         {selectedItem ? (
           <>
-            {/* Selected Item icon/emojie */}
+            {/* Selected Item icon/emoji */}
             {selectedItem.icon && (
               <Text style={styles.selectedIcon}>{selectedItem.icon}</Text>
             )}
@@ -117,7 +117,7 @@ export default function CustomPicker({
                   ]}
                   onPress={() => handleSelect(item.value)}
                 >
-                  {/* Item icon/emojie */}
+                  {/* Item icon/emoji */}
                   {item.icon && (
                     <Text style={styles.selectedIcon}>{item.icon}</Text>
                   )}

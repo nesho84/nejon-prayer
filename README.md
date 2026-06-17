@@ -111,10 +111,12 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `api.aladhan.com/v1/islamicHolidaysByHijriYear/{year}` (+ `gToH`) | Islamic holiday dates | Once per year |
 | `api.alquran.cloud/v1/surah/{id}/{edition}` | Quran translation text | Per surah, on demand |
 
-Prayer calculation method is auto-selected by latitude:
-- **41–44° N** (Albania, Kosovo, N. Macedonia, Bosnia) → Custom angle method (Fajr 15°, Isha 17°)
-- **44–50° N** (Turkey, Central Europe) → Turkish Diyanet method (method 13)
-- **Elsewhere** → ISNA (method 2)
+Prayer calculation method is auto-selected by **country** — the ISO country code from the
+device's reverse-geocoded location is mapped (via `COUNTRY_METHOD_MAP` in `prayersService.ts`)
+to the closest local authority's method (e.g. Diyanet/13 for Turkey & the Balkans, Egyptian/5
+for Egypt, ISNA/2 for US/Canada), falling back to **MWL (method 3)** for unlisted countries.
+A **One-Seventh of the Night** latitude adjustment is always applied so high-latitude Fajr/Isha
+stay reasonable in summer.
 
 ### Notifications
 

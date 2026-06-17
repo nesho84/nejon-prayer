@@ -63,7 +63,7 @@ export const QURAN_TEXT_EDITIONS = {
 } as const;
 
 // ------------------------------------------------------------
-// Fetch ayahs for a surah from alquran.cloud (aladhan.com)
+// Fetch ayahs for a surah from alquran.cloud
 // Called from quranStore.fetchAyahs() for non-Arabic languages
 // Arabic reads directly from local JSON via getSurahById()
 // ------------------------------------------------------------

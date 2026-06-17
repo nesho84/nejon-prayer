@@ -200,7 +200,7 @@ export default function QuranTabScreen() {
   }, []);
 
   // ------------------------------------------------------------
-  // Header + Search bar - Fixed in portrait, scrollbale in landscape
+  // Header + Search bar - Fixed in portrait, scrollable in landscape
   // ------------------------------------------------------------
   const renderHeader = (
     <AppCard

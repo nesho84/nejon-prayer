@@ -6,6 +6,7 @@ import { toDateKey } from '@/utils/date';
 export const getCurrentWeekDays = (): Date[] => {
   const today = new Date();
   const monday = new Date(today);
+  // (getDay() + 6) % 7 → days since Monday (Mon=0 … Sun=6); step back that many days
   monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
@@ -21,6 +22,7 @@ const getCurrentMonthGridItems = () => {
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  // (getDay() + 6) % 7 → weekday index with Monday=0 … Sunday=6 (count of leading blanks before day 1)
   const offset = (firstDay.getDay() + 6) % 7;
 
   const prevMonthLastDay = new Date(today.getFullYear(), today.getMonth(), 0).getDate();

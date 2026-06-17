@@ -151,9 +151,6 @@ export default function HomeScreen() {
     return (
         <AppLayout>
 
-            {/* Notifications Test */}
-            {/* {__DEV__ && <NotificationTester seconds={10} />} */}
-
             <ScrollView
                 style={[globalStyles.scrollContainer, { backgroundColor: theme.bg }]}
                 contentContainerStyle={[

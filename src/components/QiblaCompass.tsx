@@ -121,6 +121,7 @@ export default function QiblaCompass({
         Accelerometer.setUpdateInterval(200);
         const sub = Accelerometer.addListener(({ x, y, z }) => {
             accelRef.current = { x, y, z };
+            // z ≈ ±1g when the phone lies flat; > 0.8 means flat enough for a reliable heading
             setIsFlat(Math.abs(z) > 0.8);
         });
 
@@ -143,7 +144,9 @@ export default function QiblaCompass({
                 const { x: mx, y: my, z: mz } = mag;
                 const { x: ax, y: ay, z: az } = accelRef.current;
 
-                // Tilt-compensated compass heading
+                // Tilt-compensated heading: derive pitch/roll from the accelerometer, then
+                // project the magnetometer onto the horizontal plane (Xh, Yh) so the heading
+                // stays correct even when the phone isn't held perfectly flat
                 const pitch = Math.atan2(-ax, Math.sqrt(ay * ay + az * az));
                 const roll = Math.atan2(ay, az);
                 const Xh = mx * Math.cos(pitch) + mz * Math.sin(pitch);
@@ -156,7 +159,8 @@ export default function QiblaCompass({
                 // smooth & set
                 setCompassHeading(smoothHeading(heading));
 
-                // Check magnetic field strength for accuracy
+                // Earth's magnetic field is ~25–65 µT; readings far outside that band signal
+                // nearby interference (metal/magnets), so flag the heading as less accurate
                 const magnitude = Math.sqrt(mx * mx + my * my + mz * mz);
                 if (magnitude < 20 || magnitude > 100) setMagnetometerAccuracy('low');
                 else if (magnitude < 30 || magnitude > 70) setMagnetometerAccuracy('medium');

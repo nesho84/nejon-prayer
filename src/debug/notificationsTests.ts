@@ -46,7 +46,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                     reminderBody: "Kujtesë Lutjeje",
                 },
                 android: {
-                    // (Channel is created in notificationsService.js)
+                    // (Channel is created in notificationsService.ts)
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
@@ -203,7 +203,7 @@ export async function testFridayNotification({ options, notifSettings, seconds =
     try {
         const triggerTime = Date.now() + seconds * 1000;
         const title = "Jumu'ah Reminder";
-        const body = "Today is Jumu‘ah. Make time for prayer.";
+        const body = "Today is Jumu'ah. Make time for prayer.";
 
         await notifee.createTriggerNotification(
             {
@@ -379,4 +379,3 @@ export async function debugChannelsAndScheduled() {
         console.error('❌ debugChannelsAndScheduled failed:', err);
     }
 }
-

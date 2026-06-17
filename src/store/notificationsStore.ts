@@ -13,7 +13,6 @@ import {
   SpecialSettings,
   SpecialType
 } from '@/types/notification.types';
-import { PrayerTimes } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/date';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
@@ -29,7 +28,7 @@ interface NotificationsState {
   lastBackgroundSync: string | null;
   isLoading: boolean;
   isReady: boolean;
-  syncNotifications: (prayerTimes?: PrayerTimes | null) => Promise<void>;
+  syncNotifications: () => Promise<void>;
   syncNotificationsInBackground: () => Promise<void>;
   setSettings: (updates: Partial<NotifSettings>) => void;
   setPrayer: (prayer: PrayerType, updates: Partial<PrayerSettings>) => void;
@@ -151,7 +150,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         }
       },
 
-      // Sync background notifications (called in root index.ts on background event)
+      // Sync background notifications (called in root index.js on background event)
       syncNotificationsInBackground: async () => {
         try {
           console.log('🔄 [Background] Syncing Notifications...');
