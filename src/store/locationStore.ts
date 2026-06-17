@@ -1,18 +1,14 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "@/store/storage";
 import { Cords, TimeZone } from "@/types/location.types";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface LocationState {
   location: Cords | null;
   fullAddress: string | null;
   timeZone: TimeZone | null;
   isReady: boolean;
-  setLocation: (
-    location: Cords | null,
-    fullAddress: string | null,
-    timeZone: TimeZone | null
-  ) => void;
+  setLocation: (location: Cords | null, fullAddress: string | null, timeZone: TimeZone | null) => void;
 }
 
 export const useLocationStore = create<LocationState>()(

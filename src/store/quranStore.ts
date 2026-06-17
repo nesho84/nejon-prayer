@@ -199,8 +199,6 @@ export const useQuranStore = create<QuranState>()(
         ...(persisted as Partial<QuranState>),
         selectedEditions: { ...DEFAULT_EDITIONS, ...((persisted as Partial<QuranState>)?.selectedEditions ?? {}) },
       }),
-      // Persist reading/khatam positions, counts, and display settings
-      // — everything else (player state, loaded data) starts fresh
       partialize: (state) => ({
         lastReadSurahId: state.lastReadSurahId,
         lastReadSurahName: state.lastReadSurahName,

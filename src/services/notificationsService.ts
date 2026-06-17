@@ -364,87 +364,92 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
   // --- Special 1: Friday reminder (1 hour before Dhuhr) ---
   if (config.specials.Friday?.enabled) {
+    // Fallback reminder time when Dhuhr is unavailable/invalid (keeps Friday independent of prayer data)
+    const FALLBACK_HOUR = 11;
+    const FALLBACK_MINUTE = 0;
+
     const dhuhrTime = prayerTimes?.Dhuhr;
 
     // Strict HH:mm validation
     const match = dhuhrTime?.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
 
-    // Guard the Friday reminder ONLY. A missing/invalid Dhuhr time must skip
-    // just this block — NOT the holiday & daily-quote specials below. (A bare
-    // `return` here would exit scheduleSpecialNotifications entirely.)
-    if (!dhuhrTime) {
-      console.warn('[FridayReminder] Dhuhr time not available');
-    } else if (!match) {
-      console.warn('[FridayReminder] Invalid Dhuhr format:', dhuhrTime);
-    } else {
-      const hour = Number(match[1]);
-      const minute = Number(match[2]);
-      const now = new Date();
-      const currentDay = now.getDay(); // 0=Sun ... 5=Fri
-
-      // Calculate upcoming Friday ----
-      const triggerTime = new Date(now);
-      const daysUntilFriday = currentDay === 5 ? 0 : (5 - currentDay + 7) % 7;
-      triggerTime.setDate(now.getDate() + daysUntilFriday);
-      triggerTime.setHours(hour, minute, 0, 0);
-
-      // Subtract 1 hour safely ----
-      triggerTime.setTime(triggerTime.getTime() - 60 * 60 * 1000);
-      // Handle "already passed today" case with grace window
-      const GRACE_MS = 60 * 1000; // 1 minute tolerance
-
-      if (daysUntilFriday === 0 && triggerTime.getTime() < now.getTime() - GRACE_MS) {
-        // Too far in the past → schedule next week
-        triggerTime.setDate(triggerTime.getDate() + 7);
-      }
-
-      // Prepare notification content
-      const title = `» ${tr.labels?.fridayTitle || 'Jumu\'ah'} «`;
-      const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
-      const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
-
-      // Create Friday reminder notification
-      await notifee.createTriggerNotification(
-        {
-          id: `special-friday`,
-          title: title,
-          body: body,
-          data: {
-            type: 'special',
-            subType: 'friday-reminder',
-            scheduledFor: triggerTime.toLocaleString('en-GB'),
-          },
-          android: {
-            channelId: `nejonprayer-vib-${vibration}`,
-            smallIcon: 'ic_stat_prayer',
-            color: AndroidColor.GREEN,
-            style: { type: AndroidStyle.INBOX, lines: [body] },
-            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
-            pressAction: { id: 'default', launchActivity: 'default' },
-            lightUpScreen: true,
-            showTimestamp: true,
-            autoCancel: false,
-            ongoing: true,
-          },
-          ios: {
-            categoryId: 'special-category',
-            interruptionLevel: 'active',
-          },
-        },
-        {
-          type: TriggerType.TIMESTAMP,
-          timestamp: triggerTime.getTime(),
-          alarmManager: hasAlarm,
-          repeatFrequency: RepeatFrequency.WEEKLY,
-        }
-      );
-
-      console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
+    // Friday is independent of prayer data — when Dhuhr is missing/invalid, fall back
+    // to a fixed pre-Jumu'ah time (11:00) so the reminder never silently fails
+    if (!match) {
+      console.warn('[FridayReminder] Dhuhr unavailable/invalid, using fallback:', dhuhrTime);
     }
+
+    const hour = match ? Number(match[1]) : FALLBACK_HOUR;
+    const minute = match ? Number(match[2]) : FALLBACK_MINUTE;
+    const now = new Date();
+    const currentDay = now.getDay(); // 0=Sun ... 5=Fri
+
+    // Calculate upcoming Friday ----
+    const triggerTime = new Date(now);
+    const daysUntilFriday = currentDay === 5 ? 0 : (5 - currentDay + 7) % 7;
+    triggerTime.setDate(now.getDate() + daysUntilFriday);
+    triggerTime.setHours(hour, minute, 0, 0);
+
+    // Subtract 1 hour only when anchored to a real Dhuhr time ----
+    if (match) triggerTime.setTime(triggerTime.getTime() - 60 * 60 * 1000);
+
+    // Handle "already passed today" case with grace window
+    const GRACE_MS = 60 * 1000; // 1 minute tolerance
+    if (daysUntilFriday === 0 && triggerTime.getTime() < now.getTime() - GRACE_MS) {
+      // Too far in the past → schedule next week
+      triggerTime.setDate(triggerTime.getDate() + 7);
+    }
+
+    // Prepare notification content
+    const title = `» ${tr.labels?.fridayTitle || 'Jumu\'ah'} «`;
+    const body = tr.labels?.fridayBody || 'Today is Jumu‘ah. Take time for prayer.';
+    const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
+
+    // Create Friday reminder notification
+    await notifee.createTriggerNotification(
+      {
+        id: `special-friday`,
+        title: title,
+        body: body,
+        data: {
+          type: 'special',
+          subType: 'friday-reminder',
+          scheduledFor: triggerTime.toLocaleString('en-GB'),
+        },
+        android: {
+          channelId: `nejonprayer-vib-${vibration}`,
+          smallIcon: 'ic_stat_prayer',
+          color: AndroidColor.GREEN,
+          style: { type: AndroidStyle.INBOX, lines: [body] },
+          actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
+          pressAction: { id: 'default', launchActivity: 'default' },
+          lightUpScreen: true,
+          showTimestamp: true,
+          autoCancel: false,
+          ongoing: true,
+        },
+        ios: {
+          categoryId: 'special-category',
+          interruptionLevel: 'active',
+        },
+      },
+      {
+        type: TriggerType.TIMESTAMP,
+        timestamp: triggerTime.getTime(),
+        alarmManager: hasAlarm,
+        repeatFrequency: RepeatFrequency.WEEKLY,
+      }
+    );
+
+    console.log(`🕌 Scheduled '${title}' at ${triggerTime.toLocaleString('en-GB')}`);
   }
 
   // --- Special 2: Islamic Holidays Reminders (Olny 4 Holidays: Most important ones!) ---
   if (config.specials.Holidays?.enabled && yearlyHolidays) {
+    // Morning time for holiday reminders (scheduled N days before, at this time)
+    const HOLIDAY_HOUR = 9;
+    const HOLIDAY_MINUTE = 0;
+
     // Loop only the surfaced holidays (Ramadan, Laylat al-Qadr, 2 Eids)
     for (const name of UPCOMING_HOLIDAYS) {
       // Display/notification behavior (showFromDays, reminderDaysBefore)
@@ -462,9 +467,9 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
         continue;
       }
 
-      // Build trigger date — N days before holiday at 09:00 ----
+      // Build trigger date — N days before holiday at HOLIDAY_HOUR ----
       const [y, m, d] = gregorianDate.split("-");
-      const triggerTime = new Date(Number(y), Number(m) - 1, Number(d), 9, 0, 0, 0);
+      const triggerTime = new Date(Number(y), Number(m) - 1, Number(d), HOLIDAY_HOUR, HOLIDAY_MINUTE, 0, 0);
       triggerTime.setDate(triggerTime.getDate() - holidayConfig.reminderDaysBefore);
 
       // Skip if reminder date already passed ----

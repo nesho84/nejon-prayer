@@ -1,7 +1,4 @@
-
-// Default icon size
-const S = 30;
-
+// Holiday types
 export type HolidayName =
   | "hijri_new_year"
   | "ashura"
@@ -86,14 +83,14 @@ export const HOLIDAY_CONFIG: Record<HolidayName, HolidayConfig> = {
 
 // Icon, size and accent color per holiday
 export const HOLIDAY_META: Record<HolidayName, HolidayMeta> = {
-  hijri_new_year: { icon: 'calendar-star', size: S, color: 'orange' },
-  ashura: { icon: 'water-outline', size: S, color: 'teal' },
-  regaib: { icon: 'star-outline', size: S, color: 'violet' },
-  isra_miraj: { icon: 'shimmer', size: S, color: 'indigo' },
-  laylat_baraat: { icon: 'moon-new', size: S, color: 'info' },
-  ramadan_start: { icon: 'star-crescent', size: S, color: 'islamicGreen' },
-  laylat_qadr: { icon: 'book-outline', size: S, color: 'gold' },
-  eid_fitr: { icon: 'creation-outline', size: S, color: 'secondary' },
-  arafah: { icon: 'nature-people', size: S, color: 'brown' },
-  eid_adha: { icon: 'sheep', size: S, color: 'accent' },
+  hijri_new_year: { icon: 'calendar-star', size: 30, color: 'orange' },
+  ashura: { icon: 'water-outline', size: 30, color: 'teal' },
+  regaib: { icon: 'star-outline', size: 30, color: 'violet' },
+  isra_miraj: { icon: 'shimmer', size: 30, color: 'indigo' },
+  laylat_baraat: { icon: 'moon-new', size: 30, color: 'info' },
+  ramadan_start: { icon: 'star-crescent', size: 30, color: 'islamicGreen' },
+  laylat_qadr: { icon: 'book-outline', size: 30, color: 'gold' },
+  eid_fitr: { icon: 'creation-outline', size: 30, color: 'secondary' },
+  arafah: { icon: 'nature-people', size: 30, color: 'brown' },
+  eid_adha: { icon: 'sheep', size: 30, color: 'accent' },
 };
