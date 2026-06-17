@@ -133,12 +133,12 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Handle marking/unmarking prayers as prayed
     // ------------------------------------------------------------
-    const handleMark = useCallback((prayerName: PrayerName, isPrayed: boolean, isPast: boolean) => {
+    const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean) => {
         if (!isPast) return;
 
         isPrayed
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
-            : markPrayed(prayerName as PrayerName, selectedDateKey);
+            : await markPrayed(prayerName as PrayerName, selectedDateKey);
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
 
     // ------------------------------------------------------------

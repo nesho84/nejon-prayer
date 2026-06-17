@@ -42,7 +42,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   // ------------------------------------------------------------
   // Handle marking/unmarking prayers as prayed and show celebration modal
   // ------------------------------------------------------------
-  const handleMark = useCallback((prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
+  const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
     if (!isPast && !isCurrent) return;
 
     // If already marked as prayed, unmark it
@@ -51,7 +51,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
       return;
     }
     // Mark as prayed and check if all prayers are done for today
-    const prayersComplete = markPrayed(prayerName);
+    const prayersComplete = await markPrayed(prayerName);
 
     const today = toDateKey();
     const alreadyCelebrated = celebratedDate === today;

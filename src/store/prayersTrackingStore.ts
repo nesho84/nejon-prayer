@@ -11,12 +11,12 @@ interface PrayersTrackingState {
   tracking: TrackingRecord;
   isReady: boolean;
   celebratedDate: string | null;
-  markPrayed: (prayer: PrayerName, dateKey?: string) => boolean;
+  markPrayed: (prayer: PrayerName, dateKey?: string) => Promise<boolean>;
   unmarkPrayed: (prayer: PrayerName, dateKey?: string) => void;
   setCelebrated: (dateKey: string) => void;
 }
 
-// Keep tracking data for 31 days to prevent infinite growth of storage
+// Keep tracking data for 37 days to prevent infinite growth of storage
 const KEEP_DAYS = 37;
 
 // Remove entries older than KEEP_DAYS from the tracking record
@@ -41,7 +41,7 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       isReady: false,
       celebratedDate: null,
 
-      markPrayed: (prayer, dateKey) => {
+      markPrayed: async (prayer, dateKey) => {
         const key = dateKey ?? toDateKey();
         set((state) => ({
           tracking: {

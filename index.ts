@@ -1,5 +1,6 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
+import { PrayerName } from '@/types/prayer.types';
 import { resolveTrackingDate } from '@/utils/prayerTracking';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
@@ -10,7 +11,7 @@ import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
 
 // ------------------------------------------------------------
 // 'react-native-track-player' playback service
-// Listens listens for remote events (play, pause, stop), while the app is in the background or killed
+// Listens for remote events (play, pause, stop), while the app is in the background or killed
 // ------------------------------------------------------------
 TrackPlayer.registerPlaybackService(() => {
     return async () => {
@@ -43,11 +44,11 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
     if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
         try {
-            const prayerName = notification.data?.prayerName;
+            const prayerName = notification.data?.prayerName as PrayerName | undefined;
             if (prayerName) {
-                const prayerDate = notification.data?.prayerDate;
+                const prayerDate = notification.data?.prayerDate as string | undefined;
                 const dateToUse = resolveTrackingDate(prayerDate);
-                usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
+                await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
             }
         } catch (error) {
             console.error('❌ [Background] Failed to mark prayer as prayed:', error);

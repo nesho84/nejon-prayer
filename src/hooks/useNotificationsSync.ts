@@ -40,7 +40,7 @@ export function useNotificationsSync() {
 
   // ------------------------------------------------------------
   // AUTO-SCHEDULE notifications when prayer times are ready and notifications are enabled
-  // This runs on initial load and whenever something change
+  // This runs on initial load and whenever something changes
   // ------------------------------------------------------------
   useEffect(() => {
     if (!deviceSettingsReady || !notificationsReady || !prayerTimes || !notificationPermission) return;
@@ -83,7 +83,7 @@ export function useNotificationsSync() {
           if (prayerName) {
             const prayerDate = notification.data?.prayerDate as string | undefined;
             const dateToUse = resolveTrackingDate(prayerDate);
-            usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
+            await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
           }
         } catch (err) {
           console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);
