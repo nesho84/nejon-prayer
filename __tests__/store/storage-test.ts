@@ -1,6 +1,6 @@
-// storage.ts is a thin MMKV wrapper (setItem, getItem, removeItem) — no logic to unit test.
-// MMKV is mocked via jest.mock('@/store/storage') in all store tests that depend on persist middleware.
+// storage.ts is a thin MMKV wrapper (setItem/getItem/removeItem) — no logic to unit test.
+// It is mocked via jest.mock('@/store/storage') in every store test that uses persist.
 
 describe('storage', () => {
-  it.todo('covered indirectly — mocked in all store tests');
+  it.todo('no unit test — thin MMKV wrapper, mocked across store tests');
 });

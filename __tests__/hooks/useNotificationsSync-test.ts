@@ -1,3 +1,3 @@
 describe('useNotificationsSync', () => {
-  it.todo('covered indirectly via notificationsStore and notificationsService tests — notifee foreground events require device integration');
+  it.todo('no unit test — notifee foreground events need device integration; logic covered via notificationsStore + notificationsService tests');
 });

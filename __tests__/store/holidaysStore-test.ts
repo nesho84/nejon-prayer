@@ -1,3 +1,8 @@
+import { getYearlyHolidays } from '@/services/holidaysService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useHolidaysStore } from '@/store/holidaysStore';
+import { YearlyHolidays } from '@/types/holiday.types';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -20,11 +25,6 @@ jest.mock('@/services/holidaysService', () => ({
 jest.mock('@/store/deviceSettingsStore', () => ({
   useDeviceSettingsStore: { getState: jest.fn() },
 }));
-
-import { getYearlyHolidays } from '@/services/holidaysService';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { useHolidaysStore } from '@/store/holidaysStore';
-import { YearlyHolidays } from '@/types/holiday.types';
 
 const mockGetYearlyHolidays = getYearlyHolidays as jest.Mock;
 const mockDeviceGetState = (useDeviceSettingsStore as any).getState as jest.Mock;

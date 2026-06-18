@@ -1,3 +1,10 @@
+import { scheduleNotificationsService } from '@/services/notificationsService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { useNotificationsStore } from '@/store/notificationsStore';
+import { usePrayersStore } from '@/store/prayersStore';
+import { PrayerTimes } from '@/types/prayer.types';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -28,13 +35,6 @@ jest.mock('@/store/deviceSettingsStore', () => ({
 jest.mock('@/store/languageStore', () => ({
   useLanguageStore: { getState: jest.fn() },
 }));
-
-import { scheduleNotificationsService } from '@/services/notificationsService';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { useLanguageStore } from '@/store/languageStore';
-import { useNotificationsStore } from '@/store/notificationsStore';
-import { usePrayersStore } from '@/store/prayersStore';
-import { PrayerTimes } from '@/types/prayer.types';
 
 const mockSchedule = scheduleNotificationsService as jest.Mock;
 const mockPrayersGetState = (usePrayersStore as any).getState as jest.Mock;

@@ -1,3 +1,5 @@
+import { useOnboardingStore } from '@/store/onboardingStore';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,8 +7,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import { useOnboardingStore } from '@/store/onboardingStore';
 
 beforeEach(() => {
   useOnboardingStore.setState({ onboardingComplete: false });

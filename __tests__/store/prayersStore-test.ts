@@ -1,3 +1,11 @@
+import { getYearlyPrayerTimes } from '@/services/prayersService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { useLocationStore } from '@/store/locationStore';
+import { usePrayersStore } from '@/store/prayersStore';
+import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
+import { toDateKey } from '@/utils/date';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -33,14 +41,6 @@ jest.mock('@/store/deviceSettingsStore', () => ({
 jest.mock('@/store/languageStore', () => ({
   useLanguageStore: { getState: jest.fn() },
 }));
-
-import { getYearlyPrayerTimes } from '@/services/prayersService';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { useLanguageStore } from '@/store/languageStore';
-import { useLocationStore } from '@/store/locationStore';
-import { usePrayersStore } from '@/store/prayersStore';
-import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
-import { toDateKey } from '@/utils/date';
 
 const mockGetYearly = getYearlyPrayerTimes as jest.Mock;
 const mockLocationGetState = (useLocationStore as any).getState as jest.Mock;

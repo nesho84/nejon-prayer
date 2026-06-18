@@ -1,3 +1,6 @@
+import { cleanOldEntries, usePrayersTrackingStore } from '@/store/prayersTrackingStore';
+import { toDateKey } from '@/utils/date';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,9 +8,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import { cleanOldEntries, usePrayersTrackingStore } from '@/store/prayersTrackingStore';
-import { toDateKey } from '@/utils/date';
 
 const TODAY = toDateKey();
 

@@ -1,3 +1,9 @@
+import { usePrayerTimesSync } from '@/hooks/usePrayerTimesSync';
+import { usePrayersStore } from '@/store/prayersStore';
+import { toDateKey } from '@/utils/date';
+import { renderHook } from '@testing-library/react-native';
+import { AppState } from 'react-native';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -17,12 +23,6 @@ jest.mock('@/store/prayersStore', () => ({
 jest.mock('@/utils/date', () => ({
   toDateKey: jest.fn(),
 }));
-
-import { usePrayerTimesSync } from '@/hooks/usePrayerTimesSync';
-import { usePrayersStore } from '@/store/prayersStore';
-import { toDateKey } from '@/utils/date';
-import { renderHook } from '@testing-library/react-native';
-import { AppState } from 'react-native';
 
 const mockAddEventListener = AppState.addEventListener as jest.Mock;
 const mockToDateKey = toDateKey as jest.Mock;

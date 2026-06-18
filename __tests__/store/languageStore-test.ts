@@ -1,3 +1,6 @@
+import { GLOBAL_TR } from '@/constants/translations/global.tr';
+import { useLanguageStore } from '@/store/languageStore';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,9 +8,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import { GLOBAL_TR } from '@/constants/translations/global.tr';
-import { useLanguageStore } from '@/store/languageStore';
 
 beforeEach(() => {
   useLanguageStore.setState({ language: 'en', tr: GLOBAL_TR.en, isReady: false });
@@ -27,14 +27,7 @@ describe('languageStore — setLanguage', () => {
     expect(tr).toEqual(GLOBAL_TR.de);
   });
 
-  it('sets language to "ar" and updates tr to Arabic translations', () => {
-    useLanguageStore.getState().setLanguage('ar');
-    const { language, tr } = useLanguageStore.getState();
-    expect(language).toBe('ar');
-    expect(tr).toEqual(GLOBAL_TR.ar);
-  });
-
-  it('tr always reflects the current language', () => {
+  it('tr always reflects the current language across every supported language', () => {
     const languages = ['en', 'de', 'fr', 'sq', 'bs', 'mk', 'tr', 'ar'] as const;
     for (const lang of languages) {
       useLanguageStore.getState().setLanguage(lang);

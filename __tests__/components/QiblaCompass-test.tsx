@@ -1,5 +1,3 @@
 describe('QiblaCompass', () => {
-  it.todo(
-    'magnetometer and accelerometer sensor data — expo-sensors requires device integration',
-  );
+  it.todo('no unit test — magnetometer/accelerometer sensors need expo-sensors device integration');
 });

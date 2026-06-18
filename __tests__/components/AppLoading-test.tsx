@@ -1,7 +1,6 @@
 import AppLoading from '@/components/AppLoading';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -30,15 +29,17 @@ describe('AppLoading', () => {
     expect(screen.getByText('Please wait...')).toBeTruthy();
   });
 
-  it('renders ActivityIndicator in full mode', () => {
+  it('uses a full-screen container with the theme background by default', () => {
     const { UNSAFE_getByType } = render(<AppLoading />);
-    const { ActivityIndicator } = require('react-native');
-    expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
+    const { ActivityIndicator, StyleSheet } = require('react-native');
+    const container = UNSAFE_getByType(ActivityIndicator).parent;
+    expect(StyleSheet.flatten(container?.props.style).backgroundColor).toBe('#ffffff');
   });
 
-  it('renders ActivityIndicator in inline mode', () => {
+  it('uses a translucent overlay container in inline mode', () => {
     const { UNSAFE_getByType } = render(<AppLoading inline />);
-    const { ActivityIndicator } = require('react-native');
-    expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
+    const { ActivityIndicator, StyleSheet } = require('react-native');
+    const container = UNSAFE_getByType(ActivityIndicator).parent;
+    expect(StyleSheet.flatten(container?.props.style).backgroundColor).toBe('rgba(0,0,0,0.75)');
   });
 });

@@ -1,3 +1,7 @@
+import { DARK_COLORS, LIGHT_COLORS } from '@/constants/colors';
+import { useThemeStore } from '@/store/themeStore';
+import { Appearance } from 'react-native';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -10,10 +14,6 @@ jest.mock('react-native', () => ({
   Appearance: { getColorScheme: jest.fn(() => 'light') },
   Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
-
-import { DARK_COLORS, LIGHT_COLORS } from '@/constants/colors';
-import { useThemeStore } from '@/store/themeStore';
-import { Appearance } from 'react-native';
 
 const mockGetColorScheme = Appearance.getColorScheme as jest.Mock;
 

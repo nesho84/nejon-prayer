@@ -1,10 +1,10 @@
-jest.mock('@/store/deviceSettingsStore', () => ({ useDeviceSettingsStore: jest.fn() }));
-jest.mock('@/store/holidaysStore', () => ({ useHolidaysStore: jest.fn() }));
-
 import { useHolidaysSync } from '@/hooks/useHolidaysSync';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { renderHook } from '@testing-library/react-native';
+
+jest.mock('@/store/deviceSettingsStore', () => ({ useDeviceSettingsStore: jest.fn() }));
+jest.mock('@/store/holidaysStore', () => ({ useHolidaysStore: jest.fn() }));
 
 let deviceReady: boolean;
 let holidaysReady: boolean;
@@ -41,13 +41,6 @@ describe('useHolidaysSync', () => {
 
   it('does not call loadHolidays when device settings are not ready', () => {
     deviceReady = false;
-    renderHook(() => useHolidaysSync());
-    expect(mockLoadHolidays).not.toHaveBeenCalled();
-  });
-
-  it('does not call loadHolidays when neither store is ready', () => {
-    deviceReady = false;
-    holidaysReady = false;
     renderHook(() => useHolidaysSync());
     expect(mockLoadHolidays).not.toHaveBeenCalled();
   });

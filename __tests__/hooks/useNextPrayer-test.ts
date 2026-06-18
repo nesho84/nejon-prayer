@@ -1,3 +1,8 @@
+import useNextPrayer from '@/hooks/useNextPrayer';
+import { PrayerTimes } from '@/types/prayer.types';
+import { act, renderHook } from '@testing-library/react-native';
+import { useIsFocused } from 'expo-router';
+
 jest.mock('react-native', () => ({
   AppState: {
     currentState: 'active',
@@ -9,11 +14,6 @@ jest.mock('react-native', () => ({
 jest.mock('expo-router', () => ({
   useIsFocused: jest.fn(),
 }));
-
-import useNextPrayer from '@/hooks/useNextPrayer';
-import { PrayerTimes } from '@/types/prayer.types';
-import { act, renderHook } from '@testing-library/react-native';
-import { useIsFocused } from 'expo-router';
 
 const mockIsFocused = useIsFocused as jest.Mock;
 

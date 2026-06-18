@@ -2,9 +2,7 @@
 import { getMethodForCountry, getYearlyPrayerTimes } from '@/services/prayersService';
 import { AppLocation } from '@/types/location.types';
 
-// ------------------------------------------------------------
 // Minimal Aladhan API response factory
-// ------------------------------------------------------------
 function makeAladhanResponse(dateStr: string, timings: Record<string, string>) {
   return {
     data: {
@@ -20,9 +18,6 @@ function makeAladhanResponse(dateStr: string, timings: Record<string, string>) {
 
 const VALID_LOCATION: AppLocation = { latitude: 48.2, longitude: 16.37 };
 
-// ------------------------------------------------------------
-// getMethodForCountry
-// ------------------------------------------------------------
 describe('getMethodForCountry', () => {
   it('returns 13 for Turkey (Diyanet)', () => {
     expect(getMethodForCountry('TR')).toBe(13);
@@ -49,9 +44,6 @@ describe('getMethodForCountry', () => {
   });
 });
 
-// ------------------------------------------------------------
-// getYearlyPrayerTimes
-// ------------------------------------------------------------
 describe('getYearlyPrayerTimes', () => {
   beforeEach(() => {
     globalThis.fetch = jest.fn();

@@ -1,3 +1,9 @@
+import { getUserLocation, hasLocationChanged } from '@/services/locationService';
+import { LocationData } from '@/types/location.types';
+import NetInfo from '@react-native-community/netinfo';
+import * as Sentry from '@sentry/react-native';
+import * as Location from 'expo-location';
+import { Alert } from 'react-native';
 
 jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
@@ -22,13 +28,6 @@ jest.mock('react-native', () => ({
   Linking: { openSettings: jest.fn() },
   Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
-
-import { getUserLocation, hasLocationChanged } from '@/services/locationService';
-import { LocationData } from '@/types/location.types';
-import NetInfo from '@react-native-community/netinfo';
-import * as Sentry from '@sentry/react-native';
-import * as Location from 'expo-location';
-import { Alert } from 'react-native';
 
 const BASE_TIMEZONE = {
   timezone: 'Europe/Vienna',

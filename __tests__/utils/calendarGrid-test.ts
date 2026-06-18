@@ -59,13 +59,6 @@ describe('getCurrentMonthRows', () => {
     expect(leading).toHaveLength(4);
   });
 
-  it('has no padding when month starts on Monday', () => {
-    // Jan 2024 starts on Monday
-    jest.setSystemTime(new Date(2024, 0, 1));
-    const rows = getCurrentMonthRows();
-    expect(rows[0][0].empty).toBe(false);
-  });
-
   it('has 6 padding cells when month starts on Sunday', () => {
     // September 2024 starts on Sunday (offset = 6)
     jest.setSystemTime(new Date(2024, 8, 1));

@@ -1,16 +1,12 @@
 import { getHolidayDate, getNextHoliday, getYearlyHolidays } from '@/services/holidaysService';
 import { HOLIDAY_CONFIG, HolidayName, YearlyHolidays } from '@/types/holiday.types';
 
-// ------------------------------------------------------------
 // Helper — build a YearlyHolidays map from partial entries
-// ------------------------------------------------------------
 function makeHolidays(entries: Partial<Record<HolidayName, string[]>>): YearlyHolidays {
   return entries;
 }
 
-// ------------------------------------------------------------
 // getHolidayDate — next occurrence on or after `today`
-// ------------------------------------------------------------
 describe('getHolidayDate', () => {
   it('returns the next date on or after today, ignoring past dates', () => {
     const holidays = makeHolidays({ eid_fitr: ['2026-01-01', '2026-03-20', '2027-03-10'] });
@@ -37,10 +33,8 @@ describe('getHolidayDate', () => {
   });
 });
 
-// ------------------------------------------------------------
 // getNextHoliday — nearest holiday within its showFromDays window
 // (daysUntil is always >= 1; the holiday's own day is hidden)
-// ------------------------------------------------------------
 describe('getNextHoliday', () => {
   it('returns null when there are no holidays', () => {
     expect(getNextHoliday({}, '2026-03-01')).toBeNull();
@@ -104,12 +98,10 @@ describe('getNextHoliday', () => {
   });
 });
 
-// ------------------------------------------------------------
 // Helpers — fetch responses + Aladhan "holiday day" factory
 // NOTE: Gregorian dates below are synthetic fixtures, chosen to
 // exercise the year-filter and cross-fetch merge — not real
 // astronomical dates.
-// ------------------------------------------------------------
 function jsonResponse(data: unknown) {
   return Promise.resolve({ ok: true, json: async () => data });
 }
@@ -154,9 +146,7 @@ function mockFetchRouting(opts: YearOpts = {}) {
   });
 }
 
-// ------------------------------------------------------------
 // getYearlyHolidays — fetch, normalize, filter to current + next Gregorian year
-// ------------------------------------------------------------
 describe('getYearlyHolidays', () => {
   beforeEach(() => {
     jest.useFakeTimers();

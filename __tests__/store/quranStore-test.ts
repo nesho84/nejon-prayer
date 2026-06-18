@@ -1,3 +1,8 @@
+import { fetchAyahsFromApi, loadQuranTransliterationJson } from '@/services/quranService';
+import { useLanguageStore } from '@/store/languageStore';
+import { useQuranStore } from '@/store/quranStore';
+import { FavoriteAyah } from '@/types/quran.types';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -23,11 +28,6 @@ jest.mock('@/services/quranService', () => ({
 jest.mock('@/store/languageStore', () => ({
   useLanguageStore: { getState: jest.fn() },
 }));
-
-import { fetchAyahsFromApi, loadQuranTransliterationJson } from '@/services/quranService';
-import { useLanguageStore } from '@/store/languageStore';
-import { useQuranStore } from '@/store/quranStore';
-import { FavoriteAyah } from '@/types/quran.types';
 
 const mockFetchAyahs = fetchAyahsFromApi as jest.Mock;
 const mockLoadQuran = loadQuranTransliterationJson as jest.Mock;

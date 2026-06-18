@@ -1,3 +1,4 @@
+import PrayerIcon from '@/components/PrayerIcon';
 import { render, screen } from '@testing-library/react-native';
 
 jest.mock('@expo/vector-icons', () => {
@@ -7,8 +8,6 @@ jest.mock('@expo/vector-icons', () => {
     MaterialCommunityIcons: ({ name }: { name: string }) => React.createElement('View', { testID: `mci-${name}` }),
   };
 });
-
-import PrayerIcon from '@/components/PrayerIcon';
 
 describe('PrayerIcon', () => {
   it('renders moon-outline for Fajr', () => {

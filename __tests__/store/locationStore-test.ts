@@ -1,3 +1,6 @@
+import { useLocationStore } from '@/store/locationStore';
+import { Cords, TimeZone } from '@/types/location.types';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,9 +8,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import { useLocationStore } from '@/store/locationStore';
-import { Cords, TimeZone } from '@/types/location.types';
 
 const COORDS: Cords = { latitude: 48.2085, longitude: 16.3721 };
 

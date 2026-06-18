@@ -1,3 +1,6 @@
+import { getTriggerTime, scheduleNotificationsService } from '@/services/notificationsService';
+import notifee from 'react-native-notify-kit';
+
 jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
   captureMessage: jest.fn(),
@@ -28,9 +31,6 @@ jest.mock('react-native-notify-kit', () => ({
   RepeatFrequency: { WEEKLY: 'weekly' },
   TriggerType: { TIMESTAMP: 'timestamp' },
 }));
-
-import { getTriggerTime, scheduleNotificationsService } from '@/services/notificationsService';
-import notifee from 'react-native-notify-kit';
 
 const mockCreateTrigger = notifee.createTriggerNotification as jest.Mock;
 
@@ -151,9 +151,7 @@ describe('getTriggerTime', () => {
   });
 });
 
-// ------------------------------------------------------------
 // Helpers for scheduleNotificationsService holiday tests
-// ------------------------------------------------------------
 const PRAYER_TIMES = {
   Imsak: '04:30', Fajr: '04:50', Sunrise: '06:20',
   Dhuhr: '12:30', Asr: '15:45', Maghrib: '18:20', Isha: '19:45',

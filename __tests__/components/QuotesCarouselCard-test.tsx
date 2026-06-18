@@ -28,7 +28,7 @@ describe('QuotesCarouselCard', () => {
   });
 
   it('renders quotes after layout is measured', () => {
-    const { getByTestId, UNSAFE_getAllByType } = render(<QuotesCarouselCard />);
+    const { UNSAFE_getAllByType } = render(<QuotesCarouselCard />);
     const { View } = require('react-native');
 
     // fire onLayout to set containerWidth

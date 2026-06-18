@@ -157,8 +157,10 @@ describe('HomeScreen', () => {
     expect(screen.getByTestId('error-Network error')).toBeTruthy();
   });
 
-  it.only('renders main content with location info when ready', () => {
-    console.log('HomeScreen', HomeScreen);
+  it('renders main content (no loading or error) when everything is ready', () => {
     render(<HomeScreen />);
+    expect(screen.queryByTestId('loading-Loading')).toBeNull();
+    expect(screen.queryByTestId('error-Please set your location')).toBeNull();
+    expect(screen.queryByTestId('error-Failed to load prayer times')).toBeNull();
   });
 });

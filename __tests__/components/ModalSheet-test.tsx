@@ -1,5 +1,3 @@
 describe('ModalSheet', () => {
-  it.todo(
-    'animated bottom sheet — react-native-reanimated + react-native-gesture-handler require device integration',
-  );
+  it.todo('no unit test — animated bottom sheet needs reanimated + gesture-handler device integration');
 });

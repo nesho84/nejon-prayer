@@ -1,3 +1,8 @@
+import AppCard from '@/components/AppCard';
+import { useThemeStore } from '@/store/themeStore';
+import { render, screen } from '@testing-library/react-native';
+import { Text } from 'react-native';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,12 +10,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import AppCard from '@/components/AppCard';
-import { useThemeStore } from '@/store/themeStore';
-import { render, screen } from '@testing-library/react-native';
-import React from 'react';
-import { Text } from 'react-native';
 
 beforeEach(() => {
   useThemeStore.setState({ theme: { card: '#ffffff' } as any });

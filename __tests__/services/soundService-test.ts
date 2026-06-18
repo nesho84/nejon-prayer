@@ -1,7 +1,6 @@
-// soundService wraps the react-native-sound native library — no pure logic to unit test directly.
-// startSound and stopSound will be mocked and exercised indirectly
-// in __tests__/store/notificationsStore-test.ts
+// soundService wraps the react-native-sound native library — no pure logic to unit test.
+// startSound/stopSound are mocked and exercised indirectly in notificationsService tests.
 
 describe('soundService', () => {
-  it.todo('covered indirectly via notificationsStore tests');
+  it.todo('no unit test — native react-native-sound wrapper, mocked in notificationsService tests');
 });

@@ -1,3 +1,5 @@
+import { useTesbihStore } from '@/store/tesbihStore';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
     getItem: jest.fn(() => null),
@@ -5,8 +7,6 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
-
-import { useTesbihStore } from '@/store/tesbihStore';
 
 const INITIAL_STATE = { count: 0, totalCount: 10, laps: 0 };
 

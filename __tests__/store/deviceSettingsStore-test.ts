@@ -1,3 +1,9 @@
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import NetInfo from '@react-native-community/netinfo';
+import * as Location from 'expo-location';
+import { Platform } from 'react-native';
+import notifee, { AndroidNotificationSetting, AuthorizationStatus } from 'react-native-notify-kit';
+
 jest.mock('react-native', () => ({
   Platform: { OS: 'ios', select: (obj: Record<string, unknown>) => obj.ios ?? obj.default, Version: 0 },
 }));
@@ -19,12 +25,6 @@ jest.mock('react-native-notify-kit', () => ({
   AuthorizationStatus: { AUTHORIZED: 1, DENIED: 0 },
   AndroidNotificationSetting: { ENABLED: 1, DISABLED: 0 },
 }));
-
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import NetInfo from '@react-native-community/netinfo';
-import * as Location from 'expo-location';
-import { Platform } from 'react-native';
-import notifee, { AndroidNotificationSetting, AuthorizationStatus } from 'react-native-notify-kit';
 
 const mockHasServices = Location.hasServicesEnabledAsync as jest.Mock;
 const mockNetInfo = NetInfo.fetch as jest.Mock;

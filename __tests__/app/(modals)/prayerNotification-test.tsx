@@ -5,7 +5,6 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-// --- Core mocks ---
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -56,7 +55,6 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({ prayer: 'Fajr' })),
 }));
 
-// --- Fixture data ---
 const mockTheme = {
   bg: '#fff', bg2: '#f5f5f5', text: '#111', text2: '#555', textMuted: '#888',
   textSecondary: '#666', accent: '#007AFF', card: '#f5f5f5',

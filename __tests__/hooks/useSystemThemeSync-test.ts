@@ -1,3 +1,8 @@
+import { useSystemThemeSync } from '@/hooks/useSystemThemeSync';
+import { useThemeStore } from '@/store/themeStore';
+import { renderHook } from '@testing-library/react-native';
+import { Appearance } from 'react-native';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -12,11 +17,6 @@ jest.mock('react-native', () => ({
 jest.mock('@/store/themeStore', () => ({
   useThemeStore: jest.fn(),
 }));
-
-import { useSystemThemeSync } from '@/hooks/useSystemThemeSync';
-import { useThemeStore } from '@/store/themeStore';
-import { renderHook } from '@testing-library/react-native';
-import { Appearance } from 'react-native';
 
 const mockAddChangeListener = Appearance.addChangeListener as jest.Mock;
 

@@ -1,3 +1,3 @@
 describe('useQuranSetup', () => {
-  it.todo('covered indirectly via quranStore tests — TrackPlayer setup requires device integration');
+  it.todo('no unit test — TrackPlayer setup needs device integration; logic covered via quranStore tests');
 });

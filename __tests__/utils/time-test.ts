@@ -38,7 +38,7 @@ describe('isTimePast — midnight boundary', () => {
     expect(isTimePast('00:00')).toBe(false);
   });
 
-  it('returns true for 23:59 when current time is 00:01 (next day)', () => {
+  it('returns false for 23:59 when current time is 00:01 (still later today)', () => {
     jest.setSystemTime(new Date(2024, 0, 15, 0, 1, 0));
     expect(isTimePast('23:59')).toBe(false); // 23:59 is later today, not past
   });

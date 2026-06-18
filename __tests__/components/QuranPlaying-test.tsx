@@ -1,7 +1,6 @@
 import QuranPlaying from '@/components/QuranPlaying';
 import { useThemeStore } from '@/store/themeStore';
 import { render, screen } from '@testing-library/react-native';
-import React from 'react';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },

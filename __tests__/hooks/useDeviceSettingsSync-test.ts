@@ -1,3 +1,8 @@
+import { useDeviceSettingsSync } from '@/hooks/useDeviceSettingsSync';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { renderHook } from '@testing-library/react-native';
+import { AppState } from 'react-native';
+
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -13,11 +18,6 @@ jest.mock('react-native', () => ({
 jest.mock('@/store/deviceSettingsStore', () => ({
   useDeviceSettingsStore: jest.fn(),
 }));
-
-import { useDeviceSettingsSync } from '@/hooks/useDeviceSettingsSync';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
-import { renderHook } from '@testing-library/react-native';
-import { AppState } from 'react-native';
 
 const mockAddEventListener = AppState.addEventListener as jest.Mock;
 

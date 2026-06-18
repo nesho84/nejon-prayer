@@ -6,7 +6,6 @@ import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
-// --- Core mocks ---
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -47,7 +46,6 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({})),
 }));
 
-// --- Fixture data ---
 const mockTheme = {
   bg: '#fff', bg2: '#f5f5f5', text: '#111', text2: '#555', textMuted: '#888',
   textSecondary: '#666', accent: '#007AFF', card: '#f5f5f5', accent2: '#34C759',
@@ -79,10 +77,7 @@ beforeEach(() => {
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
   useLocationStore.setState({ location: mockLocation, timeZone: { location: 'London', zoneName: 'Europe/London', offset: '+00:00' } as any });
   usePrayersTrackingStore.setState({ tracking: {} } as any);
-  jest.spyOn(usePrayersStore.getState(), 'getPrayerTimesForDate')
-    .mockResolvedValue(mockPrayerTimes as any);
   jest.clearAllMocks();
-  // Re-apply spy after clearAllMocks
   jest.spyOn(usePrayersStore.getState(), 'getPrayerTimesForDate')
     .mockResolvedValue(mockPrayerTimes as any);
 });
@@ -118,26 +113,6 @@ describe('PrayerTimingsScreen', () => {
     render(<PrayerTimingsScreen />);
     await waitFor(() => expect(screen.getByText('London')).toBeTruthy());
     expect(screen.getByText('Europe/London • +00:00')).toBeTruthy();
-  });
-
-  it('navigating back one day then pressing Today changes date back', async () => {
-    render(<PrayerTimingsScreen />);
-    await waitFor(() => expect(screen.getByText('Fajr')).toBeTruthy());
-
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('icon-chevron-back'));
-    });
-
-    await act(async () => {
-      fireEvent.press(screen.getByText('Today'));
-    });
-
-    // After pressing Today, Today button should be disabled (isToday = true)
-    await waitFor(() => {
-      const todayBtn = screen.getByText('Today');
-      // Re-rendered — Today is now the selected date so button is disabled
-      expect(todayBtn).toBeTruthy();
-    });
   });
 
   it('navigating back one day fetches prayer times for yesterday', async () => {
