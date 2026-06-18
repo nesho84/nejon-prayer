@@ -1,4 +1,6 @@
 import { SOUNDS } from "@/constants/sounds";
+// @TODO (iOS): uncomment once assets/sounds-ios/*.caf files exist and IOS_SOUNDS is filled in
+// import { getIosSound } from "@/constants/sounds";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { getHolidayDate } from "@/services/holidaysService";
@@ -120,6 +122,37 @@ export async function createNotificationsChannels() {
     vibrationPattern: vibLong,
     ...defaults,
   });
+}
+
+// ------------------------------------------------------------
+// Create notification categories (action buttons): Called in useNotificationsSync
+// iOS requires categories to be registered before action buttons can be shown
+// ------------------------------------------------------------
+export async function createNotificationCategories(tr: Translations) {
+  if (Platform.OS !== 'ios') return;
+
+  await notifee.setNotificationCategories([
+    {
+      id: 'prayer-category',
+      actions: [
+        { id: 'done', title: tr.actions?.done || '✓ Prayed' },
+        { id: 'dismiss', title: tr.actions?.dismiss || 'Dismiss', destructive: true },
+        { id: 'snooze', title: tr.actions?.snooze || 'Later' },
+      ],
+    },
+    {
+      id: 'prayer-event-category',
+      actions: [{ id: 'OK', title: 'OK' }],
+    },
+    {
+      id: 'special-category',
+      actions: [{ id: 'OK', title: 'OK' }],
+    },
+    {
+      id: 'prayer-reminder-category',
+      actions: [{ id: 'OK', title: 'OK' }],
+    },
+  ]);
 }
 
 // ------------------------------------------------------------
@@ -271,6 +304,8 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
         ios: {
           categoryId: 'prayer-category',
           interruptionLevel: 'active',
+          // @TODO (iOS): native sound for background/killed delivery — see getIosSound in constants/sounds.ts
+          // sound: getIosSound(sound),
         },
       },
       {
@@ -340,6 +375,8 @@ async function scheduleEventNotifications(params: ScheduleParams) {
         ios: {
           categoryId: 'prayer-event-category',
           interruptionLevel: 'active',
+          // @TODO (iOS): native sound for background/killed delivery — see getIosSound in constants/sounds.ts
+          // sound: getIosSound(sound),
         },
       },
       {
@@ -715,6 +752,8 @@ export async function handleNotificationEvent(
               ios: {
                 categoryId: 'prayer-reminder-category',
                 interruptionLevel: 'active',
+                // @TODO (iOS): native sound for background/killed delivery — see getIosSound in constants/sounds.ts
+                // sound: getIosSound(SOUNDS.alarm1),
               },
             },
             {

@@ -1,6 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
 import * as Location from "expo-location";
-import { Platform } from "react-native";
 import notifee, { AndroidNotificationSetting, AuthorizationStatus } from 'react-native-notify-kit';
 import { create } from "zustand";
 
@@ -25,10 +24,8 @@ export const useDeviceSettingsStore = create<DeviceSettingsState>((set, get) => 
   deviceSettingsError: null,
   isReady: false,
 
-  // Sync device settings (Android only)
+  // Sync device settings (Android-only checks resolve to safe defaults on iOS)
   syncDeviceSettings: async () => {
-    if (Platform.OS !== 'android') return;
-
     try {
       // Fetch all device settings in parallel
       const [
@@ -40,7 +37,7 @@ export const useDeviceSettingsStore = create<DeviceSettingsState>((set, get) => 
         Location.hasServicesEnabledAsync(), // locationEnabled
         NetInfo.fetch(), // netInfo (object with isConnected and isInternetReachable)
         notifee.getNotificationSettings(), // notifeeSettings
-        notifee.isBatteryOptimizationEnabled(), // batteryOptimizationEnabled
+        notifee.isBatteryOptimizationEnabled(), // batteryOptimizationEnabled (always false on iOS)
       ]);
 
       // Derive individual settings from results

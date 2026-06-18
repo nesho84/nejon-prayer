@@ -1,4 +1,4 @@
-import { createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
+import { createNotificationCategories, createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -18,6 +18,7 @@ export function useNotificationsSync() {
   const prayerTimes = usePrayersStore((state) => state.prayerTimes);
   const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
   const language = useLanguageStore((state) => state.language);
+  const tr = useLanguageStore((state) => state.tr);
 
   // Ref to prevent race conditions
   const isSchedulingRef = useRef(false);
@@ -37,6 +38,22 @@ export function useNotificationsSync() {
     };
     initChannels();
   }, []);
+
+  // ------------------------------------------------------------
+  // CREATE notification CATEGORIES (action buttons) on app load (iOS only)
+  // Re-registered when language changes so action titles stay localized
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const initCategories = async () => {
+      try {
+        await createNotificationCategories(tr);
+      } catch (err) {
+        console.error('Failed to create notification categories:', err);
+        Sentry.captureException(err);
+      }
+    };
+    initCategories();
+  }, [tr]);
 
   // ------------------------------------------------------------
   // AUTO-SCHEDULE notifications when prayer times are ready and notifications are enabled

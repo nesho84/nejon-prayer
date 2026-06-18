@@ -55,10 +55,23 @@ describe('deviceSettingsStore — initial state', () => {
 });
 
 describe('deviceSettingsStore — syncDeviceSettings', () => {
-  it('skips sync and leaves isReady false on non-Android', async () => {
+  it('still syncs and sets isReady on iOS, with Android-only fields resolving to safe defaults', async () => {
     Object.defineProperty(Platform, 'OS', { value: 'ios', writable: true, configurable: true });
+    mockHasServices.mockResolvedValue(true);
+    mockNetInfo.mockResolvedValue({ isConnected: true, isInternetReachable: true });
+    mockGetSettings.mockResolvedValue({ authorizationStatus: AuthorizationStatus.AUTHORIZED });
+    mockBatteryOpt.mockResolvedValue(false);
+
     await useDeviceSettingsStore.getState().syncDeviceSettings();
-    expect(useDeviceSettingsStore.getState().isReady).toBe(false);
+    const s = useDeviceSettingsStore.getState();
+
+    expect(s.isReady).toBe(true);
+    expect(s.locationPermission).toBe(true);
+    expect(s.internetConnection).toBe(true);
+    expect(s.notificationPermission).toBe(true);
+    expect(s.alarmPermission).toBe(false); // no `android` field on iOS settings
+    expect(s.batteryOptimization).toBe(false); // library resolves to false on iOS
+
     Object.defineProperty(Platform, 'OS', { value: 'android', writable: true, configurable: true });
   });
 

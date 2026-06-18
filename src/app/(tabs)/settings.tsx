@@ -664,39 +664,41 @@ export default function SettingsScreen() {
                             </View>
                         </View>
 
-                        {/* ------ Battery & Alarms ------ */}
-                        <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-                            {/* Battery Optimization */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.batteryOptTitle} {batteryOptimization ? "" : " ✅"}
-                                </Text>
-                                <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
-                                    <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
-                                </Pressable>
+                        {/* ------ Battery & Alarms (Android only) ------ */}
+                        {Platform.OS === 'android' &&
+                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                                {/* Battery Optimization */}
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.batteryOptTitle} {batteryOptimization ? "" : " ✅"}
+                                    </Text>
+                                    <Pressable onPress={openBatteryOptimizationSettings} disabled={localLoading}>
+                                        <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
+                                    </Pressable>
+                                </View>
+                                {batteryOptimization &&
+                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                        {tr.labels.batteryOptBody}
+                                    </Text>
+                                }
+                                {/* Divider */}
+                                <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                                {/* Alarm & reminders */}
+                                <View style={styles.statusRow}>
+                                    <Text style={[styles.statusText, { color: theme.text }]}>
+                                        {tr.labels.alarmAccessTitle} {!alarmPermission ? "" : " ✅"}
+                                    </Text>
+                                    <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
+                                        <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
+                                    </Pressable>
+                                </View>
+                                {!alarmPermission &&
+                                    <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
+                                        {tr.labels.alarmAccessBody}
+                                    </Text>
+                                }
                             </View>
-                            {batteryOptimization &&
-                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
-                                    {tr.labels.batteryOptBody}
-                                </Text>
-                            }
-                            {/* Divider */}
-                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                            {/* Alarm & reminders */}
-                            <View style={styles.statusRow}>
-                                <Text style={[styles.statusText, { color: theme.text }]}>
-                                    {tr.labels.alarmAccessTitle} {!alarmPermission ? "" : " ✅"}
-                                </Text>
-                                <Pressable onPress={openAlarmPermissionSettings} disabled={localLoading}>
-                                    <Text style={{ color: theme.primary }}>{tr.buttons.openSettings}</Text>
-                                </Pressable>
-                            </View>
-                            {!alarmPermission &&
-                                <Text style={[styles.statusSubText, { color: theme.text2, marginTop: 8, marginBottom: 0 }]}>
-                                    {tr.labels.alarmAccessBody}
-                                </Text>
-                            }
-                        </View>
+                        }
 
                     </View>
                 </AppCard>
