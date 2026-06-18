@@ -122,14 +122,10 @@ export default function NamaziTableScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* HEADER */}
-                <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen }]}>
+                <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.islamicGreen, marginHorizontal: 0, marginBottom: 0 }]}>
                     <Text style={globalStyles.headerIcon}>📝</Text>
-                    <Text style={[globalStyles.headerTitle, { color: theme.text }]}>
-                        {namaziTr.headerTitle}
-                    </Text>
-                    <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>
-                        {namaziTr.headerSubtitle}
-                    </Text>
+                    <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{namaziTr.headerTitle}</Text>
+                    <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{namaziTr.headerSubtitle}</Text>
                 </AppCard>
 
                 {/* --- Rekate Table --- */}
@@ -235,7 +231,6 @@ export default function NamaziTableScreen() {
 const styles = StyleSheet.create({
     // Table styles
     tableCard: {
-        padding: 0,
         overflow: "hidden",
     },
     tableRow: {

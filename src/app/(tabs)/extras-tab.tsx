@@ -132,14 +132,14 @@ export default function ExtrasTabScreen() {
             >
 
                 {/* Hero Header Section */}
-                <AppCard style={styles.headerCard}>
-                    <View style={[styles.headerIconContainer, { backgroundColor: "#f59e0b26" }]}>
+                <AppCard style={styles.headerHeroCard}>
+                    <View style={[styles.headerHeroIconContainer, { backgroundColor: "#f59e0b26" }]}>
                         <Ionicons name="apps" size={52} color={theme.accent} />
                     </View>
-                    <Text style={[styles.headerTitle, { color: theme.text }]}>
+                    <Text style={[styles.headerHeroTitle, { color: theme.text }]}>
                         {tr.labels.extrasTitle || "Explore Features"}
                     </Text>
-                    <Text style={[styles.headerSubtitle, { color: theme.textSecondary }]}>
+                    <Text style={[styles.headerHeroSubtitle, { color: theme.textSecondary }]}>
                         {tr.labels.extrasSubtitle || "Enhance your spiritual journey with these tools"}
                     </Text>
                 </AppCard>
@@ -246,13 +246,13 @@ export default function ExtrasTabScreen() {
 
 const styles = StyleSheet.create({
     // Header Hero Section
-    headerCard: {
+    headerHeroCard: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 24,
         paddingHorizontal: 16,
     },
-    headerIconContainer: {
+    headerHeroIconContainer: {
         width: 80,
         height: 80,
         borderRadius: 20,
@@ -260,14 +260,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 24,
     },
-    headerTitle: {
+    headerHeroTitle: {
         fontSize: 21,
         textAlign: 'center',
         fontWeight: '700',
         marginBottom: 8,
         letterSpacing: -0.3,
     },
-    headerSubtitle: {
+    headerHeroSubtitle: {
         fontSize: 14,
         textAlign: 'center',
         lineHeight: 18,
