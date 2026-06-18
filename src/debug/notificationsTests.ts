@@ -1,7 +1,8 @@
 import { SOUNDS } from "@/constants/sounds";
 import { NotifSettings } from "@/types/notification.types";
+import { toDateKey } from "@/utils/date";
 import notifee, {
-    AlarmType,
+    AndroidCategory,
     AndroidColor,
     AndroidStyle,
     TimestampTrigger,
@@ -36,18 +37,19 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 body: "Koha për namaz (06:49)",
                 data: {
                     type: "prayer",
-                    prayerName: 'Fajr',
-                    language: options?.language ?? 'en',
                     volume: String(notifSettings?.volume ?? 1.0),
+                    sound: SOUNDS.azan1_short, // Default sound for test
                     vibration: notifSettings?.vibration ?? 'short',
                     snooze: String(notifSettings?.snooze ?? 5),
-                    sound: SOUNDS.azan1_short, // Default sound for test
+                    prayerName: 'Fajr',
+                    prayerDate: toDateKey(new Date(triggerTime)),
                     reminderTitle: "» Sabahu «",
                     reminderBody: "Kujtesë Lutjeje",
                 },
                 android: {
                     // (Channel is created in notificationsService.ts)
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
                     color: AndroidColor.OLIVE,
@@ -58,7 +60,6 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                         { title: "Më kujto më vonë", pressAction: { id: "snooze" } },
                     ],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,
@@ -72,7 +73,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: options.hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
+                alarmManager: options.hasAlarm,
                 // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
@@ -104,7 +105,7 @@ export async function testEventNotification({ options, notifSettings, seconds = 
 
         await notifee.createTriggerNotification(
             {
-                id: "event-test",
+                id: "prayer-event-test",
                 title: `» ${eventName} «`,
                 body: body,
                 data: {
@@ -114,26 +115,26 @@ export async function testEventNotification({ options, notifSettings, seconds = 
                 },
                 android: {
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
                     style: { type: AndroidStyle.INBOX, lines: [body] },
                     actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,
                     ongoing: true,
                 },
                 ios: {
-                    categoryId: "event-category",
+                    categoryId: "prayer-event-category",
                     interruptionLevel: "active",
                 },
             },
             {
                 type: TriggerType.TIMESTAMP,
                 timestamp: triggerTime,
-                alarmManager: options.hasAlarm ? { type: AlarmType.SET_ALARM_CLOCK } : false,
+                alarmManager: options.hasAlarm,
                 // repeatFrequency: RepeatFrequency.DAILY,
             }
         );
@@ -161,17 +162,16 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
                 body: body,
                 data: {
                     type: "prayer-reminder",
-                    volume: String(notifSettings?.volume ?? 1.0),
                     sound: SOUNDS.alarm1,
                 },
                 android: {
                     channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
                     style: { type: AndroidStyle.INBOX, lines: [body] },
                     actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,
@@ -212,6 +212,8 @@ export async function testFridayNotification({ options, notifSettings, seconds =
                 body: body,
                 data: {
                     type: "special",
+                    subType: "friday-reminder",
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,
@@ -220,7 +222,6 @@ export async function testFridayNotification({ options, notifSettings, seconds =
                     style: { type: AndroidStyle.INBOX, lines: [body] },
                     actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,
@@ -263,7 +264,8 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
                 body: body,
                 data: {
                     type: "special",
-                    quoteIndex: 0,
+                    subType: "daily-quote",
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,
@@ -272,7 +274,6 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
                     style: { type: AndroidStyle.BIGTEXT, text: body },
                     actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,
@@ -315,7 +316,9 @@ export async function testHolidayNotification({ options, notifSettings, seconds 
                 body: body,
                 data: {
                     type: "special",
-                    subType: "holiday",
+                    subType: "islamic-holiday",
+                    holidayType: "Ramadan",
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
                     channelId: `nejonprayer-vib-off`,
@@ -324,7 +327,6 @@ export async function testHolidayNotification({ options, notifSettings, seconds 
                     style: { type: AndroidStyle.INBOX, lines: [body] },
                     actions: [{ title: "OK", pressAction: { id: "OK" } }],
                     pressAction: { id: "default", launchActivity: "default" },
-                    fullScreenAction: { id: "default" },
                     lightUpScreen: true,
                     showTimestamp: true,
                     autoCancel: false,

@@ -1,5 +1,6 @@
 import AppLayout from '@/components/AppLayout';
 import { useThemeStore } from '@/store/themeStore';
+import { NavigationBar } from 'expo-navigation-bar';
 import { render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
@@ -16,22 +17,25 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({
-  NavigationBar: () => null,
+  NavigationBar: { setStyle: jest.fn() },
 }));
 
 beforeEach(() => {
+  (NavigationBar.setStyle as jest.Mock).mockClear();
   useThemeStore.setState({ theme: { bg: '#ffffff' } as any, resolvedTheme: 'light' as any });
 });
 
 describe('AppLayout', () => {
-  it('renders children', () => {
+  it('renders children and sets the navigation bar style for the light theme', () => {
     render(<AppLayout><Text>Hello</Text></AppLayout>);
     expect(screen.getByText('Hello')).toBeTruthy();
+    expect(NavigationBar.setStyle).toHaveBeenCalledWith('dark');
   });
 
-  it('renders children in dark theme without crashing', () => {
+  it('renders children and sets the navigation bar style for the dark theme', () => {
     useThemeStore.setState({ theme: { bg: '#000000' } as any, resolvedTheme: 'dark' as any });
     render(<AppLayout><Text>Dark</Text></AppLayout>);
     expect(screen.getByText('Dark')).toBeTruthy();
+    expect(NavigationBar.setStyle).toHaveBeenCalledWith('light');
   });
 });

@@ -17,7 +17,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({
-  NavigationBar: () => null,
+  NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
 jest.mock('expo-constants', () => ({
