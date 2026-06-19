@@ -1,12 +1,14 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
+import ImageViewer from "@/components/ImageViewer";
 import { globalStyles } from "@/constants/styles";
 import { ABDESI_TR } from "@/constants/translations/abdesi.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
-import { Image, ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface StepType {
@@ -24,6 +26,7 @@ export default function AbdesiScreen() {
 
     // Local state
     const [currentStep, setCurrentStep] = useState(1);
+    const [viewerSource, setViewerSource] = useState<ImageSourcePropType | null>(null);
 
     // Safe area insets
     const insets = useSafeAreaInsets();
@@ -72,9 +75,16 @@ export default function AbdesiScreen() {
             </View>
 
             {item.image && (
-                <View style={[styles.imageContainer, { backgroundColor: theme.bg }]}>
+                <Pressable
+                    style={({ pressed }) => [styles.imageContainer, { backgroundColor: theme.bg, opacity: pressed ? 0.85 : 1 }]}
+                    android_ripple={{ color: theme.overlayLight, borderless: false }}
+                    onPress={() => setViewerSource(item.image!)}
+                >
                     <Image source={item.image} style={styles.stepImage} />
-                </View>
+                    <View style={[styles.zoomBadge, { backgroundColor: theme.secondary }]}>
+                        <Ionicons name="expand" size={13} color={theme.card} />
+                    </View>
+                </Pressable>
             )}
         </AppCard>
     ), [theme]);
@@ -117,6 +127,12 @@ export default function AbdesiScreen() {
                 contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
                 showsVerticalScrollIndicator={false}
                 onScroll={handleScroll}
+            />
+
+            <ImageViewer
+                visible={viewerSource !== null}
+                source={viewerSource}
+                onClose={() => setViewerSource(null)}
             />
 
         </AppLayout>
@@ -168,6 +184,16 @@ const styles = StyleSheet.create({
         height: 141,
         borderRadius: 70.5,
         resizeMode: "cover",
+    },
+    zoomBadge: {
+        position: "absolute",
+        bottom: 14,
+        right: "30%",
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     // Footer card

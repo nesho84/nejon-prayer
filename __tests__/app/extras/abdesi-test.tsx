@@ -1,7 +1,8 @@
 import AbdesiScreen from '@/app/extras/abdesi';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Image } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -18,6 +19,34 @@ jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
+// Reanimated 4's worklets runtime can't initialise under Jest; stub the
+// pieces ImageViewer relies on so the screen can render.
+jest.mock('react-native-reanimated', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: { View },
+    useSharedValue: (value: number) => ({ value }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (value: number) => value,
+  };
+});
+// Stub gesture-handler so the ImageViewer overlay renders without the
+// native gesture module.
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const builder = () => {
+    const chain: Record<string, () => typeof chain> = {};
+    ['onUpdate', 'onEnd', 'numberOfTaps'].forEach((m) => { chain[m] = () => chain; });
+    return chain;
+  };
+  return {
+    Gesture: { Pinch: builder, Pan: builder, Tap: builder, Simultaneous: () => ({}) },
+    GestureDetector: ({ children }: { children: React.ReactNode }) => children,
+    GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+  };
+});
 
 const mockTheme = {
   bg: '#fff', text: '#111', text2: '#555', placeholder: '#999',
@@ -57,5 +86,15 @@ describe('AbdesiScreen', () => {
     expect(
       screen.getByText(/Make your intention.*Bismillah/s)
     ).toBeTruthy();
+  });
+
+  it('opens the image viewer when a step image is tapped', () => {
+    render(<AbdesiScreen />);
+    // Viewer closed initially
+    expect(screen.queryByTestId('image-viewer-close')).toBeNull();
+    // Step 2 is the first step with an image
+    const images = screen.UNSAFE_getAllByType(Image);
+    fireEvent.press(images[0]);
+    expect(screen.getByTestId('image-viewer-close')).toBeTruthy();
   });
 });

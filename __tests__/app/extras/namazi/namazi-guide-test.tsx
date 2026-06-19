@@ -2,6 +2,7 @@ import NamaziGuideScreen from '@/app/extras/namazi/namazi-guide';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Image } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -18,6 +19,35 @@ jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
+// Reanimated 4's worklets runtime can't initialise under Jest; stub the
+// pieces ImageViewer relies on so the screen can render.
+jest.mock('react-native-reanimated', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: { View },
+    useSharedValue: (value: number) => ({ value }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (value: number) => value,
+  };
+});
+// Stub gesture-handler so the ImageViewer overlay renders without the
+// native gesture module.
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const builder = () => {
+    const chain: Record<string, () => typeof chain> = {};
+    ['onUpdate', 'onEnd', 'numberOfTaps'].forEach((m) => { chain[m] = () => chain; });
+    return chain;
+  };
+  return {
+    Gesture: { Pinch: builder, Pan: builder, Tap: builder, Simultaneous: () => ({}) },
+    GestureDetector: ({ children }: { children: React.ReactNode }) => children,
+    GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+  };
+});
+
 const mockTheme = {
   bg: '#fff', bg2: '#f0f0f0', text: '#111', text2: '#555', textMuted: '#888',
   placeholder: '#999', card: '#f5f5f5', islamicGreen: '#1a8a00',
@@ -70,5 +100,13 @@ describe('NamaziGuideScreen', () => {
     fireEvent.press(screen.getAllByText(subhanekeName)[0]);
     // At least one block is now expanded: up chevron visible
     expect(screen.getAllByText('▲').length).toBeGreaterThan(0);
+  });
+
+  it('opens the image viewer when a step image is tapped', () => {
+    render(<NamaziGuideScreen />);
+    // Viewer closed initially
+    expect(screen.queryByTestId('image-viewer-close')).toBeNull();
+    fireEvent.press(screen.UNSAFE_getAllByType(Image)[0]);
+    expect(screen.getByTestId('image-viewer-close')).toBeTruthy();
   });
 });

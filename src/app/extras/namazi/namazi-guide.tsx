@@ -1,9 +1,11 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
+import ImageViewer from "@/components/ImageViewer";
 import { globalStyles } from "@/constants/styles";
 import { NAMAZI_GUIDE_TR, NAMAZI_SURAHS } from "@/constants/translations/namazi-guide.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
@@ -25,6 +27,7 @@ export default function NamaziGuideScreen() {
     // Local state
     const [currentStep, setCurrentStep] = useState(1);
     const [expandedSurahs, setExpandedSurahs] = useState<Set<string>>(new Set());
+    const [viewerSource, setViewerSource] = useState<ImageSourcePropType | null>(null);
 
     // Safe area insets
     const insets = useSafeAreaInsets();
@@ -121,9 +124,18 @@ export default function NamaziGuideScreen() {
             </View>
 
             {item.image && (
-                <View style={[styles.stepImageContainer, { backgroundColor: theme.bg }]}>
-                    <Image source={item.image} style={styles.stepImage} />
-                </View>
+                <Pressable
+                    style={({ pressed }) => [styles.stepImageContainer, { backgroundColor: theme.bg, opacity: pressed ? 0.85 : 1 }]}
+                    android_ripple={{ color: theme.overlayLight, borderless: false }}
+                    onPress={() => setViewerSource(item.image!)}
+                >
+                    <View style={styles.stepImageWrap}>
+                        <Image source={item.image} style={styles.stepImage} />
+                        <View style={[styles.zoomBadge, { backgroundColor: theme.islamicGreen }]}>
+                            <Ionicons name="expand" size={13} color={theme.card} />
+                        </View>
+                    </View>
+                </Pressable>
             )}
 
             {item.id === 2 && (
@@ -195,6 +207,12 @@ export default function NamaziGuideScreen() {
                 onScroll={handleScroll}
             />
 
+            <ImageViewer
+                visible={viewerSource !== null}
+                source={viewerSource}
+                onClose={() => setViewerSource(null)}
+            />
+
         </AppLayout>
     );
 }
@@ -239,11 +257,24 @@ const styles = StyleSheet.create({
         marginVertical: 16,
         borderRadius: 16,
     },
+    stepImageWrap: {
+        position: "relative",
+    },
     stepImage: {
         width: 241,
         height: 241,
         borderRadius: 12,
         resizeMode: "contain",
+    },
+    zoomBadge: {
+        position: "absolute",
+        bottom: 8,
+        right: 8,
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     // Surahs blocks
