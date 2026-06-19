@@ -16,7 +16,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 Sentry.init({
   dsn: 'https://df36491525a3844176da451e9b5710de@o4511285567488000.ingest.de.sentry.io/4511285569126480',
   enabled: !__DEV__,
-  enableLogs: true,
+  enableLogs: false,
   tracesSampleRate: 0,
   debug: false,
 });

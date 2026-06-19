@@ -184,7 +184,7 @@ async function cancelDisplayedNotification(notificationId: string) {
     await notifee.cancelDisplayedNotification(notificationId);
     await stopSound();
   } catch (err) {
-    console.error('❌ [Cleanup] Failed to clear:', err);
+    console.error('❌ [notificationsService:Cleanup] Failed to clear:', err);
     Sentry.captureException(err);
   }
 }
@@ -413,7 +413,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
     // Friday is independent of prayer data — when Dhuhr is missing/invalid, fall back
     // to a fixed pre-Jumu'ah time (11:00) so the reminder never silently fails
     if (!match) {
-      console.warn('[FridayReminder] Dhuhr unavailable/invalid, using fallback:', dhuhrTime);
+      console.warn('[notificationsService:FridayReminder] Dhuhr unavailable/invalid, using fallback:', dhuhrTime);
     }
 
     const hour = match ? Number(match[1]) : FALLBACK_HOUR;
@@ -500,7 +500,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const gregorianDate = getHolidayDate(yearlyHolidays, name, toDateKey());
 
       if (!gregorianDate) {
-        console.warn(`[HolidayReminder] Gregorian date not available for ${name}`);
+        console.warn(`[notificationsService:HolidayReminder] Gregorian date not available for ${name}`);
         continue;
       }
 
@@ -511,7 +511,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
 
       // Skip if reminder date already passed ----
       if (toDateKey(triggerTime) < toDateKey()) {
-        console.warn(`[HolidayReminder] Reminder for ${name} already passed, skipping`);
+        console.warn(`[notificationsService:HolidayReminder] Reminder for ${name} already passed, skipping`);
         continue;
       }
 
@@ -671,11 +671,11 @@ export async function handleNotificationEvent(
   // Check notification settings and alarm permission (Android)
   const ns = await notifee.getNotificationSettings();
   const hasAlarm = ns.android.alarm === AndroidNotificationSetting.ENABLED;
-  const prefix = source === 'background' ? '[Background]' : '[Foreground]';
+  const prefix = source === 'background' ? '[notificationsService:Background]' : '[notificationsService:Foreground]';
 
   // Early exit: do not play sound or handle anything if notifications are disabled on device
   if (ns.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
-    console.log(`[${source}] Notifications are disabled on this device. Ignoring notification event.`);
+    console.log(`[notificationsService:${source}] Notifications are disabled on this device. Ignoring notification event.`);
     return;
   }
 

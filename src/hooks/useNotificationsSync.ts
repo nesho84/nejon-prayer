@@ -103,7 +103,7 @@ export function useNotificationsSync() {
             await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
           }
         } catch (err) {
-          console.error('❌ [Foreground] Failed to mark prayer as prayed:', err);
+          console.error('❌ [useNotificationsSync:Foreground] Failed to mark prayer as prayed:', err);
           Sentry.captureException(err);
         }
       }
@@ -112,7 +112,7 @@ export function useNotificationsSync() {
       try {
         await handleNotificationEvent(type, notification, pressAction, 'foreground', useNotificationsStore.getState().notifSettings);
       } catch (err) {
-        console.error('❌ [Foreground] Failed to handle notification event:', err);
+        console.error('❌ [useNotificationsSync:Foreground] Failed to handle notification event:', err);
         Sentry.captureException(err);
       }
     });

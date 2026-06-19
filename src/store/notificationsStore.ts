@@ -19,6 +19,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useHolidaysStore } from './holidaysStore';
 
+type SyncResult = 'rescheduled' | 'skipped' | 'failed';
+
 interface NotificationsState {
   notifSettings: NotifSettings;
   prayers: Record<PrayerType, PrayerSettings>;
@@ -28,7 +30,7 @@ interface NotificationsState {
   lastBackgroundSync: string | null;
   isLoading: boolean;
   isReady: boolean;
-  syncNotifications: () => Promise<void>;
+  syncNotifications: () => Promise<SyncResult>;
   syncNotificationsInBackground: () => Promise<void>;
   setSettings: (updates: Partial<NotifSettings>) => void;
   setPrayer: (prayer: PrayerType, updates: Partial<PrayerSettings>) => void;
@@ -94,7 +96,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         // Check if prayerTimes are available
         if (!notificationPermission || !prayerTimes) {
           console.warn('⚠️  Cannot schedule notifications: Missing notification permission or prayer times');
-          return;
+          return 'failed';
         }
 
         // 1. Create a hash of current settings
@@ -113,19 +115,8 @@ export const useNotificationsStore = create<NotificationsState>()(
         // 2. Compare with last scheduled hash to avoid unnecessary rescheduling
         if (get().lastScheduledHash === currentHash) {
           console.log('⏸️ [notificationsStore] Notification unchanged, skipping reschedule');
-          return;
+          return 'skipped';
         }
-
-        // Log the reason for rescheduling with context (e.g. Dhuhr time changed, or user updated settings)
-        Sentry.addBreadcrumb({
-          category: 'notifications',
-          message: 'Notifications rescheduled',
-          level: 'info',
-          data: {
-            at: new Date().toISOString(),
-            prayerTimes,
-          },
-        });
 
         set({ isLoading: true });
 
@@ -142,9 +133,11 @@ export const useNotificationsStore = create<NotificationsState>()(
 
           // 4. Save hash after successful scheduling
           set({ lastScheduledHash: currentHash });
+          return 'rescheduled';
         } catch (err) {
           console.error('❌ Failed to schedule notifications:', err);
           Sentry.captureException(err);
+          return 'failed';
         } finally {
           set({ isLoading: false });
         }
@@ -153,37 +146,55 @@ export const useNotificationsStore = create<NotificationsState>()(
       // Sync background notifications (called in root index.js on background event)
       syncNotificationsInBackground: async () => {
         try {
-          console.log('🔄 [Background] Syncing Notifications...');
+          console.log('🔄 [notificationsStore:Background] Syncing Notifications...');
 
           // Check if we already updated today
           const today = toDateKey();
           const lastUpdate = get().lastBackgroundSync;
 
           if (lastUpdate === today) {
-            console.log('⏸️ [Background] Already updated today, skipping sync');
+            console.log('⏸️ [notificationsStore:Background] Already updated today, skipping sync');
             return;
           }
 
           // Load today's prayer times from yearly cache
           await usePrayersStore.getState().loadPrayerTimes();
-          // Sync notifications (hash will prevent unnecessary reschedule)
-          await get().syncNotifications();
+
+          // Sync notifications (hash prevents unnecessary reschedule)
+          const result = await get().syncNotifications();
 
           // Mark update complete for today
           set({ lastBackgroundSync: today });
 
-          // Always send to Sentry so we can audit background scheduling even when no error occurs
-          Sentry.captureMessage('[Background] Notifications synced', {
-            level: 'info',
-            extra: {
-              at: new Date().toISOString(),
-              prayerTimes: usePrayersStore.getState().prayerTimes,
-            },
-          });
+          const prayerTimes = usePrayersStore.getState().prayerTimes;
 
-          console.log('✅ [Background] Notifications synced successfully');
+          if (result === 'rescheduled') {
+            // The single daily audit entry we want: confirms the reschedule ran
+            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule OK', {
+              level: 'info',
+              extra: {
+                at: new Date().toISOString(),
+                today,
+                prayerTimes,
+              },
+            });
+          } else if (result === 'failed' || !prayerTimes) {
+            // Clear failure signal for diagnosing missed notifications
+            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule FAILED', {
+              level: 'warning',
+              extra: {
+                at: new Date().toISOString(),
+                today,
+                prayerTimes,
+              },
+            });
+          }
+          // result === 'skipped' → no Sentry entry (normal no-op)
+
+          console.log('✅ [notificationsStore:Background] Notifications synced successfully');
         } catch (error) {
-          console.error('❌ [Background] Notifications sync failed:', error);
+          console.error('❌ [notificationsStore:Background] Notifications sync failed:', error);
+          Sentry.captureException(error);
         }
       },
 

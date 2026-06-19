@@ -39,7 +39,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             // Sync notifications in the background to ensure we have the latest prayer times
             await useNotificationsStore.getState().syncNotificationsInBackground();
         } catch (err) {
-            console.error('❌ [Background] Failed to sync notifications in background:', err);
+            console.error('❌ [index.ts:Background] Failed to sync notifications in background:', err);
             Sentry.captureException(err);
         }
     }
@@ -57,7 +57,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                 await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
             }
         } catch (error) {
-            console.error('❌ [Background] Failed to mark prayer as prayed:', error);
+            console.error('❌ [index.ts:Background] Failed to mark prayer as prayed:', error);
             Sentry.captureException(error);
         }
     }
@@ -66,7 +66,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     try {
         await handleNotificationEvent(type, notification, pressAction, 'background', useNotificationsStore.getState().notifSettings);
     } catch (err) {
-        console.error('❌ [Background] Failed to handle notification event:', err);
+        console.error('❌ [index.ts:Background] Failed to handle notification event:', err);
         Sentry.captureException(err);
     }
 });
