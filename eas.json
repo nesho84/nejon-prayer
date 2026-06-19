@@ -29,6 +29,22 @@
       "autoIncrement": false,
       "channel": "preview"
     },
+    "ios-sim": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "autoIncrement": false,
+      "channel": "ios-sim"
+    },
+    "ios-device": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "autoIncrement": false,
+      "channel": "ios-device"
+    },
     "production": {
       "distribution": "store",
       "android": {
