@@ -1,9 +1,9 @@
 import AppCard from "@/components/AppCard";
-import NotificationsTester from "@/debug/NotificationsTester";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
+import DebugPanel from "@/debug/DebugPanel";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -388,6 +388,18 @@ export default function SettingsScreen() {
                     />
                 </AppCard>
 
+                {/* ------ Debug Panel (dev only) ------ */}
+                {__DEV__ && (
+                    <AppCard style={styles.settingCard}>
+                        <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
+                        {/* Divider */}
+                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                        <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                            <DebugPanel />
+                        </View>
+                    </AppCard>
+                )}
+
                 {/* ------ Location Setting ------ */}
                 <AppCard style={styles.settingCard}>
                     <View style={styles.statusRow}>
@@ -495,13 +507,6 @@ export default function SettingsScreen() {
                     <View style={styles.subSections} pointerEvents={notificationPermission ? 'auto' : 'none'}>
                         {!notificationPermission && (
                             <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.card, opacity: 0.7, zIndex: 10, borderRadius: 12 }]} />
-                        )}
-
-                        {/* ------ Notification Tester (dev only) ------ */}
-                        {__DEV__ && (
-                            <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-                                <NotificationsTester seconds={10} />
-                            </View>
                         )}
 
                         {/* ------ Sound Volume ------ */}

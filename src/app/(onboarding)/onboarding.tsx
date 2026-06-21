@@ -3,14 +3,17 @@ import AppLoading from "@/components/AppLoading";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
 import { getUserLocation } from "@/services/locationService";
+import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Application from "expo-application";
+import * as IntentLauncher from "expo-intent-launcher";
 import { useRef, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import notifee, { AuthorizationStatus } from "react-native-notify-kit";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -25,6 +28,10 @@ export default function OnboardingScreen() {
   const fullAddress = useLocationStore((state) => state.fullAddress);
   const timeZone = useLocationStore((state) => state.timeZone);
   const setLocation = useLocationStore((state) => state.setLocation);
+  const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
+  const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+  const batteryOptimization = useDeviceSettingsStore((state) => state.batteryOptimization);
+  const alarmPermission = useDeviceSettingsStore((state) => state.alarmPermission);
 
   // Local state
   const [localLoading, setLocalLoading] = useState(false);
@@ -92,23 +99,20 @@ export default function OnboardingScreen() {
   }
 
   // ------------------------------------------------------------
-  // 3️⃣ (Step 3) Request notification permission
+  // 3️⃣ (Step 3A) Request notification permission
   // ------------------------------------------------------------
   async function requestNotifications() {
+    if (notificationPermission) return; // already granted, nothing to request
+
     setLocalLoading(true);
     try {
       const settings = await notifee.requestPermission();
       if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
         Alert.alert(
           "Notifications Needed",
-          "Prayer time reminders will not be delivered until notifications are enabled. You may skip for now and activate them later in Settings."
+          "Prayer time reminders will not be delivered until notifications are enabled. You may activate them later in Settings."
         );
-        await finishOnboarding();
-        return;
       }
-
-      // Finish Onboarding (final step)
-      await finishOnboarding();
     } catch (err) {
       console.error("❌ Notification access error:", err);
       Alert.alert("Error", "Failed to request notifications. Please try again.");
@@ -116,6 +120,35 @@ export default function OnboardingScreen() {
       setLocalLoading(false);
     }
   }
+
+  // ------------------------------------------------------------
+  // 3️⃣ (Step 3B, Android) Open battery optimization settings
+  // ------------------------------------------------------------
+  const openBatteryOptimizationSettings = async () => {
+    const packageName = Application.applicationId ?? "";
+    const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
+
+    if (batteryOptimizationEnabled) {
+      try {
+        await IntentLauncher.startActivityAsync(
+          "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+          { data: `package:${packageName}` }
+        );
+        return;
+      } catch {
+        // fallthrough...
+      }
+    }
+
+    await notifee.openBatteryOptimizationSettings();
+  };
+
+  // ------------------------------------------------------------
+  // 3️⃣ (Step 3, Android) Open alarms & reminders settings
+  // ------------------------------------------------------------
+  const openAlarmPermissionSettings = async () => {
+    await notifee.openAlarmPermissionSettings();
+  };
 
   // ------------------------------------------------------------
   // 🏁 (Finish) Save data and redirect to HomeScreen
@@ -199,16 +232,24 @@ export default function OnboardingScreen() {
             <Text style={[styles.subtitle, { color: theme.textMuted }]}>
               Enable location to get accurate prayer times for your area.
             </Text>
+            {locationPermission && (
+              <View style={styles.statusBadge}>
+                <Ionicons name="checkmark-circle" size={20} color={theme.success} />
+                <Text style={[styles.statusBadgeText, { color: theme.success }]}>Location enabled</Text>
+              </View>
+            )}
             <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.primary }]}
               onPress={requestLocation}
             >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Allow Location</Text>
+              <Text style={[styles.buttonText, { color: theme.white }]}>
+                {locationPermission ? "Continue" : "Allow Location"}
+              </Text>
             </TouchableOpacity>
           </>
         )}
 
-        {/* Step 3: Notifications */}
+        {/* Step 3: Permissions */}
         {step === 3 && (
           <>
             <View style={styles.banner}>
@@ -216,19 +257,96 @@ export default function OnboardingScreen() {
             </View>
             <Text style={[styles.title, { color: theme.text }]}>Stay Updated</Text>
             <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-              Allow notifications to stay on track with your daily prayers.
+              Allow these so prayer reminders reach you on time.
             </Text>
+
+            <View style={[styles.permissionGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+              {/* Notifications */}
+              <TouchableOpacity style={styles.permissionRow} onPress={requestNotifications} activeOpacity={0.7}>
+                <View style={[styles.permissionIcon, { backgroundColor: (notificationPermission ? theme.primary : theme.warning) + '20' }]}>
+                  <MaterialCommunityIcons
+                    name={notificationPermission ? "bell-check-outline" : "bell-alert-outline"}
+                    size={20}
+                    color={notificationPermission ? theme.primary : theme.warning}
+                  />
+                </View>
+                <View style={styles.permissionText}>
+                  <Text style={[styles.permissionTitle, { color: theme.text }]}>
+                    Notifications
+                  </Text>
+                  <Text style={[styles.permissionBody, { color: theme.text2 }]}>
+                    Get notified for upcoming prayer times.
+                  </Text>
+                </View>
+                <Ionicons
+                  name={notificationPermission ? "checkmark-circle" : "alert-circle-outline"}
+                  size={22}
+                  color={notificationPermission ? theme.success : theme.warning}
+                />
+              </TouchableOpacity>
+
+              {Platform.OS === "android" && (
+                <>
+                  <View style={[styles.permissionDivider, { borderColor: theme.divider2 }]} />
+
+                  {/* Battery optimization */}
+                  <TouchableOpacity style={styles.permissionRow} onPress={openBatteryOptimizationSettings} activeOpacity={0.7}>
+                    <View style={[styles.permissionIcon, { backgroundColor: (batteryOptimization ? theme.warning : theme.primary) + '20' }]}>
+                      <MaterialCommunityIcons
+                        name={batteryOptimization ? "battery-alert-variant-outline" : "battery-check-outline"}
+                        size={20}
+                        color={batteryOptimization ? theme.warning : theme.success}
+                      />
+                    </View>
+                    <View style={styles.permissionText}>
+                      <Text style={[styles.permissionTitle, { color: theme.text }]}>
+                        Battery Optimization
+                      </Text>
+                      <Text style={[styles.permissionBody, { color: theme.text2 }]}>
+                        Disable battery optimization so reminders arrive on time.
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name={batteryOptimization ? "alert-circle-outline" : "checkmark-circle"}
+                      size={22}
+                      color={batteryOptimization ? theme.warning : theme.success}
+                    />
+                  </TouchableOpacity>
+
+                  <View style={[styles.permissionDivider, { borderColor: theme.divider2 }]} />
+
+                  {/* Alarms & reminders */}
+                  <TouchableOpacity style={styles.permissionRow} onPress={openAlarmPermissionSettings} activeOpacity={0.7}>
+                    <View style={[styles.permissionIcon, { backgroundColor: (alarmPermission ? theme.primary : theme.warning) + '20' }]}>
+                      <MaterialCommunityIcons
+                        name="alarm"
+                        size={20}
+                        color={alarmPermission ? theme.primary : theme.warning}
+                      />
+                    </View>
+                    <View style={styles.permissionText}>
+                      <Text style={[styles.permissionTitle, { color: theme.text }]}>
+                        Alarms & Reminders
+                      </Text>
+                      <Text style={[styles.permissionBody, { color: theme.text2 }]}>
+                        Enable exact alarms for precise prayer reminders.
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name={alarmPermission ? "checkmark-circle" : "alert-circle-outline"}
+                      size={22}
+                      color={alarmPermission ? theme.success : theme.warning}
+                    />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.primary }]}
-              onPress={requestNotifications}
-            >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Allow Notifications</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.danger }]}
+              style={[styles.button, { backgroundColor: theme.primary, marginTop: 24 }]}
               onPress={finishOnboarding}
             >
-              <Text style={[styles.buttonText, { color: theme.white }]}>Skip</Text>
+              <Text style={[styles.buttonText, { color: theme.white }]}>Finish</Text>
             </TouchableOpacity>
           </>
         )}
@@ -277,6 +395,53 @@ const styles = StyleSheet.create({
   inputArea: {
     width: "100%",
     marginBottom: 24,
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 24,
+  },
+  statusBadgeText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  permissionGroup: {
+    width: "100%",
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+  },
+  permissionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 4,
+  },
+  permissionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  permissionText: {
+    flex: 1,
+    gap: 2,
+  },
+  permissionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  permissionBody: {
+    fontSize: 12,
+    lineHeight: 16,
+    opacity: 0.85,
+  },
+  permissionDivider: {
+    width: "100%",
+    borderWidth: 1,
+    marginVertical: 8,
   },
   button: {
     paddingVertical: 14,
