@@ -1,4 +1,4 @@
-import { getTriggerTime, scheduleNotificationsService } from '@/services/notificationsService';
+import { getTriggerTime, getVibrationChannelId, scheduleNotificationsService } from '@/services/notificationsService';
 import notifee from 'react-native-notify-kit';
 
 jest.mock('@sentry/react-native', () => ({
@@ -247,5 +247,26 @@ describe('scheduleNotificationsService — Islamic holiday reminders', () => {
   it('schedules no holiday reminders when there are no holidays loaded', async () => {
     await scheduleNotificationsService(buildParams({ yearlyHolidays: null }));
     expect(holidayCalls()).toHaveLength(0);
+  });
+});
+
+describe('getVibrationChannelId', () => {
+  it('maps short/medium to the versioned channel ids', () => {
+    expect(getVibrationChannelId('short')).toBe('nejonprayer-vib-short-v2');
+    expect(getVibrationChannelId('medium')).toBe('nejonprayer-vib-medium-v2');
+  });
+
+  it('leaves off/long unversioned', () => {
+    expect(getVibrationChannelId('off')).toBe('nejonprayer-vib-off');
+    expect(getVibrationChannelId('long')).toBe('nejonprayer-vib-long');
+  });
+
+  it('maps the legacy "on" setting to its own legacy channel', () => {
+    expect(getVibrationChannelId('on')).toBe('nejonprayer-vib-on');
+  });
+
+  it('defaults to short when vibration is undefined or unrecognized', () => {
+    expect(getVibrationChannelId(undefined)).toBe('nejonprayer-vib-short-v2');
+    expect(getVibrationChannelId('bogus')).toBe('nejonprayer-vib-short-v2');
   });
 });

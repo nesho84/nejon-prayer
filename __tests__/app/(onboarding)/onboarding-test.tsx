@@ -38,6 +38,8 @@ jest.mock('@expo/vector-icons', () => {
   return {
     Ionicons: ({ name }: { name: string }) =>
       React.createElement('View', { testID: `icon-${name}` }),
+    MaterialCommunityIcons: ({ name }: { name: string }) =>
+      React.createElement('View', { testID: `mci-${name}` }),
   };
 });
 
@@ -77,31 +79,31 @@ describe('OnboardingScreen', () => {
     fireEvent.press(screen.getByText('Allow Location'));
     await waitFor(() => {
       expect(screen.getByText('Stay Updated')).toBeTruthy();
-      expect(screen.getByText('Allow Notifications')).toBeTruthy();
-      expect(screen.getByText('Skip')).toBeTruthy();
+      expect(screen.getByText('Notifications')).toBeTruthy();
+      expect(screen.getByText('Finish')).toBeTruthy();
     });
   });
 
-  it('calls setOnboarding(true) when Skip is pressed on step 3', async () => {
+  it('calls setOnboarding(true) when Finish is pressed on step 3', async () => {
     render(<OnboardingScreen />);
     fireEvent.press(screen.getByText('Next'));
     await waitFor(() => screen.getByText('Allow Location'));
     fireEvent.press(screen.getByText('Allow Location'));
-    await waitFor(() => screen.getByText('Skip'));
-    fireEvent.press(screen.getByText('Skip'));
+    await waitFor(() => screen.getByText('Finish'));
+    fireEvent.press(screen.getByText('Finish'));
     await waitFor(() => {
       expect(useOnboardingStore.getState().onboardingComplete).toBe(true);
     });
   });
 
-  it('calls notifee.requestPermission when Allow Notifications is pressed', async () => {
+  it('calls notifee.requestPermission when the Notifications row is pressed', async () => {
     const notifee = require('react-native-notify-kit').default;
     render(<OnboardingScreen />);
     fireEvent.press(screen.getByText('Next'));
     await waitFor(() => screen.getByText('Allow Location'));
     fireEvent.press(screen.getByText('Allow Location'));
-    await waitFor(() => screen.getByText('Allow Notifications'));
-    fireEvent.press(screen.getByText('Allow Notifications'));
+    await waitFor(() => screen.getByText('Notifications'));
+    fireEvent.press(screen.getByText('Notifications'));
     await waitFor(() => {
       expect(notifee.requestPermission).toHaveBeenCalledTimes(1);
     });

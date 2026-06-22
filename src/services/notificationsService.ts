@@ -34,6 +34,15 @@ interface ScheduleParams {
 const PRAYERS = MAIN_PRAYERS as PrayerType[];
 const EVENTS = PRAYER_EVENTS as PrayerEventType[];
 
+// Android channel ids per vibration setting ('-v2' = pattern changed; channels are immutable)
+const VIBRATION_CHANNEL_IDS: Record<string, string> = {
+  off: 'nejonprayer-vib-off',
+  short: 'nejonprayer-vib-short-v2',
+  medium: 'nejonprayer-vib-medium-v2',
+  long: 'nejonprayer-vib-long',
+  on: 'nejonprayer-vib-on',
+};
+
 // ------------------------------------------------------------
 // MAIN SCHEDULING: Called in notificationsStore when prayer times or settings change
 // ------------------------------------------------------------
@@ -59,15 +68,22 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
 }
 
 // ------------------------------------------------------------
+// Get Android channel ID based on vibration setting
+// ------------------------------------------------------------
+export function getVibrationChannelId(vibration?: string): string {
+  return VIBRATION_CHANNEL_IDS[vibration ?? 'short'] ?? VIBRATION_CHANNEL_IDS.short;
+}
+
+// ------------------------------------------------------------
 // Create channels: Called in useNotificationsSync on app load
 // ------------------------------------------------------------
 export async function createNotificationsChannels() {
   if (Platform.OS !== 'android') return;
 
-  // Short: two quick pulses like WhatsApp notification [wait, buzz, pause, buzz]
-  // const vibShort = [0, 200, 100, 200]; — use system default
-  // Medium: half of long — 10 cycles of [wait 1000ms, buzz 300ms] ≈ 13s
-  const vibMedium = Array(10).fill([1000, 300]).flat();
+  // Short: quick-quick-long "signature" pulse, recognizable as Nejon-Prayer ≈ 1.1s
+  const vibShort = [50, 180, 120, 180, 150, 500];
+  // Medium: 6 cycles of [wait 1000ms, buzz 300ms] ≈ 7.8s
+  const vibMedium = Array(6).fill([1000, 300]).flat();
   // Long: 21 cycles of [wait 1000ms, buzz 300ms] ≈ 28s
   const vibLong = Array(21).fill([1000, 300]).flat();
 
@@ -90,15 +106,15 @@ export async function createNotificationsChannels() {
     ...defaults,
   });
   await notifee.createChannel({
-    id: 'nejonprayer-vib-short',
+    id: 'nejonprayer-vib-short-v2',
     name: 'Channel with vibration SHORT',
-    description: 'Nejon-Prayer Channel With system default vibration',
+    description: 'Nejon-Prayer Channel With short signature vibration pattern',
     vibration: true,
-    vibrationPattern: undefined, // system default
+    vibrationPattern: vibShort,
     ...defaults,
   });
   await notifee.createChannel({
-    id: 'nejonprayer-vib-medium',
+    id: 'nejonprayer-vib-medium-v2',
     name: 'Channel with vibration MEDIUM',
     description: 'Nejon-Prayer Channel With medium vibration pattern',
     vibration: true,
@@ -272,7 +288,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
         android: {
-          channelId: `nejonprayer-vib-${vibration}`,
+          channelId: getVibrationChannelId(vibration),
           category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           largeIcon: require('../../assets/images/moon-islam.png'),
@@ -348,7 +364,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
           sound: sound ?? '',
         },
         android: {
-          channelId: `nejonprayer-vib-${vibration}`,
+          channelId: getVibrationChannelId(vibration),
           category: AndroidCategory.ALARM,
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.BLUE,
@@ -440,7 +456,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           scheduledFor: triggerTime.toLocaleString('en-GB'),
         },
         android: {
-          channelId: `nejonprayer-vib-${vibration}`,
+          channelId: getVibrationChannelId(vibration),
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
           style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -521,7 +537,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {
-            channelId: `nejonprayer-vib-${vibration}`,
+            channelId: getVibrationChannelId(vibration),
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -609,7 +625,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             scheduledFor: triggerTime.toLocaleString('en-GB'),
           },
           android: {
-            channelId: `nejonprayer-vib-${vibration}`,
+            channelId: getVibrationChannelId(vibration),
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.BIGTEXT, text: body },
@@ -717,7 +733,7 @@ export async function handleNotificationEvent(
                 sound: SOUNDS.alarm1, // Default reminder sound
               },
               android: {
-                channelId: `nejonprayer-vib-${vibration}`,
+                channelId: getVibrationChannelId(vibration),
                 category: AndroidCategory.ALARM,
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,

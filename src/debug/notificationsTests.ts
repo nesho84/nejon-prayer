@@ -1,4 +1,5 @@
 import { SOUNDS } from "@/constants/sounds";
+import { getVibrationChannelId } from "@/services/notificationsService";
 import { NotifSettings } from "@/types/notification.types";
 import { toDateKey } from "@/utils/datetime";
 import notifee, {
@@ -48,7 +49,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
                 },
                 android: {
                     // (Channel is created in notificationsService.ts)
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    channelId: getVibrationChannelId(notifSettings?.vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
@@ -81,7 +82,7 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
         const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
-            channelId: ${`nejonprayer-vib-${notifSettings?.vibration}`}
+            channelId: ${getVibrationChannelId(notifSettings?.vibration)}
             language: ${options?.language},
             alarm: ${options.hasAlarm},
             volume: ${notifSettings?.volume},
@@ -114,7 +115,7 @@ export async function testEventNotification({ options, notifSettings, seconds = 
                     sound: SOUNDS.alarm2,
                 },
                 android: {
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    channelId: getVibrationChannelId(notifSettings?.vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
@@ -163,7 +164,7 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
                     sound: SOUNDS.alarm1,
                 },
                 android: {
-                    channelId: `nejonprayer-vib-${notifSettings?.vibration ?? 'short'}`,
+                    channelId: getVibrationChannelId(notifSettings?.vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
