@@ -9,9 +9,8 @@ import { useLocationStore } from "@/store/locationStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
+import { openAlarmPermissionSettings, openBatteryOptimizationSettings } from "@/utils/system";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Application from "expo-application";
-import * as IntentLauncher from "expo-intent-launcher";
 import { useRef, useState } from "react";
 import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import notifee, { AuthorizationStatus } from "react-native-notify-kit";
@@ -49,7 +48,7 @@ export default function OnboardingScreen() {
   const bottomInset = insets.bottom + 12;
 
   // ------------------------------------------------------------
-  // 1️⃣ (Step 1) Handle language
+  // Handle language
   // ------------------------------------------------------------
   async function handleLanguage(value?: string | number) {
     setLocalLoading(true);
@@ -71,7 +70,7 @@ export default function OnboardingScreen() {
   }
 
   // ------------------------------------------------------------
-  // 2️⃣ (Step 2) Request location permission
+  // Request location permission
   // ------------------------------------------------------------
   async function requestLocation() {
     setLocalLoading(true);
@@ -99,7 +98,7 @@ export default function OnboardingScreen() {
   }
 
   // ------------------------------------------------------------
-  // 3️⃣ (Step 3A) Request notification permission
+  // Request notification permission
   // ------------------------------------------------------------
   async function requestNotifications() {
     if (notificationPermission) return; // already granted, nothing to request
@@ -120,35 +119,6 @@ export default function OnboardingScreen() {
       setLocalLoading(false);
     }
   }
-
-  // ------------------------------------------------------------
-  // 3️⃣ (Step 3B, Android) Open battery optimization settings
-  // ------------------------------------------------------------
-  const openBatteryOptimizationSettings = async () => {
-    const packageName = Application.applicationId ?? "";
-    const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
-
-    if (batteryOptimizationEnabled) {
-      try {
-        await IntentLauncher.startActivityAsync(
-          "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
-          { data: `package:${packageName}` }
-        );
-        return;
-      } catch {
-        // fallthrough...
-      }
-    }
-
-    await notifee.openBatteryOptimizationSettings();
-  };
-
-  // ------------------------------------------------------------
-  // 3️⃣ (Step 3, Android) Open alarms & reminders settings
-  // ------------------------------------------------------------
-  const openAlarmPermissionSettings = async () => {
-    await notifee.openAlarmPermissionSettings();
-  };
 
   // ------------------------------------------------------------
   // 🏁 (Finish) Save data and redirect to HomeScreen

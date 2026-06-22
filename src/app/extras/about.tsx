@@ -2,6 +2,7 @@ import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { openExternalUrl } from "@/utils/system";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
@@ -27,17 +28,6 @@ export default function AboutScreen() {
     const insets = useSafeAreaInsets();
     const topInset = 12;
     const bottomInset = insets.bottom + 12;
-
-    // ------------------------------------------------------------
-    // Open external link
-    // ------------------------------------------------------------
-    const openLink = (url: string) => {
-        Linking.canOpenURL(url).then((supported) => {
-            if (supported) {
-                Linking.openURL(url);
-            }
-        });
-    };
 
     // ------------------------------------------------------------
     // Open app info/settings
@@ -104,7 +94,7 @@ export default function AboutScreen() {
                 {/* Action Cards */}
                 <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
                     {/* Support / PayPal */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
                         </View>
@@ -119,7 +109,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Rate the App */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openLink(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
@@ -149,7 +139,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Contact Us */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => Linking.openURL(CONTACT_EMAIL)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(CONTACT_EMAIL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
                         </View>
@@ -164,7 +154,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* More Apps */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openLink(MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="view-grid-outline" size={22} color={theme.primary} />
                         </View>
@@ -178,13 +168,13 @@ export default function AboutScreen() {
 
                 {/* Bottom links */}
                 <View style={styles.bottomLinks}>
-                    <TouchableOpacity onPress={() => openLink("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
+                    <TouchableOpacity onPress={() => openExternalUrl("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => Linking.openURL(HELP_EMAIL)} activeOpacity={0.6}>
+                    <TouchableOpacity onPress={() => openExternalUrl(HELP_EMAIL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Help</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => openLink("https://nejon.net")} activeOpacity={0.6}>
+                    <TouchableOpacity onPress={() => openExternalUrl("https://nejon.net")} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>nejon.net</Text>
                     </TouchableOpacity>
                 </View>

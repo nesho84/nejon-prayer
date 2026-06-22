@@ -20,6 +20,10 @@ jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
+jest.mock('react-native-notify-kit', () => ({
+  __esModule: true,
+  default: {},
+}));
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { name: 'Nejon Prayer', version: '2.0.0' } },
@@ -67,14 +71,15 @@ describe('AboutScreen', () => {
     expect(Share.share).toHaveBeenCalledTimes(1);
   });
 
-  it('calls Linking.openURL with PayPal URL when support card is pressed', () => {
-    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
+  it('calls Linking.openURL with PayPal URL when support card is pressed', async () => {
     jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     render(<AboutScreen />);
     fireEvent.press(screen.getByText('Support us'));
-    expect(Linking.openURL).toHaveBeenCalledWith(
-      expect.stringContaining('paypal.me')
-    );
+    await waitFor(() => {
+      expect(Linking.openURL).toHaveBeenCalledWith(
+        expect.stringContaining('paypal.me')
+      );
+    });
   });
 
   it('calls Linking.openURL with Google Play URL when rate card is pressed', async () => {

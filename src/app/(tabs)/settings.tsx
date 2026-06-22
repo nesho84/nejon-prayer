@@ -13,16 +13,14 @@ import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { SpecialType } from "@/types/notification.types";
 import { Theme, THEMES } from "@/types/theme.types";
+import { openAlarmPermissionSettings, openBatteryOptimizationSettings, openNotificationSettings } from "@/utils/system";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Slider from '@react-native-community/slider';
-import * as Application from "expo-application";
 import * as Haptics from "expo-haptics";
-import * as IntentLauncher from "expo-intent-launcher";
 import { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
-    Linking,
     Platform,
     Pressable,
     ScrollView,
@@ -155,13 +153,7 @@ export default function SettingsScreen() {
                             { text: tr.buttons.cancel, style: "cancel" },
                             {
                                 text: tr.buttons.openSettings,
-                                onPress: async () => {
-                                    if (Platform.OS === "android") {
-                                        await notifee.openNotificationSettings();
-                                    } else {
-                                        Linking.openSettings();
-                                    }
-                                }
+                                onPress: openNotificationSettings,
                             }
                         ]
                     );
@@ -169,11 +161,7 @@ export default function SettingsScreen() {
             }
             else {
                 // Already allowed → open system settings
-                if (Platform.OS === "android") {
-                    await notifee.openNotificationSettings();
-                } else {
-                    Linking.openSettings();
-                }
+                await openNotificationSettings();
             }
         } catch (err) {
             console.error('Error checking notifications permission:', err);
@@ -268,54 +256,6 @@ export default function SettingsScreen() {
             Alert.alert(tr.labels.error, tr.labels.specialNotificationError);
         } finally {
             setLocalLoading(false);
-        }
-    };
-
-    // ------------------------------------------------------------
-    // Open Notifications settings
-    // ------------------------------------------------------------
-    const openNotificationSettings = async () => {
-        if (Platform.OS === "android") {
-            await notifee.openNotificationSettings();
-        } else {
-            Linking.openSettings();
-        }
-    };
-
-    // ------------------------------------------------------------
-    // Open Battery Optimization settings
-    // ------------------------------------------------------------
-    const openBatteryOptimizationSettings = async () => {
-        if (Platform.OS === "android") {
-            const packageName = Application.applicationId ?? "";
-            const batteryOptimizationEnabled = await notifee.isBatteryOptimizationEnabled();
-
-            if (batteryOptimizationEnabled) {
-                try {
-                    await IntentLauncher.startActivityAsync(
-                        "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
-                        { data: `package:${packageName}` }
-                    );
-                    return;
-                } catch {
-                    // fallthrough...
-                }
-            }
-
-            await notifee.openBatteryOptimizationSettings();
-        } else {
-            Linking.openSettings();
-        }
-    };
-
-    // ------------------------------------------------------------
-    // Open Alarm & reminders settings
-    // ------------------------------------------------------------
-    const openAlarmPermissionSettings = async () => {
-        if (Platform.OS === "android") {
-            await notifee.openAlarmPermissionSettings();
-        } else {
-            Linking.openSettings();
         }
     };
 

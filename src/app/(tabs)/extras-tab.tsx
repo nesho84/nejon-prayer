@@ -3,10 +3,11 @@ import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { openExternalUrl } from "@/utils/system";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
 import React, { useState } from "react";
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface SubMenuItem {
@@ -189,7 +190,7 @@ export default function ExtrasTabScreen() {
                                     <Pressable
                                         style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
                                         android_ripple={{ color: theme.overlayLight, borderless: false }}
-                                        onPress={() => Linking.openURL(item.href as string)}
+                                        onPress={() => openExternalUrl(item.href as string)}
                                     >
                                         {renderItem()}
                                     </Pressable>

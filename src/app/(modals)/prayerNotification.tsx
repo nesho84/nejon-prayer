@@ -9,11 +9,11 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerName } from "@/types/prayer.types";
+import { openNotificationSettings } from "@/utils/system";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Linking, Platform, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
-import notifee from "react-native-notify-kit";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import Sound from "react-native-sound";
 
 interface TimeOptionType {
@@ -196,17 +196,6 @@ export default function PrayersSettingsScreen() {
             clearTimeout(playTimeoutRef.current);
         }
         ModalSheetRef.current?.close();
-    };
-
-    // ------------------------------------------------------------
-    // Open device notification settings
-    // ------------------------------------------------------------
-    const handleOpenNotifSettings = async () => {
-        if (Platform.OS === "android") {
-            await notifee.openNotificationSettings();
-        } else {
-            Linking.openSettings();
-        }
     };
 
     // Dont render if no valid prayer name in params
@@ -433,7 +422,7 @@ export default function PrayersSettingsScreen() {
                             </Text>
                             <TouchableOpacity
                                 style={[styles.permissionButton, { backgroundColor: theme.overlay }]}
-                                onPress={handleOpenNotifSettings}
+                                onPress={openNotificationSettings}
                             >
                                 <MaterialCommunityIcons name="cog-outline" size={18} color={theme.accent2} />
                                 <Text style={[styles.permissionButtonText, { color: theme.accent }]}>
