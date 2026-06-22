@@ -851,7 +851,7 @@ export const GLOBAL_TR = {
             language: "Jezik",
             location: "Lokacija",
             notifications: "Obavještenja",
-            localeDate: "bs-BA",
+            localeDate: "hr-HR", // "bs-BA" didn't work for some reason, using "hr-HR" which is very similar and works fine
             locationButtonText1: "Ažuriraj lokaciju",
             locationButtonText2: "Postavi lokaciju",
             locationOff: "Dozvola za lokaciju je isključena. Dodirnite ispod za otvaranje postavki i dozvolu pristupa.",
