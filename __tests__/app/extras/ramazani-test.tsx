@@ -70,7 +70,7 @@ describe('RamadanScreen', () => {
     expect(Clipboard.setStringAsync).toHaveBeenCalledTimes(1);
   });
 
-  it('calls Share.share when share is pressed', async () => {
+  it('shares the item title and description when share is pressed', async () => {
     const { Share } = require('react-native');
     Share.share = jest.fn(() => Promise.resolve({ action: Share.sharedAction }));
     render(<RamadanScreen />);
@@ -78,5 +78,12 @@ describe('RamadanScreen', () => {
       fireEvent.press(screen.getAllByText('Share')[0]);
     });
     expect(Share.share).toHaveBeenCalledTimes(1);
+    expect(Share.share).toHaveBeenCalledWith(
+      {
+        title: 'Pure Intentions',
+        message: 'Pure Intentions\n\nFast Ramadan with faith and determination to seek the reward of Allah Almighty, with the aim of forgiveness of past sins.',
+      },
+      { dialogTitle: 'Pure Intentions', subject: 'Pure Intentions' }
+    );
   });
 });

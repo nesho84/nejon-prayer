@@ -102,7 +102,7 @@ describe('QuotesScreen', () => {
       fireEvent.press(screen.getAllByText('Share')[0]);
     });
     expect(Share.share).toHaveBeenCalledWith(
-      { message: quotes[0] },
+      { title: 'Quotes', message: `Quotes\n\n${quotes[0]}` },
       expect.objectContaining({ dialogTitle: 'Quotes' })
     );
   });

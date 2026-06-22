@@ -3,7 +3,7 @@ import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { YearlyHolidays } from '@/types/holiday.types';
-import { render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -125,5 +125,25 @@ describe('HolidaysScreen', () => {
 
     const names = screen.getAllByText(/^(Ramadan|Eid al-Fitr|Eid al-Adha)$/);
     expect(names.map((n) => n.props.children)).toEqual(['Ramadan', 'Eid al-Fitr', 'Eid al-Adha']);
+  });
+
+  it('shares the holiday title, description, and date when share is pressed', async () => {
+    const { Share } = require('react-native');
+    Share.share = jest.fn(() => Promise.resolve({ action: Share.sharedAction }));
+    setHolidays({ eid_fitr: ['2026-12-10'] });
+    render(<HolidaysScreen />);
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('share-eid_fitr'));
+    });
+
+    expect(Share.share).toHaveBeenCalledTimes(1);
+    expect(Share.share).toHaveBeenCalledWith(
+      {
+        title: 'Eid al-Fitr',
+        message: 'Eid al-Fitr\n\nFeast of breaking the fast\n\n10.12.2026',
+      },
+      { dialogTitle: 'Eid al-Fitr', subject: 'Eid al-Fitr' }
+    );
   });
 });

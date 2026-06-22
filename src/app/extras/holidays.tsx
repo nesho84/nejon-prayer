@@ -81,10 +81,10 @@ export default function HolidaysScreen() {
     // ------------------------------------------------------------
     // Share
     // ------------------------------------------------------------
-    const handleShare = async (key: string, title: string, date: string) => {
+    const handleShare = async (key: string, title: string, description: string, date: string) => {
         try {
             const result = await Share.share(
-                { title, message: `${title}\n\n${date}` },
+                { title, message: `${title}\n\n${description}\n\n${date}` },
                 { dialogTitle: title, subject: title }
             );
             if (result.action === Share.sharedAction) {
@@ -125,7 +125,8 @@ export default function HolidaysScreen() {
 
                     {/* Right — share icon */}
                     <TouchableOpacity
-                        onPress={() => handleShare(item.key, itemTr.name, formattedDate)}
+                        testID={`share-${item.key}`}
+                        onPress={() => handleShare(item.key, itemTr.name, itemTr.description, formattedDate)}
                         style={styles.shareButton}
                     >
                         <Feather name={isShared ? "check" : "share-2"} size={18} color={isShared ? theme.success : theme.placeholder} />

@@ -50,9 +50,10 @@ export default function QuotesScreen() {
   // ------------------------------------------------------------
   const handleShare = async (id: number, quote: string) => {
     try {
+      const title = tr.labels.quotes;
       const result = await Share.share(
-        { message: quote },
-        { dialogTitle: tr.labels.quotes }
+        { title, message: `${title}\n\n${quote}` },
+        { dialogTitle: title, subject: title }
       );
       if (result.action === Share.sharedAction) {
         setSharedId(id);
