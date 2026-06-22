@@ -208,11 +208,11 @@ export default function HomeScreen() {
                         </View>
                         {/* Center: Date & Location/Timezone */}
                         <View style={styles.dateLocationRow}>
-                            <Text style={[styles.dateInfoText, { color: theme.text2, opacity: 0.9 }]}>
+                            <Text style={[styles.dateInfoText, { color: theme.text2, opacity: 0.88 }]}>
                                 {formattedDateHeader}
                             </Text>
                             <View style={styles.locationInfoRow}>
-                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginTop: 0.8 }} />
+                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginLeft: -4, marginTop: 0.8 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                     {timeZone?.location || "Location"}
                                 </Text>
@@ -270,15 +270,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     dateInfoText: {
-        fontSize: 14,
-        fontWeight: '500',
+        fontSize: 14.4,
+        fontWeight: '600',
+        letterSpacing: 0.3,
+        // textTransform: 'uppercase',
         marginBottom: 4,
     },
     locationInfoRow: {
         flexDirection: 'row',
         alignItems: 'center',
         maxWidth: '100%',
-        opacity: 0.7,
+        opacity: 0.6,
         gap: 5,
     },
     locationInfoText: {
