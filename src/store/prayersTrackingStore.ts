@@ -1,6 +1,6 @@
 import { mmkvStorage } from '@/store/storage';
 import { MAIN_PRAYERS, PrayerName } from '@/types/prayer.types';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 

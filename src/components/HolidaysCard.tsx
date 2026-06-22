@@ -5,7 +5,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { HOLIDAY_META, UpcomingHoliday } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
-import { formatDateKey, toDateKey } from "@/utils/date";
+import { formatDateKey, toDateKey } from "@/utils/datetime";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo } from "react";

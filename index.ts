@@ -1,7 +1,7 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
 import { PrayerName } from '@/types/prayer.types';
-import { resolveTrackingDate } from '@/utils/prayerTracking';
+import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';

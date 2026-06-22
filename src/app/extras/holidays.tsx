@@ -7,7 +7,7 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { ALL_HOLIDAYS, HOLIDAY_META, HolidayName } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
-import { formatDateKey, toDateKey } from "@/utils/date";
+import { formatDateKey, toDateKey } from "@/utils/datetime";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";

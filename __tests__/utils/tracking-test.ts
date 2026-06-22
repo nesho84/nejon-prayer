@@ -1,5 +1,5 @@
-import { toDateKey } from '@/utils/date';
-import { getDayPrayedCount, resolveTrackingDate } from '@/utils/prayerTracking';
+import { toDateKey } from '@/utils/datetime';
+import { getDayPrayedCount, resolveTrackingDate } from '@/utils/tracking';
 
 describe('getDayPrayedCount', () => {
   it('returns 0 when no tracking data exists for the day', () => {

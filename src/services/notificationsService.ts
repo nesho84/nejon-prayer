@@ -9,7 +9,7 @@ import { HOLIDAY_CONFIG, UPCOMING_HOLIDAYS, YearlyHolidays } from "@/types/holid
 import { Language, Translations } from '@/types/language.types';
 import { EventSettings, NotifSettings, PrayerEventType, PrayerSettings, PrayerType, SpecialSettings, SpecialType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerTimes } from "@/types/prayer.types";
-import { formatDateKey, toDateKey } from '@/utils/date';
+import { formatDateKey, toDateKey } from '@/utils/datetime';
 import * as Sentry from '@sentry/react-native';
 import { Platform } from "react-native";
 import notifee, {

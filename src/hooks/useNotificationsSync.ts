@@ -6,7 +6,7 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { PrayerName } from '@/types/prayer.types';
-import { resolveTrackingDate } from '@/utils/prayerTracking';
+import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
 import notifee, { EventType } from 'react-native-notify-kit';

@@ -13,7 +13,7 @@ import {
   SpecialSettings,
   SpecialType
 } from '@/types/notification.types';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 import * as Sentry from '@sentry/react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';

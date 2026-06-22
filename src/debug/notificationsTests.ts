@@ -1,6 +1,6 @@
 import { SOUNDS } from "@/constants/sounds";
 import { NotifSettings } from "@/types/notification.types";
-import { toDateKey } from "@/utils/date";
+import { toDateKey } from "@/utils/datetime";
 import notifee, {
     AndroidCategory,
     AndroidColor,

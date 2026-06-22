@@ -4,7 +4,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {

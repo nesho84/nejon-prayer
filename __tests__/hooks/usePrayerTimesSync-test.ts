@@ -1,6 +1,6 @@
 import { usePrayerTimesSync } from '@/hooks/usePrayerTimesSync';
 import { usePrayersStore } from '@/store/prayersStore';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 import { renderHook } from '@testing-library/react-native';
 import { AppState } from 'react-native';
 
@@ -20,7 +20,7 @@ jest.mock('@/store/prayersStore', () => ({
   usePrayersStore: jest.fn(),
 }));
 
-jest.mock('@/utils/date', () => ({
+jest.mock('@/utils/datetime', () => ({
   toDateKey: jest.fn(),
 }));
 

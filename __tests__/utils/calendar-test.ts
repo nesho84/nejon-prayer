@@ -1,4 +1,4 @@
-import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendarGrid';
+import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendar';
 
 beforeEach(() => {
   jest.useFakeTimers();

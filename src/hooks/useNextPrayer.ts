@@ -1,5 +1,5 @@
 import { ALL_PRAYERS, MAIN_PRAYERS, PrayerCountdown, PrayerEntry, PrayerName, PrayerTimes } from '@/types/prayer.types';
-import { isTimePast } from '@/utils/time';
+import { isTimePast } from '@/utils/datetime';
 import { useIsFocused } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { AppState } from 'react-native';

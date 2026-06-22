@@ -1,5 +1,5 @@
 import { cleanOldEntries, usePrayersTrackingStore } from '@/store/prayersTrackingStore';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {

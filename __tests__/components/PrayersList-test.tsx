@@ -2,7 +2,7 @@ import PrayersList from '@/components/PrayersList';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
-import { toDateKey } from '@/utils/date';
+import { toDateKey } from '@/utils/datetime';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
