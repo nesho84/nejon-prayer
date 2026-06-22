@@ -12,7 +12,7 @@ writing any Expo/RN code (see `AGENTS.md`). Do not assume APIs from other SDK ve
 
 ```bash
 npm test                                    # run full Jest suite
-npx jest __tests__/utils/time-test.ts       # run a single test file
+npx jest __tests__/utils/datetime-test.ts   # run a single test file
 npx jest -t "marks prayer as prayed"        # run tests matching a name
 npm run lint                                 # expo lint (eslint-config-expo, flat config)
 npx tsc --noEmit                             # typecheck (strict mode is on)
@@ -61,6 +61,19 @@ making cross-cutting changes. Key points to internalize:
 
 - **i18n**: `languageStore` holds the active language; strings live in `src/constants/translations/`
   per feature and language (en/de/sq/tr). Supported: English, German, Albanian, Turkish.
+
+- **`src/debug/notificationsTests.ts`** duplicates the notification payload shapes built in
+  `src/services/notificationsService.ts` (used by the debug panel to fire test notifications).
+  It is **not** imported by or derived from that file — the two are hand-kept in sync. Any change
+  to a notification's `data`/`android`/`ios` payload (channels, categories, actions, fields) must
+  be mirrored in both files, or the debug tool will silently test a stale shape.
+
+## Refactoring checklist
+
+Before calling a rename/removal done, `grep` the **whole repo** for every removed/renamed
+symbol, string, or id (not just the file you were editing) — this codebase has more than one
+place that duplicates a payload/shape by hand (see `notificationsTests.ts` above), and a
+same-directory or even same-file check will miss those siblings.
 
 ## Testing
 

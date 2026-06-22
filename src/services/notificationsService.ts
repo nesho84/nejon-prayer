@@ -140,18 +140,6 @@ export async function createNotificationCategories(tr: Translations) {
         { id: 'snooze', title: tr.actions?.snooze || 'Later' },
       ],
     },
-    {
-      id: 'prayer-event-category',
-      actions: [{ id: 'OK', title: 'OK' }],
-    },
-    {
-      id: 'special-category',
-      actions: [{ id: 'OK', title: 'OK' }],
-    },
-    {
-      id: 'prayer-reminder-category',
-      actions: [{ id: 'OK', title: 'OK' }],
-    },
   ]);
 }
 
@@ -365,7 +353,6 @@ async function scheduleEventNotifications(params: ScheduleParams) {
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.BLUE,
           style: { type: AndroidStyle.INBOX, lines: [body] },
-          actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
           pressAction: { id: 'default', launchActivity: 'default' },
           lightUpScreen: true,
           showTimestamp: true,
@@ -373,7 +360,6 @@ async function scheduleEventNotifications(params: ScheduleParams) {
           ongoing: true,
         },
         ios: {
-          categoryId: 'prayer-event-category',
           interruptionLevel: 'active',
           // @TODO (iOS): native sound for background/killed delivery — see getIosSound in constants/sounds.ts
           // sound: getIosSound(sound),
@@ -458,7 +444,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           smallIcon: 'ic_stat_prayer',
           color: AndroidColor.GREEN,
           style: { type: AndroidStyle.INBOX, lines: [body] },
-          actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
           pressAction: { id: 'default', launchActivity: 'default' },
           lightUpScreen: true,
           showTimestamp: true,
@@ -466,7 +451,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
           ongoing: true,
         },
         ios: {
-          categoryId: 'special-category',
           interruptionLevel: 'active',
         },
       },
@@ -541,7 +525,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.INBOX, lines: [body] },
-            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
             pressAction: { id: 'default', launchActivity: 'default' },
             lightUpScreen: true,
             showTimestamp: true,
@@ -549,7 +532,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             ongoing: true,
           },
           ios: {
-            categoryId: 'special-category',
             interruptionLevel: 'active',
           },
         },
@@ -631,7 +613,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             smallIcon: 'ic_stat_prayer',
             color: AndroidColor.GREEN,
             style: { type: AndroidStyle.BIGTEXT, text: body },
-            actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
             pressAction: { id: 'default', launchActivity: 'default' },
             lightUpScreen: true,
             showTimestamp: true,
@@ -639,7 +620,6 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
             ongoing: true,
           },
           ios: {
-            categoryId: 'special-category',
             interruptionLevel: 'active',
           },
         },
@@ -742,7 +722,6 @@ export async function handleNotificationEvent(
                 smallIcon: 'ic_stat_prayer',
                 color: AndroidColor.RED,
                 style: { type: AndroidStyle.INBOX, lines: [reminderBody] },
-                actions: [{ title: 'OK', pressAction: { id: 'OK' } }],
                 pressAction: { id: 'default', launchActivity: 'default' },
                 lightUpScreen: true,
                 showTimestamp: true,
@@ -750,7 +729,6 @@ export async function handleNotificationEvent(
                 ongoing: true,
               },
               ios: {
-                categoryId: 'prayer-reminder-category',
                 interruptionLevel: 'active',
                 // @TODO (iOS): native sound for background/killed delivery — see getIosSound in constants/sounds.ts
                 // sound: getIosSound(SOUNDS.alarm1),
@@ -764,12 +742,6 @@ export async function handleNotificationEvent(
           );
 
           // Cancel the current notification
-          await cancelDisplayedNotification(notification.id);
-          break;
-
-        case 'OK':
-          // OK button pressed (events, reminders, specials)
-          console.log(`✅ ${prefix} Notification Reminder "OK" pressed`);
           await cancelDisplayedNotification(notification.id);
           break;
       }
