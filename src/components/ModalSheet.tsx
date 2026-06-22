@@ -88,13 +88,22 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   footer,
   onClose
 }, ref) => {
+  // Safe area insets
   const insets = useSafeAreaInsets();
+  const topInset = insets.top;
+  const bottomInset = insets.bottom;
+  const leftInset = insets.left;
+  const rightInset = insets.right;
+
+  // Layout
   const { height } = useWindowDimensions();
 
+  // Max sheet height based on size prop, clamped to 10-100% of screen height
   const sheetMaxHeight = typeof size === 'number'
     ? height * Math.min(Math.max(size, 0.1), 1)
     : height * SIZES_MAP[size ?? 'full'];
 
+  // Animated values
   const translateY = useSharedValue(0);
   const backdropOpacity = useSharedValue(0);
   const keyboardHeight = useSharedValue(0);
@@ -195,7 +204,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   // Sheet position — drag offset minus keyboard upward shift
   // ------------------------------------------------------------
   const animatedStyle = useAnimatedStyle(() => {
-    const safeHeight = height - insets.top - insets.bottom;
+    const safeHeight = height - topInset - bottomInset;
     const spaceAbove = safeHeight - sheetMaxHeight;
     const upward = Math.min(keyboardHeight.value, Math.max(spaceAbove, 0));
 
@@ -224,9 +233,9 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
         style={[
           styles.container,
           {
-            paddingTop: insets.top,
-            paddingLeft: insets.left,
-            paddingRight: insets.right,
+            paddingTop: topInset,
+            paddingLeft: leftInset,
+            paddingRight: rightInset,
           },
           animatedStyle,
         ]}
@@ -242,7 +251,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
             styles.innerContainer,
             {
               backgroundColor: colors?.sheetBackgroundColor ?? SHEET_BACKGROUND,
-              paddingBottom: insets.bottom,
+              paddingBottom: bottomInset,
               maxHeight: sheetMaxHeight,
             }
           ]}>

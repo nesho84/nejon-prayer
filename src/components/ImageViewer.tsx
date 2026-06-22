@@ -19,6 +19,7 @@ export default function ImageViewer({ visible, source, onClose }: Props) {
     const insets = useSafeAreaInsets();
     const topInset = insets.top + 12;
     const bottomInset = insets.bottom + 12;
+    const rightInset = insets.right + 16;
 
     // Layout
     const { width, height } = useWindowDimensions();
@@ -145,7 +146,7 @@ export default function ImageViewer({ visible, source, onClose }: Props) {
                     {/* Close button */}
                     <Pressable
                         testID="image-viewer-close"
-                        style={[styles.closeButton, { top: topInset, bottom: bottomInset }]}
+                        style={[styles.closeButton, { top: topInset, bottom: bottomInset, right: rightInset }]}
                         hitSlop={12}
                         onPress={handleClose}
                     >
@@ -177,7 +178,6 @@ const styles = StyleSheet.create({
     // Close button
     closeButton: {
         position: "absolute",
-        right: 16,
         width: 44,
         height: 44,
         borderRadius: 22,

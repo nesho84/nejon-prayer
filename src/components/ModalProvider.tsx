@@ -21,6 +21,8 @@ export default function ModalProvider() {
   const insets = useSafeAreaInsets();
   const topInset = insets.top + 4;
   const bottomInset = insets.bottom;
+  const leftInset = insets.left;
+  const rightInset = insets.right;
 
   if (!options && !visible) return null;
 
@@ -156,7 +158,7 @@ export default function ModalProvider() {
         statusBarTranslucent
         onRequestClose={handleDismiss}
       >
-        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: topInset, paddingBottom: bottomInset }]}>
+        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: topInset, paddingBottom: bottomInset, paddingLeft: leftInset, paddingRight: rightInset }]}>
           {renderCloseIcon()}
           {options.title && (
             <Text style={[styles.title, { color: theme.text }, options.titleStyle]}>
