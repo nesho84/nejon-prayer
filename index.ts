@@ -34,9 +34,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     // onBackgroundEvent only fires for our own notifee notifications, so any delivery is a valid sync trigger.
     if (type === EventType.DELIVERED) {
         try {
-            // Refresh in-memory store from MMKV first (it can go stale in the background)
-            await useNotificationsStore.persist.rehydrate();
-            // Sync notifications in the background to ensure we have the latest prayer times
             await useNotificationsStore.getState().syncNotificationsInBackground();
         } catch (err) {
             console.error('❌ [index.ts:Background] Failed to sync notifications in background:', err);
@@ -51,9 +48,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             if (prayerName) {
                 const prayerDate = notification.data?.prayerDate as string | undefined;
                 const dateToUse = resolveTrackingDate(prayerDate);
-                // Refresh in-memory store from MMKV first (it can go stale in the background)
-                await usePrayersTrackingStore.persist.rehydrate();
-                // Mark the prayer as prayed in the background
                 await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
             }
         } catch (error) {
