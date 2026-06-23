@@ -9,6 +9,7 @@ import { render, screen } from '@testing-library/react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
+  storage: { clearAll: jest.fn() },
 }));
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
@@ -27,9 +28,14 @@ jest.mock('react-native-sound', () => {
   return { __esModule: true, default: MockSound };
 });
 jest.mock('@/services/soundService', () => ({ startSound: jest.fn(), stopSound: jest.fn() }));
-jest.mock('@/services/notificationsService', () => ({ scheduleNotificationsService: jest.fn() }));
+jest.mock('@/services/notificationsService', () => ({
+  scheduleNotificationsService: jest.fn(),
+  cancelAllNotifications: jest.fn(),
+}));
 jest.mock('@/services/locationService', () => ({ getUserLocation: jest.fn(), hasLocationChanged: jest.fn() }));
 jest.mock('@/services/prayersService', () => ({ getYearlyPrayerTimes: jest.fn() }));
+jest.mock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
+jest.mock('react-native-track-player', () => ({ __esModule: true, default: { reset: jest.fn() } }));
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   ImpactFeedbackStyle: { Medium: 'medium' },

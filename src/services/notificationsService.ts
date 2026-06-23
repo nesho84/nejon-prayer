@@ -162,7 +162,7 @@ export async function createNotificationCategories(tr: Translations) {
 // ------------------------------------------------------------
 // Cancel all scheduled notifications
 // ------------------------------------------------------------
-async function cancelAllNotifications() {
+export async function cancelAllNotifications() {
   const notifTypes = ['prayer', 'prayer-event', 'special'];
   try {
     const scheduled = await notifee.getTriggerNotifications();

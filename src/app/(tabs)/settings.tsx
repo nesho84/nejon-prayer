@@ -4,6 +4,7 @@ import AppLoading from "@/components/AppLoading";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
 import DebugPanel from "@/debug/DebugPanel";
+import { restoreDefaults } from "@/services/resetAppService";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -259,6 +260,39 @@ export default function SettingsScreen() {
         }
     };
 
+    // ------------------------------------------------------------
+    // Reset App — wipes all data and relaunches into onboarding
+    // ------------------------------------------------------------
+    const confirmResetApp = async () => {
+        setLocalLoading(true);
+        try {
+            const result = await restoreDefaults();
+
+            if (result.status === "failed") {
+                Alert.alert(tr.labels.error, tr.labels.resetAppErrorMessage);
+                return;
+            }
+
+            if (result.status === "wiped-no-reload") {
+                Alert.alert(tr.labels.resetAppDoneTitle, tr.labels.resetAppDoneMessage);
+            }
+            // "reloaded": app is already relaunching — nothing to show
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    const handleResetApp = () => {
+        Alert.alert(
+            tr.labels.resetAppTitle,
+            tr.labels.resetAppMessage,
+            [
+                { text: tr.buttons.cancel, style: "cancel" },
+                { text: tr.labels.resetApp, style: "destructive", onPress: confirmResetApp },
+            ]
+        );
+    };
+
     // Loading state
     if (!deviceSettingsReady || !locationReady || !notifReady) {
         // prayersLoading is not used, because it covers the entire screen!
@@ -357,19 +391,19 @@ export default function SettingsScreen() {
 
                     {/* Update Location Button */}
                     <TouchableOpacity
-                        style={[styles.updateLocationButton, { backgroundColor: theme.overlay }]}
+                        style={[styles.wideButton, { backgroundColor: theme.overlay }]}
                         onPress={updateLocation}
                         disabled={localLoading}
                     >
                         <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} />
-                        <Text style={[styles.updateLocationButtonText, { color: theme.text2 }]}>
+                        <Text style={[styles.wideButtonText, { color: theme.text2 }]}>
                             {location ? (tr.labels.locationButtonText1) : (tr.labels.locationButtonText2)}
                         </Text>
                     </TouchableOpacity>
 
                     {/* fullAddress */}
                     {fullAddress && (
-                        <Text style={[styles.addressText, { color: theme.placeholder }]}>
+                        <Text style={[styles.infoText, { color: theme.placeholder }]}>
                             {fullAddress || (tr.labels.loading)}
                         </Text>
                     )}
@@ -644,12 +678,36 @@ export default function SettingsScreen() {
                                 }
                             </View>
                         }
-
                     </View>
                 </AppCard>
 
+                {/* ------ Reset App ------ */}
+                <AppCard style={styles.settingCard}>
+                    <Text style={[styles.settingTitle, { color: theme.text2 }]}>
+                        {tr.labels.resetAppRow}
+                    </Text>
+
+                    {/* Divider */}
+                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                    <TouchableOpacity
+                        style={[styles.wideButton, { backgroundColor: theme.danger + '15' }]}
+                        onPress={handleResetApp}
+                        disabled={localLoading}
+                    >
+                        <MaterialCommunityIcons name="restore-alert" size={16} color={theme.danger} />
+                        <Text style={[styles.wideButtonText, { color: theme.danger }]}>
+                            {tr.labels.resetAppButton}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <Text style={[styles.infoText, { color: theme.placeholder }]}>
+                        {tr.labels.resetAppMessage}
+                    </Text>
+                </AppCard>
+
             </ScrollView>
-        </AppLayout >
+        </AppLayout>
     );
 }
 
@@ -696,8 +754,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
 
-    // Location
-    updateLocationButton: {
+    wideButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -706,11 +763,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         gap: 6,
     },
-    updateLocationButtonText: {
+    wideButtonText: {
         fontSize: 16,
         fontWeight: '600',
     },
-    addressText: {
+    infoText: {
         marginTop: 8,
         marginBottom: 1,
     },
