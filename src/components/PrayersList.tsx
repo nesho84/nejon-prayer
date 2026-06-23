@@ -81,6 +81,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
           buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
           labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
         }],
+        celebrationAnimation: true,
       });
     }
   }, [markPrayed, unmarkPrayed, celebratedDate, setCelebrated, theme]);

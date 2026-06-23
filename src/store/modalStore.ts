@@ -18,6 +18,7 @@ export type ModalOptions = {
   content?: string;
   component?: React.ReactNode;
   buttons?: ModalButton[];
+  celebrationAnimation?: boolean;
   animationType?: 'fade' | 'slide' | 'none';
   dismissable?: boolean;
   showCloseIcon?: boolean;

@@ -9,6 +9,22 @@ jest.mock('@/store/storage', () => ({
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
+// ModalProvider transitively imports CelebrationFx → reanimated, whose worklets
+// runtime can't initialise under Jest. Stub it to passthrough Animated.* views.
+jest.mock('react-native-reanimated', () => {
+  const { View, Text } = require('react-native');
+  const passthrough = () => 0;
+  return {
+    __esModule: true,
+    default: { View, Text },
+    useSharedValue: (value: number) => ({ value }),
+    useAnimatedStyle: () => ({}),
+    withTiming: (value: number) => value,
+    withDelay: (_delay: number, value: number) => value,
+    withSequence: (...values: number[]) => values[values.length - 1],
+    Easing: { out: () => passthrough, in: () => passthrough, linear: passthrough, quad: passthrough, cubic: passthrough },
+  };
+});
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
   return {

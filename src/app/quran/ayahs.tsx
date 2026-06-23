@@ -191,6 +191,7 @@ export default function AyahsScreen() {
                 buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
                 labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
               }],
+              celebrationAnimation: true,
             });
           }}
         >

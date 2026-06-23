@@ -1,3 +1,4 @@
+import CelebrationFx from '@/components/CelebrationFx';
 import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -107,6 +108,7 @@ export default function ModalProvider() {
             )}
             {options.component}
             {options.buttons && renderButtons()}
+            {options.celebrationAnimation && <CelebrationFx />}
           </View>
         </View>
       </Modal>
@@ -197,6 +199,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
+    overflow: 'hidden',
   },
   fullscreen: {
     flex: 1,

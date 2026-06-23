@@ -1,5 +1,8 @@
+import { globalStyles } from "@/constants/styles";
+import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
+import { useModalStore } from "@/store/modalStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -31,12 +34,59 @@ interface Props {
 export default function DebugPanel({ seconds = 10 }: Props) {
   const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
+  const tr = useLanguageStore((state) => state.tr);
   const location = useLocationStore((state) => state.location);
   const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
   const options = { language, location, hasAlarm: true };
 
   const [expanded, setExpanded] = useState(false);
+
+  // Button styling shared by the celebration OK action
+  const okButton = {
+    label: "OK",
+    action: "ok",
+    buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
+    labelStyle: { fontSize: 16, fontWeight: "600" as const, color: theme.accent },
+  };
+
+  // ------------------------------------------------------------
+  // Fires the prayer-complete celebration modal (random message)
+  // ------------------------------------------------------------
+  const showPrayerCelebration = () => {
+    const variants = PRAYER_CELEBRATIONS_TR[language] ?? PRAYER_CELEBRATIONS_TR["en"];
+    const variant = variants[Math.floor(Math.random() * variants.length)];
+    useModalStore.getState().show({
+      type: "alert",
+      celebrationAnimation: true,
+      component: (
+        <View style={globalStyles.bannerContainer}>
+          <Text style={globalStyles.bannerEmoji}>{variant.emoji}</Text>
+          <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{variant.title}</Text>
+          <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{variant.message}</Text>
+        </View>
+      ),
+      buttons: [okButton],
+    });
+  };
+
+  // ------------------------------------------------------------
+  // Fires the Khatam-complete celebration modal
+  // ------------------------------------------------------------
+  const showKhatamCelebration = () => {
+    useModalStore.getState().show({
+      type: "alert",
+      celebrationAnimation: true,
+      component: (
+        <View style={globalStyles.bannerContainer}>
+          <Text style={globalStyles.bannerEmoji}>📖</Text>
+          <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.khatamCompleteTitle}</Text>
+          <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.khatamCompleteMessage}</Text>
+        </View>
+      ),
+      buttons: [okButton],
+    });
+  };
 
   return (
     <View style={[styles.container, { borderColor: theme.danger }]}>
@@ -60,6 +110,26 @@ export default function DebugPanel({ seconds = 10 }: Props) {
             onPress={() => useOnboardingStore.getState().setOnboarding(false)}
           >
             <Text style={[styles.buttonText, { color: theme.info }]}>Show Onboarding</Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+          {/* 'Prayer' Celebration Modal */}
+          <TouchableOpacity
+            style={[styles.button, { borderColor: theme.border }]}
+            activeOpacity={0.6}
+            onPress={showPrayerCelebration}
+          >
+            <Text style={[styles.buttonText, { color: theme.gray }]}>Show 'Prayer' Celebration Modal</Text>
+          </TouchableOpacity>
+          {/* 'Khatam' Celebration Modal */}
+          <TouchableOpacity
+            style={[styles.button, { borderColor: theme.border }]}
+            activeOpacity={0.6}
+            onPress={showKhatamCelebration}
+          >
+            <Text style={[styles.buttonText, { color: theme.gray }]}>Show 'Khatam' Celebration Modal</Text>
           </TouchableOpacity>
 
           {/* Divider */}
