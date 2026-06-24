@@ -437,7 +437,7 @@ export default function SettingsScreen() {
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2 }]}>
                                 ⚠️ {tr.labels.prayersError}
                             </Text>
                         </>
@@ -448,7 +448,7 @@ export default function SettingsScreen() {
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
-                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 3 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2 }]}>
                                 {tr.labels.prayerTimesOutdated}
                             </Text>
                         </>
@@ -682,10 +682,8 @@ export default function SettingsScreen() {
                     <Text style={[styles.settingTitle, { color: theme.text2 }]}>
                         {tr.labels.resetAppRow}
                     </Text>
-
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-
                     <TouchableOpacity
                         style={[styles.wideButton, { backgroundColor: theme.danger + '15' }]}
                         onPress={handleResetApp}
@@ -696,8 +694,7 @@ export default function SettingsScreen() {
                             {tr.labels.resetAppButton}
                         </Text>
                     </TouchableOpacity>
-
-                    <Text style={[styles.infoText, { color: theme.placeholder }]}>
+                    <Text style={[styles.infoText, { color: theme.placeholder, textAlign: 'center' }]}>
                         {tr.labels.resetAppMessage}
                     </Text>
                 </AppCard>
@@ -713,8 +710,10 @@ const styles = StyleSheet.create({
         padding: 14,
     },
     settingTitle: {
-        fontSize: 18,
+        fontSize: 17.5,
         fontWeight: '600',
+        letterSpacing: 0.5,
+        marginLeft: 1,
     },
     statusRow: {
         flexDirection: 'row',
@@ -723,6 +722,7 @@ const styles = StyleSheet.create({
     },
     statusText: {
         fontSize: 16,
+
     },
     statusSubText: {
         fontSize: 14,
@@ -745,9 +745,9 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     subGroup: {
-        borderRadius: 12,
         padding: 12,
         borderWidth: 1,
+        borderRadius: 12,
     },
 
     wideButton: {

@@ -72,7 +72,7 @@ function DebugToggle({ label, value, onPress }: DebugToggleProps) {
   return (
     <DebugButton
       label={`Toggle ${label}`}
-      color={theme.teal}
+      color={theme.violet}
       onPress={onPress}
       right={
         <Pill
@@ -121,7 +121,7 @@ export default function DebugPanel({ seconds = 10 }: Props) {
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
 
-  // Collapse state (kept in this component)
+  // Local state
   const [expanded, setExpanded] = useState(false);
 
   // ------------------------------------------------------------
@@ -199,13 +199,13 @@ export default function DebugPanel({ seconds = 10 }: Props) {
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Celebration modal previews */}
-          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.violet} onPress={showPrayerCelebration} />
-          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.violet} onPress={showKhatamCelebration} />
+          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} onPress={showPrayerCelebration} />
+          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.teal} onPress={showKhatamCelebration} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
-          {/* Scenario-gated UI toggles */}
+          {/* UI toggles */}
           <DebugToggle label="Holiday Card" value={forceHoliday} onPress={toggleHoliday} />
           <DebugToggle label="Friday Badge" value={forceFriday} onPress={toggleFriday} />
           <DebugToggle label="Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
@@ -223,10 +223,6 @@ export default function DebugPanel({ seconds = 10 }: Props) {
               right={<Pill label={`${seconds}s`} color={theme.placeholder} bg={theme.overlay} />}
             />
           ))}
-
-          {/* Divider */}
-          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-
           {/* Channels & scheduled dump */}
           <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugChannelsAndScheduled} />
 
