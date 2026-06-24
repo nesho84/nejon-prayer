@@ -19,9 +19,11 @@ jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() } }));
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
+  const stub = ({ name }: { name: string }) =>
+    React.createElement('View', { testID: `icon-${name}` });
   return {
-    Ionicons: ({ name }: { name: string }) =>
-      React.createElement('View', { testID: `icon-${name}` }),
+    Ionicons: stub,
+    MaterialCommunityIcons: stub,
   };
 });
 // Render header, items and footer so titles and rows are queryable.
