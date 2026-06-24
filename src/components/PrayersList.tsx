@@ -1,6 +1,7 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
+import { useDebugStore } from '@/store/debugStore';
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
@@ -37,6 +38,9 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
   const celebratedDate = usePrayersTrackingStore((state) => state.celebratedDate);
   const setCelebrated = usePrayersTrackingStore((state) => state.setCelebrated);
+
+  // DEBUG: force-show the Friday "Xhumaja" badge on any day (Debug Panel toggle)
+  const forceFriday = useDebugStore((state) => state.forceFriday);
 
   // ------------------------------------------------------------
   // Handle marking/unmarking prayers as prayed and show celebration modal
@@ -111,7 +115,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         const isPast = isTrackable && isToday && isTimePast(prayerTime);
         const isCurrent = isToday && currentPrayerName === prayerName;
         const isLast = index === arr.length - 1;
-        const isFriday = prayerTimesDate != null && new Date(prayerTimesDate).getDay() === 5; // 0=Sun, 1=Mon, ..., 5=Fri
+        const isFriday = forceFriday || (prayerTimesDate != null && new Date(prayerTimesDate).getDay() === 5); // 0=Sun, 1=Mon, ..., 5=Fri
         const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
 
         return (

@@ -326,6 +326,18 @@ export default function SettingsScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
+                {/* ------ Debug Panel (dev only) ------ */}
+                {__DEV__ && (
+                    <AppCard style={styles.settingCard}>
+                        <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
+                        {/* Divider */}
+                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                        <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
+                            <DebugPanel />
+                        </View>
+                    </AppCard>
+                )}
+
                 {/* ------ Theme Setting ------ */}
                 <AppCard style={styles.settingCard}>
                     <Text style={[styles.settingTitle, { color: theme.text }]}>
@@ -361,18 +373,6 @@ export default function SettingsScreen() {
                         modalBackgroundColor={theme.card}
                     />
                 </AppCard>
-
-                {/* ------ Debug Panel (dev only) ------ */}
-                {__DEV__ && (
-                    <AppCard style={styles.settingCard}>
-                        <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
-                        {/* Divider */}
-                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                        <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-                            <DebugPanel />
-                        </View>
-                    </AppCard>
-                )}
 
                 {/* ------ Location Setting ------ */}
                 <AppCard style={styles.settingCard}>

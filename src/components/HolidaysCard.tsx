@@ -1,5 +1,6 @@
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { getNextHoliday } from "@/services/holidaysService";
+import { useDebugStore } from "@/store/debugStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -22,20 +23,23 @@ const IslamicHolidaysCard = React.memo(() => {
   const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
   const holidaysTr = HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en;
 
+  // DEBUG: force-show the holiday card on any day (Debug Panel toggle)
+  const forceHoliday = useDebugStore((state) => state.forceHoliday);
+
   // ------------------------------------------------------------
   // Detect next upcoming holiday within its showFromDays window
   // ------------------------------------------------------------
   const upcoming = useMemo(() => {
     if (!yearlyHolidays) return null;
 
-    // DEV MODE: Show a fake upcoming holiday for UI testing
-    if (__DEV__) {
+    // DEBUG: force-show a fake upcoming holiday for UI testing (Debug Panel toggle)
+    if (forceHoliday) {
       return { name: "ramadan_start", gregorianDate: "2026-06-15", daysUntil: 3 } as UpcomingHoliday;
     }
 
-    // PROD MODE: Compute real upcoming holiday based on dates
+    // Compute real upcoming holiday based on dates
     return getNextHoliday(yearlyHolidays, toDateKey());
-  }, [yearlyHolidays]);
+  }, [yearlyHolidays, forceHoliday]);
 
   // Nothing upcoming — render nothing
   if (!upcoming) return null;

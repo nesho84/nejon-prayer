@@ -192,7 +192,7 @@ function ParticleView({ particle }: { particle: Particle }) {
   );
 }
 
-// Main component — overlays a one-shot celebration effect
+// Main component
 const CelebrationFx = React.memo(({ variant }: Props) => {
   // Stores
   const theme = useThemeStore((state) => state.theme);

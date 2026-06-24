@@ -1,4 +1,5 @@
 import HolidaysCard from '@/components/HolidaysCard';
+import { useDebugStore } from '@/store/debugStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -33,8 +34,6 @@ const mockTheme = {
 
 const mockTr = { labels: { days: 'days' } } as any;
 
-const ORIGINAL_DEV = (globalThis as any).__DEV__;
-
 function setHolidays(yearlyHolidays: YearlyHolidays | null) {
   useHolidaysStore.setState({ yearlyHolidays });
 }
@@ -44,12 +43,13 @@ beforeEach(() => {
   jest.setSystemTime(new Date('2026-06-16T12:00:00Z'));
   useThemeStore.setState({ theme: mockTheme });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
+  useDebugStore.setState({ forceHoliday: false });
   jest.clearAllMocks();
 });
 
 afterEach(() => {
   jest.useRealTimers();
-  (globalThis as any).__DEV__ = ORIGINAL_DEV;
+  useDebugStore.setState({ forceHoliday: false });
 });
 
 describe('HolidaysCard', () => {
@@ -59,9 +59,9 @@ describe('HolidaysCard', () => {
     expect(screen.toJSON()).toBeNull();
   });
 
-  describe('dev mode (fake upcoming holiday)', () => {
+  describe('debug mode (forced fake holiday)', () => {
     beforeEach(() => {
-      (globalThis as any).__DEV__ = true;
+      useDebugStore.setState({ forceHoliday: true });
     });
 
     it('renders the hardcoded Ramadan preview when holidays exist', () => {
@@ -75,11 +75,7 @@ describe('HolidaysCard', () => {
     });
   });
 
-  describe('production mode (real computation)', () => {
-    beforeEach(() => {
-      (globalThis as any).__DEV__ = false;
-    });
-
+  describe('real computation (toggle off)', () => {
     it('renders the nearest in-window holiday with name, date, days and icon', () => {
       // today = 2026-06-16; eid_adha 3 days away, within its 7-day window
       setHolidays({ eid_adha: ['2026-06-19'] });

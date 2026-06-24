@@ -1,8 +1,9 @@
+import { useDebugStore } from "@/store/debugStore";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 const BAR_HEIGHTS = [10, 16, 22, 16, 10]; // base heights for natural shape
@@ -10,7 +11,8 @@ const DURATIONS = [600, 900, 700, 800, 650]; // staggered speeds
 
 // Animated waveform Internal component
 function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive: boolean, isPlaying: boolean }) {
-  const anims = useRef(BAR_HEIGHTS.map(() => new Animated.Value(0))).current;
+  // Created once (lazy init) so it can be safely read during render — not a ref
+  const [anims] = useState(() => BAR_HEIGHTS.map(() => new Animated.Value(0)));
   const animRefs = useRef<Animated.CompositeAnimation[]>([]);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -46,7 +48,7 @@ function WaveformBars({ color, isActive, isPlaying }: { color: string; isActive:
       timeoutIdsRef.current.forEach(clearTimeout);
       animRefs.current.forEach((a) => a.stop());
     };
-  }, [isActive, isPlaying]);
+  }, [isActive, isPlaying, anims]);
 
   return (
     <View style={styles.waveform}>
@@ -83,7 +85,10 @@ const QuranPlaying = React.memo(() => {
   const isPlaying = useQuranPlayerStore((state) => state.isPlaying);
   const activeSurahName = useQuranPlayerStore((state) => state.activeSurahName);
 
-  if (!isActive || activeSurahName === null) return null;
+  // DEBUG: force-show the now-playing card for UI testing (Debug Panel toggle)
+  const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);
+
+  if (!forceQuranPlaying && (!isActive || activeSurahName === null)) return null;
 
   return (
     <Pressable onPress={() => router.navigate("/(tabs)/quran-tab")}>
