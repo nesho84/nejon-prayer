@@ -1,6 +1,7 @@
 import * as Application from "expo-application";
+import * as Clipboard from "expo-clipboard";
 import * as IntentLauncher from "expo-intent-launcher";
-import { Linking, Platform } from "react-native";
+import { Linking, Platform, Share } from "react-native";
 import notifee from "react-native-notify-kit";
 
 // ------------------------------------------------------------
@@ -66,5 +67,39 @@ export const openExternalUrl = async (url: string): Promise<void> => {
     await Linking.openURL(url);
   } catch {
     // No app can handle this URL — fail silently
+  }
+};
+
+// ------------------------------------------------------------
+// Share text via the native share sheet.
+// Builds a "title\n\nbody" message (just the title if body is empty).
+// dialogTitle is the Android chooser-sheet heading (defaults to title).
+// Returns true if the user actually shared, false on dismiss/error.
+// ------------------------------------------------------------
+export const shareText = async (title: string, body: string, dialogTitle?: string): Promise<boolean> => {
+  try {
+    const result = await Share.share(
+      { title, message: body ? `${title}\n\n${body}` : title },
+      { dialogTitle: dialogTitle ?? title, subject: title }
+    );
+    return result.action === Share.sharedAction;
+  } catch (err) {
+    console.error("Share failed:", err);
+    return false;
+  }
+};
+
+// ------------------------------------------------------------
+// Copy text to the clipboard.
+// Builds a "title\n\nbody" string (just the title if body is empty).
+// Returns true on success, false on error.
+// ------------------------------------------------------------
+export const copyText = async (title: string, body: string): Promise<boolean> => {
+  try {
+    await Clipboard.setStringAsync(body ? `${title}\n\n${body}` : title);
+    return true;
+  } catch (err) {
+    console.error("Copy failed:", err);
+    return false;
   }
 };

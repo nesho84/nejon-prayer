@@ -4,11 +4,11 @@ import { globalStyles } from "@/constants/styles";
 import { QUOTES_TR } from "@/constants/translations/quotes.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { copyText, shareText } from "@/utils/system";
 import { Feather } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
-import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function QuotesScreen() {
@@ -48,32 +48,20 @@ export default function QuotesScreen() {
   // ------------------------------------------------------------
   // Share text cross-platform
   // ------------------------------------------------------------
-  const handleShare = async (id: number, quote: string) => {
-    try {
-      const title = tr.labels.quotes;
-      const result = await Share.share(
-        { title, message: `${title}\n\n${quote}` },
-        { dialogTitle: title, subject: title }
-      );
-      if (result.action === Share.sharedAction) {
-        setSharedId(id);
-        setTimeout(() => setSharedId(null), 10000);
-      }
-    } catch (err) {
-      console.error("Share failed:", err);
+  const handleShare = async (id: number, title: string, body: string) => {
+    if (await shareText(title, body)) {
+      setSharedId(id);
+      setTimeout(() => setSharedId(null), 10000);
     }
   };
 
   // ------------------------------------------------------------
-  // Copy text (title)
+  // Copy text (title + message)
   // ------------------------------------------------------------
-  const handleCopy = async (id: number, quote: string) => {
-    try {
-      await Clipboard.setStringAsync(quote);
+  const handleCopy = async (id: number, title: string, body: string) => {
+    if (await copyText(title, body)) {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
-    } catch (err) {
-      console.error("Copy failed:", err);
     }
   };
 
@@ -87,7 +75,7 @@ export default function QuotesScreen() {
       <View style={styles.actionsRow}>
         {/* Copy button */}
         <TouchableOpacity
-          onPress={() => handleCopy(index, item)}
+          onPress={() => handleCopy(index, tr.labels.quotes, item)}
           style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
         >
           <Feather name={copiedId === index ? "check" : "copy"} size={16} color={copiedId === index ? theme.success : theme.text2} />
@@ -97,7 +85,7 @@ export default function QuotesScreen() {
         </TouchableOpacity>
         {/* Share button */}
         <TouchableOpacity
-          onPress={() => handleShare(index, item)}
+          onPress={() => handleShare(index, tr.labels.quotes, item)}
           style={[globalStyles.actionButton, { backgroundColor: theme.card2 }]}
         >
           <Feather name={sharedId === index ? "check" : "share-2"} size={16} color={sharedId === index ? theme.success : theme.text2} />

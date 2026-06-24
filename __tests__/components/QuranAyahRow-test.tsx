@@ -11,6 +11,8 @@ jest.mock('@expo/vector-icons', () => {
   };
 });
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(() => Promise.resolve()) }));
+// system.ts (shareText/copyText) imports react-native-notify-kit directly, native/unavailable in jest.
+jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
 
 const mockTheme = {
   accentLight: '#e0f0ff', accent: '#007AFF', text2: '#555', text: '#111',

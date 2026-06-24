@@ -1,8 +1,10 @@
 jest.mock('react-native', () => ({
   Platform: { OS: 'android' },
   Linking: { openSettings: jest.fn(), canOpenURL: jest.fn(), openURL: jest.fn() },
+  Share: { share: jest.fn(), sharedAction: 'sharedAction', dismissedAction: 'dismissedAction' },
 }));
 jest.mock('expo-application', () => ({ applicationId: 'com.nejon.nejonprayer' }));
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn() }));
 jest.mock('expo-intent-launcher', () => ({ startActivityAsync: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
   __esModule: true,
@@ -14,9 +16,10 @@ jest.mock('react-native-notify-kit', () => ({
   },
 }));
 
-import { openAlarmPermissionSettings, openBatteryOptimizationSettings, openExternalUrl, openNotificationSettings } from '@/utils/system';
+import { copyText, openAlarmPermissionSettings, openBatteryOptimizationSettings, openExternalUrl, openNotificationSettings, shareText } from '@/utils/system';
+import * as Clipboard from 'expo-clipboard';
 import * as IntentLauncher from 'expo-intent-launcher';
-import { Linking, Platform } from 'react-native';
+import { Linking, Platform, Share } from 'react-native';
 import notifee from 'react-native-notify-kit';
 
 const mockIsBatteryOptimizationEnabled = notifee.isBatteryOptimizationEnabled as jest.Mock;
@@ -27,6 +30,8 @@ const mockStartActivityAsync = IntentLauncher.startActivityAsync as jest.Mock;
 const mockOpenSettings = Linking.openSettings as jest.Mock;
 const mockCanOpenURL = Linking.canOpenURL as jest.Mock;
 const mockOpenURL = Linking.openURL as jest.Mock;
+const mockShare = Share.share as jest.Mock;
+const mockSetStringAsync = Clipboard.setStringAsync as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -126,5 +131,78 @@ describe('openExternalUrl', () => {
     mockOpenURL.mockRejectedValue(new Error('no activity found'));
 
     await expect(openExternalUrl('unsupported://scheme')).resolves.toBeUndefined();
+  });
+});
+
+describe('shareText', () => {
+  it('shares a "title\\n\\nbody" message and returns true when shared', async () => {
+    mockShare.mockResolvedValue({ action: Share.sharedAction });
+
+    const result = await shareText('Title', 'Body');
+
+    expect(mockShare).toHaveBeenCalledWith(
+      { title: 'Title', message: 'Title\n\nBody' },
+      { dialogTitle: 'Title', subject: 'Title' }
+    );
+    expect(result).toBe(true);
+  });
+
+  it('shares just the title when body is empty', async () => {
+    mockShare.mockResolvedValue({ action: Share.sharedAction });
+
+    await shareText('Title', '');
+
+    expect(mockShare).toHaveBeenCalledWith(
+      { title: 'Title', message: 'Title' },
+      { dialogTitle: 'Title', subject: 'Title' }
+    );
+  });
+
+  it('uses a custom dialogTitle when provided, keeping subject as the title', async () => {
+    mockShare.mockResolvedValue({ action: Share.sharedAction });
+
+    await shareText('Nejon Prayer', 'https://example.com', 'Share App');
+
+    expect(mockShare).toHaveBeenCalledWith(
+      { title: 'Nejon Prayer', message: 'Nejon Prayer\n\nhttps://example.com' },
+      { dialogTitle: 'Share App', subject: 'Nejon Prayer' }
+    );
+  });
+
+  it('returns false when the sheet is dismissed', async () => {
+    mockShare.mockResolvedValue({ action: Share.dismissedAction });
+
+    expect(await shareText('Title', 'Body')).toBe(false);
+  });
+
+  it('returns false when sharing throws', async () => {
+    mockShare.mockRejectedValue(new Error('share failed'));
+
+    expect(await shareText('Title', 'Body')).toBe(false);
+  });
+});
+
+describe('copyText', () => {
+  it('copies a "title\\n\\nbody" string and returns true', async () => {
+    mockSetStringAsync.mockResolvedValue(true);
+
+    const result = await copyText('Title', 'Body');
+
+    expect(mockSetStringAsync).toHaveBeenCalledWith('Title\n\nBody');
+    expect(result).toBe(true);
+  });
+
+  it('copies just the title when body is empty', async () => {
+    mockSetStringAsync.mockResolvedValue(true);
+
+    await copyText('Title', '');
+
+    expect(mockSetStringAsync).toHaveBeenCalledWith('Title');
+  });
+
+  it('returns false when copying throws', async () => {
+    mockSetStringAsync.mockRejectedValue(new Error('copy failed'));
+
+    expect(await copyText('Title', 'Body')).toBe(false);
   });
 });

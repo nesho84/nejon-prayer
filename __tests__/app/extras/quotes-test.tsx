@@ -15,6 +15,7 @@ jest.mock('react-native-safe-area-context', () => ({
   },
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
+jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() } }));
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(() => Promise.resolve()) }));
@@ -91,7 +92,7 @@ describe('QuotesScreen', () => {
     await act(async () => {
       fireEvent.press(screen.getAllByText('Copy')[0]);
     });
-    expect(Clipboard.setStringAsync).toHaveBeenCalledWith(quotes[0]);
+    expect(Clipboard.setStringAsync).toHaveBeenCalledWith(`Quotes\n\n${quotes[0]}`);
   });
 
   it('invokes the native share sheet when Share is pressed', async () => {

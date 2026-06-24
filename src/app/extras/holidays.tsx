@@ -8,10 +8,11 @@ import { useThemeStore } from "@/store/themeStore";
 import { ALL_HOLIDAYS, HOLIDAY_META, HolidayName } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
 import { formatDateKey, toDateKey } from "@/utils/datetime";
+import { shareText } from "@/utils/system";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
-import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type MCIcon = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -81,18 +82,10 @@ export default function HolidaysScreen() {
     // ------------------------------------------------------------
     // Share
     // ------------------------------------------------------------
-    const handleShare = async (key: string, title: string, description: string, date: string) => {
-        try {
-            const result = await Share.share(
-                { title, message: `${title}\n\n${description}\n\n${date}` },
-                { dialogTitle: title, subject: title }
-            );
-            if (result.action === Share.sharedAction) {
-                setSharedKey(key);
-                setTimeout(() => setSharedKey(null), 10000);
-            }
-        } catch (err) {
-            console.error("Share failed:", err);
+    const handleShare = async (id: string, title: string, body: string, date: string) => {
+        if (await shareText(title, `${body}\n\n${date}`)) {
+            setSharedKey(id);
+            setTimeout(() => setSharedKey(null), 10000);
         }
     };
 

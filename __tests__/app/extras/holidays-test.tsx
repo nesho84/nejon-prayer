@@ -14,6 +14,8 @@ jest.mock('@/store/storage', () => ({
 jest.mock('@/store/deviceSettingsStore', () => ({
   useDeviceSettingsStore: { getState: jest.fn(() => ({ internetConnection: true })) },
 }));
+// system.ts (shareText) imports react-native-notify-kit directly, which is native/unavailable in jest.
+jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
 jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
   captureMessage: jest.fn(),

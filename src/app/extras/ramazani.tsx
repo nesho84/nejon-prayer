@@ -4,11 +4,11 @@ import { globalStyles } from "@/constants/styles";
 import { RAMAZANI_TR } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
+import { copyText, shareText } from "@/utils/system";
 import { Feather } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import * as Clipboard from "expo-clipboard";
 import { useCallback, useMemo, useState } from "react";
-import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ItemType {
@@ -72,38 +72,20 @@ export default function RamadanScreen() {
     // ------------------------------------------------------------
     // Share text cross-platform
     // ------------------------------------------------------------
-    const handleShare = async (id: number, title: string, message: string) => {
-        try {
-            const result = await Share.share(
-                {
-                    title: title,
-                    message: `${title}\n\n${message}`,
-                },
-                {
-                    dialogTitle: title,
-                    subject: title,
-                }
-            );
-            if (result.action === Share.sharedAction) {
-                setSharedId(id);
-                setTimeout(() => setSharedId(null), 10000);
-            }
-        } catch (err) {
-            console.error("Share failed:", err);
+    const handleShare = async (id: number, title: string, body: string) => {
+        if (await shareText(title, body)) {
+            setSharedId(id);
+            setTimeout(() => setSharedId(null), 10000);
         }
     };
 
     // ------------------------------------------------------------
     // Copy text (title + message)
     // ------------------------------------------------------------
-    const handleCopy = async (id: number, title: string, message: string) => {
-        try {
-            const textToCopy = `${title}\n\n${message}`;
-            await Clipboard.setStringAsync(textToCopy);
+    const handleCopy = async (id: number, title: string, body: string) => {
+        if (await copyText(title, body)) {
             setCopiedId(id);
             setTimeout(() => setCopiedId(null), 2000);
-        } catch (err) {
-            console.error("❌ Copy failed:", err);
         }
     };
 

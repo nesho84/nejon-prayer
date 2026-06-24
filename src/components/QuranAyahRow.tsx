@@ -1,9 +1,9 @@
 import { Verse } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
+import { copyText, shareText } from "@/utils/system";
 import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   surahId: number;
@@ -38,35 +38,17 @@ const QuranAyahRow = React.memo(({
   // ------------------------------------------------------------
   const handleShare = async () => {
     const title = `${surahId}) ${surahName}, Ayah ${verse.id}`;
-    const message = translation ? `${verse.text}\n\n${translation}` : verse.text;
-    try {
-      await Share.share(
-        {
-          title: title,
-          message: `${title}\n\n${message}`,
-        },
-        {
-          dialogTitle: title,
-          subject: title,
-        }
-      );
-    } catch (err) {
-      console.error("Share failed:", err);
-    }
+    const body = translation ? `${verse.text}\n\n${translation}` : verse.text;
+    await shareText(title, body);
   };
 
   // ------------------------------------------------------------
-  // Copy text (title + message)
+  // Copy text (title + body)
   // ------------------------------------------------------------
   const handleCopy = async () => {
     const title = `${surahId}) ${surahName}, Ayah ${verse.id}`;
-    const message = translation ? `${verse.text}\n\n${translation}` : verse.text;
-    try {
-      const textToCopy = `${title}\n\n${message}`;
-      await Clipboard.setStringAsync(textToCopy);
-    } catch (err) {
-      console.error("❌ Copy failed:", err);
-    }
+    const body = translation ? `${verse.text}\n\n${translation}` : verse.text;
+    await copyText(title, body);
   };
 
   return (

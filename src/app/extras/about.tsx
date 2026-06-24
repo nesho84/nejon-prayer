@@ -2,11 +2,11 @@ import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { openExternalUrl } from "@/utils/system";
+import { openExternalUrl, shareText } from "@/utils/system";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CONTACT_EMAIL = 'mailto:support@nejon.net';
@@ -41,20 +41,7 @@ export default function AboutScreen() {
     // ------------------------------------------------------------
     const handleShare = async () => {
         const appName = Constants?.expoConfig?.name ?? 'Nejon Prayer';
-        try {
-            await Share.share(
-                {
-                    title: appName,
-                    message: `${appName}\n\n${GOOGLE_PLAY_URL}`,
-                },
-                {
-                    dialogTitle: tr.labels.shareApp,
-                    subject: appName,
-                }
-            );
-        } catch (err) {
-            console.error('Share failed:', err);
-        }
+        await shareText(appName, GOOGLE_PLAY_URL, tr.labels.shareApp);
     };
 
     return (
