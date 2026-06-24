@@ -48,6 +48,7 @@ export default function CustomPicker({
     setModalVisible(false);
   };
 
+  // Main component
   return (
     <>
       <TouchableOpacity

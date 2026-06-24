@@ -7,6 +7,7 @@ import { useModalStore } from "@/store/modalStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReactNode, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
@@ -36,6 +37,12 @@ interface DebugButtonProps {
   onPress: () => void;
 }
 
+interface PillProps {
+  label: string;
+  color: string;
+  bg: string;
+}
+
 // Test-notification triggers (label + payload builder)
 const TEST_FUNCTIONS = [
   { label: "Prayer", func: testPrayerNotification },
@@ -47,19 +54,32 @@ const TEST_FUNCTIONS = [
 ] as const;
 
 // ------------------------------------------------------------
-// Debug row with an ON / OFF state indicator
+// Small rounded status badge (ON/OFF state, delay seconds, …)
+// ------------------------------------------------------------
+function Pill({ label, color, bg }: PillProps) {
+  return (
+    <View style={[styles.pill, { backgroundColor: bg }]}>
+      <Text style={[styles.pillText, { color }]}>{label}</Text>
+    </View>
+  );
+}
+
+// ------------------------------------------------------------
+// Debug row with an ON / OFF state pill
 // ------------------------------------------------------------
 function DebugToggle({ label, value, onPress }: DebugToggleProps) {
   const theme = useThemeStore((state) => state.theme);
   return (
     <DebugButton
       label={`Toggle ${label}`}
-      color={theme.danger}
+      color={theme.teal}
       onPress={onPress}
       right={
-        <Text style={[styles.toggleValue, { color: value ? theme.islamicGreen : theme.placeholder }]}>
-          {value ? "ON" : "OFF"}
-        </Text>
+        <Pill
+          label={value ? "ON" : "OFF"}
+          color={value ? theme.islamicGreen : theme.placeholder}
+          bg={value ? theme.islamicGreen + "20" : theme.overlay}
+        />
       }
     />
   );
@@ -73,7 +93,7 @@ function DebugButton({ label, color, right, onPress }: DebugButtonProps) {
   const theme = useThemeStore((state) => state.theme);
   return (
     <TouchableOpacity
-      style={[styles.button, { borderColor: theme.border }]}
+      style={[styles.button, { backgroundColor: theme.overlayLight }]}
       activeOpacity={0.6}
       onPress={onPress}
     >
@@ -83,6 +103,8 @@ function DebugButton({ label, color, right, onPress }: DebugButtonProps) {
   );
 }
 
+// Renders the debug controls only — the containing AppCard + "Debug Tools"
+// title live in the Settings screen, so it matches the other setting cards.
 export default function DebugPanel({ seconds = 10 }: Props) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
@@ -99,7 +121,7 @@ export default function DebugPanel({ seconds = 10 }: Props) {
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
 
-  // Local state
+  // Collapse state (kept in this component)
   const [expanded, setExpanded] = useState(false);
 
   // ------------------------------------------------------------
@@ -141,39 +163,47 @@ export default function DebugPanel({ seconds = 10 }: Props) {
     showCelebration("📖", tr.labels.khatamCompleteTitle, tr.labels.khatamCompleteMessage);
   };
 
+  // Main component
   return (
-    <View style={[styles.container, { borderColor: theme.danger }]}>
-
-      {/* Expand/collapse header */}
+    <>
       <TouchableOpacity
-        style={styles.header}
-        activeOpacity={0.6}
+        style={[styles.selector, { backgroundColor: theme.overlay }]}
+        activeOpacity={0.7}
         onPress={() => setExpanded((v) => !v)}
       >
-        <Text style={[styles.headerText, { color: theme.placeholder }]}>
-          {expanded ? "▼" : "▶"} Debug
+        <Ionicons name="bug" size={20} color={theme.danger} style={styles.selectorIcon} />
+        <Text style={[styles.selectorText, { color: theme.danger }]}>
+          {expanded ? "Hide debug actions" : "Show debug actions"}
         </Text>
+        <MaterialCommunityIcons
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={24}
+          color={theme.danger}
+        />
       </TouchableOpacity>
 
       {expanded && (
         <View style={styles.body}>
 
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
           {/* Onboarding */}
           <DebugButton
-            label="Show Onboarding"
+            label="Show Onboarding Screen"
             color={theme.info}
             onPress={() => useOnboardingStore.getState().setOnboarding(false)}
           />
 
           {/* Divider */}
-          <View style={[styles.divider, { borderColor: theme.divider2 }]} />
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Celebration modal previews */}
-          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.gray} onPress={showPrayerCelebration} />
-          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.gray} onPress={showKhatamCelebration} />
+          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.violet} onPress={showPrayerCelebration} />
+          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.violet} onPress={showKhatamCelebration} />
 
           {/* Divider */}
-          <View style={[styles.divider, { borderColor: theme.divider2 }]} />
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Scenario-gated UI toggles */}
           <DebugToggle label="Holiday Card" value={forceHoliday} onPress={toggleHoliday} />
@@ -181,7 +211,7 @@ export default function DebugPanel({ seconds = 10 }: Props) {
           <DebugToggle label="Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
 
           {/* Divider */}
-          <View style={[styles.divider, { borderColor: theme.divider2 }]} />
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Test notifications */}
           {TEST_FUNCTIONS.map(({ label, func }) => (
@@ -190,37 +220,41 @@ export default function DebugPanel({ seconds = 10 }: Props) {
               label={`Test ${label}`}
               color={theme.orange}
               onPress={() => func({ options: { language, location, hasAlarm: true }, notifSettings, seconds })}
-              right={<Text style={[styles.delayText, { color: theme.placeholder }]}>{seconds}s</Text>}
+              right={<Pill label={`${seconds}s`} color={theme.placeholder} bg={theme.overlay} />}
             />
           ))}
 
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
           {/* Channels & scheduled dump */}
-          <DebugButton label="Debug Channels & Scheduled" color={theme.orange} onPress={debugChannelsAndScheduled} />
+          <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugChannelsAndScheduled} />
 
         </View>
       )}
-
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    borderRadius: 8,
-    overflow: "hidden",
+  selector: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginTop: 8,
   },
-  header: {
-    padding: 10,
+  selectorIcon: {
+    marginRight: 10,
   },
-  headerText: {
-    fontSize: 14,
-    fontWeight: "700",
+  selectorText: {
+    fontSize: 17,
+    flex: 1,
+    fontWeight: "500",
   },
   body: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
     gap: 6,
+    marginVertical: 8,
   },
 
   // Action row + right-side indicators
@@ -228,26 +262,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingVertical: 8,
+    borderRadius: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
   },
   buttonText: {
     fontSize: 13,
     fontWeight: "500",
   },
-  delayText: {
-    fontSize: 12,
+
+  // Rounded status badge (ON/OFF, delay seconds)
+  pill: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    minWidth: 36,
+    alignItems: "center",
   },
-  toggleValue: {
-    fontSize: 12,
+  pillText: {
+    fontSize: 11,
     fontWeight: "700",
   },
 
   divider: {
     width: "100%",
-    borderWidth: 1,
+    height: StyleSheet.hairlineWidth,
     marginVertical: 4,
   },
 });

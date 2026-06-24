@@ -326,15 +326,11 @@ export default function SettingsScreen() {
                 showsVerticalScrollIndicator={false}
             >
 
-                {/* ------ Debug Panel (dev only) ------ */}
+                {/* ------ Debug Tools (dev only) ------ */}
                 {__DEV__ && (
                     <AppCard style={styles.settingCard}>
                         <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
-                        {/* Divider */}
-                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                        <View style={[styles.subGroup, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
-                            <DebugPanel />
-                        </View>
+                        <DebugPanel />
                     </AppCard>
                 )}
 
