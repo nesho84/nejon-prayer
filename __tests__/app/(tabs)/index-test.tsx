@@ -25,11 +25,6 @@ jest.mock('@/services/soundService', () => ({ startSound: jest.fn(), stopSound: 
 jest.mock('@/services/notificationsService', () => ({ scheduleNotificationsService: jest.fn() }));
 jest.mock('@/services/locationService', () => ({ getUserLocation: jest.fn(), hasLocationChanged: jest.fn() }));
 jest.mock('@/services/prayersService', () => ({ getYearlyPrayerTimes: jest.fn() }));
-jest.mock('expo-updates', () => ({
-  checkForUpdateAsync: jest.fn(() => Promise.resolve({ isAvailable: false })),
-  fetchUpdateAsync: jest.fn(),
-  reloadAsync: jest.fn(),
-}));
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: any) => {
     const React = require('react');

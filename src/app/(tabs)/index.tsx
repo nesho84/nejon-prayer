@@ -19,7 +19,6 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerCountdown } from "@/types/prayer.types";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import * as Updates from "expo-updates";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -67,25 +66,6 @@ export default function HomeScreen() {
         usePrayersStore.getState().loadPrayerTimes();
 
     }, [deviceSettingsReady, locationReady]);
-
-    // ------------------------------------------------------------
-    // Check for expo OTA updates on mount
-    // ------------------------------------------------------------
-    useEffect(() => {
-        if (__DEV__) return; // Skip in dev mode
-        const checkForUpdates = async () => {
-            try {
-                const update = await Updates.checkForUpdateAsync();
-                if (update.isAvailable) {
-                    await Updates.fetchUpdateAsync();
-                    Updates.reloadAsync();
-                }
-            } catch {
-                // Network unavailable or EAS unreachable — silently ignore
-            }
-        };
-        checkForUpdates();
-    }, []);
 
     // ------------------------------------------------------------
     // Handle pull-to-refresh

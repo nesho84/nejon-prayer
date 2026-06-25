@@ -6,6 +6,7 @@ import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
+import { useUpdatesSync } from "@/hooks/useUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import * as Sentry from '@sentry/react-native';
 import { Stack } from "expo-router";
@@ -60,6 +61,7 @@ function RootLayout() {
   usePrayerTimesSync();
   useHolidaysSync();
   useQuranSetup();
+  useUpdatesSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

@@ -1,33 +1,48 @@
-import { create } from 'zustand';
+import { mmkvStorage } from "@/store/storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
-// Ephemeral debug-only store (NOT persisted — resets to OFF on
-// app restart). Backs the Debug Panel toggles that force-show
-// scenario-gated UI (holiday card, Friday badge, Quran now-playing)
-// so they can be tested on demand. Defaults are all `false`, so
-// production behavior is unchanged (the Debug Panel is dev-only).
+// Debug-only store backing the Debug Panel toggles. Only forceUpdateOnLaunch
+// is persisted (needs to survive a reload); the rest reset to OFF on restart.
 // ------------------------------------------------------------
 
-export type UpdatePreview = 'idle' | 'upToDate' | 'error';
+export type UpdatePreview = "idle" | "upToDate" | "error";
 
-interface DebugStore {
+interface DebugState {
   forceHoliday: boolean;
   forceFriday: boolean;
   forceQuranPlaying: boolean;
+  forceUpdateOnLaunch: boolean;
   updatePreview: UpdatePreview;
   toggleHoliday: () => void;
   toggleFriday: () => void;
   toggleQuranPlaying: () => void;
+  toggleUpdateOnLaunch: () => void;
   setUpdatePreview: (value: UpdatePreview) => void;
 }
 
-export const useDebugStore = create<DebugStore>((set) => ({
-  forceHoliday: false,
-  forceFriday: false,
-  forceQuranPlaying: false,
-  updatePreview: 'idle',
-  toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
-  toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
-  toggleQuranPlaying: () => set((s) => ({ forceQuranPlaying: !s.forceQuranPlaying })),
-  setUpdatePreview: (value) => set({ updatePreview: value }),
-}));
+export const useDebugStore = create<DebugState>()(
+  persist(
+    (set) => ({
+      forceHoliday: false,
+      forceFriday: false,
+      forceQuranPlaying: false,
+      forceUpdateOnLaunch: false,
+      updatePreview: "idle",
+
+      toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
+      toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
+      toggleQuranPlaying: () => set((s) => ({ forceQuranPlaying: !s.forceQuranPlaying })),
+      toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
+      setUpdatePreview: (value) => set({ updatePreview: value }),
+    }),
+    {
+      name: "debug-storage",
+      storage: createJSONStorage(() => mmkvStorage),
+      partialize: (state) => ({
+        forceUpdateOnLaunch: state.forceUpdateOnLaunch,
+      }),
+    }
+  )
+);

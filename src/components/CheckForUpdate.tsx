@@ -6,7 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
 import { openExternalUrl } from "@/utils/system";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
@@ -51,8 +51,8 @@ export function openUpdateAvailableModal() {
     type: "alert",
     component: (
       <View style={globalStyles.bannerContainer}>
-        <View style={[styles.modalIconCircle, { backgroundColor: theme.info + "20" }]}>
-          <Ionicons name="information" size={32} color={theme.info} />
+        <View style={[styles.modalIconCircle, { backgroundColor: theme.islamicGreen + "20" }]}>
+          <MaterialCommunityIcons name="information-variant-circle" size={32} color={theme.islamicGreen} />
         </View>
         <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.updateAvailableTitle}</Text>
         <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.updateAvailableMessage}</Text>
@@ -164,8 +164,8 @@ export default function CheckForUpdate() {
 
 const styles = StyleSheet.create({
   modalIconCircle: {
-    width: 64,
-    height: 64,
+    width: 54,
+    height: 54,
     borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",

@@ -75,7 +75,7 @@ function DebugToggle({ label, color, value, onPress }: ToggleProps) {
   const theme = useThemeStore((state) => state.theme);
   return (
     <DebugButton
-      label={`Toggle ${label}`}
+      label={label}
       color={color ?? theme.violet}
       onPress={onPress}
       right={
@@ -101,9 +101,11 @@ export default function DebugPanel() {
   const forceHoliday = useDebugStore((state) => state.forceHoliday);
   const forceFriday = useDebugStore((state) => state.forceFriday);
   const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);
+  const forceUpdateOnLaunch = useDebugStore((state) => state.forceUpdateOnLaunch);
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
+  const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
   const updatePreview = useDebugStore((state) => state.updatePreview);
   const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
 
@@ -157,27 +159,28 @@ export default function DebugPanel() {
 
           {/* Check-for-update previews (modal + the two inline status lines) */}
           <DebugButton label="Show 'Update available' Modal" color={theme.green} onPress={openUpdateAvailableModal} />
-          <DebugToggle label="'Up to date' line" color={theme.green} value={updatePreview === "upToDate"} onPress={() => togglePreview("upToDate")} />
-          <DebugToggle label="'Check failed' line" color={theme.green} value={updatePreview === "error"} onPress={() => togglePreview("error")} />
+          <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={updatePreview === "upToDate"} onPress={() => togglePreview("upToDate")} />
+          <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={updatePreview === "error"} onPress={() => togglePreview("error")} />
+          <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceUpdateOnLaunch} onPress={toggleUpdateOnLaunch} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* UI toggles */}
-          <DebugToggle label="Holiday Card" value={forceHoliday} onPress={toggleHoliday} />
-          <DebugToggle label="Friday Badge" value={forceFriday} onPress={toggleFriday} />
-          <DebugToggle label="Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
+          <DebugToggle label="Toggle Holiday Card" value={forceHoliday} onPress={toggleHoliday} />
+          <DebugToggle label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
+          <DebugToggle label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Test Notifications */}
-          <DebugButton label="Test Prayer" color={theme.orange} onPress={() => debugPrayerN(notifParams)} right={notifSecondsBadge} />
-          <DebugButton label="Test Prayer Event" color={theme.orange} onPress={() => debugEventN(notifParams)} right={notifSecondsBadge} />
-          <DebugButton label="Test Prayer Reminder" color={theme.orange} onPress={() => debugPrayerReminderN(notifParams)} right={notifSecondsBadge} />
-          <DebugButton label="Test Friday" color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
-          <DebugButton label="Test Daily Quote" color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
-          <DebugButton label="Test Islamic Holiday" color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Prayer Not." color={theme.orange} onPress={() => debugPrayerN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Prayer Event Not." color={theme.orange} onPress={() => debugEventN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Prayer Reminder Not." color={theme.orange} onPress={() => debugPrayerReminderN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Friday Not." color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Daily Quote Not." color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Islamic Holiday Not." color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
           {/* Test Notifications: Channels & scheduled dump */}
           <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugScheduledN} />
 
