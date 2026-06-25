@@ -1,87 +1,52 @@
-import { globalStyles } from "@/constants/styles";
-import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
-import { useDebugStore } from "@/store/debugStore";
+import { openUpdateAvailableModal } from "@/components/CheckForUpdate";
+import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
-import { useModalStore } from "@/store/modalStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ReactNode, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { previewKhatamCelebrationModal, previewPrayerCelebrationModal } from "./debugCelebs";
 import {
-  debugChannelsAndScheduled,
-  testDailyQuoteNotification,
-  testEventNotification,
-  testFridayNotification,
-  testHolidayNotification,
-  testPrayerNotification,
-  testPrayerReminderNotification,
-} from "./notificationsTests";
+  debugDailyQuoteN,
+  debugEventN,
+  debugFridayN,
+  debugHolidayN,
+  debugPrayerN,
+  debugPrayerReminderN,
+  debugScheduledN
+} from "./debugNotifs";
 
-interface Props {
-  seconds?: number;
-}
-
-interface DebugToggleProps {
+interface ToggleProps {
   label: string;
+  color?: string;
   value: boolean;
   onPress: () => void;
 }
 
-interface DebugButtonProps {
+interface ButtonProps {
   label: string;
   color: string;
   right?: ReactNode;
   onPress: () => void;
 }
 
-interface PillProps {
+interface BadgeProps {
   label: string;
   color: string;
   bg: string;
 }
 
-// Test-notification triggers (label + payload builder)
-const TEST_FUNCTIONS = [
-  { label: "Prayer", func: testPrayerNotification },
-  { label: "Prayer Event", func: testEventNotification },
-  { label: "Prayer Reminder", func: testPrayerReminderNotification },
-  { label: "Friday", func: testFridayNotification },
-  { label: "Daily Quote", func: testDailyQuoteNotification },
-  { label: "Islamic Holiday", func: testHolidayNotification },
-] as const;
-
 // ------------------------------------------------------------
 // Small rounded status badge (ON/OFF state, delay seconds, …)
 // ------------------------------------------------------------
-function Pill({ label, color, bg }: PillProps) {
+function Badge({ label, color, bg }: BadgeProps) {
   return (
-    <View style={[styles.pill, { backgroundColor: bg }]}>
-      <Text style={[styles.pillText, { color }]}>{label}</Text>
+    <View style={[styles.badge, { backgroundColor: bg }]}>
+      <Text style={[styles.badgeText, { color }]}>{label}</Text>
     </View>
-  );
-}
-
-// ------------------------------------------------------------
-// Debug row with an ON / OFF state pill
-// ------------------------------------------------------------
-function DebugToggle({ label, value, onPress }: DebugToggleProps) {
-  const theme = useThemeStore((state) => state.theme);
-  return (
-    <DebugButton
-      label={`Toggle ${label}`}
-      color={theme.violet}
-      onPress={onPress}
-      right={
-        <Pill
-          label={value ? "ON" : "OFF"}
-          color={value ? theme.islamicGreen : theme.placeholder}
-          bg={value ? theme.islamicGreen + "20" : theme.overlay}
-        />
-      }
-    />
   );
 }
 
@@ -89,7 +54,7 @@ function DebugToggle({ label, value, onPress }: DebugToggleProps) {
 // Reusable debug row — label on the left, optional
 // value/indicator (e.g. "10s") on the right
 // ------------------------------------------------------------
-function DebugButton({ label, color, right, onPress }: DebugButtonProps) {
+function DebugButton({ label, color, right, onPress }: ButtonProps) {
   const theme = useThemeStore((state) => state.theme);
   return (
     <TouchableOpacity
@@ -103,13 +68,32 @@ function DebugButton({ label, color, right, onPress }: DebugButtonProps) {
   );
 }
 
+// ------------------------------------------------------------
+// Debug row with an ON / OFF state badge
+// ------------------------------------------------------------
+function DebugToggle({ label, color, value, onPress }: ToggleProps) {
+  const theme = useThemeStore((state) => state.theme);
+  return (
+    <DebugButton
+      label={`Toggle ${label}`}
+      color={color ?? theme.violet}
+      onPress={onPress}
+      right={
+        <Badge
+          label={value ? "ON" : "OFF"}
+          color={value ? theme.islamicGreen : theme.placeholder}
+          bg={value ? theme.islamicGreen + "20" : theme.overlay}
+        />
+      }
+    />
+  );
+}
+
 // Renders the debug controls only — the containing AppCard + "Debug Tools"
-// title live in the Settings screen, so it matches the other setting cards.
-export default function DebugPanel({ seconds = 10 }: Props) {
+export default function DebugPanel() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
-  const tr = useLanguageStore((state) => state.tr);
   const location = useLocationStore((state) => state.location);
   const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
@@ -120,48 +104,17 @@ export default function DebugPanel({ seconds = 10 }: Props) {
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
+  const updatePreview = useDebugStore((state) => state.updatePreview);
+  const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
 
   // Local state
   const [expanded, setExpanded] = useState(false);
 
-  // ------------------------------------------------------------
-  // Fires a celebration modal (shared by the prayer & khatam previews)
-  // ------------------------------------------------------------
-  const showCelebration = (emoji: string, title: string, message: string) => {
-    useModalStore.getState().show({
-      type: "alert",
-      celebrationAnimation: true,
-      component: (
-        <View style={globalStyles.bannerContainer}>
-          <Text style={globalStyles.bannerEmoji}>{emoji}</Text>
-          <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{title}</Text>
-          <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{message}</Text>
-        </View>
-      ),
-      buttons: [{
-        label: "OK",
-        action: "ok",
-        buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
-        labelStyle: { fontSize: 16, fontWeight: "600", color: theme.accent },
-      }],
-    });
-  };
-
-  // ------------------------------------------------------------
-  // Prayer-complete celebration with a random localized message
-  // ------------------------------------------------------------
-  const showPrayerCelebration = () => {
-    const variants = PRAYER_CELEBRATIONS_TR[language] ?? PRAYER_CELEBRATIONS_TR["en"];
-    const variant = variants[Math.floor(Math.random() * variants.length)];
-    showCelebration(variant.emoji, variant.title, variant.message);
-  };
-
-  // ------------------------------------------------------------
-  // Khatam-complete celebration
-  // ------------------------------------------------------------
-  const showKhatamCelebration = () => {
-    showCelebration("📖", tr.labels.khatamCompleteTitle, tr.labels.khatamCompleteMessage);
-  };
+  // Shared params
+  const notifSeconds = 10; // seconds until the test notification fires
+  const notifParams = { options: { language, location, hasAlarm: true }, notifSettings, notifSeconds };
+  const notifSecondsBadge = <Badge label={`${notifSeconds}s`} color={theme.placeholder} bg={theme.overlay} />;
+  const togglePreview = (value: UpdatePreview) => setUpdatePreview(updatePreview === value ? "idle" : value);
 
   // Main component
   return (
@@ -183,24 +136,29 @@ export default function DebugPanel({ seconds = 10 }: Props) {
       </TouchableOpacity>
 
       {expanded && (
+        // The debug panel body
         <View style={styles.body}>
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Onboarding */}
-          <DebugButton
-            label="Show Onboarding Screen"
-            color={theme.info}
-            onPress={() => useOnboardingStore.getState().setOnboarding(false)}
-          />
+          <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
           {/* Celebration modal previews */}
-          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} onPress={showPrayerCelebration} />
-          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.teal} onPress={showKhatamCelebration} />
+          <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} onPress={previewPrayerCelebrationModal} />
+          <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.teal} onPress={previewKhatamCelebrationModal} />
+
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+          {/* Check-for-update previews (modal + the two inline status lines) */}
+          <DebugButton label="Show 'Update available' Modal" color={theme.green} onPress={openUpdateAvailableModal} />
+          <DebugToggle label="'Up to date' line" color={theme.green} value={updatePreview === "upToDate"} onPress={() => togglePreview("upToDate")} />
+          <DebugToggle label="'Check failed' line" color={theme.green} value={updatePreview === "error"} onPress={() => togglePreview("error")} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
@@ -213,18 +171,15 @@ export default function DebugPanel({ seconds = 10 }: Props) {
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
-          {/* Test notifications */}
-          {TEST_FUNCTIONS.map(({ label, func }) => (
-            <DebugButton
-              key={label}
-              label={`Test ${label}`}
-              color={theme.orange}
-              onPress={() => func({ options: { language, location, hasAlarm: true }, notifSettings, seconds })}
-              right={<Pill label={`${seconds}s`} color={theme.placeholder} bg={theme.overlay} />}
-            />
-          ))}
-          {/* Channels & scheduled dump */}
-          <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugChannelsAndScheduled} />
+          {/* Test Notifications */}
+          <DebugButton label="Test Prayer" color={theme.orange} onPress={() => debugPrayerN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Prayer Event" color={theme.orange} onPress={() => debugEventN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Prayer Reminder" color={theme.orange} onPress={() => debugPrayerReminderN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Friday" color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Daily Quote" color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
+          <DebugButton label="Test Islamic Holiday" color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
+          {/* Test Notifications: Channels & scheduled dump */}
+          <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugScheduledN} />
 
         </View>
       )}
@@ -268,14 +223,14 @@ const styles = StyleSheet.create({
   },
 
   // Rounded status badge (ON/OFF, delay seconds)
-  pill: {
+  badge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
     minWidth: 36,
     alignItems: "center",
   },
-  pillText: {
+  badgeText: {
     fontSize: 11,
     fontWeight: "700",
   },

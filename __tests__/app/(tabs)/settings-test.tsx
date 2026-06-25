@@ -35,6 +35,7 @@ jest.mock('@/services/notificationsService', () => ({
 jest.mock('@/services/locationService', () => ({ getUserLocation: jest.fn(), hasLocationChanged: jest.fn() }));
 jest.mock('@/services/prayersService', () => ({ getYearlyPrayerTimes: jest.fn() }));
 jest.mock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
+jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
 jest.mock('react-native-track-player', () => ({ __esModule: true, default: { reset: jest.fn() } }));
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),

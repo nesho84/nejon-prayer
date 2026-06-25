@@ -1,6 +1,6 @@
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { getNextHoliday } from "@/services/holidaysService";
-import { useDebugStore } from "@/store/debugStore";
+import { useDebugStore } from "@/debug/debugStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";

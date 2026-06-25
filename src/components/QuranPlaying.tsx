@@ -1,4 +1,4 @@
-import { useDebugStore } from "@/store/debugStore";
+import { useDebugStore } from "@/debug/debugStore";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@expo/vector-icons";

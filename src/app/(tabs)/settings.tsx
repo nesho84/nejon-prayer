@@ -1,6 +1,7 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
+import CheckForUpdate from "@/components/CheckForUpdate";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
 import DebugPanel from "@/debug/DebugPanel";
@@ -675,6 +676,11 @@ export default function SettingsScreen() {
                             </View>
                         }
                     </View>
+                </AppCard>
+
+                {/* ------ Check for Update ------ */}
+                <AppCard style={styles.settingCard}>
+                    <CheckForUpdate />
                 </AppCard>
 
                 {/* ------ Reset App ------ */}

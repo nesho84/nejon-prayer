@@ -1,21 +1,22 @@
 import { SOUNDS } from "@/constants/sounds";
 import { getVibrationChannelId } from "@/services/notificationsService";
+import { Cords } from "@/types/location.types";
 import { NotifSettings } from "@/types/notification.types";
 import { toDateKey } from "@/utils/datetime";
 import notifee, {
     AndroidCategory,
     AndroidColor,
     AndroidStyle,
+    AuthorizationStatus,
     TimestampTrigger,
     TriggerType
 } from "react-native-notify-kit";
+import { Alert } from "react-native";
 
-interface TestParams {
+interface DebugNParams {
     options: {
         language: string;
-        location?: any;
-        fullAddress?: string | null;
-        timeZone?: string | null;
+        location?: Cords | null;
         hasAlarm?: boolean;
     },
     notifSettings?: NotifSettings | null;
@@ -23,10 +24,25 @@ interface TestParams {
 }
 
 // ------------------------------------------------------------
+// Bail out (with a heads-up alert) if notifications are disabled on the
+// device — otherwise the test schedules silently and never fires
+// ------------------------------------------------------------
+async function notificationsAreOff(): Promise<boolean> {
+    const { authorizationStatus } = await notifee.getNotificationSettings();
+    const off = authorizationStatus !== AuthorizationStatus.AUTHORIZED;
+    if (off) {
+        Alert.alert("Notifications are off", "Enable notifications for this app in system settings to test this.");
+    }
+    return off;
+}
+
+// ------------------------------------------------------------
 // Debug utility: schedule a test prayer notification
 // ------------------------------------------------------------
-export async function testPrayerNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function debugPrayerN({ options, notifSettings, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         // Default to 10 seconds later if no timestamp passed
         const triggerTime = Date.now() + seconds * 1000;
 
@@ -98,8 +114,10 @@ export async function testPrayerNotification({ options, notifSettings, seconds =
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer-event notification (Imsak/Sunrise)
 // ------------------------------------------------------------
-export async function testEventNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function debugEventN({ options, notifSettings, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         const triggerTime = Date.now() + seconds * 1000;
         const eventName = 'Imsak';
         const body = `It is now time for (${eventName}) 04:52`;
@@ -148,8 +166,10 @@ export async function testEventNotification({ options, notifSettings, seconds = 
 // ------------------------------------------------------------
 // Debug utility: schedule a test prayer-reminder notification
 // ------------------------------------------------------------
-export async function testPrayerReminderNotification({ options, notifSettings = null, seconds = 10 }: TestParams) {
+export async function debugPrayerReminderN({ options, notifSettings = null, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         const triggerTime = Date.now() + seconds * 1000;
         const title = "» Sabahu «";
         const body = "Kujtesë Lutjeje";
@@ -196,8 +216,10 @@ export async function testPrayerReminderNotification({ options, notifSettings = 
 // ------------------------------------------------------------
 // Debug utility: schedule a test Friday special notification
 // ------------------------------------------------------------
-export async function testFridayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function debugFridayN({ options, notifSettings, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         const triggerTime = Date.now() + seconds * 1000;
         const title = "Jumu'ah Reminder";
         const body = "Today is Jumu'ah. Make time for prayer.";
@@ -245,8 +267,10 @@ export async function testFridayNotification({ options, notifSettings, seconds =
 // ------------------------------------------------------------
 // Debug utility: schedule a test Daily Quote special notification
 // ------------------------------------------------------------
-export async function testDailyQuoteNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         const triggerTime = Date.now() + seconds * 1000;
 
         const title = "Daily Reminder";
@@ -295,8 +319,10 @@ export async function testDailyQuoteNotification({ options, notifSettings, secon
 // ------------------------------------------------------------
 // Debug utility: schedule a test Islamic Holiday notification
 // ------------------------------------------------------------
-export async function testHolidayNotification({ options, notifSettings, seconds = 10 }: TestParams) {
+export async function debugHolidayN({ options, notifSettings, seconds = 10 }: DebugNParams) {
     try {
+        if (await notificationsAreOff()) return;
+
         const triggerTime = Date.now() + seconds * 1000;
 
         const title = "» Ramazani «";
@@ -345,7 +371,7 @@ export async function testHolidayNotification({ options, notifSettings, seconds 
 // ------------------------------------------------------------
 // Debug utility: log all channels and scheduled notifications
 // ------------------------------------------------------------
-export async function debugChannelsAndScheduled() {
+export async function debugScheduledN() {
     try {
         const channels = await notifee.getChannels();
         const channelsObj = channels.map(c => ({

@@ -1,7 +1,7 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
-import { useDebugStore } from '@/store/debugStore';
+import { useDebugStore } from '@/debug/debugStore';
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
