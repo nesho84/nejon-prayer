@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
   selectorText: {
     fontSize: 17,
     flex: 1,
-    fontWeight: "500",
   },
   body: {
     gap: 6,

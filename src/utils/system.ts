@@ -1,3 +1,4 @@
+import { APPLE_STORE_NATIVE_URL, APPLE_STORE_URL, GOOGLE_PLAY_NATIVE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import * as Application from "expo-application";
 import * as Clipboard from "expo-clipboard";
 import * as IntentLauncher from "expo-intent-launcher";
@@ -67,6 +68,22 @@ export const openExternalUrl = async (url: string): Promise<void> => {
     await Linking.openURL(url);
   } catch {
     // No app can handle this URL — fail silently
+  }
+};
+
+// ------------------------------------------------------------
+// Open this app's own store listing for the current platform: try the native deep link
+// (market://, itms-apps://) directly into the store app; if no app can handle it (no
+// Play Store/App Store installed), fall back to the https:// listing.
+// ------------------------------------------------------------
+export const openStoreListing = async (): Promise<void> => {
+  const nativeUrl = Platform.OS === "ios" ? APPLE_STORE_NATIVE_URL : GOOGLE_PLAY_NATIVE_URL;
+  const webUrl = Platform.OS === "ios" ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
+
+  try {
+    await Linking.openURL(nativeUrl);
+  } catch {
+    await openExternalUrl(webUrl);
   }
 };
 

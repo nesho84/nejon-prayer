@@ -680,6 +680,11 @@ export default function SettingsScreen() {
 
                 {/* ------ Check for Update ------ */}
                 <AppCard style={styles.settingCard}>
+                    <Text style={[styles.settingTitle, { color: theme.text2 }]}>
+                        {tr.labels.checkUpdateRow}
+                    </Text>
+                    {/* Divider */}
+                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
                     <CheckForUpdate />
                 </AppCard>
 
@@ -691,16 +696,16 @@ export default function SettingsScreen() {
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
                     <TouchableOpacity
-                        style={[styles.wideButton, { backgroundColor: theme.danger + '15' }]}
+                        style={[styles.wideButton, { backgroundColor: theme.danger + '20' }]}
                         onPress={handleResetApp}
                         disabled={localLoading}
                     >
-                        <MaterialCommunityIcons name="restore-alert" size={16} color={theme.danger} />
-                        <Text style={[styles.wideButtonText, { color: theme.danger }]}>
+                        <MaterialCommunityIcons name="delete-restore" size={16} color={theme.textMuted} />
+                        <Text style={[styles.wideButtonText, { color: theme.textMuted }]}>
                             {tr.labels.resetAppButton}
                         </Text>
                     </TouchableOpacity>
-                    <Text style={[styles.infoText, { color: theme.placeholder, textAlign: 'center' }]}>
+                    <Text style={[styles.infoText, { color: theme.placeholder, fontSize: 12.5, textAlign: 'center' }]}>
                         {tr.labels.resetAppMessage}
                     </Text>
                 </AppCard>

@@ -1,3 +1,9 @@
+import { copyText, openAlarmPermissionSettings, openBatteryOptimizationSettings, openExternalUrl, openNotificationSettings, openStoreListing, shareText } from '@/utils/system';
+import * as Clipboard from 'expo-clipboard';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { Linking, Platform, Share } from 'react-native';
+import notifee from 'react-native-notify-kit';
+
 jest.mock('react-native', () => ({
   Platform: { OS: 'android' },
   Linking: { openSettings: jest.fn(), canOpenURL: jest.fn(), openURL: jest.fn() },
@@ -15,12 +21,6 @@ jest.mock('react-native-notify-kit', () => ({
     openNotificationSettings: jest.fn(),
   },
 }));
-
-import { copyText, openAlarmPermissionSettings, openBatteryOptimizationSettings, openExternalUrl, openNotificationSettings, shareText } from '@/utils/system';
-import * as Clipboard from 'expo-clipboard';
-import * as IntentLauncher from 'expo-intent-launcher';
-import { Linking, Platform, Share } from 'react-native';
-import notifee from 'react-native-notify-kit';
 
 const mockIsBatteryOptimizationEnabled = notifee.isBatteryOptimizationEnabled as jest.Mock;
 const mockOpenBatteryOptimizationSettings = notifee.openBatteryOptimizationSettings as jest.Mock;
@@ -131,6 +131,37 @@ describe('openExternalUrl', () => {
     mockOpenURL.mockRejectedValue(new Error('no activity found'));
 
     await expect(openExternalUrl('unsupported://scheme')).resolves.toBeUndefined();
+  });
+});
+
+describe('openStoreListing', () => {
+  it('opens the Google Play native deep link directly on Android', async () => {
+    mockOpenURL.mockResolvedValue(undefined);
+
+    await openStoreListing();
+
+    expect(mockOpenURL).toHaveBeenCalledTimes(1);
+    expect(mockOpenURL).toHaveBeenCalledWith('market://details?id=com.nejon.nejonprayer');
+  });
+
+  it('falls back to the Play Store web listing when no app can handle the native scheme', async () => {
+    mockOpenURL
+      .mockRejectedValueOnce(new Error('no activity found'))
+      .mockResolvedValueOnce(undefined);
+
+    await openStoreListing();
+
+    expect(mockOpenURL).toHaveBeenNthCalledWith(1, 'market://details?id=com.nejon.nejonprayer');
+    expect(mockOpenURL).toHaveBeenNthCalledWith(2, 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer');
+  });
+
+  it('opens the website on iOS while the App Store ID is unset', async () => {
+    (Platform as { OS: string }).OS = 'ios';
+    mockOpenURL.mockResolvedValue(undefined);
+
+    await openStoreListing();
+
+    expect(mockOpenURL).toHaveBeenCalledWith('https://nejon.net');
   });
 });
 

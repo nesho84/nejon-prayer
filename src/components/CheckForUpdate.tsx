@@ -5,27 +5,13 @@ import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
-import { openExternalUrl } from "@/utils/system";
+import { openStoreListing } from "@/utils/system";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Constants from "expo-constants";
 import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type CheckStatus = "idle" | "checking" | "upToDate" | "error";
-
-// iOS App Store id for the iTunes lookup (filled in during Phase 2)
-const APP_STORE_ID = "TODO_REPLACE_WITH_APPSTORE_ID";
-
-// ------------------------------------------------------------
-// Get the store URL for the current platform
-// ------------------------------------------------------------
-function getStoreUrl(): string {
-  if (Platform.OS === "ios") {
-    return `itms-apps://itunes.apple.com/app/id${APP_STORE_ID}`;
-  }
-  return `market://details?id=${Constants?.expoConfig?.android?.package}`;
-}
 
 // ------------------------------------------------------------
 // Color + message to show for the current status
@@ -68,7 +54,7 @@ export function openUpdateAvailableModal() {
       {
         label: tr.buttons.openStore,
         action: "openStore",
-        onPress: () => openExternalUrl(getStoreUrl()),
+        onPress: openStoreListing,
         buttonStyle: { backgroundColor: theme.islamicGreen + "20", borderWidth: 1, borderColor: theme.islamicGreen + "40" },
         labelStyle: { color: theme.islamicGreen },
       },
@@ -120,25 +106,18 @@ export default function CheckForUpdate() {
 
   return (
     <>
-      <Text style={[styles.settingTitle, { color: theme.text2 }]}>
-        {tr.labels.checkUpdateRow}
-      </Text>
-
-      {/* Divider */}
-      <View style={[styles.divider, { borderColor: theme.divider2 }]} />
-
       <TouchableOpacity
-        style={[styles.wideButton, { backgroundColor: theme.primary + "15" }]}
+        style={[styles.wideButton, { backgroundColor: theme.primary + "20" }]}
         onPress={runCheck}
         disabled={status === "checking"}
         activeOpacity={0.8}
       >
         {status === "checking" ? (
-          <ActivityIndicator size="small" color={theme.primary} />
+          <ActivityIndicator size="small" color={theme.textSecondary} />
         ) : (
           <>
-            <MaterialCommunityIcons name="update" size={16} color={theme.primary} />
-            <Text style={[styles.wideButtonText, { color: theme.primary }]}>
+            <MaterialCommunityIcons name="update" size={16} color={theme.textSecondary} />
+            <Text style={[styles.wideButtonText, { color: theme.textSecondary }]}>
               {tr.labels.checkUpdateButton}
             </Text>
           </>
@@ -170,12 +149,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  settingTitle: {
-    fontSize: 17.5,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-    marginLeft: 1,
-  },
   divider: {
     width: "100%",
     borderWidth: 1,
@@ -195,6 +168,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   infoText: {
+    fontSize: 13,
     marginTop: 8,
     marginBottom: 1,
   },

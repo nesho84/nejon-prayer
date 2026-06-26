@@ -1,23 +1,14 @@
 import AppLayout from "@/components/AppLayout";
+import { APPLE_STORE_URL, CONTACT_EMAIL, GOOGLE_PLAY_URL, HELP_EMAIL, MORE_APPS_APP_STORE_URL, MORE_APPS_GOOGLE_PLAY_URL, NEJON_WEBSITE_URL, PAYPAL_DONATE_URL, PRIVACY_POLICY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { openExternalUrl, shareText } from "@/utils/system";
+import { openExternalUrl, openStoreListing, shareText } from "@/utils/system";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const CONTACT_EMAIL = 'mailto:support@nejon.net';
-const HELP_EMAIL = 'mailto:help@nejon.net';
-
-const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer';
-const MORE_APPS_GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/developer?id=Neshat%20Ademi';
-// const MORE_APPS_GOOGLE_PLAY_URL = 'https://play.google.com/store/search?q=nejon&c=apps'; // Alternative search URL
-
-// const APPLE_STORE_URL = 'https://apps.apple.com/app/nejon-prayer/idXXXXXXXXX'; // TODO: Add Apple App Store URL
-// const MORE_APPS_APP_STORE_URL = 'https://apps.apple.com/developer/nejon/'; // TODO: Add correct App Store developer page URL
 
 export default function AboutScreen() {
     // Stores
@@ -41,7 +32,8 @@ export default function AboutScreen() {
     // ------------------------------------------------------------
     const handleShare = async () => {
         const appName = Constants?.expoConfig?.name ?? 'Nejon Prayer';
-        await shareText(appName, GOOGLE_PLAY_URL, tr.labels.shareApp);
+        const storeUrl = Platform.OS === "ios" ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
+        await shareText(appName, storeUrl, tr.labels.shareApp);
     };
 
     return (
@@ -81,7 +73,7 @@ export default function AboutScreen() {
                 {/* Action Cards */}
                 <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
                     {/* Support / PayPal */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl('https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT')} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(PAYPAL_DONATE_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
                         </View>
@@ -96,7 +88,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Rate the App */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={openStoreListing} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
@@ -141,7 +133,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* More Apps */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(Platform.OS === "ios" ? MORE_APPS_APP_STORE_URL : MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialCommunityIcons name="view-grid-outline" size={22} color={theme.primary} />
                         </View>
@@ -155,13 +147,13 @@ export default function AboutScreen() {
 
                 {/* Bottom links */}
                 <View style={styles.bottomLinks}>
-                    <TouchableOpacity onPress={() => openExternalUrl("https://nejon-prayer.nejon.net/privacy.html")} activeOpacity={0.6}>
+                    <TouchableOpacity onPress={() => openExternalUrl(PRIVACY_POLICY_URL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Privacy</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => openExternalUrl(HELP_EMAIL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Help</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => openExternalUrl("https://nejon.net")} activeOpacity={0.6}>
+                    <TouchableOpacity onPress={() => openExternalUrl(NEJON_WEBSITE_URL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>nejon.net</Text>
                     </TouchableOpacity>
                 </View>

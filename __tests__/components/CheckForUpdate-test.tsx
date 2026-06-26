@@ -5,16 +5,13 @@ import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import * as ExpoInAppUpdates from 'expo-in-app-updates';
+import { Linking, Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
-jest.mock('expo-constants', () => ({
-  __esModule: true,
-  default: { expoConfig: { android: { package: 'com.nejon.prayer' } } },
-}));
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -46,6 +43,7 @@ const mockTr = {
 const checkForUpdate = ExpoInAppUpdates.checkForUpdate as jest.Mock;
 
 beforeEach(() => {
+  (Platform as { OS: string }).OS = 'android';
   useThemeStore.setState({ theme: mockTheme });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
   useDebugStore.setState({ updatePreview: 'idle' });
@@ -81,6 +79,29 @@ describe('CheckForUpdate', () => {
       expect(useModalStore.getState().visible).toBe(true);
     });
     expect(screen.getByText('Check if a new version is available')).toBeTruthy();
+  });
+
+  it('opens the native Play Store deep link when "Open Store" is pressed in the update modal', async () => {
+    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
+    render(<CheckForUpdate />);
+
+    fireEvent.press(screen.getByText('Check for Update'));
+
+    await waitFor(() => {
+      expect(useModalStore.getState().visible).toBe(true);
+    });
+
+    const openStoreButton = useModalStore.getState().options?.buttons?.find(
+      (button) => button.action === 'openStore'
+    );
+    openStoreButton?.onPress?.();
+
+    await waitFor(() => {
+      expect(Linking.openURL).toHaveBeenCalledWith(
+        expect.stringContaining('market://')
+      );
+    });
   });
 
   it('shows the error message when the check fails', async () => {

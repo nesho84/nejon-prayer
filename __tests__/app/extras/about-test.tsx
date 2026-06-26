@@ -2,7 +2,7 @@ import AboutScreen from '@/app/extras/about';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -51,6 +51,7 @@ const mockTr = {
 } as any;
 
 beforeEach(() => {
+  (Platform as { OS: string }).OS = 'android';
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });
   useLanguageStore.setState({ tr: mockTr });
   jest.clearAllMocks();
@@ -71,6 +72,18 @@ describe('AboutScreen', () => {
     expect(Share.share).toHaveBeenCalledTimes(1);
   });
 
+  it('shares the website instead of a Play Store link on iOS', async () => {
+    (Platform as { OS: string }).OS = 'ios';
+    const { Share } = require('react-native');
+    Share.share = jest.fn(() => Promise.resolve({ action: 'sharedAction' }));
+    render(<AboutScreen />);
+    fireEvent.press(screen.getByText('Share App'));
+    expect(Share.share).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.stringContaining('nejon.net') }),
+      expect.anything()
+    );
+  });
+
   it('calls Linking.openURL with PayPal URL when support card is pressed', async () => {
     jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     render(<AboutScreen />);
@@ -82,13 +95,25 @@ describe('AboutScreen', () => {
     });
   });
 
-  it('calls Linking.openURL with Google Play URL when rate card is pressed', async () => {
-    jest.spyOn(Linking, 'canOpenURL').mockResolvedValue(true);
+  it('calls Linking.openURL with the native Play Store deep link when rate card is pressed', async () => {
     jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     render(<AboutScreen />);
     fireEvent.press(screen.getByText('Rate the App'));
     await waitFor(() => {
       expect(Linking.openURL).toHaveBeenCalledWith(
+        expect.stringContaining('market://')
+      );
+    });
+  });
+
+  it('falls back to the Play Store web listing when the native deep link fails', async () => {
+    jest.spyOn(Linking, 'openURL')
+      .mockRejectedValueOnce(new Error('no Play Store'))
+      .mockResolvedValueOnce(undefined);
+    render(<AboutScreen />);
+    fireEvent.press(screen.getByText('Rate the App'));
+    await waitFor(() => {
+      expect(Linking.openURL).toHaveBeenLastCalledWith(
         expect.stringContaining('play.google.com')
       );
     });
