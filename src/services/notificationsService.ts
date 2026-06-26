@@ -68,13 +68,6 @@ export async function scheduleNotificationsService(params: ScheduleParams) {
 }
 
 // ------------------------------------------------------------
-// Get Android channel ID based on vibration setting
-// ------------------------------------------------------------
-export function getVibrationChannelId(vibration?: string): string {
-  return VIBRATION_CHANNEL_IDS[vibration ?? 'short'] ?? VIBRATION_CHANNEL_IDS.short;
-}
-
-// ------------------------------------------------------------
 // Create channels: Called in useNotificationsSync on app load
 // ------------------------------------------------------------
 export async function createNotificationsChannels() {
@@ -138,6 +131,13 @@ export async function createNotificationsChannels() {
     vibrationPattern: vibLong,
     ...defaults,
   });
+}
+
+// ------------------------------------------------------------
+// Get Android channel ID based on vibration setting
+// ------------------------------------------------------------
+export function getVibrationChannelId(vibration?: string): string {
+  return VIBRATION_CHANNEL_IDS[vibration ?? 'short'] ?? VIBRATION_CHANNEL_IDS.short;
 }
 
 // ------------------------------------------------------------
@@ -524,7 +524,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const body = `${description} · ${formattedDate}`;
       const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 
-      // Create notification
+      // Create holiday reminder notification
       await notifee.createTriggerNotification(
         {
           id: `special-${name}`,
@@ -613,7 +613,7 @@ async function scheduleSpecialNotifications(params: ScheduleParams) {
       const body = shuffledQuotes[i];
       const vibration = config.notifSettings.vibration === 'off' ? 'off' : 'short';
 
-      // Create notification
+      // Create daily quote notification
       await notifee.createTriggerNotification(
         {
           id: notificationId,

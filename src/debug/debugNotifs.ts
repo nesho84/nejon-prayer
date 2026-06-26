@@ -3,6 +3,7 @@ import { getVibrationChannelId } from "@/services/notificationsService";
 import { Cords } from "@/types/location.types";
 import { NotifSettings } from "@/types/notification.types";
 import { toDateKey } from "@/utils/datetime";
+import { Alert } from "react-native";
 import notifee, {
     AndroidCategory,
     AndroidColor,
@@ -11,7 +12,6 @@ import notifee, {
     TimestampTrigger,
     TriggerType
 } from "react-native-notify-kit";
-import { Alert } from "react-native";
 
 interface DebugNParams {
     options: {
@@ -46,26 +46,34 @@ export async function debugPrayerN({ options, notifSettings, seconds = 10 }: Deb
         // Default to 10 seconds later if no timestamp passed
         const triggerTime = Date.now() + seconds * 1000;
 
-        // Schedule the notification
+        // Prepare notification content
+        const title = `» Sabahu «`;
+        const body = `Koha për namaz (06:49)`;
+        const sound = SOUNDS.azan1_short;
+        const volume = String(notifSettings?.volume ?? 1.0);
+        const vibration = notifSettings?.vibration ?? 'short';
+        const snooze = String(notifSettings?.snooze ?? 5);
+        const reminderTitle = `» Sabahu «`;
+        const reminderBody = `Kujtesë Lutjeje`;
+
         await notifee.createTriggerNotification(
             {
                 id: "prayer-test",
-                title: "» Sabahu «",
-                body: "Koha për namaz (06:49)",
+                title: title,
+                body: body,
                 data: {
                     type: "prayer",
-                    volume: String(notifSettings?.volume ?? 1.0),
-                    sound: SOUNDS.azan1_short, // Default sound for test
-                    vibration: notifSettings?.vibration ?? 'short',
-                    snooze: String(notifSettings?.snooze ?? 5),
+                    volume: volume,
+                    sound: sound,
+                    vibration: vibration,
+                    snooze: snooze,
                     prayerName: 'Fajr',
                     prayerDate: toDateKey(new Date(triggerTime)),
-                    reminderTitle: "» Sabahu «",
-                    reminderBody: "Kujtesë Lutjeje",
+                    reminderTitle: reminderTitle,
+                    reminderBody: reminderBody,
                 },
                 android: {
-                    // (Channel is created in notificationsService.ts)
-                    channelId: getVibrationChannelId(notifSettings?.vibration),
+                    channelId: getVibrationChannelId(vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     largeIcon: require("../../assets/images/moon-islam.png"),
@@ -98,12 +106,12 @@ export async function debugPrayerN({ options, notifSettings, seconds = 10 }: Deb
         const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
 
         console.log(`🔔 Test notification scheduled to trigger in ${remainingSeconds}seconds...
-            channelId: ${getVibrationChannelId(notifSettings?.vibration)}
+            channelId: ${getVibrationChannelId(vibration)}
             language: ${options?.language},
             alarm: ${options.hasAlarm},
-            volume: ${notifSettings?.volume},
-            vibration: ${notifSettings?.vibration},
-            snooze: ${notifSettings?.snooze}
+            volume: ${volume},
+            vibration: ${vibration},
+            snooze: ${snooze}
             `);
 
     } catch (err) {
@@ -118,22 +126,28 @@ export async function debugEventN({ options, notifSettings, seconds = 10 }: Debu
     try {
         if (await notificationsAreOff()) return;
 
+        // Default to 10 seconds later if no timestamp passed
         const triggerTime = Date.now() + seconds * 1000;
-        const eventName = 'Imsak';
-        const body = `It is now time for (${eventName}) 04:52`;
+
+        // Prepare notification content
+        const title = `» Imsak «`;
+        const body = `It is now time for (Imsak) 04:52`;
+        const sound = SOUNDS.alarm2;
+        const volume = String(notifSettings?.volume ?? 1.0);
+        const vibration = notifSettings?.vibration;
 
         await notifee.createTriggerNotification(
             {
                 id: "prayer-event-test",
-                title: `» ${eventName} «`,
+                title: title,
                 body: body,
                 data: {
                     type: "prayer-event",
-                    volume: String(notifSettings?.volume ?? 1.0),
-                    sound: SOUNDS.alarm2,
+                    volume: volume,
+                    sound: sound,
                 },
                 android: {
-                    channelId: getVibrationChannelId(notifSettings?.vibration),
+                    channelId: getVibrationChannelId(vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.BLUE,
@@ -171,8 +185,12 @@ export async function debugPrayerReminderN({ options, notifSettings = null, seco
         if (await notificationsAreOff()) return;
 
         const triggerTime = Date.now() + seconds * 1000;
-        const title = "» Sabahu «";
-        const body = "Kujtesë Lutjeje";
+
+        // Prepare notification content
+        const title = `» Sabahu «`;
+        const body = `Kujtesë Lutjeje`;
+        const sound = SOUNDS.alarm1;
+        const vibration = notifSettings?.vibration;
 
         await notifee.createTriggerNotification(
             {
@@ -181,10 +199,10 @@ export async function debugPrayerReminderN({ options, notifSettings = null, seco
                 body: body,
                 data: {
                     type: "prayer-reminder",
-                    sound: SOUNDS.alarm1,
+                    sound: sound,
                 },
                 android: {
-                    channelId: getVibrationChannelId(notifSettings?.vibration),
+                    channelId: getVibrationChannelId(vibration),
                     category: AndroidCategory.ALARM,
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.RED,
@@ -221,8 +239,11 @@ export async function debugFridayN({ options, notifSettings, seconds = 10 }: Deb
         if (await notificationsAreOff()) return;
 
         const triggerTime = Date.now() + seconds * 1000;
-        const title = "Jumu'ah Reminder";
-        const body = "Today is Jumu'ah. Make time for prayer.";
+
+        // Prepare notification content
+        const title = `Jumu'ah Reminder`;
+        const body = `Today is Jumu'ah. Make time for prayer.`;
+        const vibration = notifSettings?.vibration === 'off' ? 'off' : 'short';
 
         await notifee.createTriggerNotification(
             {
@@ -235,7 +256,7 @@ export async function debugFridayN({ options, notifSettings, seconds = 10 }: Deb
                     scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
-                    channelId: `nejonprayer-vib-off`,
+                    channelId: getVibrationChannelId(vibration),
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
                     style: { type: AndroidStyle.INBOX, lines: [body] },
@@ -265,6 +286,60 @@ export async function debugFridayN({ options, notifSettings, seconds = 10 }: Deb
 }
 
 // ------------------------------------------------------------
+// Debug utility: schedule a test Islamic Holiday notification
+// ------------------------------------------------------------
+export async function debugHolidayN({ options, notifSettings, seconds = 10 }: DebugNParams) {
+    try {
+        if (await notificationsAreOff()) return;
+
+        const triggerTime = Date.now() + seconds * 1000;
+
+        // Prepare notification content
+        const title = `» Ramazani «`;
+        const body = `Muaji i shenjtë i Ramazanit · 08.02.2027`;
+        const vibration = notifSettings?.vibration === 'off' ? 'off' : 'short';
+
+        await notifee.createTriggerNotification(
+            {
+                id: `special-holiday-test-${Date.now()}`,
+                title: title,
+                body: body,
+                data: {
+                    type: "special",
+                    subType: "islamic-holiday",
+                    holidayType: "Ramadan",
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
+                },
+                android: {
+                    channelId: getVibrationChannelId(vibration),
+                    smallIcon: "ic_stat_prayer",
+                    color: AndroidColor.GREEN,
+                    style: { type: AndroidStyle.INBOX, lines: [body] },
+                    pressAction: { id: "default", launchActivity: "default" },
+                    lightUpScreen: true,
+                    showTimestamp: true,
+                    autoCancel: false,
+                    ongoing: true,
+                },
+                ios: {
+                    interruptionLevel: "active",
+                },
+            },
+            {
+                type: TriggerType.TIMESTAMP,
+                timestamp: triggerTime,
+                alarmManager: options.hasAlarm,
+            }
+        );
+
+        const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
+        console.log(`🔔 Test Islamic holiday notification scheduled in ${remainingSeconds}s`);
+    } catch (err) {
+        console.error("❌ Failed to schedule test Islamic holiday notification:", err);
+    }
+}
+
+// ------------------------------------------------------------
 // Debug utility: schedule a test Daily Quote special notification
 // ------------------------------------------------------------
 export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }: DebugNParams) {
@@ -273,8 +348,10 @@ export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }:
 
         const triggerTime = Date.now() + seconds * 1000;
 
-        const title = "Daily Reminder";
-        const body = "Verily, in the remembrance of Allah do hearts find rest 💚 (Ar-Ra'd 13:28)";
+        // Prepare notification content
+        const title = `Daily Reminder`;
+        const body = `Verily, in the remembrance of Allah do hearts find rest 💚 (Ar-Ra'd 13:28)`;
+        const vibration = notifSettings?.vibration === 'off' ? 'off' : 'short';
 
         await notifee.createTriggerNotification(
             {
@@ -287,7 +364,7 @@ export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }:
                     scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
-                    channelId: `nejonprayer-vib-off`,
+                    channelId: getVibrationChannelId(vibration),
                     smallIcon: "ic_stat_prayer",
                     color: AndroidColor.GREEN,
                     style: { type: AndroidStyle.BIGTEXT, text: body },
@@ -313,58 +390,6 @@ export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }:
         console.log(`🔔 Test daily-quote notification scheduled in ${remainingSeconds}s`);
     } catch (err) {
         console.error("❌ Failed to schedule test daily-quote notification:", err);
-    }
-}
-
-// ------------------------------------------------------------
-// Debug utility: schedule a test Islamic Holiday notification
-// ------------------------------------------------------------
-export async function debugHolidayN({ options, notifSettings, seconds = 10 }: DebugNParams) {
-    try {
-        if (await notificationsAreOff()) return;
-
-        const triggerTime = Date.now() + seconds * 1000;
-
-        const title = "» Ramazani «";
-        const body = "Muaji i shenjtë i Ramazanit · 08.02.2027";
-
-        await notifee.createTriggerNotification(
-            {
-                id: `special-holiday-test-${Date.now()}`,
-                title: title,
-                body: body,
-                data: {
-                    type: "special",
-                    subType: "islamic-holiday",
-                    holidayType: "Ramadan",
-                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
-                },
-                android: {
-                    channelId: `nejonprayer-vib-off`,
-                    smallIcon: "ic_stat_prayer",
-                    color: AndroidColor.GREEN,
-                    style: { type: AndroidStyle.INBOX, lines: [body] },
-                    pressAction: { id: "default", launchActivity: "default" },
-                    lightUpScreen: true,
-                    showTimestamp: true,
-                    autoCancel: false,
-                    ongoing: true,
-                },
-                ios: {
-                    interruptionLevel: "active",
-                },
-            },
-            {
-                type: TriggerType.TIMESTAMP,
-                timestamp: triggerTime,
-                alarmManager: options.hasAlarm,
-            }
-        );
-
-        const remainingSeconds = Math.max(0, Math.floor((triggerTime - Date.now()) / 1000) + 1);
-        console.log(`🔔 Test Islamic holiday notification scheduled in ${remainingSeconds}s`);
-    } catch (err) {
-        console.error("❌ Failed to schedule test Islamic holiday notification:", err);
     }
 }
 
