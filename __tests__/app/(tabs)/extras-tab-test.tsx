@@ -20,12 +20,17 @@ jest.mock('react-native-notify-kit', () => ({
   __esModule: true,
   default: {},
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return {
     Ionicons: ({ name }: { name: string }) =>
       React.createElement('View', { testID: `icon-${name}` }),
-    MaterialCommunityIcons: ({ name }: { name: string }) =>
+  };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  return {
+    MaterialDesignIcons: ({ name }: { name: string }) =>
       React.createElement('View', { testID: `icon-${name}` }),
   };
 });

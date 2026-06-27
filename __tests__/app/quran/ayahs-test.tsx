@@ -29,11 +29,9 @@ jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn(),
   NotificationFeedbackType: { Success: 'success' },
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 jest.mock('@shopify/flash-list', () => {
   const React = require('react');

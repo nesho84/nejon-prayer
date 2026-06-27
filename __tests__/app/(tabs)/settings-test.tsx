@@ -65,13 +65,17 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-    MaterialCommunityIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-    MaterialIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  return { MaterialDesignIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-icons/static', () => {
+  const React = require('react');
+  return { MaterialIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 
 const mockTheme = {

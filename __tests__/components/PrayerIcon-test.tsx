@@ -1,12 +1,13 @@
 import PrayerIcon from '@/components/PrayerIcon';
 import { render, screen } from '@testing-library/react-native';
 
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `ion-${name}` }),
-    MaterialCommunityIcons: ({ name }: { name: string }) => React.createElement('View', { testID: `mci-${name}` }),
-  };
+  return { Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `ion-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  return { MaterialDesignIcons: ({ name }: { name: string }) => React.createElement('View', { testID: `mci-${name}` }) };
 });
 
 describe('PrayerIcon', () => {

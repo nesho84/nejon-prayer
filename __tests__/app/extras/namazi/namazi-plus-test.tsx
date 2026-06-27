@@ -17,14 +17,13 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() } }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  const stub = ({ name }: { name: string }) =>
-    React.createElement('View', { testID: `icon-${name}` });
-  return {
-    Ionicons: stub,
-    MaterialCommunityIcons: stub,
-  };
+  return { Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  return { MaterialDesignIcons: ({ name }: { name: string }) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 // Render header, items and footer so titles and rows are queryable.
 jest.mock('@shopify/flash-list', () => {

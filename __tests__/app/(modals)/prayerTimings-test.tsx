@@ -35,11 +35,9 @@ jest.mock('@/components/AppLoading', () => {
   const { ActivityIndicator } = require('react-native');
   return ({ text }: any) => React.createElement(ActivityIndicator, { testID: `loading-${text}` });
 });
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 jest.mock('@react-native-community/datetimepicker', () => () => null);
 jest.mock('expo-router', () => ({

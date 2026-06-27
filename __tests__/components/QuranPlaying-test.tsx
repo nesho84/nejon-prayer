@@ -6,11 +6,9 @@ jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 
 const mockTheme = { accent: '#007AFF', card: '#fff', divider: '#eee', text2: '#555' };

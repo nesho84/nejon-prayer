@@ -36,12 +36,13 @@ jest.mock('expo-router', () => ({
     React.useEffect(cb, []);
   },
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-    MaterialCommunityIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  return { MaterialDesignIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 jest.mock('@/services/quranService', () => ({
   AUDIO_EDITIONS: { alafasy: 'Mishary Alafasy' },

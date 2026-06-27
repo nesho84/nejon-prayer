@@ -1,10 +1,10 @@
 import CustomPicker from '@/components/CustomPicker';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   const React = require('react');
   return {
-    MaterialCommunityIcons: ({ name }: { name: string }) =>
+    MaterialDesignIcons: ({ name }: { name: string }) =>
       React.createElement('View', { testID: `icon-${name}` }),
   };
 });

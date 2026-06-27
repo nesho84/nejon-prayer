@@ -38,12 +38,13 @@ jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() }
 jest.mock('expo-router', () => ({
   router: { navigate: jest.fn() },
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
-  return {
-    Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-    MaterialIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-icons/static', () => {
+  const React = require('react');
+  return { MaterialIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 jest.mock('@/hooks/useNextPrayer', () => ({
   __esModule: true,

@@ -28,10 +28,10 @@ jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { name: 'Nejon Prayer', version: '2.0.0' } },
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   const React = require('react');
   return {
-    MaterialCommunityIcons: ({ name }: { name: string }) =>
+    MaterialDesignIcons: ({ name }: { name: string }) =>
       React.createElement('View', { testID: `icon-${name}` }),
   };
 });

@@ -25,7 +25,7 @@ jest.mock('react-native-reanimated', () => {
     Easing: { out: () => passthrough, in: () => passthrough, linear: passthrough, quad: passthrough, cubic: passthrough },
   };
 });
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return {
     Ionicons: ({ name }: { name: string }) =>

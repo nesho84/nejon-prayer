@@ -19,12 +19,10 @@ jest.mock('@sentry/react-native', () => ({
   addBreadcrumb: jest.fn(),
   init: jest.fn(),
 }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   const React = require('react');
   const { View } = require('react-native');
-  return {
-    MaterialCommunityIcons: ({ name }: any) => React.createElement(View, { testID: `mci-${name}` }),
-  };
+  return { MaterialDesignIcons: ({ name }: any) => React.createElement(View, { testID: `mci-${name}` }) };
 });
 
 const mockTheme = {

@@ -32,13 +32,15 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() } }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   const React = require('react');
   const { View } = require('react-native');
-  return {
-    MaterialCommunityIcons: ({ name }: any) => React.createElement(View, { testID: `mci-${name}` }),
-    Feather: ({ name }: any) => React.createElement(View, { testID: `feather-${name}` }),
-  };
+  return { MaterialDesignIcons: ({ name }: any) => React.createElement(View, { testID: `mci-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/feather/static', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return { Feather: ({ name }: any) => React.createElement(View, { testID: `feather-${name}` }) };
 });
 // Render header, items and footer so the year badges (header) are testable
 jest.mock('@shopify/flash-list', () => {

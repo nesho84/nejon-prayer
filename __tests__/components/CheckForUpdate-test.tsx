@@ -12,13 +12,15 @@ jest.mock('@/store/storage', () => ({
 }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   const { View } = require('react-native');
-  return {
-    Ionicons: ({ name }: any) => React.createElement(View, { testID: `icon-${name}` }),
-    MaterialCommunityIcons: ({ name }: any) => React.createElement(View, { testID: `icon-${name}` }),
-  };
+  return { Ionicons: ({ name }: any) => React.createElement(View, { testID: `icon-${name}` }) };
+});
+jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return { MaterialDesignIcons: ({ name }: any) => React.createElement(View, { testID: `icon-${name}` }) };
 });
 
 const mockTheme = {

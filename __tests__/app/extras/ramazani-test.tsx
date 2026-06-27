@@ -20,7 +20,7 @@ jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(() => Promise.resolve()) }));
-jest.mock('@expo/vector-icons', () => {
+jest.mock('@react-native-vector-icons/feather/static', () => {
   const React = require('react');
   return {
     Feather: ({ name }: { name: string }) =>
