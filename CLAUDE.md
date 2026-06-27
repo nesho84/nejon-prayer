@@ -26,6 +26,26 @@ Native modules (`react-native-mmkv`, `react-native-notify-kit`, `react-native-tr
 `react-native-nitro-modules`, sensors) **do not work in Expo Go** — use the dev client.
 See `README.md` for the full build/EAS/OTA/Sentry workflow.
 
+### Do not bump `react-native-track-player`
+
+It is held at `^5.0.0-alpha0` (resolving to the `5.0.0-alpha0-nightly-cad7f4b0...` build), and
+`react-native-track-player` is intentionally listed under `expo.doctor.reactNativeDirectoryCheck.exclude`.
+This is **not** an old/legacy version: it is the last **Apache-2.0 (free)** build of the v5
+New-Architecture rewrite (TurboModule + JSI, Media3 on Android), frozen right before the project
+was renamed to `@rntp/player` and relicensed as commercial. So we already have the New-Arch engine
+for free, and the doctor exclusion is expected (the pinned nightly isn't in the RN directory).
+
+- **Don't "upgrade" it.** `@rntp/player` v5.x is the same engine but requires a **paid commercial
+  license** to ship to end users (distributing an app — even free — is "commercial use" per
+  rntp.dev/terms). Downgrading to stable v4.x is a **regression**: legacy ExoPlayer2 bridge
+  instead of Media3/New-Arch, and its `State` enum differs enough to break the switch in
+  `src/hooks/useQuranSetup.ts`.
+- **If the pinned build ever breaks on a newer SDK**, the migration to `@rntp/player` is a ~1:1
+  import rename (the v5 API matches what we already call): swap `'react-native-track-player'` →
+  `'@rntp/player'` in `index.ts`, `src/hooks/useQuranSetup.ts`, `src/app/(tabs)/quran-tab.tsx`,
+  `src/services/resetAppService.ts`, and the two test mocks; then buy a license and re-test
+  background/lock-screen playback on the dev client.
+
 ## Path aliases
 
 - `@/*` → `src/*`
