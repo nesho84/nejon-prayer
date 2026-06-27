@@ -4,7 +4,8 @@ import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openExternalUrl } from "@/utils/system";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { Href, router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -52,7 +53,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.abdesDesc || "Step by step ablution guide",
             color: theme.secondary,
             bg: `${theme.secondary}20`,
-            icon: <MaterialCommunityIcons name="shimmer" size={32} color={theme.secondary} />
+            icon: <MaterialDesignIcons name="shimmer" size={32} color={theme.secondary} />
         },
         {
             id: 2,
@@ -62,7 +63,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.namazDesc || "Mëso dhe praktiko Namazin",
             color: theme.islamicGreen,
             bg: `${theme.islamicGreen}20`,
-            icon: <MaterialCommunityIcons name="mosque-outline" size={32} color={theme.islamicGreen} />,
+            icon: <MaterialDesignIcons name="mosque-outline" size={32} color={theme.islamicGreen} />,
             subItems: [
                 { href: "/extras/namazi/namazi-guide", label: tr.labels.namazGuideItem || "Udhëzuesi i Namazit" },
                 { href: "/extras/namazi/namazi-table", label: tr.labels.namazTableItem || "Tabela e Rekateve" },
@@ -77,7 +78,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.tesbihDesc || "Digital prayer beads counter",
             color: theme.pink,
             bg: `${theme.pink}20`,
-            icon: <MaterialCommunityIcons name="counter" size={36} color={theme.pink} />,
+            icon: <MaterialDesignIcons name="counter" size={36} color={theme.pink} />,
         },
         {
             id: 4,
@@ -107,7 +108,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.quotesDesc || "Daily inspiration from Quran & Hadith",
             color: theme.danger,
             bg: `${theme.danger}20`,
-            icon: <MaterialCommunityIcons name="book-outline" size={32} color={theme.accent2} />
+            icon: <MaterialDesignIcons name="book-outline" size={32} color={theme.accent2} />
         },
         {
             id: 7,
@@ -117,7 +118,7 @@ export default function ExtrasTabScreen() {
             description: tr.labels.aboutDesc || "App information & credits",
             color: theme.primary,
             bg: `${theme.primary}17`,
-            icon: <MaterialCommunityIcons name="information-outline" size={34} color={theme.primary} />
+            icon: <MaterialDesignIcons name="information-outline" size={34} color={theme.primary} />
         },
     ];
 

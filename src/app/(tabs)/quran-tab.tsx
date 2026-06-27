@@ -11,7 +11,8 @@ import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Surah } from '@/types/quran.types';
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
@@ -214,7 +215,7 @@ export default function QuranTabScreen() {
           <View style={{ position: 'absolute', top: 6 }}>
             <Ionicons name="volume-medium" size={14} color={theme.gold} />
           </View>
-          <MaterialCommunityIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={theme.gold} />
+          <MaterialDesignIcons name="book-open-variant" style={{ paddingTop: 8 }} size={32} color={theme.gold} />
         </View>
 
         {/* Center: Title and Subtitle */}

@@ -16,7 +16,9 @@ import { Language, LANGUAGES } from "@/types/language.types";
 import { SpecialType } from "@/types/notification.types";
 import { Theme, THEMES } from "@/types/theme.types";
 import { openAlarmPermissionSettings, openBatteryOptimizationSettings, openNotificationSettings } from "@/utils/system";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import { MaterialIcons } from "@react-native-vector-icons/material-icons/static";
 import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
@@ -392,7 +394,7 @@ export default function SettingsScreen() {
                         onPress={updateLocation}
                         disabled={localLoading}
                     >
-                        <MaterialCommunityIcons name="web-refresh" size={16} color={theme.text2} />
+                        <MaterialDesignIcons name="web-refresh" size={16} color={theme.text2} />
                         <Text style={[styles.wideButtonText, { color: theme.text2 }]}>
                             {location ? (tr.labels.locationButtonText1) : (tr.labels.locationButtonText2)}
                         </Text>
@@ -700,7 +702,7 @@ export default function SettingsScreen() {
                         onPress={handleResetApp}
                         disabled={localLoading}
                     >
-                        <MaterialCommunityIcons name="delete-restore" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="delete-restore" size={16} color={theme.textMuted} />
                         <Text style={[styles.wideButtonText, { color: theme.textMuted }]}>
                             {tr.labels.resetAppButton}
                         </Text>

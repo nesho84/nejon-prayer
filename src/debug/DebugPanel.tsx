@@ -5,7 +5,8 @@ import { useLocationStore } from "@/store/locationStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { ReactNode, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { previewKhatamCelebrationModal, previewPrayerCelebrationModal } from "./debugCelebs";
@@ -130,7 +131,7 @@ export default function DebugPanel() {
         <Text style={[styles.selectorText, { color: theme.danger }]}>
           {expanded ? "Hide debug actions" : "Show debug actions"}
         </Text>
-        <MaterialCommunityIcons
+        <MaterialDesignIcons
           name={expanded ? "chevron-up" : "chevron-down"}
           size={24}
           color={theme.danger}

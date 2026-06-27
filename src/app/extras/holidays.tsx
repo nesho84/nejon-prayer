@@ -9,13 +9,14 @@ import { ALL_HOLIDAYS, HOLIDAY_META, HolidayName } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
 import { formatDateKey, toDateKey } from "@/utils/datetime";
 import { shareText } from "@/utils/system";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@react-native-vector-icons/feather/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type MCIcon = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
 type ThemeKey = keyof ThemeColors;
 
 interface HolidayItem {
@@ -106,7 +107,7 @@ export default function HolidaysScreen() {
                 <View style={styles.itemRow}>
                     {/* Left — icon box */}
                     <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
-                        <MaterialCommunityIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />
+                        <MaterialDesignIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />
                     </View>
 
                     {/* Middle — name, desc, date */}

@@ -1,6 +1,6 @@
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -35,7 +35,7 @@ export default function TabLayout() {
                 options={{
                     title: tr.labels.home,
                     tabBarIcon: ({ focused, color, size }) =>
-                        <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={size} color={color} />,
+                        <MaterialDesignIcons name={focused ? "home" : "home-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -43,7 +43,7 @@ export default function TabLayout() {
                 options={{
                     title: tr.labels.qibla,
                     tabBarIcon: ({ focused, color, size }) =>
-                        <MaterialCommunityIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
+                        <MaterialDesignIcons name={focused ? "compass" : "compass-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -51,7 +51,7 @@ export default function TabLayout() {
                 options={{
                     title: tr.labels.read,
                     tabBarIcon: ({ focused, color, size }) =>
-                        <MaterialCommunityIcons name={focused ? "book-open-variant" : "book-open-variant-outline"} size={size} color={color} />,
+                        <MaterialDesignIcons name={focused ? "book-open-variant" : "book-open-variant-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -59,7 +59,7 @@ export default function TabLayout() {
                 options={{
                     title: tr.labels.settings,
                     tabBarIcon: ({ focused, color, size }) =>
-                        <MaterialCommunityIcons name={focused ? "cog" : "cog-outline"} size={size} color={color} />,
+                        <MaterialDesignIcons name={focused ? "cog" : "cog-outline"} size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
@@ -68,7 +68,7 @@ export default function TabLayout() {
                     title: "More",
                     tabBarLabel: tr.labels.more,
                     tabBarIcon: ({ focused, color, size }) =>
-                        <MaterialCommunityIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
+                        <MaterialDesignIcons name={focused ? "apps" : "apps"} size={size} color={color} />,
                 }}
             />
         </Tabs>

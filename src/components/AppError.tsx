@@ -1,9 +1,9 @@
 import { useThemeStore } from '@/store/themeStore';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, IoniconsIconName } from "@react-native-vector-icons/ionicons/static";
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
-    icon?: keyof typeof Ionicons.glyphMap;
+    icon?: IoniconsIconName;
     iconColor?: string;
     message?: string;
     buttonText?: string;

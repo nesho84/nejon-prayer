@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { router } from 'expo-router';
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import {

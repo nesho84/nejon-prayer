@@ -1,7 +1,8 @@
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialIcons } from "@react-native-vector-icons/material-icons/static";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";

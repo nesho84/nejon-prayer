@@ -1,7 +1,7 @@
 import CelebrationFx from '@/components/CelebrationFx';
 import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import {
   Modal,
   Pressable,

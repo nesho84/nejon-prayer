@@ -10,7 +10,7 @@ import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { isTimePast, toDateKey } from "@/utils/datetime";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";

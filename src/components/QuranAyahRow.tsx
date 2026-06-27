@@ -1,7 +1,7 @@
 import { Verse } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
 import { copyText, shareText } from "@/utils/system";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 

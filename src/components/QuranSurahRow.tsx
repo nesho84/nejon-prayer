@@ -2,7 +2,8 @@ import AppCard from "@/components/AppCard";
 import { Translations } from "@/types/language.types";
 import { Surah } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from "expo-router";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -53,7 +54,7 @@ const QuranSurahRow = React.memo(({
   const playButtonIcon = () => {
     if (isThisBuffering) return <ActivityIndicator size="small" color={theme.accent} />;
 
-    if (hasError) return <MaterialCommunityIcons name="reload-alert" size={34} color={theme.danger} />;
+    if (hasError) return <MaterialDesignIcons name="reload-alert" size={34} color={theme.danger} />;
 
     return (
       <Ionicons

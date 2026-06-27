@@ -5,7 +5,7 @@ import { globalStyles } from "@/constants/styles";
 import { NAMAZI_GUIDE_TR, NAMAZI_SURAHS } from "@/constants/translations/namazi-guide.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";

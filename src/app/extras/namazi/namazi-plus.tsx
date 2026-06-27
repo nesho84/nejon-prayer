@@ -4,7 +4,8 @@ import { globalStyles } from "@/constants/styles";
 import { NAMAZI_PLUS_TR, NamaziPlusContent } from "@/constants/translations/namazi-plus.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -85,7 +86,7 @@ export default function NamaziPlusScreen() {
           android_ripple={{ color: theme.overlayLight, borderless: false }}
         >
           <View style={styles.itemRow}>
-            <MaterialCommunityIcons name="mosque-outline" size={22} color={theme.islamicGreen} />
+            <MaterialDesignIcons name="mosque-outline" size={22} color={theme.islamicGreen} />
             <View style={styles.itemContent}>
               <Text style={[styles.itemTitle, { color: theme.text2 }]}>{item.prayer.name}</Text>
               {!isExpanded && (

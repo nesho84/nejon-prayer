@@ -8,7 +8,7 @@ import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Verse } from '@/types/quran.types';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';

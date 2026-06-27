@@ -11,7 +11,8 @@ import { useThemeStore } from '@/store/themeStore';
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from '@/types/prayer.types';
 import { isTimePast, toDateKey } from '@/utils/datetime';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useCallback } from 'react';
@@ -98,12 +99,12 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     const settings = prayers?.[prayerName as PrayerType] || events?.[prayerName as PrayerEventType];
 
     if (!notificationPermission || !settings?.enabled) {
-      return <MaterialCommunityIcons name="bell-off-outline" size={size} color={color} style={{ opacity: 0.3, paddingBottom: 1 }} />;
+      return <MaterialDesignIcons name="bell-off-outline" size={size} color={color} style={{ opacity: 0.3, paddingBottom: 1 }} />;
     }
     if (settings.offset === 0) {
-      return <MaterialCommunityIcons name="bell-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
+      return <MaterialDesignIcons name="bell-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
     }
-    return <MaterialCommunityIcons name="bell-cog-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
+    return <MaterialDesignIcons name="bell-cog-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
   };
 
   return (

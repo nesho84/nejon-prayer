@@ -4,7 +4,8 @@ import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons, MaterialCommunityIcons as McIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
@@ -189,7 +190,7 @@ export default function TesbihScreen() {
                 {/* Bottom Controls - Inside pill container */}
                 <View style={[styles.controls, { backgroundColor: theme.card }]}>
                     <TouchableOpacity style={styles.controlBtn} onPress={decrementTotal}>
-                        <McIcons name="minus" size={24} color={theme.text2} />
+                        <MaterialDesignIcons name="minus" size={24} color={theme.text2} />
                     </TouchableOpacity>
 
                     <Text style={[styles.controlValue, { color: theme.text2 }]}>
@@ -197,11 +198,11 @@ export default function TesbihScreen() {
                     </Text>
 
                     <TouchableOpacity style={styles.controlBtn} onPress={incrementTotal}>
-                        <McIcons name="plus" size={24} color={theme.text2} />
+                        <MaterialDesignIcons name="plus" size={24} color={theme.text2} />
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.controlBtn} onPress={handleReset}>
-                        <McIcons name="reload" size={26} color={theme.primary} />
+                        <MaterialDesignIcons name="reload" size={26} color={theme.primary} />
                     </TouchableOpacity>
                 </View>
 

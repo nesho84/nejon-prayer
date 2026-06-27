@@ -10,7 +10,8 @@ import { useThemeStore } from "@/store/themeStore";
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PRAYER_EVENTS, PrayerName } from "@/types/prayer.types";
 import { openNotificationSettings } from "@/utils/system";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
@@ -260,7 +261,7 @@ export default function PrayersSettingsScreen() {
                         {/* SECTION 1: Enable/Disable */}
                         <AppCard style={styles.sectionCard}>
                             <View style={styles.sectionHeader}>
-                                <MaterialCommunityIcons
+                                <MaterialDesignIcons
                                     name="bell-outline"
                                     size={20}
                                     color={theme.accent}
@@ -334,7 +335,7 @@ export default function PrayersSettingsScreen() {
                             {/* SECTION 3: Sound Selection */}
                             <AppCard style={styles.sectionCard}>
                                 <View style={[styles.sectionHeader, { marginBottom: 12 }]}>
-                                    <MaterialCommunityIcons name="cellphone-sound" size={20} color={theme.accent} />
+                                    <MaterialDesignIcons name="cellphone-sound" size={20} color={theme.accent} />
                                     <Text style={[styles.sectionTitle, { color: theme.text }]}>
                                         {tr.labels.notificationSound}
                                     </Text>
@@ -413,7 +414,7 @@ export default function PrayersSettingsScreen() {
                     {/* Permission prompt — shown above the dimmed sections when notificationPermission=false */}
                     {!notificationPermission && (
                         <View style={[styles.permissionCardAlert, { backgroundColor: theme.card }]}>
-                            <MaterialCommunityIcons name="bell-off-outline" size={44} color={theme.accent2} />
+                            <MaterialDesignIcons name="bell-off-outline" size={44} color={theme.accent2} />
                             <Text style={[styles.permissionTitle, { color: theme.text2 }]}>
                                 {tr.labels.notificationsDisabled}
                             </Text>
@@ -424,7 +425,7 @@ export default function PrayersSettingsScreen() {
                                 style={[styles.permissionButton, { backgroundColor: theme.overlay }]}
                                 onPress={openNotificationSettings}
                             >
-                                <MaterialCommunityIcons name="cog-outline" size={18} color={theme.accent2} />
+                                <MaterialDesignIcons name="cog-outline" size={18} color={theme.accent2} />
                                 <Text style={[styles.permissionButtonText, { color: theme.accent }]}>
                                     {tr.buttons.openSettings}
                                 </Text>

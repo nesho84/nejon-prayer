@@ -5,7 +5,8 @@ import { useThemeStore } from '@/store/themeStore';
 import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendar';
 import { toDateKey } from '@/utils/datetime';
 import { getDayPrayedCount } from '@/utils/tracking';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -147,7 +148,7 @@ const PrayerProgressCard = React.memo(() => {
       <View style={styles.header}>
         {/* Left: Title */}
         <View style={styles.titleLeftRow}>
-          <MaterialCommunityIcons name="progress-check" size={23} color={theme.accent} style={{ opacity: 0.8 }} />
+          <MaterialDesignIcons name="progress-check" size={23} color={theme.accent} style={{ opacity: 0.8 }} />
           <Text style={[styles.title, { color: theme.text2 }]}>{tr.labels.myProgress}</Text>
         </View>
 

@@ -5,7 +5,7 @@ import { RAMAZANI_TR } from "@/constants/translations/ramazani.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { copyText, shareText } from "@/utils/system";
-import { Feather } from "@expo/vector-icons";
+import { Feather } from "@react-native-vector-icons/feather/static";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";

@@ -1,5 +1,5 @@
 import { useLanguageStore } from "@/store/languageStore";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { router, useIsFocused } from 'expo-router';
 import { Accelerometer, Magnetometer } from 'expo-sensors';
 import { useEffect, useMemo, useRef, useState } from 'react';

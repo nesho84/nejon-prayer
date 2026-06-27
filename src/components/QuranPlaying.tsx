@@ -1,7 +1,7 @@
 import { useDebugStore } from "@/debug/debugStore";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";

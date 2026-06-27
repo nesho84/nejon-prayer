@@ -10,7 +10,8 @@ import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { openAlarmPermissionSettings, openBatteryOptimizationSettings } from "@/utils/system";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { useRef, useState } from "react";
 import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import notifee, { AuthorizationStatus } from "react-native-notify-kit";
@@ -234,7 +235,7 @@ export default function OnboardingScreen() {
               {/* Notifications */}
               <TouchableOpacity style={styles.permissionRow} onPress={requestNotifications} activeOpacity={0.7}>
                 <View style={[styles.permissionIcon, { backgroundColor: (notificationPermission ? theme.primary : theme.warning) + '20' }]}>
-                  <MaterialCommunityIcons
+                  <MaterialDesignIcons
                     name={notificationPermission ? "bell-check-outline" : "bell-alert-outline"}
                     size={20}
                     color={notificationPermission ? theme.primary : theme.warning}
@@ -262,7 +263,7 @@ export default function OnboardingScreen() {
                   {/* Battery optimization */}
                   <TouchableOpacity style={styles.permissionRow} onPress={openBatteryOptimizationSettings} activeOpacity={0.7}>
                     <View style={[styles.permissionIcon, { backgroundColor: (batteryOptimization ? theme.warning : theme.primary) + '20' }]}>
-                      <MaterialCommunityIcons
+                      <MaterialDesignIcons
                         name={batteryOptimization ? "battery-alert-variant-outline" : "battery-check-outline"}
                         size={20}
                         color={batteryOptimization ? theme.warning : theme.success}
@@ -288,7 +289,7 @@ export default function OnboardingScreen() {
                   {/* Alarms & reminders */}
                   <TouchableOpacity style={styles.permissionRow} onPress={openAlarmPermissionSettings} activeOpacity={0.7}>
                     <View style={[styles.permissionIcon, { backgroundColor: (alarmPermission ? theme.primary : theme.warning) + '20' }]}>
-                      <MaterialCommunityIcons
+                      <MaterialDesignIcons
                         name="alarm"
                         size={20}
                         color={alarmPermission ? theme.primary : theme.warning}

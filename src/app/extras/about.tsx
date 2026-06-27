@@ -4,7 +4,7 @@ import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openExternalUrl, openStoreListing, shareText } from "@/utils/system";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -53,7 +53,7 @@ export default function AboutScreen() {
                         title: tr.labels.about,
                         headerRight: () => (
                             <TouchableOpacity onPress={openAppInfo} style={styles.infoIcon} activeOpacity={0.3}>
-                                <MaterialCommunityIcons name="information-outline" size={22} color={theme.text} />
+                                <MaterialDesignIcons name="information-outline" size={22} color={theme.text} />
                             </TouchableOpacity>
                         ),
                     }}
@@ -75,13 +75,13 @@ export default function AboutScreen() {
                     {/* Support / PayPal */}
                     <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(PAYPAL_DONATE_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialCommunityIcons name="heart-outline" size={22} color={theme.danger} />
+                            <MaterialDesignIcons name="heart-outline" size={22} color={theme.danger} />
                         </View>
                         <View style={styles.cardTextContainer}>
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.supportDesc}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}
@@ -90,13 +90,13 @@ export default function AboutScreen() {
                     {/* Rate the App */}
                     <TouchableOpacity style={styles.cardRow} onPress={openStoreListing} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialCommunityIcons name="star-outline" size={22} color={theme.primary} />
+                            <MaterialDesignIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.cardTextContainer}>
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.rateApp}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}
@@ -105,13 +105,13 @@ export default function AboutScreen() {
                     {/* Share with a Friend */}
                     <TouchableOpacity style={styles.cardRow} onPress={handleShare} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialCommunityIcons name="share-outline" size={22} color={theme.primary} />
+                            <MaterialDesignIcons name="share-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.cardTextContainer}>
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.shareApp}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.shareAppDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="share-variant-outline" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="share-variant-outline" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}
@@ -120,13 +120,13 @@ export default function AboutScreen() {
                     {/* Contact Us */}
                     <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(CONTACT_EMAIL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialCommunityIcons name="email-outline" size={22} color={theme.primary} />
+                            <MaterialDesignIcons name="email-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.cardTextContainer}>
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.contactUs}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.contactUsDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}
@@ -135,13 +135,13 @@ export default function AboutScreen() {
                     {/* More Apps */}
                     <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(Platform.OS === "ios" ? MORE_APPS_APP_STORE_URL : MORE_APPS_GOOGLE_PLAY_URL)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialCommunityIcons name="view-grid-outline" size={22} color={theme.primary} />
+                            <MaterialDesignIcons name="view-grid-outline" size={22} color={theme.primary} />
                         </View>
                         <View style={styles.cardTextContainer}>
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.moreApps}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.moreAppsDesc}</Text>
                         </View>
-                        <MaterialCommunityIcons name="open-in-new" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
                 </View>
 

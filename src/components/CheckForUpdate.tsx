@@ -6,7 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
 import { openStoreListing } from "@/utils/system";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -38,7 +38,7 @@ export function openUpdateAvailableModal() {
     component: (
       <View style={globalStyles.bannerContainer}>
         <View style={[styles.modalIconCircle, { backgroundColor: theme.islamicGreen + "20" }]}>
-          <MaterialCommunityIcons name="information-variant-circle" size={32} color={theme.islamicGreen} />
+          <MaterialDesignIcons name="information-variant-circle" size={32} color={theme.islamicGreen} />
         </View>
         <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.updateAvailableTitle}</Text>
         <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.updateAvailableMessage}</Text>
@@ -116,7 +116,7 @@ export default function CheckForUpdate() {
           <ActivityIndicator size="small" color={theme.textSecondary} />
         ) : (
           <>
-            <MaterialCommunityIcons name="update" size={16} color={theme.textSecondary} />
+            <MaterialDesignIcons name="update" size={16} color={theme.textSecondary} />
             <Text style={[styles.wideButtonText, { color: theme.textSecondary }]}>
               {tr.labels.checkUpdateButton}
             </Text>

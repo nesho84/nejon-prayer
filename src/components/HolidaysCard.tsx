@@ -7,12 +7,12 @@ import { useThemeStore } from "@/store/themeStore";
 import { HOLIDAY_META, UpcomingHoliday } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
 import { formatDateKey, toDateKey } from "@/utils/datetime";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type MCIcon = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
 type ThemeKey = keyof ThemeColors;
 
 const IslamicHolidaysCard = React.memo(() => {
@@ -59,7 +59,7 @@ const IslamicHolidaysCard = React.memo(() => {
 
       {/* Left - Icon Box */}
       <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
-        {<MaterialCommunityIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />}
+        {<MaterialDesignIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />}
       </View>
 
       {/* Middle — name, desc. and date */}
