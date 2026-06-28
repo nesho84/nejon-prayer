@@ -10,8 +10,8 @@ import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { isTimePast, toDateKey } from "@/utils/datetime";
-import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
+import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -57,7 +57,7 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Get yearly prayer times from prayers store for the selected date
     // ------------------------------------------------------------
-    const fetchPrayerTimesForDate = async (date: Date) => {
+    const getPrayerTimesForDate = async (date: Date) => {
         if (!location) return;
 
         setIsLoading(true);
@@ -86,7 +86,7 @@ export default function PrayersSettingsScreen() {
         if (location) {
             // Intentional: refetch prayer times when the selected date/location changes.
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            fetchPrayerTimesForDate(selectedDate);
+            getPrayerTimesForDate(selectedDate);
         }
     }, [selectedDate, location]);
 
@@ -154,23 +154,20 @@ export default function PrayersSettingsScreen() {
         ? (Object.entries(prayerTimesByDate) as PrayerTimeEntry[])
         : [];
 
-    // Fixed Footer with Close/Today buttons — a plain element, not a component
+    // Fixed Footer with Cancel/Today buttons — a plain element, not a component
     // declared in render (avoids re-creating a component type every render)
     const fixedFooter = (
-        <View style={[globalStyles.modalFooter, { alignSelf: 'flex-end', backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-            <TouchableOpacity
-                style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-                onPress={handleClose}
-            >
+        <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
+            {/* Cancel Button */}
+            <TouchableOpacity style={globalStyles.modalButton} onPress={handleClose}>
                 <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
                     {tr.buttons.cancel}
                 </Text>
             </TouchableOpacity>
-
+            {/* Action Button */}
             <TouchableOpacity
                 style={[
                     globalStyles.modalButton,
-                    styles.todayButton,
                     { backgroundColor: theme.overlay, opacity: isToday() ? 0.6 : 1 }
                 ]}
                 onPress={() => setSelectedDate(new Date())}
@@ -359,7 +356,7 @@ export default function PrayersSettingsScreen() {
                                 </Text>
                                 <TouchableOpacity
                                     style={[globalStyles.modalButton, { backgroundColor: theme.overlay, marginTop: 8 }]}
-                                    onPress={() => fetchPrayerTimesForDate(selectedDate)}
+                                    onPress={() => getPrayerTimesForDate(selectedDate)}
                                 >
                                     <Ionicons name="refresh" size={18} color={theme.text} />
                                     <Text style={[globalStyles.modalButtonText, { color: theme.text }]}>
@@ -501,7 +498,4 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center',
     },
-
-    // Footer
-    todayButton: {},
 });

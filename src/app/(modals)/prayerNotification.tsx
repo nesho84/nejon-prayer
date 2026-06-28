@@ -191,7 +191,7 @@ export default function PrayersSettingsScreen() {
     // ------------------------------------------------------------
     // Cancel - dismiss without saving
     // ------------------------------------------------------------
-    const handleCancel = async () => {
+    const handleClose = async () => {
         await stopSound();
         if (playTimeoutRef.current) {
             clearTimeout(playTimeoutRef.current);
@@ -206,19 +206,16 @@ export default function PrayersSettingsScreen() {
     // declared in render (avoids re-creating a component type every render)
     const fixedFooter = (
         <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-            <TouchableOpacity
-                style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-                onPress={handleCancel}
-            >
+            {/* Cancel Button */}
+            <TouchableOpacity style={globalStyles.modalButton} onPress={handleClose}>
                 <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
                     {tr.buttons.cancel}
                 </Text>
             </TouchableOpacity>
-
+            {/* Action Button */}
             <TouchableOpacity
                 style={[
                     globalStyles.modalButton,
-                    styles.saveButton,
                     { backgroundColor: theme.overlay, opacity: notificationPermission ? 1 : 0.4 }
                 ]}
                 onPress={handleSave}
@@ -559,7 +556,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
-
-    // Footer
-    saveButton: {},
 });

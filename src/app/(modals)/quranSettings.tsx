@@ -54,7 +54,7 @@ export default function QuranSettingsScreen() {
   // ------------------------------------------------------------
   // Handle close
   // ------------------------------------------------------------
-  const handleCancel = () => {
+  const handleClose = () => {
     ModalSheetRef.current?.close();
   };
 
@@ -62,19 +62,16 @@ export default function QuranSettingsScreen() {
   // declared in render (avoids re-creating a component type every render)
   const fixedFooter = (
     <View style={[globalStyles.modalFooter, { backgroundColor: theme.card, borderTopColor: theme.divider }]}>
-      <TouchableOpacity
-        style={[globalStyles.modalButton, globalStyles.modalCancelButton]}
-        onPress={handleCancel}
-      >
+      {/* Cancel Button */}
+      <TouchableOpacity style={globalStyles.modalButton} onPress={handleClose}>
         <Text style={[globalStyles.modalButtonText, { color: theme.text2 }]}>
           {tr.buttons.cancel}
         </Text>
       </TouchableOpacity>
-
+      {/* Action Button */}
       <TouchableOpacity
         style={[
           globalStyles.modalButton,
-          styles.saveButton,
           { backgroundColor: theme.overlay }
         ]}
         onPress={handleSave}
@@ -294,7 +291,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
   },
-
-  // Footer
-  saveButton: {},
 });

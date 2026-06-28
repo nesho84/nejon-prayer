@@ -16,17 +16,6 @@ export const globalStyles = StyleSheet.create({
     paddingHorizontal: 8,
     gap: 10,
   },
-  modalContainer: {
-    flexGrow: 1,
-    paddingTop: 12,
-    paddingBottom: 14,
-    paddingHorizontal: 8,
-    gap: 10,
-  },
-  fullDivider: {
-    height: 1.5,
-    width: '100%',
-  },
 
   // Progress bar
   progressWrapper: {
@@ -85,7 +74,14 @@ export const globalStyles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // Modal footer
+  // Modals
+  modalContainer: {
+    flexGrow: 1,
+    paddingTop: 12,
+    paddingBottom: 14,
+    paddingHorizontal: 8,
+    gap: 10,
+  },
   modalFooter: {
     flexDirection: 'row',
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -97,17 +93,14 @@ export const globalStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 8,
+    padding: 10,
     gap: 6,
   },
   modalButtonText: {
     fontSize: 16,
     fontWeight: '600',
-  },
-  modalCancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: StyleSheet.hairlineWidth,
   },
 
   // Banner
@@ -146,6 +139,12 @@ export const globalStyles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+
+  // Dividers
+  fullDivider: {
+    height: 1.5,
+    width: '100%',
   },
 
   // AppCard shadow
