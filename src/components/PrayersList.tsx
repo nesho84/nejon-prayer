@@ -107,6 +107,20 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     return <MaterialDesignIcons name="bell-cog-outline" size={size} color={color} style={{ opacity: 0.6, paddingBottom: 1 }} />;
   };
 
+  // ------------------------------------------------------------
+  // Renders the prayer tracking circle (prayed checkmark vs empty ring)
+  // ------------------------------------------------------------
+  const renderTrackingIcon = (isPrayed: boolean, isCurrent: boolean) => {
+    if (!isPrayed) {
+      return <View style={[styles.trackCircle, { borderColor: isCurrent ? theme.placeholder : theme.borderCard }]} />;
+    }
+    return (
+      <View style={[styles.trackCircle, { backgroundColor: theme.green, borderColor: theme.green, opacity: 0.7 }]}>
+        <MaterialDesignIcons name="check-bold" size={12} color={theme.text2} />
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
 
@@ -144,12 +158,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
                   }}
                 >
                   {/* Left: Tracking circle */}
-                  <Ionicons
-                    name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
-                    size={21}
-                    color={isPrayed ? theme.islamicGreen : theme.text2}
-                    style={{ opacity: isPrayed ? 0.8 : 0.4 }}
-                  />
+                  {renderTrackingIcon(isPrayed, isCurrent)}
                   {/* Prayer Name Text */}
                   <Text style={[styles.prayerNameText, { color: isCurrent ? theme.accent : theme.text2 }]}>
                     {tr.prayers[prayerName] || prayerName}
@@ -248,12 +257,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 5,
-    gap: 10,
+    gap: 12,
+  },
+  trackCircle: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   prayerNameText: {
     fontSize: 16,
     fontWeight: '500',
-    lineHeight: 24,
+    lineHeight: 18,
   },
   prayerTimeText: {
     fontSize: 16,

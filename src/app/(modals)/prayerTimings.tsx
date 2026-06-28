@@ -12,6 +12,7 @@ import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/
 import { isTimePast, toDateKey } from "@/utils/datetime";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -139,6 +140,20 @@ export default function PrayersSettingsScreen() {
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
             : await markPrayed(prayerName as PrayerName, selectedDateKey);
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
+
+    // ------------------------------------------------------------
+    // Renders the prayer tracking circle (prayed checkmark vs empty ring)
+    // ------------------------------------------------------------
+    const renderTrackingIcon = (isPrayed: boolean) => {
+        if (!isPrayed) {
+            return <View style={[styles.trackCircle, { borderColor: theme.borderCard }]} />;
+        }
+        return (
+            <View style={[styles.trackCircle, { backgroundColor: theme.green, borderColor: theme.green, opacity: 0.7 }]}>
+                <MaterialDesignIcons name="check-bold" size={12} color={theme.white} />
+            </View>
+        );
+    };
 
     // ------------------------------------------------------------
     // Handle close
@@ -304,12 +319,7 @@ export default function PrayersSettingsScreen() {
                                                     }}
                                                 >
                                                     {/* Left: Tracking circle */}
-                                                    <Ionicons
-                                                        name={isPrayed ? 'checkmark-circle' : 'ellipse-outline'}
-                                                        size={21}
-                                                        color={isPrayed ? theme.islamicGreen : theme.text2}
-                                                        style={{ opacity: isPrayed ? 0.8 : 0.4 }}
-                                                    />
+                                                    {renderTrackingIcon(isPrayed)}
                                                     {/* Prayer Name Text */}
                                                     <Text style={[styles.prayerNameText, { color: theme.text }]}>
                                                         {tr.prayers[prayerName] || prayerName}
@@ -463,12 +473,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 11,
         paddingHorizontal: 16,
-        gap: 10,
+        gap: 12,
+    },
+    trackCircle: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     prayerNameText: {
         fontSize: 16,
         fontWeight: '500',
-        lineHeight: 24,
+        lineHeight: 18,
     },
     prayerTimeText: {
         fontSize: 16,
