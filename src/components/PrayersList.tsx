@@ -11,7 +11,6 @@ import { useThemeStore } from '@/store/themeStore';
 import { PrayerEventType, PrayerType } from "@/types/notification.types";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from '@/types/prayer.types';
 import { isTimePast, toDateKey } from '@/utils/datetime';
-import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
@@ -193,7 +192,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
               ) : (
                 <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
                   {/* Left: Dash placeholder */}
-                  <Ionicons name="remove" size={21} color={theme.placeholder} />
+                  <MaterialDesignIcons name="minus" size={19} color={theme.placeholder} />
                   {/* Prayer Name Text */}
                   <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
                     {tr.prayers[prayerName] || prayerName}
@@ -257,7 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 5,
-    gap: 12,
+    gap: 11,
   },
   trackCircle: {
     width: 20,

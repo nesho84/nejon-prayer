@@ -336,7 +336,7 @@ export default function PrayersSettingsScreen() {
                                             ) : (
                                                 <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
                                                     {/* Left: Dash placeholder */}
-                                                    <Ionicons name="remove" size={21} color={theme.placeholder} />
+                                                    <MaterialDesignIcons name="minus" size={19} color={theme.placeholder} />
                                                     {/* Prayer Name Text */}
                                                     <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
                                                         {tr.prayers[prayerName] || prayerName}
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 11,
         paddingHorizontal: 16,
-        gap: 12,
+        gap: 11,
     },
     trackCircle: {
         width: 20,
