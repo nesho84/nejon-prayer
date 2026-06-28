@@ -115,7 +115,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     }
     return (
       <View style={[styles.trackCircle, { backgroundColor: theme.green, borderColor: theme.green, opacity: 0.7 }]}>
-        <MaterialDesignIcons name="check-bold" size={12} color={theme.text2} />
+        <MaterialDesignIcons name="check-bold" size={11} color={theme.white} />
       </View>
     );
   };
@@ -192,7 +192,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
               ) : (
                 <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
                   {/* Left: Dash placeholder */}
-                  <MaterialDesignIcons name="minus" size={19} color={theme.placeholder} />
+                  <MaterialDesignIcons name="minus" size={18} color={theme.placeholder} />
                   {/* Prayer Name Text */}
                   <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
                     {tr.prayers[prayerName] || prayerName}
@@ -256,13 +256,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 5,
-    gap: 11,
+    gap: 12,
   },
   trackCircle: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },
