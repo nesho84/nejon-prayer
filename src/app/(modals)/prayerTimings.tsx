@@ -1,7 +1,7 @@
 import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
-import PrayerIcon from "@/components/PrayerIcon";
+import PrayerRow from "@/components/PrayerRow";
 import { globalStyles } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -12,7 +12,6 @@ import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/
 import { isTimePast, toDateKey } from "@/utils/datetime";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -140,20 +139,6 @@ export default function PrayersSettingsScreen() {
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
             : await markPrayed(prayerName as PrayerName, selectedDateKey);
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
-
-    // ------------------------------------------------------------
-    // Renders the prayer tracking circle (prayed checkmark vs empty ring)
-    // ------------------------------------------------------------
-    const renderTrackingIcon = (isPrayed: boolean) => {
-        if (!isPrayed) {
-            return <View style={[styles.trackCircle, { borderColor: theme.borderCard }]} />;
-        }
-        return (
-            <View style={[styles.trackCircle, { backgroundColor: theme.green, borderColor: theme.green, opacity: 0.7 }]}>
-                <MaterialDesignIcons name="check-bold" size={11} color={theme.white} />
-            </View>
-        );
-    };
 
     // ------------------------------------------------------------
     // Handle close
@@ -305,51 +290,14 @@ export default function PrayersSettingsScreen() {
 
                                 return (
                                     <View key={prayerName}>
-                                        {/* Mark/unmark area (trackable) or plain view (non-trackable) */}
-                                        <View style={styles.prayerRow}>
-                                            {isTrackable ? (
-                                                <TouchableOpacity
-                                                    style={styles.prayerRowLeft}
-                                                    activeOpacity={0.3}
-                                                    delayPressIn={0}
-                                                    delayPressOut={0}
-                                                    hitSlop={8}
-                                                    onPress={() => {
-                                                        handleMark(prayerName as PrayerName, isPrayed, isPast);
-                                                    }}
-                                                >
-                                                    {/* Left: Tracking circle */}
-                                                    {renderTrackingIcon(isPrayed)}
-                                                    {/* Prayer Name Text */}
-                                                    <Text style={[styles.prayerNameText, { color: theme.text }]}>
-                                                        {tr.prayers[prayerName] || prayerName}
-                                                    </Text>
-                                                    {/* Prayer Name Icon */}
-                                                    <PrayerIcon name={prayerName} size={18} color={theme.text2} opacity={0.7} />
-                                                    {/* Horizontal Spacer */}
-                                                    <View style={{ flex: 1 }} />
-                                                    {/* Prayer Time */}
-                                                    <Text style={[styles.prayerTimeText, { color: theme.text }]}>
-                                                        {prayerTime}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            ) : (
-                                                <View style={[styles.prayerRowLeft, { opacity: 0.4 }]}>
-                                                    {/* Left: Dash placeholder */}
-                                                    <MaterialDesignIcons name="minus" size={18} color={theme.placeholder} />
-                                                    {/* Prayer Name Text */}
-                                                    <Text style={[styles.prayerNameText, { color: theme.text2 }]}>
-                                                        {tr.prayers[prayerName] || prayerName}
-                                                    </Text>
-                                                    {/* Prayer Name Icon */}
-                                                    <PrayerIcon name={prayerName} size={18} color={theme.text2} />
-                                                    {/* Horizontal Spacer */}
-                                                    <View style={{ flex: 1 }} />
-                                                    {/* Prayer Time */}
-                                                    <Text style={[styles.prayerTimeText, { color: theme.text2 }]}>{prayerTime}</Text>
-                                                </View>
-                                            )}
-                                        </View>
+                                        <PrayerRow
+                                            prayerName={prayerName}
+                                            prayerTime={prayerTime}
+                                            isTrackable={isTrackable}
+                                            isPrayed={isPrayed}
+                                            variant="plain"
+                                            onPress={() => handleMark(prayerName as PrayerName, isPrayed, isPast)}
+                                        />
 
                                         {/* Prayer Divider */}
                                         {!isLast && (
@@ -462,38 +410,6 @@ const styles = StyleSheet.create({
     prayersRowContainer: {
         paddingTop: 5,
         paddingBottom: 14,
-    },
-    prayerRow: {
-        flexDirection: 'row',
-        alignItems: 'stretch',
-    },
-    prayerRowLeft: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 11,
-        paddingHorizontal: 16,
-        gap: 11,
-    },
-    trackCircle: {
-        width: 18,
-        height: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderRadius: 9,
-    },
-    prayerNameText: {
-        fontSize: 16,
-        fontWeight: '500',
-        includeFontPadding: false,
-    },
-    prayerTimeText: {
-        fontSize: 16,
-        fontWeight: '600',
-        letterSpacing: 0.5,
-        includeFontPadding: false,
-        marginRight: 4,
     },
     prayerDivider: {
         height: 1,
