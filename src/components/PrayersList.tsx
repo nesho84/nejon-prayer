@@ -256,26 +256,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 5,
-    gap: 12,
+    gap: 11,
   },
   trackCircle: {
     width: 18,
     height: 18,
-    borderWidth: 1,
-    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 9,
   },
   prayerNameText: {
     fontSize: 16,
     fontWeight: '500',
-    lineHeight: 18,
+    includeFontPadding: false,
   },
   prayerTimeText: {
     fontSize: 16,
     fontWeight: '600',
-    marginRight: 4,
     letterSpacing: 0.5,
+    includeFontPadding: false,
+    marginRight: 4,
   },
 
   // Xhumaja Badge (Fridays only)
