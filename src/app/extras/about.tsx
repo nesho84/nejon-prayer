@@ -18,11 +18,12 @@ import { openExternalUrl, openStoreListing, shareText } from "@/utils/system";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-import { useRef } from "react";
+import { useState } from "react";
 import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DEBUG_MODE_TAP_THRESHOLD = 5;
+const DEBUG_MODE_TAP_HINT_START = 3;
 
 export default function AboutScreen() {
     // Stores
@@ -36,8 +37,8 @@ export default function AboutScreen() {
     const topInset = 12;
     const bottomInset = insets.bottom + 12;
 
-    // Refs
-    const versionTapCount = useRef(0);
+    // Local state
+    const [tapCount, setTapCount] = useState(0);
 
     // ------------------------------------------------------------
     // Open app info/settings
@@ -50,10 +51,12 @@ export default function AboutScreen() {
     // Tap the version number N times to toggle debug mode
     // ------------------------------------------------------------
     const handleVersionTap = () => {
-        versionTapCount.current += 1;
-        if (versionTapCount.current >= DEBUG_MODE_TAP_THRESHOLD) {
-            versionTapCount.current = 0;
+        const nextCount = tapCount + 1;
+        if (nextCount >= DEBUG_MODE_TAP_THRESHOLD) {
+            setTapCount(0);
             toggleDebugMode();
+        } else {
+            setTapCount(nextCount);
         }
     };
 
@@ -97,21 +100,27 @@ export default function AboutScreen() {
                     <Text style={[styles.title, { color: theme.text2 }]}>
                         {Constants?.expoConfig?.name}
                     </Text>
-                    {/* App Version (On 5 times Press activates debug mode) */}
+                    {/* App Version (5 times Press activates debug mode) */}
                     <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.6}>
                         <Text style={[styles.versionText, { color: theme.placeholder }]}>
                             Version {Constants?.expoConfig?.version}
                         </Text>
                     </TouchableOpacity>
-                    {/* Hidden debug-mode toggle banner */}
-                    {debugModeEnabled && (
-                        <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.6}>
-                            <View style={[styles.debugBadge, { borderColor: theme.danger }]}>
-                                <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
-                                    Debug mode activated. Tap {DEBUG_MODE_TAP_THRESHOLD} times to deactivate.
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                    {/* Debug-mode hint */}
+                    {tapCount >= DEBUG_MODE_TAP_HINT_START && (
+                        <View style={[styles.debugBadge, { borderColor: 'transparent' }]}>
+                            <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
+                                Tap {DEBUG_MODE_TAP_THRESHOLD - tapCount} more time{DEBUG_MODE_TAP_THRESHOLD - tapCount === 1 ? "" : "s"} to {debugModeEnabled ? "deactivate" : "activate"} debug mode.
+                            </Text>
+                        </View>
+                    )}
+                    {/* Debug-mode status badge*/}
+                    {tapCount < DEBUG_MODE_TAP_HINT_START && debugModeEnabled && (
+                        <View style={[styles.debugBadge, { borderColor: theme.danger }]}>
+                            <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
+                                Debug mode activated. Tap {DEBUG_MODE_TAP_THRESHOLD} times to deactivate.
+                            </Text>
+                        </View>
                     )}
                 </View>
 
