@@ -46,6 +46,7 @@ const mockTr = {
     myProgress: 'My Progress',
     week: 'Week',
     month: 'Month',
+    localeDate: 'en-US', // pin locale so the badge isn't at the mercy of the runner's default
     dayNames: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   },
 };
@@ -108,5 +109,26 @@ describe('PrayerProgressCard — week row follows prayerTimesDate, not the devic
 
     expect(todayNum.color).toBe('#FF6B00'); // theme.accent2 → today
     expect(otherNum.color).toBe('#aaa');    // theme.placeholder → not today
+  });
+
+  it('month view fills the final row with next-month days, matching the week view', () => {
+    usePrayersStore.setState({ prayerTimesDate: '2026-06-30' } as any); // June ends Tue → Jul 1–5 trail
+    render(<PrayerProgressCard />);
+    fireEvent.press(screen.getByText('Month'));
+
+    // Jul 1–5 render in addition to Jun 1–5, so each of these date numbers appears twice…
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    expect(screen.getAllByText('5')).toHaveLength(2);
+    // …while Jun 30 (last real day) is unique — no empty trailing cells.
+    expect(screen.getAllByText('30')).toHaveLength(1);
+  });
+
+  it('badge still shows the month range when the grid has leading previous-month days', () => {
+    usePrayersStore.setState({ prayerTimesDate: '2026-07-01' } as any); // July starts Wed → Jun 29–30 lead
+    render(<PrayerProgressCard />);
+    fireEvent.press(screen.getByText('Month'));
+
+    // Locale-agnostic: badge renders a two-month range ending in the year (e.g. "June - July 2026").
+    expect(screen.getByText(/\S+\s+-\s+\S+\s+2026/)).toBeTruthy();
   });
 });

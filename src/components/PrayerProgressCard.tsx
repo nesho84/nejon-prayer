@@ -55,7 +55,7 @@ const PrayerProgressCard = React.memo(() => {
     const firstCell = monthRows[0]?.[0];
     if (firstCell && 'isPrevMonth' in firstCell && firstCell.isPrevMonth) {
       // Find first current-month cell
-      const currentMonthCell = monthRows.flat().find(item => !item.empty && !item.isPrevMonth);
+      const currentMonthCell = monthRows.flat().find(item => !item.isPrevMonth && !item.isNextMonth);
       const firstDate = new Date(firstCell.key + 'T00:00:00');
       const currentDate = currentMonthCell
         ? new Date(currentMonthCell.key + 'T00:00:00')
@@ -80,13 +80,13 @@ const PrayerProgressCard = React.memo(() => {
   const renderDayCell = (
     dateKey: string,
     dateNumber: number,
-    options: { isEmpty?: boolean; isPrevMonth?: boolean } = {}
+    options: { isPrevMonth?: boolean } = {}
   ) => {
-    const { isEmpty = false, isPrevMonth = false } = options;
-    const isFuture = !isEmpty && !isPrevMonth && dateKey > today;
+    const { isPrevMonth = false } = options;
+    const isFuture = !isPrevMonth && dateKey > today;
     const isToday = dateKey === today;
-    const isPast = !isFuture && !isEmpty;
-    const count = isEmpty ? 0 : getDayPrayedCount(tracking, dateKey);
+    const isPast = !isFuture;
+    const count = getDayPrayedCount(tracking, dateKey);
 
     const barColorByCount: Record<number, string> = {
       0: theme.placeholder,
@@ -101,7 +101,7 @@ const PrayerProgressCard = React.memo(() => {
     const barColor = isPast ? barColorByCount[count] : theme.placeholder;
     const borderColor = isToday ? theme.accent2 : theme.borderCard;
     const fractionColor = isToday ? theme.accent2 : theme.text2;
-    const cellOpacity = isEmpty ? 0 : isFuture ? 0.25 : isPrevMonth ? 0.35 : 0.8;
+    const cellOpacity = isFuture ? 0.25 : isPrevMonth ? 0.35 : 0.8;
     const dateNumColor = isToday ? theme.accent2 : theme.placeholder;
 
     const cellContent = (
@@ -115,12 +115,12 @@ const PrayerProgressCard = React.memo(() => {
           </View>
         </View>
         <Text style={[styles.dateNum, { color: dateNumColor, opacity: isPrevMonth ? 0.4 : 1 }]}>
-          {isEmpty ? ' ' : dateNumber}
+          {dateNumber}
         </Text>
       </>
     );
 
-    if (isPast && !isEmpty) {
+    if (isPast) {
       return (
         <TouchableOpacity
           key={dateKey}
@@ -195,12 +195,7 @@ const PrayerProgressCard = React.memo(() => {
             {monthRows.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.cellRow}>
                 {row.map((item) =>
-                  item.empty
-                    ? renderDayCell(item.key, 0, { isEmpty: true })
-                    : renderDayCell(item.key, item.date.getDate(), { isPrevMonth: item.isPrevMonth })
-                )}
-                {row.length < 7 && Array.from({ length: 7 - row.length }, (_, i) =>
-                  renderDayCell(`fill-${i}`, 0, { isEmpty: true })
+                  renderDayCell(item.key, item.date.getDate(), { isPrevMonth: item.isPrevMonth })
                 )}
               </View>
             ))}
