@@ -1,30 +1,60 @@
 import AppLayout from "@/components/AppLayout";
-import { APPLE_STORE_URL, CONTACT_EMAIL, GOOGLE_PLAY_URL, HELP_EMAIL, MORE_APPS_APP_STORE_URL, MORE_APPS_GOOGLE_PLAY_URL, NEJON_WEBSITE_URL, PAYPAL_DONATE_URL, PRIVACY_POLICY_URL } from "@/constants/links";
+import {
+    APPLE_STORE_URL,
+    CONTACT_EMAIL,
+    GOOGLE_PLAY_URL,
+    HELP_EMAIL,
+    MORE_APPS_APP_STORE_URL,
+    MORE_APPS_GOOGLE_PLAY_URL,
+    NEJON_WEBSITE_URL,
+    PAYPAL_DONATE_URL,
+    PRIVACY_POLICY_URL
+} from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
+import { useDebugStore } from "@/debug/debugStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openExternalUrl, openStoreListing, shareText } from "@/utils/system";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
+import { useRef } from "react";
 import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const DEBUG_MODE_TAP_THRESHOLD = 5;
 
 export default function AboutScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
+    const toggleDebugMode = useDebugStore((state) => state.toggleDebugMode);
 
     // Safe area insets
     const insets = useSafeAreaInsets();
     const topInset = 12;
     const bottomInset = insets.bottom + 12;
 
+    // Refs
+    const versionTapCount = useRef(0);
+
     // ------------------------------------------------------------
     // Open app info/settings
     // ------------------------------------------------------------
     const openAppInfo = () => {
         Linking.openSettings();
+    };
+
+    // ------------------------------------------------------------
+    // Tap the version number N times to toggle debug mode
+    // ------------------------------------------------------------
+    const handleVersionTap = () => {
+        versionTapCount.current += 1;
+        if (versionTapCount.current >= DEBUG_MODE_TAP_THRESHOLD) {
+            versionTapCount.current = 0;
+            toggleDebugMode();
+        }
     };
 
     // ------------------------------------------------------------
@@ -61,13 +91,28 @@ export default function AboutScreen() {
 
                 {/* Logo + Title + Version */}
                 <View style={styles.logoSection}>
+                    {/* Logo */}
                     <Image style={styles.logo} source={require("../../../assets/icons/icon-bg.png")} />
+                    {/* App Name */}
                     <Text style={[styles.title, { color: theme.text2 }]}>
                         {Constants?.expoConfig?.name}
                     </Text>
-                    <Text style={[styles.versionText, { color: theme.placeholder }]}>
-                        Version {Constants?.expoConfig?.version}
-                    </Text>
+                    {/* App Version (On 5 times Press activates debug mode) */}
+                    <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.6}>
+                        <Text style={[styles.versionText, { color: theme.placeholder }]}>
+                            Version {Constants?.expoConfig?.version}
+                        </Text>
+                    </TouchableOpacity>
+                    {/* Hidden debug-mode toggle banner */}
+                    {debugModeEnabled && (
+                        <TouchableOpacity onPress={handleVersionTap} activeOpacity={0.6}>
+                            <View style={[styles.debugBadge, { borderColor: theme.danger }]}>
+                                <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
+                                    Debug mode activated. Tap {DEBUG_MODE_TAP_THRESHOLD} times to deactivate.
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* Action Cards */}
@@ -180,7 +225,7 @@ const styles = StyleSheet.create({
     logo: {
         width: 96,
         height: 96,
-        borderRadius: 22,
+        // borderRadius: 22,
         marginBottom: 6,
     },
     title: {
@@ -192,6 +237,21 @@ const styles = StyleSheet.create({
     versionText: {
         fontSize: 14,
         fontWeight: "400",
+    },
+    debugBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 20,
+        marginTop: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        gap: 6,
+    },
+    debugBadgeText: {
+        fontSize: 12,
+        fontWeight: '500',
+        includeFontPadding: false,
     },
 
     // Action cards

@@ -5,6 +5,7 @@ import CheckForUpdate from "@/components/CheckForUpdate";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles } from "@/constants/styles";
 import DebugPanel from "@/debug/DebugPanel";
+import { useDebugStore } from "@/debug/debugStore";
 import { restoreDefaults } from "@/services/resetAppService";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -60,6 +61,7 @@ export default function SettingsScreen() {
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const specials = useNotificationsStore((state) => state.specials);
+    const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -330,7 +332,7 @@ export default function SettingsScreen() {
             >
 
                 {/* ------ Debug Tools (dev only) ------ */}
-                {__DEV__ && (
+                {(__DEV__ || debugModeEnabled) && (
                     <AppCard style={styles.settingCard}>
                         <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
                         <DebugPanel />

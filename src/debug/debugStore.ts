@@ -3,13 +3,15 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
-// Debug-only store backing the Debug Panel toggles. Only forceUpdateOnLaunch
-// is persisted (needs to survive a reload); the rest reset to OFF on restart.
+// Debug-only store backing the Debug Panel toggles. forceUpdateOnLaunch and
+// debugModeEnabled are persisted (need to survive a reload); the rest reset
+// to OFF on restart.
 // ------------------------------------------------------------
 
 export type UpdatePreview = "idle" | "upToDate" | "error";
 
 interface DebugState {
+  debugModeEnabled: boolean;
   forceHoliday: boolean;
   forceFriday: boolean;
   forceQuranPlaying: boolean;
@@ -19,12 +21,14 @@ interface DebugState {
   toggleFriday: () => void;
   toggleQuranPlaying: () => void;
   toggleUpdateOnLaunch: () => void;
+  toggleDebugMode: () => void;
   setUpdatePreview: (value: UpdatePreview) => void;
 }
 
 export const useDebugStore = create<DebugState>()(
   persist(
     (set) => ({
+      debugModeEnabled: false,
       forceHoliday: false,
       forceFriday: false,
       forceQuranPlaying: false,
@@ -35,12 +39,14 @@ export const useDebugStore = create<DebugState>()(
       toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
       toggleQuranPlaying: () => set((s) => ({ forceQuranPlaying: !s.forceQuranPlaying })),
       toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
+      toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
       setUpdatePreview: (value) => set({ updatePreview: value }),
     }),
     {
       name: "debug-storage",
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
+        debugModeEnabled: state.debugModeEnabled,
         forceUpdateOnLaunch: state.forceUpdateOnLaunch,
       }),
     }
