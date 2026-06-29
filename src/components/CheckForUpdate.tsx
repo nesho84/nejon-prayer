@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   wideButtonText: {
     fontSize: 16,
     fontWeight: "600",
+    includeFontPadding: false,
   },
   infoText: {
     fontSize: 13,

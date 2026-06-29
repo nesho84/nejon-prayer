@@ -49,7 +49,7 @@ export default function PrayerRow({
   const trackingIcon = !isTrackable ? (
     <MaterialDesignIcons name="minus" size={TRACKING_ICON_SIZE} color={theme.placeholder} />
   ) : !isPrayed ? (
-    <View style={[styles.trackCircle, { borderColor: isCurrent ? theme.placeholder : theme.borderCard }]} />
+    <View style={[styles.trackCircle, { borderColor: isCurrent ? theme.placeholder : theme.divider2 }]} />
   ) : (
     <View style={[styles.trackCircle, { backgroundColor: theme.green, borderColor: theme.green, opacity: 0.7 }]}>
       <MaterialDesignIcons name="check-bold" size={CHECK_ICON_SIZE} color={theme.white} />

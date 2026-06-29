@@ -4,6 +4,7 @@ import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
@@ -75,5 +76,37 @@ describe('PrayerProgressCard', () => {
     fireEvent.press(screen.getByText('Month'));
     // Month view renders multiple rows — still shows day names
     expect(screen.getByText('Su')).toBeTruthy();
+  });
+});
+
+// prayerTimesDate is '2026-05-26' (Tue) → week Mon May 25 – Sun May 31.
+describe('PrayerProgressCard — week row follows prayerTimesDate, not the device clock', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('renders the prayerTimesDate week even when the device clock is in another week', () => {
+    // Put the device clock in a different week (Mon Jun 29 – Sun Jul 5) to surface
+    // any new Date() divergence — the regression that left the row stale at midnight.
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2026, 5, 29));
+
+    render(<PrayerProgressCard />);
+
+    // Week of prayerTimesDate (May 25–31) is shown…
+    expect(screen.getByText('25')).toBeTruthy();
+    expect(screen.getByText('31')).toBeTruthy();
+    // …not the device-clock week — Jul 4 would only render if the grid read new Date().
+    expect(screen.queryByText('4')).toBeNull();
+  });
+
+  it('highlights the prayerTimesDate cell as today', () => {
+    render(<PrayerProgressCard />);
+
+    const todayNum = StyleSheet.flatten(screen.getByText('26').props.style);
+    const otherNum = StyleSheet.flatten(screen.getByText('25').props.style);
+
+    expect(todayNum.color).toBe('#FF6B00'); // theme.accent2 → today
+    expect(otherNum.color).toBe('#aaa');    // theme.placeholder → not today
   });
 });

@@ -2,8 +2,8 @@ import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
-import { getCurrentMonthRows, getCurrentWeekDays } from '@/utils/calendar';
-import { toDateKey } from '@/utils/datetime';
+import { getMonthRows, getWeekDays } from '@/utils/calendar';
+import { keyToDate, toDateKey } from '@/utils/datetime';
 import { getDayPrayedCount } from '@/utils/tracking';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
@@ -26,8 +26,9 @@ const PrayerProgressCard = React.memo(() => {
 
   // Derived data for calendar rendering
   const today = prayerTimesDate ?? toDateKey();
-  const weekDays = getCurrentWeekDays();
-  const monthRows = getCurrentMonthRows();
+  const todayDate = keyToDate(today);
+  const weekDays = getWeekDays(todayDate);
+  const monthRows = getMonthRows(todayDate);
 
   // ------------------------------------------------------------
   // Opens prayerTimings modal for the tapped date
@@ -71,7 +72,7 @@ const PrayerProgressCard = React.memo(() => {
       month: 'long',
       year: 'numeric',
     }).replace(/^\p{L}/gu, c => c.toUpperCase());
-  }, [progressView, today, weekDays, monthRows, tr]);
+  }, [progressView, today, monthRows, tr]);
 
   // ------------------------------------------------------------
   // Renders a single day cell
@@ -343,6 +344,6 @@ const styles = StyleSheet.create({
   monthBadgeText: {
     fontSize: 13,
     fontWeight: '500',
-    lineHeight: 16,
+    includeFontPadding: false,
   },
 });

@@ -3,8 +3,7 @@ import { toDateKey } from '@/utils/datetime';
 // ------------------------------------------------------------
 // Returns the 7 Date objects for the current week (Mon–Sun)
 // ------------------------------------------------------------
-export const getCurrentWeekDays = (): Date[] => {
-  const today = new Date();
+export const getWeekDays = (today: Date): Date[] => {
   const monday = new Date(today);
   // (getDay() + 6) % 7 → days since Monday (Mon=0 … Sun=6); step back that many days
   monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
@@ -18,8 +17,7 @@ export const getCurrentWeekDays = (): Date[] => {
 // ------------------------------------------------------------
 // Internal: Returns grid items for the current month (including leading days from the previous month)
 // ------------------------------------------------------------
-const getCurrentMonthGridItems = () => {
-  const today = new Date();
+const getCurrentMonthGridItems = (today: Date) => {
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   // (getDay() + 6) % 7 → weekday index with Monday=0 … Sunday=6 (count of leading blanks before day 1)
@@ -43,8 +41,8 @@ const getCurrentMonthGridItems = () => {
 // ------------------------------------------------------------
 // Groups month grid items into rows of 7 for rendering
 // ------------------------------------------------------------
-export const getCurrentMonthRows = () => {
-  const items = getCurrentMonthGridItems();
+export const getMonthRows = (today: Date) => {
+  const items = getCurrentMonthGridItems(today);
   const rows: (typeof items)[] = [];
   for (let i = 0; i < items.length; i += 7) rows.push(items.slice(i, i + 7));
   return rows;

@@ -16,10 +16,10 @@ import { Language, LANGUAGES } from "@/types/language.types";
 import { SpecialType } from "@/types/notification.types";
 import { Theme, THEMES } from "@/types/theme.types";
 import { openAlarmPermissionSettings, openBatteryOptimizationSettings, openNotificationSettings } from "@/utils/system";
+import Slider from '@react-native-community/slider';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { MaterialIcons } from "@react-native-vector-icons/material-icons/static";
-import Slider from '@react-native-community/slider';
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
 import {
@@ -775,6 +775,7 @@ const styles = StyleSheet.create({
     wideButtonText: {
         fontSize: 16,
         fontWeight: '600',
+        includeFontPadding: false,
     },
     infoText: {
         marginTop: 8,
