@@ -143,7 +143,7 @@ export const useNotificationsStore = create<NotificationsState>()(
         }
       },
 
-      // Sync background notifications (called in root index.js on background event)
+      // Sync background notifications (called in root index.ts on background event)
       syncNotificationsInBackground: async () => {
         try {
           console.log('🔄 [notificationsStore:Background] Syncing Notifications...');
@@ -168,33 +168,24 @@ export const useNotificationsStore = create<NotificationsState>()(
 
           const prayerTimes = usePrayersStore.getState().prayerTimes;
 
+          // Log result to Sentry for monitoring
+          const extra = { at: new Date().toISOString(), today, prayerTimes };
+
           if (result === 'rescheduled') {
-            // The single daily audit entry we want: confirms the reschedule ran
-            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule OK', {
-              level: 'info',
-              extra: {
-                at: new Date().toISOString(),
-                today,
-                prayerTimes,
-              },
-            });
-          } else if (result === 'failed' || !prayerTimes) {
-            // Clear failure signal for diagnosing missed notifications
-            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule FAILED', {
-              level: 'warning',
-              extra: {
-                at: new Date().toISOString(),
-                today,
-                prayerTimes,
-              },
-            });
+            // Confirms the reschedule ran
+            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule OK', { level: 'info', extra });
+          } else if (result === 'skipped') {
+            // Settings/times unchanged since last schedule — existing DAILY triggers re-fire
+            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule SKIPPED (hash unchanged)', { level: 'info', extra });
+          } else {
+            // Clear failure signal for diagnosing missed notifications ('failed' or missing prayerTimes)
+            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule FAILED', { level: 'warning', extra });
           }
-          // result === 'skipped' → no Sentry entry (normal no-op)
 
           console.log('✅ [notificationsStore:Background] Notifications synced successfully');
-        } catch (error) {
-          console.error('❌ [notificationsStore:Background] Notifications sync failed:', error);
-          Sentry.captureException(error);
+        } catch (err) {
+          console.error('❌ [notificationsStore:Background] Notifications sync failed:', err);
+          Sentry.captureException(err);
         }
       },
 

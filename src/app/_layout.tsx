@@ -13,14 +13,8 @@ import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 
-// Initialize Sentry for error tracking and performance monitoring
-Sentry.init({
-  dsn: 'https://df36491525a3844176da451e9b5710de@o4511285567488000.ingest.de.sentry.io/4511285569126480',
-  enabled: !__DEV__,
-  enableLogs: false,
-  tracesSampleRate: 0,
-  debug: false,
-});
+// Sentry.init lives in index.ts (the entry that also runs in headless background tasks).
+// Here we only wrap the root component with Sentry's error boundary (see default export).
 
 const RootStack = () => {
   const isReady = useOnboardingStore((state) => state.isReady);
