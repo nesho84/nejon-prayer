@@ -84,7 +84,7 @@ export default function HomeScreen() {
     }, []);
 
     // ------------------------------------------------------------
-    // Formatted date string for the prayers date header
+    // Formatted date string for the prayers List date header (e.g. "Monday, 12 June 2026")
     // ------------------------------------------------------------
     const formattedDateHeader = useMemo(() => {
         return new Date(prayerTimesDate + 'T00:00:00').toLocaleDateString(tr.labels.localeDate, {

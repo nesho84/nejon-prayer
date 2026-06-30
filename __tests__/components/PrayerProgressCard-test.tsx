@@ -123,12 +123,17 @@ describe('PrayerProgressCard — week row follows prayerTimesDate, not the devic
     expect(screen.getAllByText('30')).toHaveLength(1);
   });
 
-  it('badge still shows the month range when the grid has leading previous-month days', () => {
-    usePrayersStore.setState({ prayerTimesDate: '2026-07-01' } as any); // July starts Wed → Jun 29–30 lead
+  it('badge always shows only the current month regardless of leading/trailing overflow cells', () => {
+    usePrayersStore.setState({ prayerTimesDate: '2026-07-01' } as any); // July has Jun 29-30 leading + Aug 1-2 trailing
     render(<PrayerProgressCard />);
-    fireEvent.press(screen.getByText('Month'));
 
-    // Locale-agnostic: badge renders a two-month range ending in the year (e.g. "June - July 2026").
-    expect(screen.getByText(/\S+\s+-\s+\S+\s+2026/)).toBeTruthy();
+    // Week view — "July 2026", not "June - July 2026"
+    expect(screen.getAllByText(/July 2026/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/-/)).toBeNull();
+
+    // Month view — same
+    fireEvent.press(screen.getByText('Month'));
+    expect(screen.getAllByText(/July 2026/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/-/)).toBeNull();
   });
 });

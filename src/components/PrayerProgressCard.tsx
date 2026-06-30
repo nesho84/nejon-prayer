@@ -8,7 +8,7 @@ import { getDayPrayedCount } from '@/utils/tracking';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const PrayerProgressCard = React.memo(() => {
@@ -38,41 +38,11 @@ const PrayerProgressCard = React.memo(() => {
   };
 
   // ------------------------------------------------------------
-  // Formatted date string badge based on current view and month rows
+  // Formatted month badge (e.g. "June 2026")
   // ------------------------------------------------------------
-  const formattedBadge = useMemo(() => {
-    // Week view — always just current month/year
-    if (progressView === 'week') {
-      const d = new Date(today + 'T00:00:00');
-      return d.toLocaleDateString(tr.labels.localeDate, {
-        month: 'long',
-        year: 'numeric',
-      }).replace(/^\p{L}/gu, c => c.toUpperCase());
-    }
-
-    // Month view — if first cell is prev month,
-    // show range (e.g. "September - October 2026"), otherwise just current month/year
-    const firstCell = monthRows[0]?.[0];
-    if (firstCell && 'isPrevMonth' in firstCell && firstCell.isPrevMonth) {
-      // Find first current-month cell
-      const currentMonthCell = monthRows.flat().find(item => !item.isPrevMonth && !item.isNextMonth);
-      const firstDate = new Date(firstCell.key + 'T00:00:00');
-      const currentDate = currentMonthCell
-        ? new Date(currentMonthCell.key + 'T00:00:00')
-        : new Date(today + 'T00:00:00');
-      const m1 = firstDate.toLocaleDateString(tr.labels.localeDate, { month: 'long' })
-        .replace(/^\p{L}/gu, c => c.toUpperCase());
-      const m2 = currentDate.toLocaleDateString(tr.labels.localeDate, { month: 'long', year: 'numeric' })
-        .replace(/^\p{L}/gu, c => c.toUpperCase());
-      return `${m1} - ${m2}`;
-    }
-
-    const currentDate = new Date(today + 'T00:00:00');
-    return currentDate.toLocaleDateString(tr.labels.localeDate, {
-      month: 'long',
-      year: 'numeric',
-    }).replace(/^\p{L}/gu, c => c.toUpperCase());
-  }, [progressView, today, monthRows, tr]);
+  const formattedBadge = new Date(today + 'T00:00:00')
+    .toLocaleDateString(tr.labels.localeDate, { month: 'long', year: 'numeric' })
+    .replace(/^\p{L}/gu, c => c.toUpperCase());
 
   // ------------------------------------------------------------
   // Renders a single day cell
