@@ -1,19 +1,27 @@
-import { MAIN_PRAYERS } from '@/types/prayer.types';
+import { MAIN_PRAYERS, PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 
 // ------------------------------------------------------------
-// Resolves the prayer date to use for tracking.
-// If prayerDate is today or yesterday, use it; otherwise default to today.
-// Handles edge cases where a user marks a prayer as done after midnight.
+// Date to track a prayer against on the "Prayed" action tap. Uses the tap
+// moment + prayer identity, not the notification's frozen date (stale across
+// DAILY repeats). Exception: Isha tapped before today's Fajr → previous day.
 // ------------------------------------------------------------
-export function resolveTrackingDate(prayerDate?: string): string {
-  const today = toDateKey();
+export function resolveTrackingDate(prayerName: PrayerName, fajrTime: string | undefined): string {
+  const now = new Date();
+  const today = toDateKey(now);
 
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  const yesterday = toDateKey(d);
+  // Before Fajr, the only Isha that can have been prayed is last night's.
+  if (prayerName === 'Isha' && fajrTime) {
+    const [fh, fm] = fajrTime.split(':').map(Number);
+    const beforeFajr = now.getHours() * 60 + now.getMinutes() < fh * 60 + fm;
+    if (beforeFajr) {
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return toDateKey(yesterday);
+    }
+  }
 
-  return prayerDate === today || prayerDate === yesterday ? prayerDate : today;
+  return today;
 }
 
 // ------------------------------------------------------------

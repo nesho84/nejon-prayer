@@ -283,7 +283,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           vibration: vibration, // for the reminder to choose the right channel
           snooze: snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
-          prayerDate: toDateKey(triggerTime), // ex. "2026-03-20" (used for tracking in foreground/background)
+          prayerDate: toDateKey(triggerTime), // diagnostic only; goes stale across DAILY repeats — tracking uses the tap moment (see resolveTrackingDate)
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },

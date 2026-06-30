@@ -1,4 +1,3 @@
-import { toDateKey } from '@/utils/datetime';
 import { getDayPrayedCount, resolveTrackingDate } from '@/utils/tracking';
 
 describe('getDayPrayedCount', () => {
@@ -28,25 +27,67 @@ describe('getDayPrayedCount', () => {
 });
 
 describe('resolveTrackingDate', () => {
-  it('returns today when no date is passed', () => {
-    const today = toDateKey();
-    expect(resolveTrackingDate(undefined)).toBe(today);
+  const FAJR = '03:30';
+
+  beforeEach(() => {
+    jest.useFakeTimers();
   });
 
-  it('returns today when today is passed', () => {
-    const today = toDateKey();
-    expect(resolveTrackingDate(today)).toBe(today);
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
 
-  it('returns yesterday when yesterday is passed', () => {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    const yesterday = toDateKey(d);
-    expect(resolveTrackingDate(yesterday)).toBe(yesterday);
+  // Same times day N+1, no reschedule — frozen "N" ignored, records the tap day.
+  it('records the tap day for a daytime non-Isha tap (same-times day N+1)', () => {
+    jest.setSystemTime(new Date(2026, 5, 29, 14, 0, 0));
+    expect(resolveTrackingDate('Fajr', FAJR)).toBe('2026-06-29');
   });
 
-  it('returns today when an old date is passed', () => {
-    const today = toDateKey();
-    expect(resolveTrackingDate('2023-01-01')).toBe(today);
+  // Tap on N+2 with identical times — proves no off-by-one assumption.
+  it('records the tap day on N+2 with identical times (no off-by-one)', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 14, 0, 0));
+    expect(resolveTrackingDate('Dhuhr', FAJR)).toBe('2026-06-30');
+  });
+
+  // Regression: normal daytime tap on a reschedule day.
+  it('records today for a normal daytime tap (different-times day)', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 13, 0, 0));
+    expect(resolveTrackingDate('Asr', FAJR)).toBe('2026-06-30');
+  });
+
+  it('attributes a late-night Isha (00:15, before Fajr) to the previous day', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 0, 15, 0));
+    expect(resolveTrackingDate('Isha', FAJR)).toBe('2026-06-29');
+  });
+
+  // Isha rule never touches Fajr.
+  it('attributes an early Fajr (03:40) to today, never yesterday', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 3, 40, 0));
+    expect(resolveTrackingDate('Fajr', FAJR)).toBe('2026-06-30');
+  });
+
+  // Isha pushed past midnight by a positive offset.
+  it('attributes a post-midnight Isha tap (00:20) to the previous day', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 0, 20, 0));
+    expect(resolveTrackingDate('Isha', FAJR)).toBe('2026-06-29');
+  });
+
+  it('records today for any prayer tapped during the day, including Isha', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 14, 0, 0));
+    expect(resolveTrackingDate('Isha', FAJR)).toBe('2026-06-30');
+    expect(resolveTrackingDate('Maghrib', FAJR)).toBe('2026-06-30');
+  });
+
+  // Locks the evening edge so the before-Fajr window can't bleed into the evening.
+  it('records today for an evening Isha tap (22:00)', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 22, 0, 0));
+    expect(resolveTrackingDate('Isha', FAJR)).toBe('2026-06-30');
+  });
+
+  // No-Fajr path returns today — can't reintroduce the stale-date bug.
+  it('records today when Fajr is unavailable (no boundary), even for Isha at 00:15', () => {
+    jest.setSystemTime(new Date(2026, 5, 30, 0, 15, 0));
+    expect(resolveTrackingDate('Isha', undefined)).toBe('2026-06-30');
   });
 });

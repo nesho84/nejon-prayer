@@ -1,12 +1,14 @@
 import 'expo-router/entry'; // This auto-registers the root app
 
 import { PrayerName } from '@/types/prayer.types';
+import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
+import { usePrayersStore } from './src/store/prayersStore';
 import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
 
 // ------------------------------------------------------------
@@ -59,8 +61,9 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             try {
                 const prayerName = notification.data?.prayerName as PrayerName | undefined;
                 if (prayerName) {
-                    const prayerDate = notification.data?.prayerDate as string | undefined;
-                    const dateToUse = resolveTrackingDate(prayerDate);
+                    const today = toDateKey();
+                    const fajrTime = usePrayersStore.getState().yearlyPrayerTimes?.[today]?.Fajr;
+                    const dateToUse = resolveTrackingDate(prayerName, fajrTime);
                     await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
                 }
             } catch (err) {

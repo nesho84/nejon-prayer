@@ -6,6 +6,7 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { PrayerName } from '@/types/prayer.types';
+import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import { useEffect, useRef } from 'react';
@@ -98,8 +99,9 @@ export function useNotificationsSync() {
         try {
           const prayerName = notification.data?.prayerName as PrayerName | undefined;
           if (prayerName) {
-            const prayerDate = notification.data?.prayerDate as string | undefined;
-            const dateToUse = resolveTrackingDate(prayerDate);
+            const today = toDateKey();
+            const fajrTime = usePrayersStore.getState().yearlyPrayerTimes?.[today]?.Fajr;
+            const dateToUse = resolveTrackingDate(prayerName, fajrTime);
             await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
           }
         } catch (err) {

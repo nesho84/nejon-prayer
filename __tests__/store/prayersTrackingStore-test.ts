@@ -74,6 +74,28 @@ describe('prayersTrackingStore — markPrayed', () => {
     expect(result).toBe(true);
   });
 
+  it('is idempotent — re-tapping the same prayer keeps it prayed without corrupting the day', async () => {
+    const store = usePrayersTrackingStore.getState();
+    await store.markPrayed('Fajr');
+    await store.markPrayed('Fajr');
+    const day = usePrayersTrackingStore.getState().tracking[TODAY];
+    expect(day?.Fajr).toBe('prayed');
+    // No other prayer was touched by the re-tap.
+    expect(Object.keys(day ?? {})).toEqual(['Fajr']);
+  });
+
+  it('re-tapping the completing prayer still reports all-done (no broken celebration)', async () => {
+    const store = usePrayersTrackingStore.getState();
+    await store.markPrayed('Fajr');
+    await store.markPrayed('Dhuhr');
+    await store.markPrayed('Asr');
+    await store.markPrayed('Maghrib');
+    await store.markPrayed('Isha');
+    // Tapping Isha again on an already-complete day returns true again, idempotently.
+    const result = await usePrayersTrackingStore.getState().markPrayed('Isha');
+    expect(result).toBe(true);
+  });
+
   it('preserves other days when marking today', async () => {
     await usePrayersTrackingStore.getState().markPrayed('Fajr', '2026-01-15');
     await usePrayersTrackingStore.getState().markPrayed('Dhuhr');
