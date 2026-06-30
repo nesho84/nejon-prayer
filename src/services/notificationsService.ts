@@ -194,6 +194,29 @@ async function cancelDisplayedNotification(notificationId: string) {
 }
 
 // ------------------------------------------------------------
+// Sweep stale displayed notifications (shown on an earlier day) — the day resets at Fajr.
+// Clears only in-tray notifications (app-scoped); scheduled triggers and today's stay untouched.
+// @Caution: best-effort — anchored to Fajr's DELIVERED, so a disabled or missed Fajr leaves the tray un-swept that day.
+// ------------------------------------------------------------
+export async function sweepStaleDisplayedNotifications() {
+  const today = toDateKey();
+  try {
+    const displayed = await notifee.getDisplayedNotifications();
+    for (const n of displayed) {
+      const notificationId = n.notification.id;
+      const shownDay = toDateKey(new Date(Number(n.date)));
+      if (notificationId && shownDay < today) {
+        await notifee.cancelDisplayedNotification(notificationId);
+      }
+    }
+    console.log('🧹 Stale displayed notifications swept');
+  } catch (err) {
+    console.error('❌ Failed to sweep displayed notifications', err);
+    Sentry.captureException(err);
+  }
+}
+
+// ------------------------------------------------------------
 // Parse time string and calculate next notification trigger time with offset
 // timeStringRaw: "HH:mm" format (e.g., "13:45" or "5:30")
 // tomorrowTimeStringRaw: tomorrow's actual time — falls back to today's if omitted/null/invalid

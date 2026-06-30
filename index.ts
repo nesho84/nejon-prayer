@@ -6,7 +6,7 @@ import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
 import TrackPlayer, { Event } from 'react-native-track-player';
-import { handleNotificationEvent } from './src/services/notificationsService';
+import { handleNotificationEvent, sweepStaleDisplayedNotifications } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
 import { usePrayersStore } from './src/store/prayersStore';
 import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
@@ -54,6 +54,12 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                 console.error('❌ [index.ts:Background] Failed to sync notifications in background:', err);
                 Sentry.captureException(err);
             }
+
+            // On the daily Fajr delivery, clear yesterday's leftover notifications from the tray
+            // @Caution: best-effort — skipped if Fajr is disabled or its delivery is missed
+            if (notification.data?.prayerName === 'Fajr') {
+                await sweepStaleDisplayedNotifications();
+            }
         }
 
         // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
@@ -79,6 +85,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             console.error('❌ [index.ts:Background] Failed to handle notification event:', err);
             Sentry.captureException(err);
         }
+
     } finally {
         // Headless tasks are torn down fast — flush so queued Sentry events upload before suspension.
         await Sentry.flush();

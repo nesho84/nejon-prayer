@@ -1,6 +1,5 @@
 import { SOUNDS } from '@/constants/sounds';
 import { scheduleNotificationsService } from '@/services/notificationsService';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { mmkvStorage } from '@/store/storage';
@@ -15,6 +14,7 @@ import {
 } from '@/types/notification.types';
 import { toDateKey } from '@/utils/datetime';
 import * as Sentry from '@sentry/react-native';
+import notifee, { AuthorizationStatus } from 'react-native-notify-kit';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { useHolidaysStore } from './holidaysStore';
@@ -77,13 +77,15 @@ export const useNotificationsStore = create<NotificationsState>()(
 
       // Main scheduling function in the store (called in useNotificationsSync)
       syncNotifications: async () => {
-        // Pull fresh data from other stores using getState()
-        const notificationPermission = useDeviceSettingsStore.getState().notificationPermission;
         const prayerTimes = usePrayersStore.getState().prayerTimes;
         const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
         const yearlyHolidays = useHolidaysStore.getState().yearlyHolidays;
         const language = useLanguageStore.getState().language;
         const tr = useLanguageStore.getState().tr;
+
+        // Read permission live: deviceSettingsStore's flag is empty in headless background (not persisted)
+        const ns = await notifee.getNotificationSettings();
+        const notificationPermission = ns.authorizationStatus === AuthorizationStatus.AUTHORIZED;
 
         // Extract current notification settings
         const { notifSettings, prayers, events, specials } = get();
@@ -163,8 +165,10 @@ export const useNotificationsStore = create<NotificationsState>()(
           // Sync notifications (hash prevents unnecessary reschedule)
           const result = await get().syncNotifications();
 
-          // Mark update complete for today
-          set({ lastBackgroundSync: today });
+          // Mark update complete for today — but not on failure, so the next delivery can retry
+          if (result !== 'failed') {
+            set({ lastBackgroundSync: today });
+          }
 
           const prayerTimes = usePrayersStore.getState().prayerTimes;
 

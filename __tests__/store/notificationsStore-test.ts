@@ -1,9 +1,9 @@
 import { scheduleNotificationsService } from '@/services/notificationsService';
-import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { PrayerTimes } from '@/types/prayer.types';
+import notifee from 'react-native-notify-kit';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: {
@@ -28,18 +28,22 @@ jest.mock('@/store/prayersStore', () => ({
   usePrayersStore: { getState: jest.fn() },
 }));
 
-jest.mock('@/store/deviceSettingsStore', () => ({
-  useDeviceSettingsStore: { getState: jest.fn() },
-}));
-
 jest.mock('@/store/languageStore', () => ({
   useLanguageStore: { getState: jest.fn() },
 }));
 
+jest.mock('react-native-notify-kit', () => ({
+  __esModule: true,
+  default: {
+    getNotificationSettings: jest.fn(() => Promise.resolve({ authorizationStatus: 'authorized' })),
+  },
+  AuthorizationStatus: { AUTHORIZED: 'authorized' },
+}));
+
 const mockSchedule = scheduleNotificationsService as jest.Mock;
 const mockPrayersGetState = (usePrayersStore as any).getState as jest.Mock;
-const mockDeviceGetState = (useDeviceSettingsStore as any).getState as jest.Mock;
 const mockLanguageGetState = (useLanguageStore as any).getState as jest.Mock;
+const mockGetNotifSettings = (notifee as any).getNotificationSettings as jest.Mock;
 
 const PRAYER_TIMES: PrayerTimes = {
   Imsak: '04:30', Fajr: '04:50', Sunrise: '06:20',
@@ -55,8 +59,8 @@ beforeEach(() => {
     isLoading: false, isReady: false,
   });
   mockLanguageGetState.mockReturnValue({ language: 'en', tr: TR_MOCK });
-  mockPrayersGetState.mockReturnValue({ prayerTimes: PRAYER_TIMES, yearlyPrayerTimes: null });
-  mockDeviceGetState.mockReturnValue({ notificationPermission: true });
+  mockPrayersGetState.mockReturnValue({ prayerTimes: PRAYER_TIMES, yearlyPrayerTimes: null, loadPrayerTimes: jest.fn() });
+  mockGetNotifSettings.mockResolvedValue({ authorizationStatus: 'authorized' });
 });
 
 describe('notificationsStore — setters', () => {
@@ -86,8 +90,8 @@ describe('notificationsStore — setters', () => {
 });
 
 describe('notificationsStore — syncNotifications', () => {
-  it('skips scheduling when notification permission is denied', async () => {
-    mockDeviceGetState.mockReturnValue({ notificationPermission: false });
+  it('skips scheduling when notification permission is denied (read live from notifee)', async () => {
+    mockGetNotifSettings.mockResolvedValue({ authorizationStatus: 'denied' });
     await useNotificationsStore.getState().syncNotifications();
     expect(mockSchedule).not.toHaveBeenCalled();
   });
@@ -116,5 +120,25 @@ describe('notificationsStore — syncNotifications', () => {
     mockSchedule.mockResolvedValue(undefined);
     await useNotificationsStore.getState().syncNotifications();
     expect(useNotificationsStore.getState().isLoading).toBe(false);
+  });
+});
+
+describe('notificationsStore — syncNotificationsInBackground', () => {
+  it('reschedules in headless context where the store flag would be empty (permission read live)', async () => {
+    mockSchedule.mockResolvedValue(undefined);
+    await useNotificationsStore.getState().syncNotificationsInBackground();
+    expect(mockSchedule).toHaveBeenCalledTimes(1);
+  });
+
+  it('marks lastBackgroundSync done when the reschedule succeeds', async () => {
+    mockSchedule.mockResolvedValue(undefined);
+    await useNotificationsStore.getState().syncNotificationsInBackground();
+    expect(useNotificationsStore.getState().lastBackgroundSync).not.toBeNull();
+  });
+
+  it('does NOT mark lastBackgroundSync on failure, so the next delivery can retry', async () => {
+    mockGetNotifSettings.mockResolvedValue({ authorizationStatus: 'denied' }); // → syncNotifications returns 'failed'
+    await useNotificationsStore.getState().syncNotificationsInBackground();
+    expect(useNotificationsStore.getState().lastBackgroundSync).toBeNull();
   });
 });

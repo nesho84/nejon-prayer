@@ -1,4 +1,4 @@
-import { getTriggerTime, getVibrationChannelId, scheduleNotificationsService } from '@/services/notificationsService';
+import { getTriggerTime, getVibrationChannelId, scheduleNotificationsService, sweepStaleDisplayedNotifications } from '@/services/notificationsService';
 import notifee from 'react-native-notify-kit';
 
 jest.mock('@sentry/react-native', () => ({
@@ -19,6 +19,8 @@ jest.mock('react-native-notify-kit', () => ({
     cancelTriggerNotification: jest.fn(() => Promise.resolve()),
     getNotificationSettings: jest.fn(() => Promise.resolve({ android: { alarm: 'enabled' } })),
     createTriggerNotification: jest.fn(() => Promise.resolve()),
+    getDisplayedNotifications: jest.fn(() => Promise.resolve([])),
+    cancelDisplayedNotification: jest.fn(() => Promise.resolve()),
   },
   AndroidCategory: {},
   AndroidColor: { GREEN: 'green' },
@@ -33,6 +35,8 @@ jest.mock('react-native-notify-kit', () => ({
 }));
 
 const mockCreateTrigger = notifee.createTriggerNotification as jest.Mock;
+const mockGetDisplayed = notifee.getDisplayedNotifications as jest.Mock;
+const mockCancelDisplayed = notifee.cancelDisplayedNotification as jest.Mock;
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -268,5 +272,38 @@ describe('getVibrationChannelId', () => {
   it('defaults to short when vibration is undefined or unrecognized', () => {
     expect(getVibrationChannelId(undefined)).toBe('nejonprayer-vib-short-v2');
     expect(getVibrationChannelId('bogus')).toBe('nejonprayer-vib-short-v2');
+  });
+});
+
+describe('sweepStaleDisplayedNotifications', () => {
+  // System time fixed at 2026-05-22 05:00 local → toDateKey() === "2026-05-22"
+  const NOW = new Date(2026, 4, 22, 5, 0, 0);
+  const yesterday = new Date(2026, 4, 21, 13, 0, 0).getTime();
+  const todayMorning = new Date(2026, 4, 22, 4, 50, 0).getTime();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.setSystemTime(NOW);
+    mockGetDisplayed.mockResolvedValue([
+      { notification: { id: 'prayer-dhuhr', data: { type: 'prayer' } }, date: String(yesterday) },               // earlier day → cancel
+      { notification: { id: 'special-friday', data: { type: 'special' } }, date: String(yesterday) },            // earlier day → cancel
+      { notification: { id: 'prayer-reminder-x', data: { type: 'prayer-reminder' } }, date: String(yesterday) }, // earlier day → cancel
+      { notification: { id: '0', data: {} }, date: String(yesterday) },                                          // earlier day → cancel
+      { notification: { id: 'prayer-fajr', data: { type: 'prayer' } }, date: String(todayMorning) },             // today → keep
+    ]);
+  });
+
+  it('cancels every notification shown on an earlier day, regardless of type', async () => {
+    await sweepStaleDisplayedNotifications();
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-dhuhr');
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('special-friday');
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-reminder-x');
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('0');
+    expect(mockCancelDisplayed).toHaveBeenCalledTimes(4);
+  });
+
+  it("keeps today's notifications", async () => {
+    await sweepStaleDisplayedNotifications();
+    expect(mockCancelDisplayed).not.toHaveBeenCalledWith('prayer-fajr');
   });
 });
