@@ -8,6 +8,7 @@ import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
+import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
@@ -190,6 +191,30 @@ export default function DebugPanel() {
     const { yearlyHolidays, fetchedYear } = useHolidaysStore.getState();
     showJsonViewerModal("Islamic Holidays", { fetchedYear, yearlyHolidays });
   };
+  const showQuranModal = () => {
+    const {
+      lastReadSurahName,
+      lastReadAyahId,
+      lastKhatamSurahName,
+      lastKhatamAyahId,
+      khatamCount,
+      arabicFontSize,
+      translationFontSize,
+      selectedEditions,
+      favoriteAyahs,
+    } = useQuranStore.getState();
+    showJsonViewerModal("Quran", {
+      lastReadSurahName,
+      lastReadAyahId,
+      lastKhatamSurahName,
+      lastKhatamAyahId,
+      khatamCount,
+      arabicFontSize,
+      translationFontSize,
+      selectedEditions,
+      favoriteAyahs,
+    });
+  };
 
   // Main component
   return (
@@ -261,9 +286,10 @@ export default function DebugPanel() {
 
           {/* JSON data in full screen modals */}
           <DebugButton label="Show 'Prayer Times - JSON' Modal" color={theme.gray} onPress={showPrayerTimesModal} />
-          <DebugButton label="Show 'Islamic Holidays - JSON' Modal" color={theme.gray} onPress={showHolidaysModal} />
           <DebugButton label="Show 'Prayer Tracking - JSON' Modal" color={theme.gray} onPress={showPrayerTrackingModal} />
           <DebugButton label="Show 'Scheduled Notifications - JSON' Modal" color={theme.gray} onPress={showScheduledNModal} />
+          <DebugButton label="Show 'Islamic Holidays - JSON' Modal" color={theme.gray} onPress={showHolidaysModal} />
+          <DebugButton label="Show 'Quran - JSON' Modal" color={theme.gray} onPress={showQuranModal} />
 
         </View>
       )}
