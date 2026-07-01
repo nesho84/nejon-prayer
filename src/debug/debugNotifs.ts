@@ -394,9 +394,35 @@ export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }:
 }
 
 // ------------------------------------------------------------
+// Returns all channels + scheduled notifications as a plain object
+// (for displaying in the debug JSON viewer modal)
+// ------------------------------------------------------------
+export async function getScheduledNData(): Promise<object> {
+    const channels = await notifee.getChannels();
+    const scheduled = await notifee.getTriggerNotifications();
+    const settings = await notifee.getNotificationSettings();
+    return {
+        channels: channels.map(c => ({
+            id: c.id,
+            name: c.name,
+            vibration: c.vibration,
+            vibrationPattern: c.vibrationPattern,
+            importance: c.importance,
+        })),
+        scheduled: scheduled.map(n => ({
+            id: n.notification.id,
+            channelId: n.notification.android?.channelId,
+            data: n.notification.data,
+            timestamp: (n.trigger as TimestampTrigger)?.timestamp,
+        })),
+        settings: settings,
+    };
+}
+
+// ------------------------------------------------------------
 // Debug utility: log all channels and scheduled notifications
 // ------------------------------------------------------------
-export async function debugScheduledN() {
+export async function logScheduledN() {
     try {
         const channels = await notifee.getChannels();
         const channelsObj = channels.map(c => ({

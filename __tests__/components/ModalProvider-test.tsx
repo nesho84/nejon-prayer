@@ -34,7 +34,7 @@ jest.mock('@react-native-vector-icons/ionicons/static', () => {
 });
 
 const mockTheme = {
-  bg2: '#ffffff', black: '#000', text: '#111', text2: '#555', card: '#eee',
+  bg: '#000', bg2: '#ffffff', black: '#000', text: '#111', text2: '#555', card: '#eee',
 };
 
 beforeEach(() => {
@@ -74,5 +74,25 @@ describe('ModalProvider', () => {
     fireEvent.press(screen.getByText('OK'));
     expect(onPress).toHaveBeenCalledTimes(1);
     expect(hide).toHaveBeenCalledWith('ok');
+  });
+
+  it('renders fullscreen modal with title + component and dismisses via the close icon', () => {
+    const { Text } = require('react-native');
+    const hide = jest.fn();
+    useModalStore.setState({
+      visible: true,
+      options: {
+        type: 'fullscreen',
+        title: 'Debug JSON',
+        showCloseIcon: true,
+        component: <Text>BODY</Text>,
+      },
+      hide,
+    } as any);
+    render(<ModalProvider />);
+    expect(screen.getByText('Debug JSON')).toBeTruthy();
+    expect(screen.getByText('BODY')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('icon-close'));
+    expect(hide).toHaveBeenCalledWith('dismiss');
   });
 });

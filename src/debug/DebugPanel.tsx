@@ -1,14 +1,19 @@
 import { openUpdateAvailableModal } from "@/components/CheckForUpdate";
 import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
+import { useModalStore } from "@/store/modalStore";
 import { useNotificationsStore } from "@/store/notificationsStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
+import { usePrayersStore } from "@/store/prayersStore";
+import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import * as Clipboard from "expo-clipboard";
 import { ReactNode, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { previewKhatamCelebrationModal, previewPrayerCelebrationModal } from "./debugCelebs";
 import {
   debugDailyQuoteN,
@@ -17,7 +22,8 @@ import {
   debugHolidayN,
   debugPrayerN,
   debugPrayerReminderN,
-  debugScheduledN
+  getScheduledNData,
+  logScheduledN,
 } from "./debugNotifs";
 
 interface ToggleProps {
@@ -38,6 +44,10 @@ interface BadgeProps {
   label: string;
   color: string;
   bg: string;
+}
+
+interface JsonViewerProps {
+  json: string;
 }
 
 // ------------------------------------------------------------
@@ -90,6 +100,58 @@ function DebugToggle({ label, color, value, onPress }: ToggleProps) {
   );
 }
 
+// ------------------------------------------------------------
+// JSON viewer for debugging: scrollable, selectable, copy-to-clipboard
+// ------------------------------------------------------------
+function JsonViewer({ json }: JsonViewerProps) {
+  const theme = useThemeStore((s) => s.theme);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(json);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: theme.bg2 }} contentContainerStyle={{ padding: 6 }}>
+        <Text
+          selectable
+          style={{
+            fontFamily: Platform.OS === "ios" ? "Courier New" : "monospace",
+            fontSize: 11,
+            color: theme.textMuted,
+            lineHeight: 17,
+          }}
+        >
+          {json}
+        </Text>
+      </ScrollView>
+      <TouchableOpacity
+        style={[styles.copyBtn, { backgroundColor: theme.green + "20" }]}
+        activeOpacity={0.7}
+        onPress={handleCopy}
+      >
+        <Text style={[styles.copyBtnText, { color: theme.green }]}>
+          {copied ? "Copied ✓" : "Copy JSON"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ------------------------------------------------------------
+// Open a fullscreen JSON viewer modal via ModalProvider
+// ------------------------------------------------------------
+const showJsonViewerModal = (title: string, data: object) =>
+  useModalStore.getState().show({
+    type: "fullscreen",
+    showCloseIcon: true,
+    title,
+    component: <JsonViewer json={JSON.stringify(data, null, 2)} />,
+  });
+
 // Renders the debug controls only — the containing AppCard + "Debug Tools"
 export default function DebugPanel() {
   // Stores
@@ -113,11 +175,21 @@ export default function DebugPanel() {
   // Local state
   const [expanded, setExpanded] = useState(false);
 
-  // Shared params
+  // Shared params and handlers
   const notifSeconds = 10; // seconds until the test notification fires
   const notifParams = { options: { language, location, hasAlarm: true }, notifSettings, notifSeconds };
   const notifSecondsBadge = <Badge label={`${notifSeconds}s`} color={theme.placeholder} bg={theme.overlay} />;
   const togglePreview = (value: UpdatePreview) => setUpdatePreview(updatePreview === value ? "idle" : value);
+  const showScheduledNModal = async () => showJsonViewerModal("Scheduled Notifications", await getScheduledNData());
+  const showPrayerTrackingModal = () => showJsonViewerModal("Prayer Tracking", usePrayersTrackingStore.getState().tracking);
+  const showPrayerTimesModal = () => {
+    const { prayerTimes, prayerTimesDate, fetchedYear, lastFetchedDate, prayersOutdated, prayersError } = usePrayersStore.getState();
+    showJsonViewerModal("Prayer Times", { fetchedYear, prayerTimesDate, lastFetchedDate, prayersError, prayersOutdated, prayerTimes });
+  };
+  const showHolidaysModal = () => {
+    const { yearlyHolidays, fetchedYear } = useHolidaysStore.getState();
+    showJsonViewerModal("Islamic Holidays", { fetchedYear, yearlyHolidays });
+  };
 
   // Main component
   return (
@@ -182,8 +254,16 @@ export default function DebugPanel() {
           <DebugButton label="Test Friday Not." color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
           <DebugButton label="Test Islamic Holiday Not." color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
           <DebugButton label="Test Daily Quote Not." color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
-          {/* Test Notifications: Channels & scheduled dump */}
-          <DebugButton label="Debug Channels & Scheduled" color={theme.gray} onPress={debugScheduledN} />
+          <DebugButton label="Log Channels & Scheduled" color={theme.orange} onPress={logScheduledN} />
+
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
+          {/* JSON data in full screen modals */}
+          <DebugButton label="Show 'Prayer Times - JSON' Modal" color={theme.gray} onPress={showPrayerTimesModal} />
+          <DebugButton label="Show 'Islamic Holidays - JSON' Modal" color={theme.gray} onPress={showHolidaysModal} />
+          <DebugButton label="Show 'Prayer Tracking - JSON' Modal" color={theme.gray} onPress={showPrayerTrackingModal} />
+          <DebugButton label="Show 'Scheduled Notifications - JSON' Modal" color={theme.gray} onPress={showScheduledNModal} />
 
         </View>
       )}
@@ -242,5 +322,16 @@ const styles = StyleSheet.create({
     width: "100%",
     height: StyleSheet.hairlineWidth,
     marginVertical: 4,
+  },
+
+  // Copy-to-clipboard button for JSON viewer
+  copyBtn: {
+    paddingVertical: 10,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  copyBtnText: {
+    fontSize: 13,
+    fontWeight: "600",
   },
 });

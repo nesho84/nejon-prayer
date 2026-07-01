@@ -126,8 +126,14 @@ export async function getYearlyHolidays(): Promise<{ holidays: YearlyHolidays; c
       // Only keep dates from the current or next Gregorian year
       if (gregYear < currentGregorianYear || gregYear > currentGregorianYear + 1) return;
 
-      // Append to the holiday's date list
-      (yearlyHolidays[match] ??= []).push(gregorianDate);
+      // Append to the holiday's date list (skip duplicates from the overlapping Hijri-year fetches)
+      if (!yearlyHolidays[match]) {
+        yearlyHolidays[match] = [];
+      }
+      const dates = yearlyHolidays[match];
+      if (!dates.includes(gregorianDate)) {
+        dates.push(gregorianDate);
+      }
     });
 
     console.log(`✅ [holidaysService] Normalized holidays for Hijri ${hijriYear - 1}-${hijriYear + 1} (Gregorian ${currentGregorianYear}-${currentGregorianYear + 1})`);

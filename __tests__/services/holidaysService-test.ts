@@ -192,6 +192,20 @@ describe('getYearlyHolidays', () => {
     await expect(getYearlyHolidays()).rejects.toThrow('All Hijri-year holiday fetches failed');
   });
 
+  it('dedupes the same holiday date returned by overlapping Hijri-year fetches', async () => {
+    // ramadan_start on 2026-02-18 is returned by BOTH the current and next Hijri-year fetches
+    (globalThis.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('/gToH/')) return jsonResponse({ data: { hijri: { year: '1447' } } });
+      if (url.includes('/islamicHolidaysByHijriYear/1446')) return jsonResponse({ data: [] });
+      if (url.includes('/islamicHolidaysByHijriYear/1447')) return jsonResponse({ data: [holidayDay(9, 1, '18-02-2026')] });
+      if (url.includes('/islamicHolidaysByHijriYear/1448')) return jsonResponse({ data: [holidayDay(9, 1, '18-02-2026')] });
+      return Promise.reject(new Error('unexpected url: ' + url));
+    });
+
+    const { holidays } = await getYearlyHolidays();
+    expect(holidays.ramadan_start).toEqual(['2026-02-18']); // kept once, not duplicated
+  });
+
   it('throws when the gToH lookup returns a non-OK response', async () => {
     (globalThis.fetch as jest.Mock).mockImplementation((url: string) =>
       url.includes('/gToH/') ? Promise.resolve({ ok: false, status: 500 }) : jsonResponse({ data: [] })

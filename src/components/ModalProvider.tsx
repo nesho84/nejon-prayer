@@ -18,12 +18,12 @@ export default function ModalProvider() {
   // Modal store
   const { visible, options, hide } = useModalStore();
 
-  // Safe area insets
+  // Safe area insets (base content padding baked in, like ImageViewer)
   const insets = useSafeAreaInsets();
   const topInset = insets.top + 4;
-  const bottomInset = insets.bottom;
-  const leftInset = insets.left;
-  const rightInset = insets.right;
+  const bottomInset = insets.bottom + 10;
+  const leftInset = insets.left + 12;
+  const rightInset = insets.right + 12;
 
   if (!options && !visible) return null;
 
@@ -156,17 +156,35 @@ export default function ModalProvider() {
     return (
       <Modal
         visible={visible}
+        transparent
         animationType={options.animationType ?? 'slide'}
         statusBarTranslucent
         onRequestClose={handleDismiss}
       >
-        <View style={[styles.fullscreen, { backgroundColor: theme.bg, paddingTop: topInset, paddingBottom: bottomInset, paddingLeft: leftInset, paddingRight: rightInset }]}>
-          {renderCloseIcon()}
-          {options.title && (
-            <Text style={[styles.title, { color: theme.text }, options.titleStyle]}>
-              {options.title}
-            </Text>
-          )}
+        {/* Solid background — always painted (like the alert overlay) */}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: theme.bg }]} />
+
+        <View style={[styles.fullscreen, { paddingTop: topInset, paddingBottom: bottomInset, paddingLeft: leftInset, paddingRight: rightInset }]}>
+
+          {/* Top row — title (left) + close (right) on the same line */}
+          <View style={styles.fullscreenTopRow}>
+            {options.title && (
+              <Text style={[styles.title, styles.fullscreenTitle, { color: theme.text }, options.titleStyle]} numberOfLines={1}>
+                {options.title}
+              </Text>
+            )}
+            {dismissable && options.showCloseIcon && (
+              <TouchableOpacity
+                style={[styles.fullscreenCloseBtn, { backgroundColor: theme.card }]}
+                onPress={handleDismiss}
+                hitSlop={8}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="close" size={20} color={theme.text2} />
+              </TouchableOpacity>
+            )}
+          </View>
+
           {options.content && (
             <Text style={[styles.content, { color: theme.text2 }, options.contentStyle]}>
               {options.content}
@@ -174,6 +192,7 @@ export default function ModalProvider() {
           )}
           {options.component}
           {options.buttons && renderButtons()}
+
         </View>
       </Modal>
     );
@@ -203,8 +222,23 @@ const styles = StyleSheet.create({
   },
   fullscreen: {
     flex: 1,
-    paddingHorizontal: 20,
     gap: 12,
+  },
+  fullscreenTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  fullscreenTitle: {
+    flex: 1,
+    marginTop: 8,
+  },
+  fullscreenCloseBtn: {
+    padding: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
   },
   closeIconContainer: {
     position: 'absolute',
