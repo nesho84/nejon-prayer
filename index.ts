@@ -1,5 +1,3 @@
-import 'expo-router/entry'; // This auto-registers the root app
-
 import { PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
@@ -10,6 +8,9 @@ import { handleNotificationEvent, sweepStaleDisplayedNotifications } from './src
 import { useNotificationsStore } from './src/store/notificationsStore';
 import { usePrayersStore } from './src/store/prayersStore';
 import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
+
+// Must stay last — registers the app entry after all side effects (Expo docs)
+import 'expo-router/entry';
 
 // ------------------------------------------------------------
 // Sentry initialization
