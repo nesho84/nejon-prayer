@@ -9,7 +9,7 @@ import { PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import notifee, { EventType } from 'react-native-notify-kit';
 
 export function useNotificationsSync() {
@@ -20,9 +20,6 @@ export function useNotificationsSync() {
   const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
   const language = useLanguageStore((state) => state.language);
   const tr = useLanguageStore((state) => state.tr);
-
-  // Ref to prevent race conditions
-  const isSchedulingRef = useRef(false);
 
   // ------------------------------------------------------------
   // CREATE notifications CHANNELS once on app load (Android only)
@@ -62,26 +59,9 @@ export function useNotificationsSync() {
   // ------------------------------------------------------------
   useEffect(() => {
     if (!deviceSettingsReady || !notificationsReady || !prayerTimes || !notificationPermission) return;
-    if (isSchedulingRef.current) return;
-
-    isSchedulingRef.current = true;
-    let cancelled = false;
-
-    const syncNotifications = async () => {
-      try {
-        await useNotificationsStore.getState().syncNotifications();
-      } catch (err) {
-        if (!cancelled) {
-          console.error('❌ Failed to schedule notifications:', err);
-          Sentry.captureException(err);
-        }
-      } finally {
-        isSchedulingRef.current = false;
-      }
-    };
-    syncNotifications();
-
-    return () => { cancelled = true; };
+    // Store coalesces concurrent syncs and never rejects — fire-and-forget.
+    // yearlyHolidays/language are re-trigger keys only — the sync reads them via getState.
+    useNotificationsStore.getState().syncNotifications();
   }, [deviceSettingsReady, notificationsReady, prayerTimes, yearlyHolidays, notificationPermission, language]);
 
   // ------------------------------------------------------------

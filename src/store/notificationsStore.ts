@@ -21,6 +21,10 @@ import { useHolidaysStore } from './holidaysStore';
 
 type SyncResult = 'rescheduled' | 'skipped' | 'failed';
 
+// Coalescing mutex — one sync at a time; calls during an active sync queue exactly one re-run
+let syncInProgress: Promise<SyncResult> | null = null;
+let syncQueued = false;
+
 interface NotificationsState {
   notifSettings: NotifSettings;
   prayers: Record<PrayerType, PrayerSettings>;
@@ -76,73 +80,103 @@ export const useNotificationsStore = create<NotificationsState>()(
       isReady: false,
 
       // Main scheduling function in the store (called in useNotificationsSync)
-      syncNotifications: async () => {
-        const prayerTimes = usePrayersStore.getState().prayerTimes;
-        const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
-        const yearlyHolidays = useHolidaysStore.getState().yearlyHolidays;
-        const language = useLanguageStore.getState().language;
-        const tr = useLanguageStore.getState().tr;
-
-        // Read permission live: deviceSettingsStore's flag is empty in headless background (not persisted)
-        const ns = await notifee.getNotificationSettings();
-        const notificationPermission = ns.authorizationStatus === AuthorizationStatus.AUTHORIZED;
-
-        // Extract current notification settings
-        const { notifSettings, prayers, events, specials } = get();
-
-        // Tomorrow's prayer times — used for correct scheduling of already-passed prayers
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowPrayerTimes = yearlyPrayerTimes?.[toDateKey(tomorrow)] ?? null;
-
-        // Check if prayerTimes are available
-        if (!notificationPermission || !prayerTimes) {
-          console.warn('⚠️  Cannot schedule notifications: Missing notification permission or prayer times');
-          return 'failed';
+      // Coalesced: concurrent calls share one run + at most one queued re-run on fresh state
+      syncNotifications: () => {
+        if (syncInProgress) {
+          syncQueued = true;
+          return syncInProgress;
         }
 
-        // 1. Create a hash of current settings
-        const currentHash = JSON.stringify({
-          prayerTimes,
-          prayers,
-          events,
-          specials,
-          yearlyHolidays,
-          language,
-          volume: notifSettings.volume,
-          vibration: notifSettings.vibration,
-          snooze: notifSettings.snooze
-        });
+        // Single pass — never rejects, so fire-and-forget setters are safe
+        const runOnce = async (): Promise<SyncResult> => {
+          try {
+            const prayerTimes = usePrayersStore.getState().prayerTimes;
+            const yearlyPrayerTimes = usePrayersStore.getState().yearlyPrayerTimes;
+            const yearlyHolidays = useHolidaysStore.getState().yearlyHolidays;
+            const language = useLanguageStore.getState().language;
+            const tr = useLanguageStore.getState().tr;
 
-        // 2. Compare with last scheduled hash to avoid unnecessary rescheduling
-        if (get().lastScheduledHash === currentHash) {
-          console.log('⏸️ [notificationsStore] Notification unchanged, skipping reschedule');
-          return 'skipped';
-        }
+            // Read permission live: deviceSettingsStore's flag is empty in headless background (not persisted)
+            const ns = await notifee.getNotificationSettings();
+            const notificationPermission = ns.authorizationStatus === AuthorizationStatus.AUTHORIZED;
 
-        set({ isLoading: true });
+            // Extract current notification settings
+            const { notifSettings, prayers, events, specials } = get();
 
-        try {
-          // 3. Call service to schedule notifications with current settings and prayer times
-          await scheduleNotificationsService({
-            prayerTimes,
-            tomorrowPrayerTimes,
-            yearlyHolidays,
-            config: { notifSettings, prayers, events, specials },
-            language,
-            tr
-          });
+            // Tomorrow's prayer times — used for correct scheduling of already-passed prayers
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowPrayerTimes = yearlyPrayerTimes?.[toDateKey(tomorrow)] ?? null;
 
-          // 4. Save hash after successful scheduling
-          set({ lastScheduledHash: currentHash });
-          return 'rescheduled';
-        } catch (err) {
-          console.error('❌ Failed to schedule notifications:', err);
-          Sentry.captureException(err);
-          return 'failed';
-        } finally {
-          set({ isLoading: false });
-        }
+            // Check if prayerTimes are available
+            if (!notificationPermission || !prayerTimes) {
+              console.warn('⚠️  Cannot schedule notifications: Missing notification permission or prayer times');
+              return 'failed';
+            }
+
+            // 1. Create a hash of current settings
+            const currentHash = JSON.stringify({
+              prayerTimes,
+              prayers,
+              events,
+              specials,
+              yearlyHolidays,
+              language,
+              volume: notifSettings.volume,
+              vibration: notifSettings.vibration,
+              snooze: notifSettings.snooze
+            });
+
+            // 2. Compare with last scheduled hash to avoid unnecessary rescheduling
+            if (get().lastScheduledHash === currentHash) {
+              console.log('⏸️ [notificationsStore] Notification unchanged, skipping reschedule');
+              return 'skipped';
+            }
+
+            set({ isLoading: true });
+
+            try {
+              // 3. Call service to schedule notifications with current settings and prayer times
+              await scheduleNotificationsService({
+                prayerTimes,
+                tomorrowPrayerTimes,
+                yearlyHolidays,
+                config: { notifSettings, prayers, events, specials },
+                language,
+                tr
+              });
+
+              // 4. Save hash after successful scheduling
+              set({ lastScheduledHash: currentHash });
+              return 'rescheduled';
+            } catch (err) {
+              console.error('❌ Failed to schedule notifications:', err);
+              Sentry.captureException(err);
+              return 'failed';
+            } finally {
+              set({ isLoading: false });
+            }
+          } catch (err) {
+            // Rejection before the schedule try (e.g. getNotificationSettings) must not escape
+            console.error('❌ Notification sync failed:', err);
+            Sentry.captureException(err);
+            return 'failed';
+          }
+        };
+
+        syncInProgress = (async () => {
+          try {
+            let result = await runOnce();
+            while (syncQueued) {
+              syncQueued = false;
+              result = await runOnce(); // fresh state re-read; hash skips unchanged re-runs
+            }
+            return result;
+          } finally {
+            syncInProgress = null; // in-body finally — no gap for a queued sync to drop
+          }
+        })();
+        return syncInProgress;
       },
 
       // Sync background notifications (called in root index.ts on background event)

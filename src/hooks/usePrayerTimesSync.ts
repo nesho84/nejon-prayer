@@ -10,17 +10,20 @@ export function usePrayerTimesSync() {
   const loadedDateRef = useRef(toDateKey());
 
   useEffect(() => {
+    // Sync check-and-claim — single-threaded JS, so interval + AppState can't double-fire
+    const reloadOnDayChange = () => {
+      const todayKey = toDateKey();
+      if (todayKey === loadedDateRef.current) return;
+      loadedDateRef.current = todayKey;
+      loadPrayerTimes();
+    };
+
     // Poll every 60s to detect day change while app in foreground.
     // A long setTimeout is unreliable on Android release builds — OEM Doze
     // (especially Samsung) throttles JS timers scheduled hours in advance.
     const intervalId = setInterval(() => {
       if (AppState.currentState !== 'active') return;
-
-      const todayKey = toDateKey();
-      if (todayKey !== loadedDateRef.current) {
-        loadedDateRef.current = todayKey;
-        loadPrayerTimes();
-      }
+      reloadOnDayChange();
     }, 60000); // 60s
 
     // ------------------------------------------------------------
@@ -28,11 +31,7 @@ export function usePrayerTimesSync() {
     // ------------------------------------------------------------
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-        const todayKey = toDateKey();
-        if (todayKey !== loadedDateRef.current) {
-          loadedDateRef.current = todayKey;
-          loadPrayerTimes();
-        }
+        reloadOnDayChange();
       }
 
       appStateRef.current = nextAppState;

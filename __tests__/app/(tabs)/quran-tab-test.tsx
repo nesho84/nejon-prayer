@@ -1,8 +1,10 @@
 import QuranTabScreen from '@/app/(tabs)/quran-tab';
 import { useLanguageStore } from '@/store/languageStore';
+import { useQuranPlayerStore } from '@/store/quranPlayerStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import TrackPlayer from 'react-native-track-player';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -60,10 +62,12 @@ jest.mock('@/services/quranService', () => ({
 jest.mock('@/components/QuranReadingCard', () => () => null);
 jest.mock('@/components/QuranSurahRow', () => {
   const React = require('react');
-  const { View, Text } = require('react-native');
-  return ({ surah }: any) =>
+  const { View, Text, TouchableOpacity } = require('react-native');
+  return ({ surah, onPlayPauseReplay, onStop }: any) =>
     React.createElement(View, { testID: `surah-${surah.id}` },
-      React.createElement(Text, null, surah.transliteration));
+      React.createElement(Text, null, surah.transliteration),
+      React.createElement(TouchableOpacity, { testID: `play-${surah.id}`, onPress: () => onPlayPauseReplay(surah) }),
+      React.createElement(TouchableOpacity, { testID: `stop-${surah.id}`, onPress: () => onStop(surah) }));
 });
 jest.mock('@/components/AppLoading', () => {
   const React = require('react');
@@ -109,6 +113,10 @@ beforeEach(() => {
     quranError: null,
     loadFullQuran: jest.fn(),
   } as any);
+  useQuranPlayerStore.setState({
+    isActive: false, isPlaying: false, isBuffering: false, hasFinished: false,
+    isSwitching: false, activeSurahId: null, activeSurahName: null, playbackError: null,
+  });
   jest.clearAllMocks();
 });
 
@@ -142,5 +150,47 @@ describe('QuranTabScreen', () => {
     fireEvent.changeText(input, 'Fatihah');
     expect(screen.getByTestId('surah-1')).toBeTruthy();
     expect(screen.queryByTestId('surah-2')).toBeNull();
+  });
+});
+
+describe('QuranTabScreen — playback handlers', () => {
+  it('starts a new surah and releases the switching lock', async () => {
+    render(<QuranTabScreen />);
+    fireEvent.press(screen.getByTestId('play-1'));
+
+    await waitFor(() => {
+      expect(TrackPlayer.play).toHaveBeenCalled();
+      expect(useQuranPlayerStore.getState().isSwitching).toBe(false);
+    });
+    expect(TrackPlayer.reset).toHaveBeenCalled();
+    expect(TrackPlayer.add).toHaveBeenCalled();
+    expect(useQuranPlayerStore.getState().activeSurahId).toBe(1);
+  });
+
+  it('clears the switching lock and stores the error when play fails', async () => {
+    (TrackPlayer.play as jest.Mock).mockRejectedValueOnce(new Error('stream failed'));
+    render(<QuranTabScreen />);
+    fireEvent.press(screen.getByTestId('play-1'));
+
+    // Regression: a rejected await must not strand isSwitching (stuck buffering UI)
+    await waitFor(() => {
+      const s = useQuranPlayerStore.getState();
+      expect(s.playbackError).toBeTruthy();
+      expect(s.isSwitching).toBe(false);
+    });
+  });
+
+  it('resets playback state even when stop fails', async () => {
+    useQuranPlayerStore.setState({ isActive: true, isPlaying: true, activeSurahId: 2, activeSurahName: 'Al-Baqarah' });
+    (TrackPlayer.stop as jest.Mock).mockRejectedValueOnce(new Error('native error'));
+    render(<QuranTabScreen />);
+    fireEvent.press(screen.getByTestId('stop-2'));
+
+    await waitFor(() => {
+      const s = useQuranPlayerStore.getState();
+      expect(s.isActive).toBe(false);
+      expect(s.isPlaying).toBe(false);
+      expect(s.activeSurahId).toBeNull();
+    });
   });
 });

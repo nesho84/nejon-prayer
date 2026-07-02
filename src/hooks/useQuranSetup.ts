@@ -39,6 +39,7 @@ export function useQuranSetup() {
           return;
         }
         console.error('❌ TrackPlayer setup failed:', err);
+        return; // player not initialized — getActiveTrack/getPlaybackState would reject
       }
 
       // Sync active track (user started audio → left app → came back)

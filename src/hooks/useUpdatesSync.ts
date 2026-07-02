@@ -44,6 +44,7 @@ export function useUpdatesSync() {
       }
     };
 
+    // Call both checks once on app mount
     checkOtaUpdate();
     checkStoreUpdate();
   }, []);

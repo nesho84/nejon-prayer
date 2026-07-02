@@ -67,55 +67,66 @@ export default function QuranTabScreen() {
   // Play / Pause / Replay handler
   // ------------------------------------------------------------
   const handlePlayPauseReplay = useCallback(async (surah: Surah) => {
-    const currentTrack = await TrackPlayer.getActiveTrack();
-    if (currentTrack && activeSurahId === surah.id) {
-      if (hasFinished) {
-        // Replay from start
-        await TrackPlayer.seekTo(0);
-        await TrackPlayer.play();
-      } else if (isPlaying) {
-        // Pause current
-        await TrackPlayer.pause();
-      } else {
-        // Resume current
-        await TrackPlayer.play();
+    try {
+      const currentTrack = await TrackPlayer.getActiveTrack();
+      if (currentTrack && activeSurahId === surah.id) {
+        if (hasFinished) {
+          // Replay from start
+          await TrackPlayer.seekTo(0);
+          await TrackPlayer.play();
+        } else if (isPlaying) {
+          // Pause current
+          await TrackPlayer.pause();
+        } else {
+          // Resume current
+          await TrackPlayer.play();
+        }
+        return;
       }
-      return;
+
+      // New surah → stop current, load and play new
+      syncPlayback({
+        isSwitching: true,
+        activeSurahId: surah.id,
+        activeSurahName: surah.transliteration,
+        playbackError: null,
+      });
+
+      // Reset/Clear the foreground/live notification
+      await TrackPlayer.reset();
+
+      // Add new track and play
+      const audioUrl = getSurahAudioUrl(surah.id);
+      await TrackPlayer.add({
+        id: `surah-${surah.id}`,
+        url: audioUrl,
+        title: surah.transliteration,
+        artist: AUDIO_EDITIONS.alafasy,
+        isLiveStream: false,
+      });
+      await TrackPlayer.play();
+    } catch (err) {
+      console.error('❌ [quran-tab] Playback failed:', err);
+      syncPlayback({ playbackError: err, isPlaying: false, isBuffering: false });
+    } finally {
+      // Always release listener lock — a rejected await must not strand the buffering UI
+      syncPlayback({ isSwitching: false });
     }
-
-    // New surah → stop current, load and play new
-    syncPlayback({
-      isSwitching: true,
-      activeSurahId: surah.id,
-      activeSurahName: surah.transliteration,
-      playbackError: null,
-    });
-
-    // Reset/Clear the foreground/live notification
-    await TrackPlayer.reset();
-
-    // Add new track and play
-    const audioUrl = getSurahAudioUrl(surah.id);
-    await TrackPlayer.add({
-      id: `surah-${surah.id}`,
-      url: audioUrl,
-      title: surah.transliteration,
-      artist: AUDIO_EDITIONS.alafasy,
-      isLiveStream: false,
-    });
-    await TrackPlayer.play();
-
-    // Release listener lock
-    syncPlayback({ isSwitching: false });
   }, [activeSurahId, isPlaying, hasFinished]);
 
   // ------------------------------------------------------------
   // Stop handler
   // ------------------------------------------------------------
   const handleStop = useCallback(async (surah: Surah) => {
-    if (activeSurahId === surah.id) {
+    if (activeSurahId !== surah.id) return;
+    try {
       await TrackPlayer.stop();
 
+      // Reset/Clear the foreground/live notification
+      await TrackPlayer.reset();
+    } catch (err) {
+      console.error('❌ [quran-tab] Stop failed:', err);
+    } finally {
       // Reset all playback-related state in the store
       syncPlayback({
         isActive: false,
@@ -127,9 +138,6 @@ export default function QuranTabScreen() {
         activeSurahName: null,
         playbackError: null,
       });
-
-      // Reset/Clear the foreground/live notification
-      await TrackPlayer.reset();
     }
   }, [activeSurahId]);
 

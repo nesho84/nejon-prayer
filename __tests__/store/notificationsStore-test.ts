@@ -3,6 +3,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { PrayerTimes } from '@/types/prayer.types';
+import * as Sentry from '@sentry/react-native';
 import notifee from 'react-native-notify-kit';
 
 jest.mock('@/store/storage', () => ({
@@ -140,5 +141,44 @@ describe('notificationsStore — syncNotificationsInBackground', () => {
     mockGetNotifSettings.mockResolvedValue({ authorizationStatus: 'denied' }); // → syncNotifications returns 'failed'
     await useNotificationsStore.getState().syncNotificationsInBackground();
     expect(useNotificationsStore.getState().lastBackgroundSync).toBeNull();
+  });
+});
+
+describe('notificationsStore — syncNotifications concurrency', () => {
+  it('coalesces concurrent calls into one shared promise', async () => {
+    mockSchedule.mockResolvedValue(undefined);
+    const p1 = useNotificationsStore.getState().syncNotifications();
+    const p2 = useNotificationsStore.getState().syncNotifications();
+    expect(p2).toBe(p1);                           // second caller gets the same promise
+    await p1;
+    expect(mockSchedule).toHaveBeenCalledTimes(1); // queued re-run hash-skips — no double reschedule
+  });
+
+  it('a call landing mid-sync queues one re-run that reads fresh state', async () => {
+    // First schedule call blocks until released, so a settings change can land mid-run
+    let releaseFirst!: () => void;
+    let markStarted!: () => void;
+    const firstStarted = new Promise<void>((res) => { markStarted = res; });
+    mockSchedule
+      .mockImplementationOnce(() => { markStarted(); return new Promise<void>((r) => { releaseFirst = r; }); })
+      .mockResolvedValue(undefined);
+
+    const p = useNotificationsStore.getState().syncNotifications();
+    await firstStarted; // run 1 has captured its (old) state snapshot
+
+    const flipped = !useNotificationsStore.getState().prayers.Fajr.enabled;
+    useNotificationsStore.getState().setPrayer('Fajr', { enabled: flipped }); // queues re-run
+    releaseFirst();
+    await p;
+
+    expect(mockSchedule).toHaveBeenCalledTimes(2); // stale run + fresh re-run
+    expect(mockSchedule.mock.calls[1][0].config.prayers.Fajr.enabled).toBe(flipped);
+  });
+
+  it("resolves 'failed' (never rejects) when a pre-schedule call rejects", async () => {
+    mockGetNotifSettings.mockRejectedValue(new Error('notifee unavailable'));
+    await expect(useNotificationsStore.getState().syncNotifications()).resolves.toBe('failed');
+    expect(mockSchedule).not.toHaveBeenCalled();
+    expect(Sentry.captureException).toHaveBeenCalled();
   });
 });
