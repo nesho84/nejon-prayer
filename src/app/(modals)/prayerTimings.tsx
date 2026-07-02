@@ -136,8 +136,8 @@ export default function PrayersSettingsScreen() {
         if (!isPast) return;
 
         isPrayed
-            ? unmarkPrayed(prayerName as PrayerName, selectedDateKey)
-            : await markPrayed(prayerName as PrayerName, selectedDateKey);
+            ? unmarkPrayed(prayerName as PrayerName, selectedDateKey, 'calendar')
+            : await markPrayed(prayerName as PrayerName, selectedDateKey, 'calendar');
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
 
     // ------------------------------------------------------------
@@ -286,7 +286,7 @@ export default function PrayersSettingsScreen() {
                                 const isLast = index === prayerEntries.length - 1;
                                 const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
                                 const isPast = isTrackable && (isSelectedPastDay || (isSelectedToday && isTimePast(prayerTime)));
-                                const isPrayed = isTrackable && tracking[selectedDateKey]?.[prayerName as PrayerName] === 'prayed';
+                                const isPrayed = isTrackable && tracking[selectedDateKey]?.[prayerName as PrayerName]?.status === 'prayed';
 
                                 return (
                                     <View key={prayerName}>

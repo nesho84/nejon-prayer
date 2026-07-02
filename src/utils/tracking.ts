@@ -1,6 +1,9 @@
 import { MAIN_PRAYERS, PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 
+// This counter only needs each prayer's status
+type PrayerStatus = { status: 'prayed' | null };
+
 // ------------------------------------------------------------
 // Date to track a prayer against on the "Prayed" action tap. Uses the tap
 // moment + prayer identity, not the notification's frozen date (stale across
@@ -28,10 +31,10 @@ export function resolveTrackingDate(prayerName: PrayerName, fajrTime: string | u
 // Returns how many trackable prayers were prayed on a given day
 // ------------------------------------------------------------
 export const getDayPrayedCount = (
-  tracking: Record<string, Partial<Record<string, 'prayed' | null>>>,
+  tracking: Record<string, Partial<Record<string, PrayerStatus>>>,
   dateKey: string,
 ): number => {
   const day = tracking[dateKey];
   if (!day) return 0;
-  return MAIN_PRAYERS.filter((p) => day[p] === 'prayed').length;
+  return MAIN_PRAYERS.filter((p) => day[p]?.status === 'prayed').length;
 };

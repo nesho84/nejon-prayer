@@ -70,7 +70,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
                     const today = toDateKey();
                     const fajrTime = usePrayersStore.getState().yearlyPrayerTimes?.[today]?.Fajr;
                     const dateToUse = resolveTrackingDate(prayerName, fajrTime);
-                    await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
+                    await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse, 'notif-bg');
                 }
             } catch (err) {
                 console.error('❌ [index.ts:Background] Failed to mark prayer as prayed:', err);

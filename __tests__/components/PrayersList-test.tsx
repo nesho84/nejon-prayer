@@ -70,7 +70,7 @@ describe('PrayersList', () => {
     usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName="Fajr" />);
     fireEvent.press(screen.getByText('Fajr'));
-    expect(markPrayed).toHaveBeenCalledWith('Fajr');
+    expect(markPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
   });
 });
 
@@ -90,7 +90,7 @@ describe('PrayersList — past / future / unmark logic', () => {
     usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
     fireEvent.press(screen.getByText('Fajr')); // 04:50 — past at noon
-    expect(markPrayed).toHaveBeenCalledWith('Fajr');
+    expect(markPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
   });
 
   it('pressing a future prayer does nothing', () => {
@@ -105,13 +105,13 @@ describe('PrayersList — past / future / unmark logic', () => {
     const unmarkPrayed = jest.fn();
     const today = toDateKey();
     usePrayersTrackingStore.setState({
-      tracking: { [today]: { Fajr: 'prayed' } },
+      tracking: { [today]: { Fajr: { status: 'prayed' } } },
       celebratedDate: null,
       markPrayed: jest.fn(() => false),
       unmarkPrayed,
     } as any);
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={today} currentPrayerName={null} />);
     fireEvent.press(screen.getByText('Fajr')); // already prayed → unmark
-    expect(unmarkPrayed).toHaveBeenCalledWith('Fajr');
+    expect(unmarkPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
   });
 });

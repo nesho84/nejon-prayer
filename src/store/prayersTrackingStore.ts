@@ -4,15 +4,27 @@ import { toDateKey } from '@/utils/datetime';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-type DayTracking = Partial<Record<PrayerName, 'prayed' | null>>;
+// Where a mark/unmark originated — key diagnostic for wrong-date / headless-JS bugs
+type MarkSource = 'home' | 'calendar' | 'notif-fg' | 'notif-bg' | 'unknown';
+
+// Per-prayer entry: status plus trace metadata (absent key = never touched)
+interface PrayerMark {
+  status: 'prayed' | null;    // same meaning as the old bare string; null = unmarked
+  markedAt: string | null;    // en-GB formatted timestamp of last mark
+  unmarkedAt: string | null;  // en-GB formatted timestamp of last unmark (kept after re-mark)
+  source: MarkSource;         // origin of the last action
+  toggles: number;            // count of mark+unmark actions on this prayer/day
+}
+
+type DayTracking = Partial<Record<PrayerName, PrayerMark>>;
 type TrackingRecord = Record<string, DayTracking>;
 
 interface PrayersTrackingState {
   tracking: TrackingRecord;
   isReady: boolean;
   celebratedDate: string | null;
-  markPrayed: (prayer: PrayerName, dateKey?: string) => Promise<boolean>;
-  unmarkPrayed: (prayer: PrayerName, dateKey?: string) => void;
+  markPrayed: (prayer: PrayerName, dateKey?: string, source?: MarkSource) => Promise<boolean>;
+  unmarkPrayed: (prayer: PrayerName, dateKey?: string, source?: MarkSource) => void;
   setCelebrated: (dateKey: string) => void;
 }
 
@@ -41,36 +53,46 @@ export const usePrayersTrackingStore = create<PrayersTrackingState>()(
       isReady: false,
       celebratedDate: null,
 
-      markPrayed: async (prayer, dateKey) => {
+      markPrayed: async (prayer, dateKey, source = 'unknown') => {
         const key = dateKey ?? toDateKey();
-        set((state) => ({
-          tracking: {
-            ...state.tracking,
-            [key]: { ...state.tracking[key], [prayer]: 'prayed' },
-          },
-        }));
+        set((state) => {
+          const prev = state.tracking[key]?.[prayer];
+          const mark: PrayerMark = {
+            status: 'prayed',
+            markedAt: new Date().toLocaleString('en-GB'),
+            unmarkedAt: prev?.unmarkedAt ?? null,
+            source,
+            toggles: (prev?.toggles ?? 0) + 1,
+          };
+          return { tracking: { ...state.tracking, [key]: { ...state.tracking[key], [prayer]: mark } } };
+        });
         // Returns whether all prayers are done for that day.
         // Return value is optional — callers that don't need it can ignore it.
         const { tracking } = get();
         const isToday = key === toDateKey();
-        const allDone = MAIN_PRAYERS.every((p) => tracking[key]?.[p] === 'prayed');
+        const allDone = MAIN_PRAYERS.every((p) => tracking[key]?.[p]?.status === 'prayed');
         return isToday && allDone;
       },
 
-      unmarkPrayed: (prayer, dateKey) => {
+      unmarkPrayed: (prayer, dateKey, source = 'unknown') => {
         const key = dateKey ?? toDateKey();
-        set((state) => ({
-          tracking: {
-            ...state.tracking,
-            [key]: { ...state.tracking[key], [prayer]: null },
-          },
-        }));
+        set((state) => {
+          const prev = state.tracking[key]?.[prayer];
+          const mark: PrayerMark = {
+            status: null,
+            markedAt: prev?.markedAt ?? null,
+            unmarkedAt: new Date().toLocaleString('en-GB'),
+            source,
+            toggles: (prev?.toggles ?? 0) + 1,
+          };
+          return { tracking: { ...state.tracking, [key]: { ...state.tracking[key], [prayer]: mark } } };
+        });
       },
 
       setCelebrated: (dateKey) => set({ celebratedDate: dateKey }),
     }),
     {
-      name: 'prayer-tracking-storage',
+      name: 'prayer-tracking-storage-v2',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         tracking: state.tracking,

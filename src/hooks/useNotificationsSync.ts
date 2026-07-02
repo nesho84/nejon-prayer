@@ -108,7 +108,7 @@ export function useNotificationsSync() {
             const today = toDateKey();
             const fajrTime = usePrayersStore.getState().yearlyPrayerTimes?.[today]?.Fajr;
             const dateToUse = resolveTrackingDate(prayerName, fajrTime);
-            await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse);
+            await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse, 'notif-fg');
           }
         } catch (err) {
           console.error('❌ [useNotificationsSync:Foreground] Failed to mark prayer as prayed:', err);

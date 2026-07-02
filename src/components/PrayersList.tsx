@@ -47,11 +47,11 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
 
     // If already marked as prayed, unmark it
     if (isPrayed) {
-      unmarkPrayed(prayerName);
+      unmarkPrayed(prayerName, undefined, 'home');
       return;
     }
     // Mark as prayed and check if all prayers are done for today
-    const prayersComplete = await markPrayed(prayerName);
+    const prayersComplete = await markPrayed(prayerName, undefined, 'home');
 
     const today = toDateKey();
     const alreadyCelebrated = celebratedDate === today;
@@ -106,7 +106,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         const isPast = isTrackable && isToday && isTimePast(prayerTime);
         const isCurrent = isToday && currentPrayerName === prayerName;
         const isFriday = forceFriday || (prayerTimesDate != null && new Date(prayerTimesDate).getDay() === 5); // 0=Sun, 1=Mon, ..., 5=Fri
-        const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName] === 'prayed';
+        const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName]?.status === 'prayed';
 
         return (
           <PrayerRow

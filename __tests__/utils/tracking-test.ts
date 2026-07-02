@@ -6,22 +6,22 @@ describe('getDayPrayedCount', () => {
   });
 
   it('returns 0 when no prayers are marked as prayed', () => {
-    const tracking = { '2024-01-05': { Fajr: null, Dhuhr: null, Asr: null, Maghrib: null, Isha: null } } as const;
+    const tracking = { '2024-01-05': { Fajr: { status: null }, Dhuhr: { status: null }, Asr: { status: null }, Maghrib: { status: null }, Isha: { status: null } } } as const;
     expect(getDayPrayedCount(tracking, '2024-01-05')).toBe(0);
   });
 
   it('counts only prayers marked as prayed', () => {
-    const tracking = { '2024-01-05': { Fajr: 'prayed', Dhuhr: 'prayed', Asr: null, Maghrib: null, Isha: null } } as const;
+    const tracking = { '2024-01-05': { Fajr: { status: 'prayed' }, Dhuhr: { status: 'prayed' }, Asr: { status: null }, Maghrib: { status: null }, Isha: { status: null } } } as const;
     expect(getDayPrayedCount(tracking, '2024-01-05')).toBe(2);
   });
 
   it('returns 5 when all main prayers are prayed', () => {
-    const tracking = { '2024-01-05': { Fajr: 'prayed', Dhuhr: 'prayed', Asr: 'prayed', Maghrib: 'prayed', Isha: 'prayed' } } as const;
+    const tracking = { '2024-01-05': { Fajr: { status: 'prayed' }, Dhuhr: { status: 'prayed' }, Asr: { status: 'prayed' }, Maghrib: { status: 'prayed' }, Isha: { status: 'prayed' } } } as const;
     expect(getDayPrayedCount(tracking, '2024-01-05')).toBe(5);
   });
 
   it('returns 0 for a different date key', () => {
-    const tracking = { '2024-01-05': { Fajr: 'prayed' } } as const;
+    const tracking = { '2024-01-05': { Fajr: { status: 'prayed' } } } as const;
     expect(getDayPrayedCount(tracking, '2024-01-06')).toBe(0);
   });
 });
