@@ -1,0 +1,32 @@
+import { create } from "zustand";
+
+type QuranPlayerData = {
+  isActive: boolean;
+  isPlaying: boolean;
+  isBuffering: boolean;
+  hasFinished: boolean;
+  isSwitching: boolean;
+  activeSurahId: number | null;
+  activeSurahName: string | null;
+  playbackError: unknown;
+}
+
+interface QuranPlayerState extends QuranPlayerData {
+  syncPlayback: (payload: Partial<QuranPlayerData>) => void;
+}
+
+export const useQuranPlayerStore = create<QuranPlayerState>()((set) => ({
+  // Player state
+  isActive: false,
+  isPlaying: false,
+  isBuffering: false,
+  hasFinished: false,
+  isSwitching: false,
+  activeSurahId: null,
+  activeSurahName: null,
+  playbackError: null,
+
+  // Sync any playback-related state fields into the store
+  // Accepts a partial payload — only passed fields are updated (shallow merge)
+  syncPlayback: (payload) => set(payload),
+}));

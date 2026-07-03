@@ -1,3 +1,5 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
 # dependencies
 node_modules/
 
@@ -8,8 +10,6 @@ web-build/
 expo-env.d.ts
 
 # Native
-/android
-/ios
 .kotlin/
 *.orig.*
 *.jks
@@ -33,12 +33,18 @@ yarn-error.*
 # local env files
 .env*.local
 
-# assets
-assets/psd/
-
 # typescript
 *.tsbuildinfo
 
-# IDE - VSCode
-/.vscode
-**/.vscode/
+example
+
+# generated native folders
+/ios
+/android
+
+# testing
+coverage/
+
+# Claude Code
+.claude/
+.claude/settings.local.json

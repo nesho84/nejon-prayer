@@ -1,0 +1,110 @@
+import { createNotificationCategories, createNotificationsChannels, handleNotificationEvent, sweepStaleDisplayedNotifications } from '@/services/notificationsService';
+import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useHolidaysStore } from '@/store/holidaysStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { useNotificationsStore } from '@/store/notificationsStore';
+import { usePrayersStore } from '@/store/prayersStore';
+import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
+import { PrayerName } from '@/types/prayer.types';
+import { toDateKey } from '@/utils/datetime';
+import { resolveTrackingDate } from '@/utils/tracking';
+import * as Sentry from '@sentry/react-native';
+import { useEffect } from 'react';
+import notifee, { EventType } from 'react-native-notify-kit';
+
+export function useNotificationsSync() {
+  const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
+  const notificationsReady = useNotificationsStore((state) => state.isReady);
+  const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+  const prayerTimes = usePrayersStore((state) => state.prayerTimes);
+  const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
+  const language = useLanguageStore((state) => state.language);
+  const tr = useLanguageStore((state) => state.tr);
+
+  // ------------------------------------------------------------
+  // CREATE notifications CHANNELS once on app load (Android only)
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const initChannels = async () => {
+      try {
+        await createNotificationsChannels();
+        // console.log('✅ Notification channels created or already exist');
+      } catch (err) {
+        console.error('Failed to create notification channels:', err);
+        Sentry.captureException(err);
+      }
+    };
+    initChannels();
+  }, []);
+
+  // ------------------------------------------------------------
+  // CREATE notification CATEGORIES (action buttons) on app load (iOS only)
+  // Re-registered when language changes so action titles stay localized
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const initCategories = async () => {
+      try {
+        await createNotificationCategories(tr);
+      } catch (err) {
+        console.error('Failed to create notification categories:', err);
+        Sentry.captureException(err);
+      }
+    };
+    initCategories();
+  }, [tr]);
+
+  // ------------------------------------------------------------
+  // AUTO-SCHEDULE notifications when prayer times are ready and notifications are enabled
+  // This runs on initial load and whenever something changes
+  // ------------------------------------------------------------
+  useEffect(() => {
+    if (!deviceSettingsReady || !notificationsReady || !prayerTimes || !notificationPermission) return;
+    // Store coalesces concurrent syncs and never rejects — fire-and-forget.
+    // yearlyHolidays/language are re-trigger keys only — the sync reads them via getState.
+    useNotificationsStore.getState().syncNotifications();
+  }, [deviceSettingsReady, notificationsReady, prayerTimes, yearlyHolidays, notificationPermission, language]);
+
+  // ------------------------------------------------------------
+  // Notifee - FOREGROUND event handler
+  // Listens for notification events while the app is in the foreground
+  // ------------------------------------------------------------
+  useEffect(() => {
+    const unsubscribe = notifee.onForegroundEvent(async ({ type, detail }) => {
+      const { notification, pressAction } = detail;
+
+      if (!notification) return;
+
+      // On the daily Fajr delivery, clear yesterday's leftover notifications from the tray
+      // @Caution: best-effort — skipped if Fajr is disabled or its delivery is missed
+      if (type === EventType.DELIVERED && notification.data?.prayerName === 'Fajr') {
+        await sweepStaleDisplayedNotifications();
+      }
+
+      // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
+      if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
+        try {
+          const prayerName = notification.data?.prayerName as PrayerName | undefined;
+          if (prayerName) {
+            const today = toDateKey();
+            const fajrTime = usePrayersStore.getState().yearlyPrayerTimes?.[today]?.Fajr;
+            const dateToUse = resolveTrackingDate(prayerName, fajrTime);
+            await usePrayersTrackingStore.getState().markPrayed(prayerName, dateToUse, 'notif-fg');
+          }
+        } catch (err) {
+          console.error('❌ [useNotificationsSync:Foreground] Failed to mark prayer as prayed:', err);
+          Sentry.captureException(err);
+        }
+      }
+
+      // Handled in notificationsService for both foreground and background
+      try {
+        await handleNotificationEvent(type, notification, pressAction, 'foreground', useNotificationsStore.getState().notifSettings);
+      } catch (err) {
+        console.error('❌ [useNotificationsSync:Foreground] Failed to handle notification event:', err);
+        Sentry.captureException(err);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+}

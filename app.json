@@ -2,45 +2,49 @@
   "expo": {
     "name": "Nejon Prayer",
     "slug": "nejon-prayer",
-    "version": "2.2.0",
-    "orientation": "portrait",
+    "version": "2.2.8",
+    "orientation": "default",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "jsEngine": "hermes",
     "owner": "nesho84",
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "splash": {
-      "image": "./assets/icons/splash-icon-dark.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "updates": {
+      "url": "https://u.expo.dev/4d4c4cab-c707-41be-b1a4-3d6d6d3e5781",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
     },
     "android": {
-      "versionCode": 40,
+      "versionCode": 48,
       "package": "com.nejon.nejonprayer",
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "monochromeImage": "./assets/icons/adaptive-icon.png",
+        "foregroundImage": "./assets/icons/android-icon-foreground.png",
+        "monochromeImage": "./assets/icons/android-icon-monochrome.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
-        "android.permission.USE_EXACT_ALARM",
         "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
         "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.WAKE_LOCK",
         "android.permission.VIBRATE",
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
       ]
     },
     "ios": {
-      "buildNumber": "40",
+      "buildNumber": "48",
       "bundleIdentifier": "com.nejon.nejonprayer",
       "supportsTablet": true,
       "infoPlist": {
@@ -67,6 +71,14 @@
     "plugins": [
       "./src/plugins/resBuild.js",
       "expo-router",
+      "expo-status-bar",
+      "expo-font",
+      "@react-native-vector-icons/ionicons",
+      "@react-native-vector-icons/material-icons",
+      "@react-native-vector-icons/material-design-icons",
+      "@react-native-vector-icons/feather",
+      "@react-native-community/datetimepicker",
+      "react-native-notify-kit",
       [
         "expo-splash-screen",
         {
@@ -78,6 +90,12 @@
             "image": "./assets/icons/splash-icon-light.png",
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "enforceContrast": true
         }
       ],
       [
@@ -96,16 +114,21 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0",
-            "extraMavenRepos": [
-              "../../node_modules/@notifee/react-native/android/libs"
-            ]
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "buildToolsVersion": "36.0.0"
           },
           "ios": {
-            "deploymentTarget": "15.1"
+            "deploymentTarget": "16.4"
           }
+        }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "nejonnet"
         }
       ]
     ],

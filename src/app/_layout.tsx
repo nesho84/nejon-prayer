@@ -1,0 +1,70 @@
+import AppLoading from "@/components/AppLoading";
+import ModalProvider from "@/components/ModalProvider";
+import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
+import { useHolidaysSync } from "@/hooks/useHolidaysSync";
+import { useNotificationsSync } from "@/hooks/useNotificationsSync";
+import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
+import { useQuranSetup } from "@/hooks/useQuranSetup";
+import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
+import { useUpdatesSync } from "@/hooks/useUpdatesSync";
+import { useOnboardingStore } from "@/store/onboardingStore";
+import * as Sentry from '@sentry/react-native';
+import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+
+const RootStack = () => {
+  const isReady = useOnboardingStore((state) => state.isReady);
+  const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
+
+  if (!isReady) return <AppLoading />;
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Onboarding */}
+      <Stack.Protected guard={!onboardingComplete}>
+        <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
+      </Stack.Protected>
+
+      {/* Main app only after onboarding */}
+      <Stack.Protected guard={onboardingComplete}>
+        <Stack.Screen name="(tabs)" options={{ animation: "default" }} />
+        <Stack.Screen name="extras" options={{ animation: "ios_from_right" }} />
+        <Stack.Screen name="quran" options={{ animation: "ios_from_right" }} />
+        {/* Modal Screens */}
+        <Stack.Screen
+          name="(modals)"
+          options={{
+            presentation: "transparentModal",
+            animation: "slide_from_bottom"
+          }}
+        />
+      </Stack.Protected>
+    </Stack>
+  );
+}
+
+function RootLayout() {
+  // Initialization and global sync hooks
+  useSystemThemeSync();
+  useDeviceSettingsSync();
+  useNotificationsSync();
+  usePrayerTimesSync();
+  useHolidaysSync();
+  useQuranSetup();
+  useUpdatesSync();
+
+  return (
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <RootStack />
+        <ModalProvider />
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
+  );
+}
+
+// Sentry.init lives in index.ts (the entry that also runs in headless background tasks).
+// Here we only wrap the root component with Sentry.wrap (touch-event breadcrumbs + profiler — see default export).
+// Sentry.wrap adds touch-event breadcrumbs and profiling; errors are caught globally by Sentry.init
+export default Sentry.wrap(RootLayout);
