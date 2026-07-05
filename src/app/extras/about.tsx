@@ -220,7 +220,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
     // Native Header
     infoIcon: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 4,
         paddingVertical: 4,
     },
 

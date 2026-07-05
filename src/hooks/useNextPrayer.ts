@@ -203,4 +203,3 @@ export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPray
         totalSeconds,
     };
 }
-
