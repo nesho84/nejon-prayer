@@ -7,6 +7,7 @@ import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
 import { openStoreListing } from "@/utils/system";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import Constants from "expo-constants";
 import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -106,6 +107,7 @@ export default function CheckForUpdate() {
 
   return (
     <>
+      {/* Check for Update Button */}
       <TouchableOpacity
         style={[styles.wideButton, { backgroundColor: theme.primary + "20" }]}
         onPress={runCheck}
@@ -124,14 +126,36 @@ export default function CheckForUpdate() {
         )}
       </TouchableOpacity>
 
-      <Text style={[styles.infoText, { textAlign: "center", color: statusColor }]}>
-        {statusMessage}
+      {/* Version */}
+      <Text style={[styles.versionText, { color: theme.placeholder, opacity: 0.8 }]}>
+        Version {Constants?.expoConfig?.version}
       </Text>
+
+      {/* Idle/checking hint */}
+      {(shown === "idle" || shown === "checking") && (
+        <Text style={[styles.infoText, { textAlign: "center", color: statusColor }]}>
+          {statusMessage}
+        </Text>
+      )}
+
+      {/* Check result badge */}
+      {(shown === "upToDate" || shown === "error") && (
+        <View style={[styles.statusBadge, { borderColor: statusColor }]}>
+          <MaterialDesignIcons
+            name={shown === "upToDate" ? "check-circle-outline" : "close-circle-outline"}
+            size={14}
+            color={statusColor}
+          />
+          <Text style={[styles.statusBadgeText, { color: shown === "upToDate" ? theme.green : theme.danger }]}>
+            {statusMessage}
+          </Text>
+        </View>
+      )}
 
       {/* Dev-only: raw error text, so a failed check is debuggable without digging through logs */}
       {__DEV__ && shown === "error" && errorDetail && (
         <>
-          <View style={[styles.divider, { borderWidth: 0.3, borderColor: theme.divider2 }]} />
+          <View style={[styles.divider, { marginTop: 12, borderWidth: 0.3, borderColor: theme.divider2 }]} />
           <Text style={[styles.devErrorText, { color: theme.placeholder }]}>
             {errorDetail}
           </Text>
@@ -168,10 +192,32 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     includeFontPadding: false,
   },
+  versionText: {
+    fontSize: 12,
+    textAlign: "center",
+    marginVertical: 6,
+  },
   infoText: {
     fontSize: 13,
-    marginTop: 8,
+    marginTop: 4,
     marginBottom: 1,
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    borderWidth: 1,
+    borderRadius: 20,
+    marginTop: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+  },
+  statusBadgeText: {
+    flexShrink: 1,
+    fontSize: 12,
+    fontWeight: "500",
+    includeFontPadding: false,
   },
   devErrorText: {
     fontSize: 12,
