@@ -24,7 +24,7 @@ jest.mock('expo-location', () => ({
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
-jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFeedbackType: { Success: 'success' } }));
+jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFeedbackType: { Success: 'success' }, impactAsync: jest.fn(), ImpactFeedbackStyle: { Medium: 'medium' } }));
 jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');

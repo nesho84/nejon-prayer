@@ -13,7 +13,7 @@ interface Props {
   isFriday?: boolean;                   // drives the Xhumaja badge on Dhuhr
   variant?: 'card' | 'plain';           // 'card' = home (border/bg), 'plain' = modal (borderless)
   notifState?: 'off' | 'on' | 'custom'; // bell icon state (home only); default 'off'
-  onPress?: () => void;                 // mark/unmark; row is a TouchableOpacity only when trackable
+  onTrackingPress?: () => void;         // mark/unmark; row is a TouchableOpacity only when trackable
   onNotifIconPress?: () => void;        // present → render the right-side notification icon (home only)
 }
 
@@ -30,7 +30,7 @@ export default function PrayerRow({
   isFriday = false,
   variant = 'card',
   notifState = 'off',
-  onPress,
+  onTrackingPress,
   onNotifIconPress,
 }: Props) {
   // Stores
@@ -123,7 +123,7 @@ export default function PrayerRow({
           delayPressOut={0}
           activeOpacity={0.3}
           hitSlop={8}
-          onPress={onPress}
+          onPress={onTrackingPress}
         >
           {rowContent}
         </TouchableOpacity>

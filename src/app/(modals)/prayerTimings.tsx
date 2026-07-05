@@ -12,6 +12,7 @@ import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/
 import { isTimePast, toDateKey } from "@/utils/datetime";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -135,6 +136,10 @@ export default function PrayersSettingsScreen() {
     const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean) => {
         if (!isPast) return;
 
+        // Tactile feedback on a valid mark/unmark tap
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+        // Mark/unmark the prayer for the selected date
         isPrayed
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey, 'calendar')
             : await markPrayed(prayerName as PrayerName, selectedDateKey, 'calendar');
@@ -296,7 +301,7 @@ export default function PrayersSettingsScreen() {
                                             isTrackable={isTrackable}
                                             isPrayed={isPrayed}
                                             variant="plain"
-                                            onPress={() => handleMark(prayerName as PrayerName, isPrayed, isPast)}
+                                            onTrackingPress={() => handleMark(prayerName as PrayerName, isPrayed, isPast)}
                                         />
 
                                         {/* Prayer Divider */}

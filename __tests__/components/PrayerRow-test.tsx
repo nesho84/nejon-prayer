@@ -37,11 +37,11 @@ describe('PrayerRow', () => {
     expect(screen.getByText('04:50')).toBeTruthy();
   });
 
-  it('calls onPress when a trackable row is pressed', () => {
-    const onPress = jest.fn();
-    render(<PrayerRow prayerName="Fajr" prayerTime="04:50" isTrackable isPrayed={false} onPress={onPress} />);
+  it('calls onTrackingPress when a trackable row is pressed', () => {
+    const onTrackingPress = jest.fn();
+    render(<PrayerRow prayerName="Fajr" prayerTime="04:50" isTrackable isPrayed={false} onTrackingPress={onTrackingPress} />);
     fireEvent.press(screen.getByText('Fajr'));
-    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onTrackingPress).toHaveBeenCalledTimes(1);
   });
 
   it('renders a dash placeholder for a non-trackable row', () => {

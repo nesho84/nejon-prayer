@@ -58,7 +58,7 @@ export async function debugPrayerN({ options, notifSettings, seconds = 10 }: Deb
 
         await notifee.createTriggerNotification(
             {
-                id: "prayer-test",
+                id: "prayer-fajr", // this is good test case for fajr, because when fajr delieved it will sweep all other notifications, so we can test that too
                 title: title,
                 body: body,
                 data: {

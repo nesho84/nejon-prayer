@@ -45,6 +45,9 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
   const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
     if (!isPast && !isCurrent) return;
 
+    // Tactile feedback on a valid mark/unmark tap
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     // If already marked as prayed, unmark it
     if (isPrayed) {
       unmarkPrayed(prayerName, undefined, 'home');
@@ -119,8 +122,12 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
             isFriday={isFriday}
             variant="card"
             notifState={getNotifState(prayerName)}
-            onPress={() => handleMark(prayerName as PrayerName, isPrayed, isPast, isCurrent)}
-            onNotifIconPress={() => router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`)}
+            onTrackingPress={() => {
+              handleMark(prayerName as PrayerName, isPrayed, isPast, isCurrent);
+            }}
+            onNotifIconPress={() => {
+              router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`);
+            }}
           />
         );
       })}
