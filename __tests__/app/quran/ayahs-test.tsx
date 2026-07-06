@@ -1,9 +1,12 @@
 import AyahsScreen from '@/app/quran/ayahs';
+import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
-import { render, screen } from '@testing-library/react-native';
+import { shareText } from '@/utils/system';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -57,6 +60,9 @@ jest.mock('@/components/AppLoading', () => {
   const { ActivityIndicator } = require('react-native');
   return ({ text }: any) => React.createElement(ActivityIndicator, { testID: `loading-${text}` });
 });
+jest.mock('@/utils/system', () => ({
+  shareText: jest.fn(() => Promise.resolve(true)),
+}));
 jest.mock('@/components/AppError', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -78,6 +84,9 @@ const mockTr = {
     khatamFinish: 'Complete Khatam',
     khatamCompleteTitle: 'Khatam Complete!',
     khatamCompleteMessage: 'Congratulations',
+    khatamShareTitle: 'Khatam Complete! 📖',
+    khatamShareMessage: 'I have completed a Khatam.',
+    khatamShareVia: 'Completed using Nejon Prayer:',
   },
   buttons: { retry: 'Retry' },
 } as any;
@@ -99,8 +108,17 @@ const mockNextSurah = {
   verses: [{ id: 1, text: 'بِسْمِ اللَّهِ', transliteration: 'Bismillah' }],
 };
 
+const mockLastSurah = {
+  id: 114,
+  name: 'الناس',
+  transliteration: 'An-Nas',
+  verses: [{ id: 1, text: 'قُلْ أَعُوذُ', transliteration: 'Qul a\'udhu' }],
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
+  const { useLocalSearchParams } = require('expo-router');
+  useLocalSearchParams.mockImplementation(() => ({ surahId: '2', surahName: 'Al-Baqarah', readingMode: 'reading' }));
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
   useModalStore.setState({ show: jest.fn() } as any);
@@ -128,6 +146,7 @@ beforeEach(() => {
     getSurahById: (id: number) => {
       if (id === 2) return mockSurah;
       if (id === 3) return mockNextSurah;
+      if (id === 114) return mockLastSurah;
       return null;
     },
   } as any);
@@ -155,5 +174,43 @@ describe('AyahsScreen', () => {
   it('renders "Next Surah" footer for non-last surahs', () => {
     render(<AyahsScreen />);
     expect(screen.getByText('Next Surah')).toBeTruthy();
+  });
+});
+
+describe('AyahsScreen khatam completion', () => {
+  beforeEach(() => {
+    const { useLocalSearchParams } = require('expo-router');
+    useLocalSearchParams.mockImplementation(() => ({ surahId: '114', surahName: 'An-Nas', readingMode: 'khatam' }));
+  });
+
+  it('shows celebration modal with Share and OK buttons on Complete Khatam', () => {
+    render(<AyahsScreen />);
+    fireEvent.press(screen.getByText('Complete Khatam'));
+
+    expect(useQuranStore.getState().completeKhatam).toHaveBeenCalled();
+    const show = useModalStore.getState().show as jest.Mock;
+    expect(show).toHaveBeenCalledTimes(1);
+
+    const options = show.mock.calls[0][0];
+    expect(options.celebrationAnimation).toBe(true);
+    expect(options.buttons).toHaveLength(2);
+    expect(options.buttons[0].action).toBe('share');
+    expect(options.buttons[1].action).toBe('ok');
+  });
+
+  it('shares the khatam message with store link and navigates back', async () => {
+    render(<AyahsScreen />);
+    fireEvent.press(screen.getByText('Complete Khatam'));
+
+    const show = useModalStore.getState().show as jest.Mock;
+    const shareButton = show.mock.calls[0][0].buttons[0];
+    await shareButton.onPress();
+
+    const storeUrl = Platform.OS === 'ios' ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
+    expect(shareText).toHaveBeenCalledWith(
+      mockTr.labels.khatamShareTitle,
+      `${mockTr.labels.khatamShareMessage}\n\n${mockTr.labels.khatamShareVia}\n${storeUrl}`,
+    );
+    expect(require('expo-router').router.back).toHaveBeenCalled();
   });
 });

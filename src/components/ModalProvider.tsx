@@ -72,6 +72,7 @@ export default function ModalProvider() {
           }}
           activeOpacity={0.8}
         >
+          {btn.icon}
           <Text style={[styles.btnText, btn.labelStyle]}>
             {btn.label}
           </Text>
@@ -268,6 +269,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 44,
     borderRadius: 14,
+    flexDirection: 'row',
+    gap: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -76,6 +76,21 @@ describe('ModalProvider', () => {
     expect(hide).toHaveBeenCalledWith('ok');
   });
 
+  it('renders a button icon next to its label', () => {
+    const { Ionicons } = require('@react-native-vector-icons/ionicons/static');
+    useModalStore.setState({
+      visible: true,
+      options: {
+        type: 'alert',
+        title: 'Khatam',
+        buttons: [{ action: 'share', label: 'Share', icon: <Ionicons name="share-social-outline" /> }],
+      },
+    } as any);
+    render(<ModalProvider />);
+    expect(screen.getByTestId('icon-share-social-outline')).toBeTruthy();
+    expect(screen.getByText('Share')).toBeTruthy();
+  });
+
   it('renders fullscreen modal with title + component and dismisses via the close icon', () => {
     const { Text } = require('react-native');
     const hide = jest.fn();

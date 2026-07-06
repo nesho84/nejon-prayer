@@ -2,18 +2,20 @@ import AppError from '@/components/AppError';
 import AppLayout from '@/components/AppLayout';
 import AppLoading from '@/components/AppLoading';
 import QuranAyahRow from '@/components/QuranAyahRow';
+import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
 import { globalStyles } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Verse } from '@/types/quran.types';
+import { shareText } from '@/utils/system';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AyahsScreen() {
@@ -160,6 +162,15 @@ export default function AyahsScreen() {
   }, [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
 
   // ------------------------------------------------------------
+  // Share the Khatam celebration
+  // ------------------------------------------------------------
+  const handleShare = useCallback(async () => {
+    const storeUrl = Platform.OS === "ios" ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
+    await shareText(tr.labels.khatamShareTitle, `${tr.labels.khatamShareMessage}\n\n${tr.labels.khatamShareVia}\n${storeUrl}`);
+    router.back();
+  }, [tr]);
+
+  // ------------------------------------------------------------
   // Footer: Next Surah button (or Complete Khatam on surah 114)
   // ------------------------------------------------------------
   const renderFooter = useCallback(() => {
@@ -184,13 +195,23 @@ export default function AyahsScreen() {
                   <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.khatamCompleteMessage}</Text>
                 </View>
               ),
-              buttons: [{
-                label: 'OK',
-                action: 'ok',
-                onPress: () => router.back(),
-                buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
-                labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
-              }],
+              buttons: [
+                {
+                  label: tr.buttons.share,
+                  action: 'share',
+                  icon: <Ionicons name="share-social-outline" size={17} color={theme.textSecondary} />,
+                  onPress: handleShare,
+                  buttonStyle: { backgroundColor: `${theme.green}20`, borderWidth: 1, borderColor: `${theme.green}40` },
+                  labelStyle: { fontSize: 16, fontWeight: '600', color: theme.textSecondary },
+                },
+                {
+                  label: 'OK',
+                  action: 'ok',
+                  onPress: () => router.back(),
+                  buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
+                  labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
+                }
+              ],
               celebrationAnimation: true,
             });
           }}
@@ -245,7 +266,7 @@ export default function AyahsScreen() {
         <Ionicons name="chevron-forward" size={18} color={theme.gold} />
       </TouchableOpacity>
     );
-  }, [surahIdNum, mode, theme, tr, getSurahById, setLastKhatam, completeKhatam]);
+  }, [surahIdNum, mode, theme, tr, getSurahById, setLastKhatam, completeKhatam, handleShare]);
 
   // Loading state
   if (isLoadingAyahs) {
