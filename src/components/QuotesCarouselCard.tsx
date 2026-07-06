@@ -65,6 +65,7 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
         }
 
         return arr;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refreshKey, language]);
 
     // ------------------------------------------------------------
@@ -175,7 +176,8 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
                 </Text>
             </View>
         </View>
-    ), [itemWidth, theme.accent, theme.text2]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    ), [itemWidth, theme]);
 
     return (
         <View style={[styles.container, { backgroundColor: theme.card }]}>
@@ -222,6 +224,8 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
         </View>
     );
 });
+
+QuotesCarouselCard.displayName = 'QuotesCarouselCard';
 
 export default QuotesCarouselCard;
 

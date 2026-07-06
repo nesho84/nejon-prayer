@@ -131,6 +131,8 @@ const PrayerCountdownCard = React.memo(({
   );
 });
 
+PrayerCountdownCard.displayName = 'PrayerCountdownCard';
+
 export default PrayerCountdownCard;
 
 const styles = StyleSheet.create({

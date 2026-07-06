@@ -134,6 +134,8 @@ const QuranPlaying = React.memo(() => {
   );
 });
 
+QuranPlaying.displayName = 'QuranPlaying';
+
 export default QuranPlaying;
 
 const styles = StyleSheet.create({

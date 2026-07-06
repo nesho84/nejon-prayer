@@ -6,7 +6,6 @@ import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
 import { shareText } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-import { router } from "expo-router";
 import { Platform, Text, View } from "react-native";
 
 // ------------------------------------------------------------
@@ -63,7 +62,6 @@ export function previewKhatamCelebrationModal() {
         onPress: async () => {
           const storeUrl = Platform.OS === "ios" ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
           await shareText(tr.labels.khatamShareTitle, `${tr.labels.khatamShareMessage}\n\n${tr.labels.khatamShareVia}\n${storeUrl}`);
-          router.back();
         },
         buttonStyle: { backgroundColor: `${theme.green}20`, borderWidth: 1, borderColor: `${theme.green}40` },
         labelStyle: { fontSize: 16, fontWeight: '600', color: theme.textSecondary },
@@ -71,7 +69,6 @@ export function previewKhatamCelebrationModal() {
       {
         label: 'OK',
         action: 'ok',
-        onPress: () => router.back(),
         buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
         labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
       }

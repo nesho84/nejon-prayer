@@ -88,6 +88,7 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         celebrationAnimation: true,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markPrayed, unmarkPrayed, celebratedDate, setCelebrated, theme]);
 
   // ------------------------------------------------------------
@@ -135,6 +136,8 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     </View>
   );
 });
+
+PrayersList.displayName = 'PrayersList';
 
 export default PrayersList;
 

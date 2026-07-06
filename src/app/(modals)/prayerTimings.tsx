@@ -89,6 +89,7 @@ export default function PrayersSettingsScreen() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             getPrayerTimesForDate(selectedDate);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate, location]);
 
     // ------------------------------------------------------------
@@ -140,6 +141,7 @@ export default function PrayersSettingsScreen() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
         // Mark/unmark the prayer for the selected date
+        // eslint-disable-next-line no-unused-expressions
         isPrayed
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey, 'calendar')
             : await markPrayed(prayerName as PrayerName, selectedDateKey, 'calendar');

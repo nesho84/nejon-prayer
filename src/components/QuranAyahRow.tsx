@@ -114,6 +114,8 @@ const QuranAyahRow = React.memo(({
   );
 });
 
+QuranAyahRow.displayName = 'QuranAyahRow';
+
 export default QuranAyahRow;
 
 const styles = StyleSheet.create({

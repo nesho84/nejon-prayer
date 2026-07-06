@@ -104,6 +104,7 @@ function ParticleView({ particle }: { particle: Particle }) {
     } else {
       progress.value = withDelay(particle.delay, withTiming(1, { duration: particle.duration, easing: Easing.linear }));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -215,6 +216,8 @@ const CelebrationFx = React.memo(({ variant }: Props) => {
     </View>
   );
 });
+
+CelebrationFx.displayName = 'CelebrationFx';
 
 export default CelebrationFx;
 

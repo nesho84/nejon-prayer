@@ -270,6 +270,7 @@ export function getTriggerTime(
 // PRAYER SCHEDULE: All Prayer Notifications
 // ------------------------------------------------------------
 async function schedulePrayerNotifications(params: ScheduleParams) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { config, prayerTimes, tomorrowPrayerTimes, language, tr, hasAlarm } = params;
 
   for (const prayer of PRAYERS) {
@@ -353,6 +354,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
 // PRAYER-EVENT SCHEDULE: All Prayer Event Notifications
 // ------------------------------------------------------------
 async function scheduleEventNotifications(params: ScheduleParams) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { config, prayerTimes, tomorrowPrayerTimes, language, tr, hasAlarm } = params;
 
   for (const event of EVENTS) {
@@ -715,11 +717,13 @@ export async function handleNotificationEvent(
       // Background sync handled in index.js
 
       // Actions based on notification type
+      // eslint-disable-next-line eqeqeq
       if (notifType == 'prayer' || notifType == 'prayer-event') {
         if (sound) await startSound(sound, volume);
       }
       // prayer-reminder fires minutes after snooze — its data.volume may be stale.
       // Read fresh from notifSettings instead.
+      // eslint-disable-next-line eqeqeq
       else if (notifType == 'prayer-reminder') {
         if (sound) await startSound(sound, notifSettings?.volume ?? volume);
       }

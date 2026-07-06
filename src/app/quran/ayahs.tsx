@@ -69,6 +69,7 @@ export default function AyahsScreen() {
   const bottomInset = insets.bottom + 12;
 
   // Arabic verses — always from local JSON
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const verses = getSurahById(surahIdNum)?.verses ?? [];
 
   // Translation keyed by verse number for fast lookup
@@ -86,6 +87,7 @@ export default function AyahsScreen() {
     hasScrolledRef.current = false;
 
     fetchAyahs(surahIdNum);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isQuranReady, language, selectedEditions]);
 
   // ------------------------------------------------------------
@@ -103,7 +105,8 @@ export default function AyahsScreen() {
   // ------------------------------------------------------------
   // Handle viewable items change to update last read only after user interaction
   // ------------------------------------------------------------
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken<Verse>[] }) => {
+  // Identity stays stable for FlashList: params and store setters never change per mount
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken<Verse>[] }) => {
     if (!userInteractedRef.current) return; // <-- do nothing until user scrolls or taps
 
     const firstVisible = viewableItems[0]?.item;
@@ -121,7 +124,7 @@ export default function AyahsScreen() {
         setLastKhatam(surahIdNum, surahNameStr, firstVisible.id);
       }
     }, 200);
-  }).current;
+  }, [mode, surahIdNum, surahNameStr, setLastRead, setLastKhatam]);
 
   // ------------------------------------------------------------
   // Render a single ayah row
@@ -159,6 +162,7 @@ export default function AyahsScreen() {
         })}
       />
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
 
   // ------------------------------------------------------------

@@ -114,6 +114,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   const handleClose = useCallback(() => {
     onClose?.();
     router.back();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose, router]);
 
   // ------------------------------------------------------------
@@ -124,6 +125,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
     backdropOpacity.value = withTiming(0, { duration: ANIMATION_DURATION }, (finished) => {
       if (finished) scheduleOnRN(handleClose);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height, handleClose]);
 
   // ------------------------------------------------------------
@@ -147,6 +149,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
       backdropOpacity.value = withTiming(1, { duration: ANIMATION_DURATION });
     }, BACKDROP_DELAY);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ------------------------------------------------------------
@@ -178,6 +181,7 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
       subShow.remove();
       subHide.remove();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ------------------------------------------------------------
@@ -296,6 +300,8 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
     </View>
   );
 });
+
+ModalSheet.displayName = 'ModalSheet';
 
 export default ModalSheet;
 

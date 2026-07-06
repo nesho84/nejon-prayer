@@ -165,6 +165,7 @@ export default function NamaziGuideScreen() {
                 </>
             )}
         </AppCard>
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [theme, expandedSurahs, language]);
 
     // Main Content

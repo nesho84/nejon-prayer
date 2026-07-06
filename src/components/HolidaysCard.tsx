@@ -81,6 +81,8 @@ const IslamicHolidaysCard = React.memo(() => {
   );
 });
 
+IslamicHolidaysCard.displayName = 'IslamicHolidaysCard';
+
 export default IslamicHolidaysCard;
 
 const styles = StyleSheet.create({

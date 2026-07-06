@@ -112,6 +112,7 @@ export default function QuranTabScreen() {
       // Always release listener lock — a rejected await must not strand the buffering UI
       syncPlayback({ isSwitching: false });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId, isPlaying, hasFinished]);
 
   // ------------------------------------------------------------
@@ -139,6 +140,7 @@ export default function QuranTabScreen() {
         playbackError: null,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId]);
 
   // ------------------------------------------------------------
@@ -187,6 +189,7 @@ export default function QuranTabScreen() {
   // ------------------------------------------------------------
   useEffect(() => {
     scrollToPlaying(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   // ------------------------------------------------------------
@@ -302,6 +305,7 @@ export default function QuranTabScreen() {
         onStop={(surah) => handleStop(surah)}
       />
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, tr, activeSurahId, isPlaying, hasFinished, playbackError, currentTime, duration]);
 
   // Loading state

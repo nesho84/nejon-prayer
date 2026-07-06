@@ -103,6 +103,7 @@ export default function PrayersSettingsScreen() {
         setSelectedOffset(current.offset);
         setSelectedSound(current.sound ?? SOUNDS.azan1_short);
         /* eslint-enable react-hooks/set-state-in-effect */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [prayerName, prayers, events]);
 
     // ------------------------------------------------------------
@@ -127,6 +128,7 @@ export default function PrayersSettingsScreen() {
             }
             stopSound();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ------------------------------------------------------------

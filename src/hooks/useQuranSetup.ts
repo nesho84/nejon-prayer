@@ -15,6 +15,7 @@ export function useQuranSetup() {
     requestAnimationFrame(() => {
       loadFullQuran();
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ------------------------------------------------------------
@@ -61,6 +62,7 @@ export function useQuranSetup() {
       }
     };
     setupAndSync();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ------------------------------------------------------------
@@ -108,5 +110,6 @@ export function useQuranSetup() {
       onStateChange.remove();
       onError.remove();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

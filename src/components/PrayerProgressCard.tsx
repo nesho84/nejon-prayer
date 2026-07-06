@@ -187,6 +187,8 @@ const PrayerProgressCard = React.memo(() => {
   );
 });
 
+PrayerProgressCard.displayName = 'PrayerProgressCard';
+
 export default PrayerProgressCard;
 
 const styles = StyleSheet.create({

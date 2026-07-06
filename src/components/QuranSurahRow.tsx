@@ -168,6 +168,8 @@ const QuranSurahRow = React.memo(({
   );
 });
 
+QuranSurahRow.displayName = 'QuranSurahRow';
+
 export default QuranSurahRow;
 
 const styles = StyleSheet.create({
