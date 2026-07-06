@@ -15,7 +15,7 @@ const mockTheme = { accent: '#007AFF', card: '#fff', divider: '#eee', text2: '#5
 
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme as any });
-  require('@/store/quranPlayerStore').useQuranPlayerStore.setState({
+  require('@/store/quranAudioStore').useQuranAudioStore.setState({
     isActive: false,
     isPlaying: false,
     activeSurahName: null,
@@ -29,7 +29,7 @@ describe('QuranPlaying', () => {
   });
 
   it('renders play icon and surah name when active', () => {
-    require('@/store/quranPlayerStore').useQuranPlayerStore.setState({
+    require('@/store/quranAudioStore').useQuranAudioStore.setState({
       isActive: true,
       isPlaying: true,
       activeSurahName: 'Al-Fatiha',

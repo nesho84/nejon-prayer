@@ -29,7 +29,7 @@ See `README.md` for the full build/EAS/OTA/Sentry workflow.
 ### Quran audio (expo-audio)
 
 The Quran player uses `expo-audio` via a module-level singleton wrapped in
-`src/services/quranPlayerService.ts` — the only file that may import expo-audio playback APIs
+`src/services/quranAudioService.ts` — the only file that may import expo-audio playback APIs
 (components/hooks go through the service; `useAudioPlayerStatus` in `quran-tab.tsx` is the one
 exception, fed by `getQuranPlayer()`). Lock-screen/notification controls are handled natively
 (no JS playback service); the media notification offers play/pause only — no Stop button.
@@ -37,7 +37,7 @@ Background playback needs the `expo-audio` config plugin with `enableBackgroundP
 in `app.json` and `setActiveForLockScreen` (called in `playSurah`), otherwise Android kills
 audio after ~3 min in background.
 
-- `isSwitching` in `quranPlayerStore` is released by the **status listener** in `useQuranSetup`
+- `isSwitching` in `quranAudioStore` is released by the **status listener** in `useQuranSetup`
   (first playing/error/finish tick), not by the tab handlers — releasing it earlier flickers the
   row's progress bar while stale duration ticks arrive.
 - **Known regression vs RNTP (SDK-57 limitation):** swiping the app from recents stops audio

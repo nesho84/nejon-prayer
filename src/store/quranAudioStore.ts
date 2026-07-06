@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type QuranPlayerData = {
+type QuranAudioData = {
   isActive: boolean;
   isPlaying: boolean;
   isBuffering: boolean;
@@ -11,11 +11,11 @@ type QuranPlayerData = {
   playbackError: string | null;
 }
 
-interface QuranPlayerState extends QuranPlayerData {
-  syncPlayback: (payload: Partial<QuranPlayerData>) => void;
+interface QuranAudioState extends QuranAudioData {
+  syncPlayback: (payload: Partial<QuranAudioData>) => void;
 }
 
-export const useQuranPlayerStore = create<QuranPlayerState>()((set) => ({
+export const useQuranAudioStore = create<QuranAudioState>()((set) => ({
   // Player state
   isActive: false,
   isPlaying: false,

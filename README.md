@@ -131,7 +131,7 @@ Three notification types:
 
 Two audio systems are used:
 - `react-native-sound` — for azan notification sounds played inside the notification
-- `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranPlayerService.ts`)
+- `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranAudioService.ts`)
 
 ---
 

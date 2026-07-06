@@ -1,7 +1,7 @@
-import { useQuranPlayerStore } from '@/store/quranPlayerStore';
+import { useQuranAudioStore } from '@/store/quranAudioStore';
 
 beforeEach(() => {
-  useQuranPlayerStore.setState({
+  useQuranAudioStore.setState({
     isActive: false,
     isPlaying: false,
     isBuffering: false,
@@ -13,9 +13,9 @@ beforeEach(() => {
   });
 });
 
-describe('quranPlayerStore', () => {
+describe('quranAudioStore', () => {
   it('initialises with all playback fields off/null', () => {
-    const s = useQuranPlayerStore.getState();
+    const s = useQuranAudioStore.getState();
     expect(s.isActive).toBe(false);
     expect(s.isPlaying).toBe(false);
     expect(s.isBuffering).toBe(false);
@@ -27,8 +27,8 @@ describe('quranPlayerStore', () => {
   });
 
   it('syncPlayback merges partial state', () => {
-    useQuranPlayerStore.getState().syncPlayback({ isPlaying: true, activeSurahId: 5, activeSurahName: 'Al-Maidah' });
-    const s = useQuranPlayerStore.getState();
+    useQuranAudioStore.getState().syncPlayback({ isPlaying: true, activeSurahId: 5, activeSurahName: 'Al-Maidah' });
+    const s = useQuranAudioStore.getState();
     expect(s.isPlaying).toBe(true);
     expect(s.activeSurahId).toBe(5);
     expect(s.activeSurahName).toBe('Al-Maidah');
@@ -38,22 +38,22 @@ describe('quranPlayerStore', () => {
   });
 
   it('syncPlayback can set isSwitching and clear it', () => {
-    useQuranPlayerStore.getState().syncPlayback({ isSwitching: true });
-    expect(useQuranPlayerStore.getState().isSwitching).toBe(true);
+    useQuranAudioStore.getState().syncPlayback({ isSwitching: true });
+    expect(useQuranAudioStore.getState().isSwitching).toBe(true);
 
-    useQuranPlayerStore.getState().syncPlayback({ isSwitching: false });
-    expect(useQuranPlayerStore.getState().isSwitching).toBe(false);
+    useQuranAudioStore.getState().syncPlayback({ isSwitching: false });
+    expect(useQuranAudioStore.getState().isSwitching).toBe(false);
   });
 
   it('syncPlayback stores a playbackError', () => {
-    useQuranPlayerStore.getState().syncPlayback({ playbackError: 'stream failed' });
-    expect(useQuranPlayerStore.getState().playbackError).toBe('stream failed');
+    useQuranAudioStore.getState().syncPlayback({ playbackError: 'stream failed' });
+    expect(useQuranAudioStore.getState().playbackError).toBe('stream failed');
   });
 
   it('syncPlayback can reset active surah', () => {
-    useQuranPlayerStore.getState().syncPlayback({ activeSurahId: 2, activeSurahName: 'Al-Baqarah', isActive: true });
-    useQuranPlayerStore.getState().syncPlayback({ isActive: false, activeSurahId: null, activeSurahName: null });
-    const s = useQuranPlayerStore.getState();
+    useQuranAudioStore.getState().syncPlayback({ activeSurahId: 2, activeSurahName: 'Al-Baqarah', isActive: true });
+    useQuranAudioStore.getState().syncPlayback({ isActive: false, activeSurahId: null, activeSurahName: null });
+    const s = useQuranAudioStore.getState();
     expect(s.isActive).toBe(false);
     expect(s.activeSurahId).toBeNull();
     expect(s.activeSurahName).toBeNull();

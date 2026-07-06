@@ -1,9 +1,9 @@
 import QuranTabScreen from '@/app/(tabs)/quran-tab';
 import { useLanguageStore } from '@/store/languageStore';
-import { useQuranPlayerStore } from '@/store/quranPlayerStore';
+import { useQuranAudioStore } from '@/store/quranAudioStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
-import { playSurah, stopPlayback } from '@/services/quranPlayerService';
+import { playSurah, stopPlayback } from '@/services/quranAudioService';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -21,7 +21,7 @@ jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-audio', () => ({
   useAudioPlayerStatus: jest.fn(() => ({ currentTime: 0, duration: 0 })),
 }));
-jest.mock('@/services/quranPlayerService', () => ({
+jest.mock('@/services/quranAudioService', () => ({
   getQuranPlayer: jest.fn(() => ({})),
   isSurahLoaded: jest.fn(() => false),
   playSurah: jest.fn(() => Promise.resolve()),
@@ -112,7 +112,7 @@ beforeEach(() => {
     quranError: null,
     loadFullQuran: jest.fn(),
   } as any);
-  useQuranPlayerStore.setState({
+  useQuranAudioStore.setState({
     isActive: false, isPlaying: false, isBuffering: false, hasFinished: false,
     isSwitching: false, activeSurahId: null, activeSurahName: null, playbackError: null,
   });
@@ -160,7 +160,7 @@ describe('QuranTabScreen — playback handlers', () => {
     await waitFor(() => {
       expect(playSurah).toHaveBeenCalledWith(1, 'Al-Fatihah');
     });
-    const s = useQuranPlayerStore.getState();
+    const s = useQuranAudioStore.getState();
     expect(s.activeSurahId).toBe(1);
     expect(s.isActive).toBe(true);
     // Released by the status listener (useQuranSetup) on the first playing/error tick
@@ -174,20 +174,20 @@ describe('QuranTabScreen — playback handlers', () => {
 
     // Regression: a rejected await must not strand isSwitching (stuck buffering UI)
     await waitFor(() => {
-      const s = useQuranPlayerStore.getState();
+      const s = useQuranAudioStore.getState();
       expect(s.playbackError).toBeTruthy();
       expect(s.isSwitching).toBe(false);
     });
   });
 
   it('resets playback state even when stop fails', async () => {
-    useQuranPlayerStore.setState({ isActive: true, isPlaying: true, activeSurahId: 2, activeSurahName: 'Al-Baqarah' });
+    useQuranAudioStore.setState({ isActive: true, isPlaying: true, activeSurahId: 2, activeSurahName: 'Al-Baqarah' });
     (stopPlayback as jest.Mock).mockRejectedValueOnce(new Error('native error'));
     render(<QuranTabScreen />);
     fireEvent.press(screen.getByTestId('stop-2'));
 
     await waitFor(() => {
-      const s = useQuranPlayerStore.getState();
+      const s = useQuranAudioStore.getState();
       expect(s.isActive).toBe(false);
       expect(s.isPlaying).toBe(false);
       expect(s.activeSurahId).toBeNull();

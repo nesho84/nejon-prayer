@@ -1,5 +1,5 @@
 import { cancelAllNotifications } from "@/services/notificationsService";
-import { stopPlayback } from "@/services/quranPlayerService";
+import { stopPlayback } from "@/services/quranAudioService";
 import { storage } from "@/store/storage";
 import * as Updates from "expo-updates";
 

@@ -1,11 +1,11 @@
-import { addStatusListener, configureAudioMode } from "@/services/quranPlayerService";
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { addStatusListener, configureAudioMode } from "@/services/quranAudioService";
+import { useQuranAudioStore } from "@/store/quranAudioStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useEffect } from "react";
 
 export function useQuranSetup() {
   const loadFullQuran = useQuranStore((state) => state.loadFullQuran);
-  const syncPlayback = useQuranPlayerStore((state) => state.syncPlayback);
+  const syncPlayback = useQuranAudioStore((state) => state.syncPlayback);
 
   // ------------------------------------------------------------
   // Init: Load Full Quran from local JSON asset into store
@@ -36,7 +36,7 @@ export function useQuranSetup() {
   useEffect(() => {
     const subscription = addStatusListener((status) => {
       // Idle/stopped — handlers own the store reset; late ticks must not resurrect state
-      if (useQuranPlayerStore.getState().activeSurahId === null) return;
+      if (useQuranAudioStore.getState().activeSurahId === null) return;
 
       // The listener owns releasing isSwitching: the switch is only over once the player
       // reports playing (or fails) — the handler releasing it earlier flickers the row
@@ -61,7 +61,7 @@ export function useQuranSetup() {
         // But a failed source stays unloaded forever — once an error is showing, don't let
         // !isLoaded resurrect the spinner (it also disables the retry button). The user's
         // retry clears playbackError and re-enters buffering.
-        const hasError = useQuranPlayerStore.getState().playbackError !== null;
+        const hasError = useQuranAudioStore.getState().playbackError !== null;
         syncPlayback({ isPlaying: false, isBuffering: !hasError && (status.isBuffering || !status.isLoaded) });
       }
     });

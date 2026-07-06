@@ -5,9 +5,9 @@ import AppLoading from "@/components/AppLoading";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
 import { globalStyles } from "@/constants/styles";
-import { getQuranPlayer, isSurahLoaded, pausePlayback, playSurah, replayFromStart, resumePlayback, stopPlayback } from "@/services/quranPlayerService";
+import { getQuranPlayer, isSurahLoaded, pausePlayback, playSurah, replayFromStart, resumePlayback, stopPlayback } from "@/services/quranAudioService";
 import { useLanguageStore } from "@/store/languageStore";
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { useQuranAudioStore } from "@/store/quranAudioStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Surah } from '@/types/quran.types';
@@ -26,17 +26,17 @@ export default function QuranTabScreen() {
 
   // Quran Store
   const surahs = useQuranStore((state) => state.surahs);
-  const activeSurahId = useQuranPlayerStore((state) => state.activeSurahId);
+  const activeSurahId = useQuranAudioStore((state) => state.activeSurahId);
   const quranError = useQuranStore((state) => state.quranError);
   const isQuranReady = useQuranStore((state) => state.isQuranReady);
 
   // Playback-related state from the store
-  const isPlaying = useQuranPlayerStore((state) => state.isPlaying);
-  const isBuffering = useQuranPlayerStore((state) => state.isBuffering);
-  const hasFinished = useQuranPlayerStore((state) => state.hasFinished);
-  const isSwitching = useQuranPlayerStore((state) => state.isSwitching);
-  const playbackError = useQuranPlayerStore((state) => state.playbackError);
-  const syncPlayback = useQuranPlayerStore((state) => state.syncPlayback);
+  const isPlaying = useQuranAudioStore((state) => state.isPlaying);
+  const isBuffering = useQuranAudioStore((state) => state.isBuffering);
+  const hasFinished = useQuranAudioStore((state) => state.hasFinished);
+  const isSwitching = useQuranAudioStore((state) => state.isSwitching);
+  const playbackError = useQuranAudioStore((state) => state.playbackError);
+  const syncPlayback = useQuranAudioStore((state) => state.syncPlayback);
 
   // Derived states from the player status (1s cadence set at player creation)
   const status = useAudioPlayerStatus(getQuranPlayer());

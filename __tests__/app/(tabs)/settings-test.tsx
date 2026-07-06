@@ -36,7 +36,7 @@ jest.mock('@/services/locationService', () => ({ getUserLocation: jest.fn(), has
 jest.mock('@/services/prayersService', () => ({ getYearlyPrayerTimes: jest.fn() }));
 jest.mock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
-jest.mock('@/services/quranPlayerService', () => ({ stopPlayback: jest.fn() }));
+jest.mock('@/services/quranAudioService', () => ({ stopPlayback: jest.fn() }));
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   ImpactFeedbackStyle: { Medium: 'medium' },

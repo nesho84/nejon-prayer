@@ -1,5 +1,5 @@
 import { useDebugStore } from "@/debug/debugStore";
-import { useQuranPlayerStore } from "@/store/quranPlayerStore";
+import { useQuranAudioStore } from "@/store/quranAudioStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { router } from "expo-router";
@@ -81,9 +81,9 @@ const QuranPlaying = React.memo(() => {
   const theme = useThemeStore((state) => state.theme);
 
   // Quran Store
-  const isActive = useQuranPlayerStore((state) => state.isActive);
-  const isPlaying = useQuranPlayerStore((state) => state.isPlaying);
-  const activeSurahName = useQuranPlayerStore((state) => state.activeSurahName);
+  const isActive = useQuranAudioStore((state) => state.isActive);
+  const isPlaying = useQuranAudioStore((state) => state.isPlaying);
+  const activeSurahName = useQuranAudioStore((state) => state.activeSurahName);
 
   // DEBUG: force-show the now-playing card for UI testing (Debug Panel toggle)
   const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);

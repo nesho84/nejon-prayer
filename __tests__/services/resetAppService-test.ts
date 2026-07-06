@@ -1,11 +1,11 @@
 import { cancelAllNotifications } from '@/services/notificationsService';
-import { stopPlayback } from '@/services/quranPlayerService';
+import { stopPlayback } from '@/services/quranAudioService';
 import { restoreDefaults } from '@/services/resetAppService';
 import { storage } from '@/store/storage';
 import * as Updates from 'expo-updates';
 
 jest.mock('expo-updates', () => ({ isEnabled: true, reloadAsync: jest.fn() }));
-jest.mock('@/services/quranPlayerService', () => ({ stopPlayback: jest.fn() }));
+jest.mock('@/services/quranAudioService', () => ({ stopPlayback: jest.fn() }));
 jest.mock('@/services/notificationsService', () => ({ cancelAllNotifications: jest.fn() }));
 jest.mock('@/store/storage', () => ({ storage: { clearAll: jest.fn() } }));
 
@@ -58,7 +58,7 @@ describe('restoreDefaults', () => {
     // re-require everything fresh within this isolated registry.
     jest.resetModules();
     jest.doMock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
-    jest.doMock('@/services/quranPlayerService', () => ({ stopPlayback: jest.fn() }));
+    jest.doMock('@/services/quranAudioService', () => ({ stopPlayback: jest.fn() }));
     jest.doMock('@/services/notificationsService', () => ({ cancelAllNotifications: jest.fn() }));
     jest.doMock('@/store/storage', () => ({ storage: { clearAll: jest.fn() } }));
 

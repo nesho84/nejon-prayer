@@ -1,4 +1,4 @@
-import type * as QuranPlayerService from '@/services/quranPlayerService';
+import type * as QuranAudioService from '@/services/quranAudioService';
 
 // Shared fake player — the mock factory below closes over it ("mock" prefix allows this)
 const mockPlayer = {
@@ -23,7 +23,7 @@ jest.mock('@/services/quranService', () => ({
 }));
 
 // Fresh module registry per test — resets the service's lazy player singleton
-let service: typeof QuranPlayerService;
+let service: typeof QuranAudioService;
 let createAudioPlayer: jest.Mock;
 let setAudioModeAsync: jest.Mock;
 
@@ -32,10 +32,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockPlayer.isLoaded = false;
   ({ createAudioPlayer, setAudioModeAsync } = require('expo-audio'));
-  service = require('@/services/quranPlayerService');
+  service = require('@/services/quranAudioService');
 });
 
-describe('quranPlayerService', () => {
+describe('quranAudioService', () => {
   it('creates the player once with a 1s status cadence', () => {
     const first = service.getQuranPlayer();
     const second = service.getQuranPlayer();
