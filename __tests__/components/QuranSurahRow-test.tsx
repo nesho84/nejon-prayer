@@ -30,7 +30,7 @@ const baseProps = {
   surah: mockSurah as any,
   theme: mockTheme,
   tr: mockTr,
-  activeSurahId: null,
+  isActive: false,
   isPlaying: false,
   isBufferingActive: false,
   hasFinished: false,

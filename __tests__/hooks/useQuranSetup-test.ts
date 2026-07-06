@@ -116,4 +116,15 @@ describe('useQuranSetup — status → store mapping', () => {
     expect(s.isBuffering).toBe(false);
     expect(s.isSwitching).toBe(false);
   });
+
+  it('does not resurrect the spinner after an error when the dead source keeps reporting unloaded', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1 });
+    // Airplane mode: error tick, then the failed source keeps emitting isLoaded:false ticks
+    act(() => cb(makeStatus({ error: 'stream failed' })));
+    act(() => cb(makeStatus({ isLoaded: false })));
+    const s = useQuranPlayerStore.getState();
+    expect(s.isBuffering).toBe(false);       // spinner must not come back (would disable retry)
+    expect(s.playbackError).toBe('stream failed');
+  });
 });

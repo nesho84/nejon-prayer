@@ -40,9 +40,11 @@ audio after ~3 min in background.
 - `isSwitching` in `quranPlayerStore` is released by the **status listener** in `useQuranSetup`
   (first playing/error/finish tick), not by the tab handlers — releasing it earlier flickers the
   row's progress bar while stale duration ticks arrive.
-- Known SDK-57 limitation: swiping the app from recents stops audio (correct) but leaves a
-  stale media notification — expo-audio's `AudioControlsService` has no `onTaskRemoved`
-  handler. No JS-side fix; re-check on the next SDK upgrade.
+- **Known regression vs RNTP (SDK-57 limitation):** swiping the app from recents stops audio
+  (correct) but leaves a **stale media notification** in the tray. RNTP removed it via
+  `AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification`; expo-audio's `AudioControlsService`
+  has no `onTaskRemoved` handler, and the JS process is dead so there's no JS-side fix. Re-check on
+  the next expo-audio upgrade (upstream MediaSession fixes are queued in the unpublished changelog).
 
 ## Path aliases
 

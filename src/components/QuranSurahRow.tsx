@@ -12,7 +12,7 @@ interface Props {
   surah: Surah;
   theme: ThemeColors;
   tr: Translations;
-  activeSurahId: number | null;
+  isActive: boolean;
   isPlaying: boolean;
   isBufferingActive: boolean;
   hasFinished: boolean;
@@ -29,7 +29,7 @@ const QuranSurahRow = React.memo(({
   surah,
   theme,
   tr,
-  activeSurahId,
+  isActive,
   isPlaying,
   isBufferingActive,
   hasFinished,
@@ -40,27 +40,23 @@ const QuranSurahRow = React.memo(({
   onPlayPauseReplay,
   onStop,
 }: Props) => {
-  // Local state
-  const isThisActive = activeSurahId === surah.id;
-  const isThisPlaying = isThisActive && isPlaying;
-  const isThisBuffering = isThisActive && isBufferingActive;
-  const showReplay = isThisActive && hasFinished;
-  const showStop = isThisActive && !isBufferingActive && !hasError;
+  // Derived state (props are already gated to the active row by the parent)
+  const showStop = isActive && !isBufferingActive && !hasError;
   const widthPercent = totalDuration ? (currentProgress / totalDuration) * 100 : 0;
 
   // ------------------------------------------------------------
   // Play button icon — error takes priority over all other states
   // ------------------------------------------------------------
   const playButtonIcon = () => {
-    if (isThisBuffering) return <ActivityIndicator size="small" color={theme.accent} />;
+    if (isBufferingActive) return <ActivityIndicator size="small" color={theme.accent} />;
 
     if (hasError) return <MaterialDesignIcons name="reload-alert" size={34} color={theme.danger} />;
 
     return (
       <Ionicons
-        name={showReplay ? "reload-circle" : (isThisPlaying ? "pause-circle" : "play-circle")}
+        name={hasFinished ? "reload-circle" : (isPlaying ? "pause-circle" : "play-circle")}
         size={34}
-        color={isThisActive ? theme.accent : theme.text2}
+        color={isActive ? theme.accent : theme.text2}
       />
     );
   };
@@ -72,7 +68,7 @@ const QuranSurahRow = React.memo(({
         delayPressIn={0}
         delayPressOut={0}
         activeOpacity={0.3}
-        disabled={isThisBuffering}
+        disabled={isBufferingActive}
         onPress={() => {
           router.navigate({
             pathname: "/quran/ayahs",
@@ -91,7 +87,7 @@ const QuranSurahRow = React.memo(({
           {
             backgroundColor: theme.accentLight,
             borderColor: hasError ? theme.danger : theme.accent,
-            borderWidth: isThisActive ? 2 : 0
+            borderWidth: isActive ? 2 : 0
           }
         ]}
         >
@@ -126,7 +122,7 @@ const QuranSurahRow = React.memo(({
           </View>
 
           {/* Progress bar */}
-          {isThisActive && totalDuration > 0 && (
+          {isActive && totalDuration > 0 && (
             <View style={[styles.progressBar, { backgroundColor: theme.divider }]}>
               <View style={[styles.progressFill, { width: `${widthPercent}%`, backgroundColor: theme.accent }]} />
             </View>
@@ -140,7 +136,6 @@ const QuranSurahRow = React.memo(({
             <TouchableOpacity
               style={styles.playerButton}
               onPress={() => onStop(surah)}
-              disabled={isThisBuffering}
             >
               <Ionicons
                 name="stop-circle"
@@ -154,7 +149,7 @@ const QuranSurahRow = React.memo(({
           <TouchableOpacity
             style={styles.playerButton}
             onPress={() => onPlayPauseReplay(surah)}
-            disabled={isThisBuffering}
+            disabled={isBufferingActive}
           >
             {playButtonIcon()}
           </TouchableOpacity>

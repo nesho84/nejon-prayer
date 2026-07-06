@@ -280,7 +280,7 @@ export default function QuranTabScreen() {
         surah={item}
         theme={theme}
         tr={tr}
-        activeSurahId={activeSurahId}
+        isActive={active}
         // Only active row receives changed values
         isPlaying={active && isPlaying}
         isBufferingActive={active && isBufferingActive}
@@ -289,12 +289,12 @@ export default function QuranTabScreen() {
         currentProgress={active ? currentTime : 0}
         totalDuration={active ? duration : 0}
         rowHeight={ROW_HEIGHT}
-        onPlayPauseReplay={(surah) => handlePlayPauseReplay(surah)}
-        onStop={(surah) => handleStop(surah)}
+        onPlayPauseReplay={handlePlayPauseReplay}
+        onStop={handleStop}
       />
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, tr, activeSurahId, isPlaying, hasFinished, playbackError, currentTime, duration]);
+  }, [theme, tr, activeSurahId, isPlaying, isBufferingActive, hasFinished, playbackError, currentTime, duration]);
 
   // Loading state
   if (!isQuranReady) {
