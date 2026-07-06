@@ -46,9 +46,8 @@ describe('quranPlayerStore', () => {
   });
 
   it('syncPlayback stores a playbackError', () => {
-    const err = new Error('stream failed');
-    useQuranPlayerStore.getState().syncPlayback({ playbackError: err });
-    expect(useQuranPlayerStore.getState().playbackError).toBe(err);
+    useQuranPlayerStore.getState().syncPlayback({ playbackError: 'stream failed' });
+    expect(useQuranPlayerStore.getState().playbackError).toBe('stream failed');
   });
 
   it('syncPlayback can reset active surah', () => {

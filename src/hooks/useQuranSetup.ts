@@ -1,7 +1,7 @@
+import { addStatusListener, configureAudioMode } from "@/services/quranPlayerService";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useEffect } from "react";
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability, Event, State } from "react-native-track-player";
 
 export function useQuranSetup() {
   const loadFullQuran = useQuranStore((state) => state.loadFullQuran);
@@ -19,97 +19,50 @@ export function useQuranSetup() {
   }, []);
 
   // ------------------------------------------------------------
-  // Init: Setup TrackPlayer + Sync active track on app start
-  // Handles: previous session restore (user had audio, closed app, reopened)
+  // Init: Global audio mode — background playback + lock-screen association
+  // Non-fatal: playback still works in foreground if this fails
   // ------------------------------------------------------------
   useEffect(() => {
-    const setupAndSync = async () => {
-      // Setup TrackPlayer once on mount
-      try {
-        await TrackPlayer.setupPlayer();
-        await TrackPlayer.updateOptions({
-          capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
-          android: {
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-            alwaysPauseOnInterruption: true,
-          },
-        });
-      } catch (err: unknown) {
-        // Ignore "already initialized" error
-        if (err instanceof Error && err.message.includes('already been initialized')) {
-          return;
-        }
-        console.error('❌ TrackPlayer setup failed:', err);
-        return; // player not initialized — getActiveTrack/getPlaybackState would reject
-      }
-
-      // Sync active track (user started audio → left app → came back)
-      const currentTrack = await TrackPlayer.getActiveTrack();
-      const playerState = await TrackPlayer.getPlaybackState();
-      const active = playerState.state !== State.None;
-      const playing = playerState.state === State.Playing;
-
-      if (currentTrack) {
-        const surahId = parseInt(currentTrack.id.replace("surah-", ""));
-        syncPlayback({
-          activeSurahId: surahId,
-          activeSurahName: currentTrack.title ?? null,
-          isActive: active,
-          isPlaying: playing,
-          isBuffering: false,
-          hasFinished: false,
-        });
-      }
-    };
-    setupAndSync();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    configureAudioMode().catch((err) => {
+      console.error('❌ [useQuranSetup] Audio mode setup failed:', err);
+    });
   }, []);
 
   // ------------------------------------------------------------
-  // Event listener → store
+  // Status listener → store
   // Fires from anywhere: QuranScreen, lock screen, notification, background controls
   // Syncs playback state into the store for global access
   // ------------------------------------------------------------
   useEffect(() => {
-    const onStateChange = TrackPlayer.addEventListener(Event.PlaybackState, (event) => {
-      switch (event.state) {
-        case State.Playing:
-          syncPlayback({ isActive: true, isPlaying: true, isBuffering: false, hasFinished: false, playbackError: null });
-          break
+    const subscription = addStatusListener((status) => {
+      // Idle/stopped — handlers own the store reset; late ticks must not resurrect state
+      if (useQuranPlayerStore.getState().activeSurahId === null) return;
 
-        case State.Paused:
-          syncPlayback({ isActive: true, isPlaying: false, isBuffering: false, hasFinished: false });
-          break;
+      // The listener owns releasing isSwitching: the switch is only over once the player
+      // reports playing (or fails) — the handler releasing it earlier flickers the row
 
-        case State.Buffering:
-        case State.Loading:
-          syncPlayback({ isActive: true, isPlaying: false, isBuffering: true, hasFinished: false });
-          break;
+      // Fires on network failure, bad audio URL, or stream interruption
+      if (status.error) {
+        console.error("❌ [useQuranSetup] Playback error:", status.error);
+        syncPlayback({ playbackError: status.error, isPlaying: false, isBuffering: false, isSwitching: false });
+        return;
+      }
 
-        case State.Ended:
-          syncPlayback({ isActive: true, isPlaying: false, isBuffering: false, hasFinished: true });
-          break;
+      // hasFinished is sticky — only a real playing tick (or the handlers) clears it
+      if (status.didJustFinish) {
+        syncPlayback({ isPlaying: false, isBuffering: false, hasFinished: true, isSwitching: false });
+        return;
+      }
 
-        case State.Stopped:
-          // Player controller (QuranScreen) owns this — store already updated before this fires
-          break;
-
-        case State.None:
-          syncPlayback({ isActive: false, isPlaying: false, isBuffering: false, hasFinished: false });
-          break;
+      if (status.playing) {
+        syncPlayback({ isPlaying: true, isBuffering: false, hasFinished: false, playbackError: null, isSwitching: false });
+      } else {
+        // A not-yet-loaded source counts as buffering (replaces RNTP's Loading state)
+        syncPlayback({ isPlaying: false, isBuffering: status.isBuffering || !status.isLoaded });
       }
     });
 
-    // Fires on network failure, bad audio URL, or stream interruption
-    const onError = TrackPlayer.addEventListener(Event.PlaybackError, (event) => {
-      console.error("❌ TrackPlayer playback error:", event);
-      syncPlayback({ playbackError: event, isPlaying: false, isBuffering: false });
-    });
-
-    return () => {
-      onStateChange.remove();
-      onError.remove();
-    }
+    return () => subscription.remove();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

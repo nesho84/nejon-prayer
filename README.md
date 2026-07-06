@@ -7,7 +7,7 @@ Nejon Prayer is a React Native / Expo app for Muslim daily practice. Its main fe
 - **Prayer times** — fetched once per year from [aladhan.com](https://aladhan.com/prayer-times-api) and cached locally. The calculation method is auto-selected by latitude (Balkans/Turkey vs global fallback).
 - **Prayer notifications** — per-prayer scheduling via `react-native-notify-kit`. Each prayer supports enable/disable, time offset (early/late), and custom azan sound. Special notifications for Friday Jumu'ah and daily quotes.
 - **Prayer tracking** — mark each prayer as prayed, 30-day rolling history.
-- **Quran reader** — Arabic text with transliteration loaded locally from a bundled JSON. Translations fetched per-surah from [alquran.cloud](https://alquran.cloud/api). Audio playback via `react-native-track-player`.
+- **Quran reader** — Arabic text with transliteration loaded locally from a bundled JSON. Translations fetched per-surah from [alquran.cloud](https://alquran.cloud/api). Audio playback via `expo-audio`.
 - **Qibla compass** — bearing to Mecca using `expo-sensors`.
 - **Tesbih (dhikr counter)** — digital prayer bead counter with configurable target and lap tracking.
 - **Islamic holidays** — yearly Islamic holiday dates (Hijri-based) with a next-holiday card on the home screen, a full list screen, and optional reminders for the four major holidays.
@@ -131,7 +131,7 @@ Three notification types:
 
 Two audio systems are used:
 - `react-native-sound` — for azan notification sounds played inside the notification
-- `react-native-track-player` — for the in-app Quran audio player (background-capable)
+- `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranPlayerService.ts`)
 
 ---
 

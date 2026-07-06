@@ -8,7 +8,7 @@ type QuranPlayerData = {
   isSwitching: boolean;
   activeSurahId: number | null;
   activeSurahName: string | null;
-  playbackError: unknown;
+  playbackError: string | null;
 }
 
 interface QuranPlayerState extends QuranPlayerData {

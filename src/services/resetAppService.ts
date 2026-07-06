@@ -1,7 +1,7 @@
 import { cancelAllNotifications } from "@/services/notificationsService";
+import { stopPlayback } from "@/services/quranPlayerService";
 import { storage } from "@/store/storage";
 import * as Updates from "expo-updates";
-import TrackPlayer from "react-native-track-player";
 
 export type RestoreResult =
     | { status: "reloaded" }        // process is relaunching
@@ -26,13 +26,13 @@ export async function restoreDefaults(): Promise<RestoreResult> {
 }
 
 // ------------------------------------------------------------
-// Stop any active playback — non-fatal, TrackPlayer throws if never initialized this session
+// Stop any active playback — non-fatal, continue the wipe regardless
 // ------------------------------------------------------------
 async function stopAudio(): Promise<void> {
     try {
-        await TrackPlayer.reset();
+        await stopPlayback();
     } catch (err) {
-        console.warn("⚠️ [resetAppService] TrackPlayer.reset skipped (player not initialized):", err);
+        console.warn("⚠️ [resetAppService] stopPlayback failed, continuing with wipe:", err);
     }
 }
 

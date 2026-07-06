@@ -22,29 +22,27 @@ npx expo run:android                         # build + install dev-client APK (n
 npx expo prebuild --clean                    # regenerate android/ after native config changes
 ```
 
-Native modules (`react-native-mmkv`, `react-native-notify-kit`, `react-native-track-player`,
-`react-native-nitro-modules`, sensors) **do not work in Expo Go** — use the dev client.
+Native modules (`react-native-mmkv`, `react-native-notify-kit`, `react-native-nitro-modules`,
+sensors) **do not work in Expo Go** — use the dev client.
 See `README.md` for the full build/EAS/OTA/Sentry workflow.
 
-### Do not bump `react-native-track-player`
+### Quran audio (expo-audio)
 
-It is held at `^5.0.0-alpha0` (resolving to the `5.0.0-alpha0-nightly-cad7f4b0...` build), and
-`react-native-track-player` is intentionally listed under `expo.doctor.reactNativeDirectoryCheck.exclude`.
-This is **not** an old/legacy version: it is the last **Apache-2.0 (free)** build of the v5
-New-Architecture rewrite (TurboModule + JSI, Media3 on Android), frozen right before the project
-was renamed to `@rntp/player` and relicensed as commercial. So we already have the New-Arch engine
-for free, and the doctor exclusion is expected (the pinned nightly isn't in the RN directory).
+The Quran player uses `expo-audio` via a module-level singleton wrapped in
+`src/services/quranPlayerService.ts` — the only file that may import expo-audio playback APIs
+(components/hooks go through the service; `useAudioPlayerStatus` in `quran-tab.tsx` is the one
+exception, fed by `getQuranPlayer()`). Lock-screen/notification controls are handled natively
+(no JS playback service); the media notification offers play/pause only — no Stop button.
+Background playback needs the `expo-audio` config plugin with `enableBackgroundPlayback: true`
+in `app.json` and `setActiveForLockScreen` (called in `playSurah`), otherwise Android kills
+audio after ~3 min in background.
 
-- **Don't "upgrade" it.** `@rntp/player` v5.x is the same engine but requires a **paid commercial
-  license** to ship to end users (distributing an app — even free — is "commercial use" per
-  rntp.dev/terms). Downgrading to stable v4.x is a **regression**: legacy ExoPlayer2 bridge
-  instead of Media3/New-Arch, and its `State` enum differs enough to break the switch in
-  `src/hooks/useQuranSetup.ts`.
-- **If the pinned build ever breaks on a newer SDK**, the migration to `@rntp/player` is a ~1:1
-  import rename (the v5 API matches what we already call): swap `'react-native-track-player'` →
-  `'@rntp/player'` in `index.ts`, `src/hooks/useQuranSetup.ts`, `src/app/(tabs)/quran-tab.tsx`,
-  `src/services/resetAppService.ts`, and the two test mocks; then buy a license and re-test
-  background/lock-screen playback on the dev client.
+- `isSwitching` in `quranPlayerStore` is released by the **status listener** in `useQuranSetup`
+  (first playing/error/finish tick), not by the tab handlers — releasing it earlier flickers the
+  row's progress bar while stale duration ticks arrive.
+- Known SDK-57 limitation: swiping the app from recents stops audio (correct) but leaves a
+  stale media notification — expo-audio's `AudioControlsService` has no `onTaskRemoved`
+  handler. No JS-side fix; re-check on the next SDK upgrade.
 
 ## Path aliases
 
@@ -59,7 +57,7 @@ making cross-cutting changes. Key points to internalize:
 
 - **Routing** is Expo Router (file-based). `src/app/_layout.tsx` gates the app behind
   `onboardingStore.onboardingComplete` using `<Stack.Protected>`. Route groups: `(tabs)`,
-  `(modals)` (transparent bottom sheets), `(onboarding)`, `(shared)`, plus `extras/` and `quran/`.
+  `(modals)` (transparent bottom sheets), `(onboarding)`, plus `extras/` and `quran/`.
 
 - **State** is Zustand. Stores in `src/store/` are persisted to **MMKV** via the `persist`
   middleware + the shared `mmkvStorage` adapter in `src/store/storage.ts`. MMKV is synchronous,
@@ -73,11 +71,11 @@ making cross-cutting changes. Key points to internalize:
   (prayers/aladhan, quran/alquran.cloud, location, notifications, sound, holidays). Stores call
   services; components call stores.
 
-- **`index.js`** registers background handlers that run when the app is killed:
-  `TrackPlayer` remote playback events and `notifee.onBackgroundEvent` (notification delivery →
-  `syncNotificationsInBackground`, "done" action → mark prayer prayed). These call
-  `useStore.getState()` directly (not hooks) to **avoid the store ↔ service circular dependency** —
-  preserve that pattern when adding background logic.
+- **`index.js`** registers the background handler that runs when the app is killed:
+  `notifee.onBackgroundEvent` (notification delivery → `syncNotificationsInBackground`,
+  "done" action → mark prayer prayed). It calls `useStore.getState()` directly (not hooks)
+  to **avoid the store ↔ service circular dependency** — preserve that pattern when adding
+  background logic.
 
 - **i18n**: `languageStore` holds the active language; strings live in `src/constants/translations/`
   per feature and language (en/de/sq/tr). Supported: English, German, Albanian, Turkish.

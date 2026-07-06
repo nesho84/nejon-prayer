@@ -3,7 +3,6 @@ import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
 import * as Sentry from '@sentry/react-native';
 import notifee, { EventType } from 'react-native-notify-kit';
-import TrackPlayer, { Event } from 'react-native-track-player';
 import { handleNotificationEvent, sweepStaleDisplayedNotifications } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
 import { usePrayersStore } from './src/store/prayersStore';
@@ -22,18 +21,6 @@ Sentry.init({
     enableLogs: false,
     tracesSampleRate: 0,
     debug: false,
-});
-
-// ------------------------------------------------------------
-// 'react-native-track-player' playback service
-// Listens for remote events (play, pause, stop), while the app is in the background or killed
-// ------------------------------------------------------------
-TrackPlayer.registerPlaybackService(() => {
-    return async () => {
-        TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play());
-        TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
-        TrackPlayer.addEventListener(Event.RemoteStop, () => TrackPlayer.stop());
-    }
 });
 
 // ------------------------------------------------------------

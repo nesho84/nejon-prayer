@@ -1,60 +1,119 @@
 import { useQuranSetup } from '@/hooks/useQuranSetup';
+import { addStatusListener, configureAudioMode } from '@/services/quranPlayerService';
+import { useQuranPlayerStore } from '@/store/quranPlayerStore';
 import { useQuranStore } from '@/store/quranStore';
 import { act, renderHook } from '@testing-library/react-native';
-import TrackPlayer from 'react-native-track-player';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 
-jest.mock('react-native-track-player', () => ({
-  __esModule: true,
-  default: {
-    setupPlayer: jest.fn(() => Promise.resolve()),
-    updateOptions: jest.fn(() => Promise.resolve()),
-    getActiveTrack: jest.fn(() => Promise.resolve(null)),
-    getPlaybackState: jest.fn(() => Promise.resolve({ state: 'none' })),
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  },
-  AppKilledPlaybackBehavior: { StopPlaybackAndRemoveNotification: 'stop' },
-  Capability: { Play: 'play', Pause: 'pause', Stop: 'stop' },
-  Event: { PlaybackState: 'playback-state', PlaybackError: 'playback-error' },
-  State: {
-    None: 'none', Playing: 'playing', Paused: 'paused',
-    Buffering: 'buffering', Loading: 'loading', Ended: 'ended', Stopped: 'stopped',
-  },
+jest.mock('@/services/quranPlayerService', () => ({
+  configureAudioMode: jest.fn(() => Promise.resolve()),
+  addStatusListener: jest.fn(() => ({ remove: jest.fn() })),
 }));
 
-const mockSetupPlayer = TrackPlayer.setupPlayer as jest.Mock;
-const mockGetActiveTrack = TrackPlayer.getActiveTrack as jest.Mock;
+const mockConfigureAudioMode = configureAudioMode as jest.Mock;
+const mockAddStatusListener = addStatusListener as jest.Mock;
+
+// Minimal AudioStatus — only the fields the listener reads
+const makeStatus = (overrides: object = {}) => ({
+  playing: false, isBuffering: false, isLoaded: true, didJustFinish: false, error: null, ...overrides,
+});
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockSetupPlayer.mockResolvedValue(undefined);
-  mockGetActiveTrack.mockResolvedValue(null);
-  (TrackPlayer.updateOptions as jest.Mock).mockResolvedValue(undefined);
-  (TrackPlayer.getPlaybackState as jest.Mock).mockResolvedValue({ state: 'none' });
+  mockConfigureAudioMode.mockResolvedValue(undefined);
+  mockAddStatusListener.mockReturnValue({ remove: jest.fn() });
   useQuranStore.setState({ loadFullQuran: jest.fn() } as any);
+  useQuranPlayerStore.setState({
+    isActive: false, isPlaying: false, isBuffering: false, hasFinished: false,
+    isSwitching: false, activeSurahId: null, activeSurahName: null, playbackError: null,
+  });
 });
 
-describe('useQuranSetup — player setup', () => {
-  it('syncs the active track after successful setup', async () => {
-    renderHook(() => useQuranSetup());
-    await act(async () => {});
-    expect(mockGetActiveTrack).toHaveBeenCalled();
+// Renders the hook and returns the captured status callback
+async function renderWithListener() {
+  const rendered = renderHook(() => useQuranSetup());
+  await act(async () => {});
+  return { ...rendered, cb: mockAddStatusListener.mock.calls[0][0] as (status: any) => void };
+}
+
+describe('useQuranSetup — audio setup', () => {
+  it('configures the audio mode and attaches the status listener on mount', async () => {
+    await renderWithListener();
+    expect(mockConfigureAudioMode).toHaveBeenCalledTimes(1);
+    expect(mockAddStatusListener).toHaveBeenCalledTimes(1);
   });
 
-  it('bails out when setup fails — no calls on an uninitialized player', async () => {
-    mockSetupPlayer.mockRejectedValue(new Error('player exploded'));
-    renderHook(() => useQuranSetup());
-    await act(async () => {});
-    expect(mockGetActiveTrack).not.toHaveBeenCalled();
+  it('still attaches the listener when audio mode setup fails', async () => {
+    mockConfigureAudioMode.mockRejectedValue(new Error('native error'));
+    await renderWithListener();
+    expect(mockAddStatusListener).toHaveBeenCalledTimes(1);
   });
 
-  it('bails out on the benign "already initialized" error too', async () => {
-    mockSetupPlayer.mockRejectedValue(new Error('The player has already been initialized via setupPlayer.'));
-    renderHook(() => useQuranSetup());
-    await act(async () => {});
-    expect(mockGetActiveTrack).not.toHaveBeenCalled();
+  it('removes the listener on unmount', async () => {
+    const remove = jest.fn();
+    mockAddStatusListener.mockReturnValue({ remove });
+    const { unmount } = await renderWithListener();
+    unmount();
+    expect(remove).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useQuranSetup — status → store mapping', () => {
+  it('ignores updates while no surah is active (late ticks must not resurrect state)', async () => {
+    const { cb } = await renderWithListener();
+    act(() => cb(makeStatus({ playing: true })));
+    expect(useQuranPlayerStore.getState().isPlaying).toBe(false);
+  });
+
+  it('syncs a playing tick, clears hasFinished/playbackError, and releases the switching lock', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1, hasFinished: true, playbackError: 'old error', isSwitching: true });
+    act(() => cb(makeStatus({ playing: true })));
+    const s = useQuranPlayerStore.getState();
+    expect(s.isPlaying).toBe(true);
+    expect(s.hasFinished).toBe(false);
+    expect(s.playbackError).toBeNull();
+    expect(s.isSwitching).toBe(false);
+  });
+
+  it('maps a stalled buffering tick to isBuffering', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1, isPlaying: true });
+    act(() => cb(makeStatus({ isBuffering: true })));
+    const s = useQuranPlayerStore.getState();
+    expect(s.isPlaying).toBe(false);
+    expect(s.isBuffering).toBe(true);
+  });
+
+  it('treats a not-yet-loaded tick as buffering (no flicker between switch and playback)', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1, isBuffering: true });
+    act(() => cb(makeStatus({ isLoaded: false })));
+    expect(useQuranPlayerStore.getState().isBuffering).toBe(true);
+  });
+
+  it('keeps hasFinished sticky across a trailing paused tick', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1, isPlaying: true });
+    act(() => cb(makeStatus({ didJustFinish: true })));
+    expect(useQuranPlayerStore.getState().hasFinished).toBe(true);
+
+    // Regression: the next 1s tick after the finish must not clear the replay state
+    act(() => cb(makeStatus()));
+    expect(useQuranPlayerStore.getState().hasFinished).toBe(true);
+  });
+
+  it('stores playback errors, drops the playing/buffering flags, and releases the switching lock', async () => {
+    const { cb } = await renderWithListener();
+    useQuranPlayerStore.setState({ activeSurahId: 1, isPlaying: true, isSwitching: true });
+    act(() => cb(makeStatus({ error: 'stream failed' })));
+    const s = useQuranPlayerStore.getState();
+    expect(s.playbackError).toBe('stream failed');
+    expect(s.isPlaying).toBe(false);
+    expect(s.isBuffering).toBe(false);
+    expect(s.isSwitching).toBe(false);
   });
 });

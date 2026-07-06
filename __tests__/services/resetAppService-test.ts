@@ -1,15 +1,15 @@
 import { cancelAllNotifications } from '@/services/notificationsService';
+import { stopPlayback } from '@/services/quranPlayerService';
 import { restoreDefaults } from '@/services/resetAppService';
 import { storage } from '@/store/storage';
 import * as Updates from 'expo-updates';
-import TrackPlayer from 'react-native-track-player';
 
 jest.mock('expo-updates', () => ({ isEnabled: true, reloadAsync: jest.fn() }));
-jest.mock('react-native-track-player', () => ({ __esModule: true, default: { reset: jest.fn() } }));
+jest.mock('@/services/quranPlayerService', () => ({ stopPlayback: jest.fn() }));
 jest.mock('@/services/notificationsService', () => ({ cancelAllNotifications: jest.fn() }));
 jest.mock('@/store/storage', () => ({ storage: { clearAll: jest.fn() } }));
 
-const mockReset = TrackPlayer.reset as jest.Mock;
+const mockStopPlayback = stopPlayback as jest.Mock;
 const mockCancelAllNotifications = cancelAllNotifications as jest.Mock;
 const mockClearAll = storage.clearAll as jest.Mock;
 const mockReloadAsync = Updates.reloadAsync as jest.Mock;
@@ -20,7 +20,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   (globalThis as any).__DEV__ = false;
   (Updates as any).isEnabled = true;
-  mockReset.mockResolvedValue(undefined);
+  mockStopPlayback.mockResolvedValue(undefined);
   mockCancelAllNotifications.mockResolvedValue(undefined);
   mockClearAll.mockImplementation(() => undefined);
   mockReloadAsync.mockResolvedValue(undefined);
@@ -34,7 +34,7 @@ describe('restoreDefaults', () => {
   it('wipes and reloads on the happy path', async () => {
     const result = await restoreDefaults();
 
-    expect(mockReset).toHaveBeenCalledTimes(1);
+    expect(mockStopPlayback).toHaveBeenCalledTimes(1);
     expect(mockCancelAllNotifications).toHaveBeenCalledTimes(1);
     expect(mockClearAll).toHaveBeenCalledTimes(1);
     expect(mockReloadAsync).toHaveBeenCalledTimes(1);
@@ -54,11 +54,11 @@ describe('restoreDefaults', () => {
   it('returns wiped-no-reload when updates are disabled', async () => {
     // Mutating the already-imported Updates namespace doesn't propagate across the
     // module boundary (Babel's CJS interop copies it) — reset & re-mock instead.
-    // resetModules() also clears the storage/track-player mocks' module cache, so
+    // resetModules() also clears the storage/audio-service mocks' module cache, so
     // re-require everything fresh within this isolated registry.
     jest.resetModules();
     jest.doMock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
-    jest.doMock('react-native-track-player', () => ({ __esModule: true, default: { reset: jest.fn() } }));
+    jest.doMock('@/services/quranPlayerService', () => ({ stopPlayback: jest.fn() }));
     jest.doMock('@/services/notificationsService', () => ({ cancelAllNotifications: jest.fn() }));
     jest.doMock('@/store/storage', () => ({ storage: { clearAll: jest.fn() } }));
 
@@ -91,8 +91,8 @@ describe('restoreDefaults', () => {
     expect(result).toEqual({ status: 'failed' });
   });
 
-  it('still wipes and reloads when TrackPlayer.reset throws (player not initialized)', async () => {
-    mockReset.mockRejectedValue(new Error('player not initialized'));
+  it('still wipes and reloads when stopPlayback throws', async () => {
+    mockStopPlayback.mockRejectedValue(new Error('native error'));
 
     const result = await restoreDefaults();
 

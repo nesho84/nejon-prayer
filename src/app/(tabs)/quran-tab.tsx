@@ -5,7 +5,7 @@ import AppLoading from "@/components/AppLoading";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
 import { globalStyles } from "@/constants/styles";
-import { AUDIO_EDITIONS, getSurahAudioUrl } from "@/services/quranService";
+import { getQuranPlayer, isSurahLoaded, pausePlayback, playSurah, replayFromStart, resumePlayback, stopPlayback } from "@/services/quranPlayerService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranPlayerStore } from "@/store/quranPlayerStore";
 import { useQuranStore } from "@/store/quranStore";
@@ -13,11 +13,11 @@ import { useThemeStore } from "@/store/themeStore";
 import { Surah } from '@/types/quran.types';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import { useAudioPlayerStatus } from "expo-audio";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import TrackPlayer, { useProgress } from "react-native-track-player";
 
 export default function QuranTabScreen() {
   // Stores
@@ -38,10 +38,10 @@ export default function QuranTabScreen() {
   const playbackError = useQuranPlayerStore((state) => state.playbackError);
   const syncPlayback = useQuranPlayerStore((state) => state.syncPlayback);
 
-  // Derived states from TrackPlayer hooks
-  const progress = useProgress(1000);
-  const currentTime = isSwitching ? 0 : (progress.position ?? 0);
-  const duration = isSwitching ? 0 : (progress.duration ?? 0);
+  // Derived states from the player status (1s cadence set at player creation)
+  const status = useAudioPlayerStatus(getQuranPlayer());
+  const currentTime = isSwitching ? 0 : (status.currentTime ?? 0);
+  const duration = isSwitching ? 0 : (status.duration ?? 0);
   const isBufferingActive = isSwitching || isBuffering;
 
   // Local state / refs
@@ -68,49 +68,39 @@ export default function QuranTabScreen() {
   // ------------------------------------------------------------
   const handlePlayPauseReplay = useCallback(async (surah: Surah) => {
     try {
-      const currentTrack = await TrackPlayer.getActiveTrack();
-      if (currentTrack && activeSurahId === surah.id) {
+      if (isSurahLoaded() && activeSurahId === surah.id) {
         if (hasFinished) {
           // Replay from start
-          await TrackPlayer.seekTo(0);
-          await TrackPlayer.play();
+          await replayFromStart();
         } else if (isPlaying) {
           // Pause current
-          await TrackPlayer.pause();
+          pausePlayback();
         } else {
           // Resume current
-          await TrackPlayer.play();
+          resumePlayback();
         }
         return;
       }
 
-      // New surah → stop current, load and play new
+      // New surah → mark active (handlers own isActive, the status listener doesn't write it)
+      // isBuffering starts true so the spinner survives the gap until the first status tick
       syncPlayback({
         isSwitching: true,
+        isActive: true,
+        isBuffering: true,
+        hasFinished: false,
         activeSurahId: surah.id,
         activeSurahName: surah.transliteration,
         playbackError: null,
       });
 
-      // Reset/Clear the foreground/live notification
-      await TrackPlayer.reset();
-
-      // Add new track and play
-      const audioUrl = getSurahAudioUrl(surah.id);
-      await TrackPlayer.add({
-        id: `surah-${surah.id}`,
-        url: audioUrl,
-        title: surah.transliteration,
-        artist: AUDIO_EDITIONS.alafasy,
-        isLiveStream: false,
-      });
-      await TrackPlayer.play();
+      // Load and play + take over the lock-screen/notification controls.
+      // isSwitching stays true until the status listener sees the first playing/error tick —
+      // releasing it earlier lets stale currentTime/duration ticks flash the progress bar.
+      await playSurah(surah.id, surah.transliteration);
     } catch (err) {
       console.error('❌ [quran-tab] Playback failed:', err);
-      syncPlayback({ playbackError: err, isPlaying: false, isBuffering: false });
-    } finally {
-      // Always release listener lock — a rejected await must not strand the buffering UI
-      syncPlayback({ isSwitching: false });
+      syncPlayback({ playbackError: err instanceof Error ? err.message : String(err), isPlaying: false, isBuffering: false, isSwitching: false });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId, isPlaying, hasFinished]);
@@ -120,25 +110,23 @@ export default function QuranTabScreen() {
   // ------------------------------------------------------------
   const handleStop = useCallback(async (surah: Surah) => {
     if (activeSurahId !== surah.id) return;
+    // Reset the store first — with activeSurahId null the status listener ignores the
+    // pause/seek ticks emitted while stopping, so the row can't flicker
+    syncPlayback({
+      isActive: false,
+      isPlaying: false,
+      isBuffering: false,
+      hasFinished: false,
+      isSwitching: false,
+      activeSurahId: null,
+      activeSurahName: null,
+      playbackError: null,
+    });
     try {
-      await TrackPlayer.stop();
-
-      // Reset/Clear the foreground/live notification
-      await TrackPlayer.reset();
+      // Stops playback and clears the lock-screen/notification controls
+      await stopPlayback();
     } catch (err) {
       console.error('❌ [quran-tab] Stop failed:', err);
-    } finally {
-      // Reset all playback-related state in the store
-      syncPlayback({
-        isActive: false,
-        isPlaying: false,
-        isBuffering: false,
-        hasFinished: false,
-        isSwitching: false,
-        activeSurahId: null,
-        activeSurahName: null,
-        playbackError: null,
-      });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId]);
