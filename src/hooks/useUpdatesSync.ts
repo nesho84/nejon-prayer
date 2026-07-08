@@ -11,14 +11,22 @@ import { useEffect } from "react";
 // modal if one exists.
 // ------------------------------------------------------------
 export function useUpdatesSync() {
+  // Gate the dev check on the debug store's hydration (MMKV is sync, so this is already
+  // true by read time — kept for parity with nejon-tasker's async-storage version)
+  const isReady = useDebugStore((state) => state.isReady);
+
+  // Dev-only test for the auto-launch flow — see DebugPanel's -> "Toggle 'Update available' On Launch".
+  // Runs once the debug store has rehydrated, so forceUpdateOnLaunch is its persisted value.
   useEffect(() => {
-    if (__DEV__) {
-      // Dev-only test for the auto-launch flow — see DebugPanel's -> "Toggle 'Update available' On Launch"
-      if (useDebugStore.getState().forceUpdateOnLaunch) {
-        openUpdateAvailableModal();
-      }
-      return;
+    if (!__DEV__ || !isReady) return;
+    if (useDebugStore.getState().forceUpdateOnLaunch) {
+      openUpdateAvailableModal();
     }
+  }, [isReady]);
+
+  // Real update checks (production only), once on mount
+  useEffect(() => {
+    if (__DEV__) return;
 
     const checkOtaUpdate = async () => {
       try {

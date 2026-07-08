@@ -17,6 +17,7 @@ interface DebugState {
   forceQuranPlaying: boolean;
   forceUpdateOnLaunch: boolean;
   updatePreview: UpdatePreview;
+  isReady: boolean;
   toggleHoliday: () => void;
   toggleFriday: () => void;
   toggleQuranPlaying: () => void;
@@ -34,6 +35,7 @@ export const useDebugStore = create<DebugState>()(
       forceQuranPlaying: false,
       forceUpdateOnLaunch: false,
       updatePreview: "idle",
+      isReady: false,
 
       toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
       toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
@@ -49,6 +51,11 @@ export const useDebugStore = create<DebugState>()(
         debugModeEnabled: state.debugModeEnabled,
         forceUpdateOnLaunch: state.forceUpdateOnLaunch,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.isReady = true;
+        }
+      },
     }
   )
 );
