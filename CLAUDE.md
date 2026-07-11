@@ -104,11 +104,10 @@ add the matching test under the parallel `__tests__/` path. `jest` runs in `sile
 
 ## Error tracking
 
-Sentry is initialized in `index.ts` (`enabled: !__DEV__`, so it's off in dev), and `_layout.tsx`
-wraps the root component with `Sentry.wrap`. Init lives in the entry (not `_layout.tsx`) because
-headless background tasks evaluate `index.ts` but never mount the React tree — initializing in
-`_layout.tsx` would leave the SDK uninitialized in the background, silently dropping every
-`captureMessage`/`captureException` there. Background handlers in `index.ts` call
-`Sentry.captureException` in their catch blocks and `await Sentry.flush()` before returning (the
-headless task is torn down before the async transport would otherwise upload) — follow both for
-new background error paths.
+Sentry is initialized in `src/app/_layout.tsx` (`enabled: !__DEV__`, so it's off in dev), which
+also wraps the root component with `Sentry.wrap`. The background handlers in `index.ts`
+deliberately use **no** Sentry: an `await Sentry.flush()` there delayed notification actions,
+and killed-app captures were noise. They log with `console.error` only — keep it that way for
+new background error paths. Sentry calls in stores/services (e.g.
+`syncNotificationsInBackground`) only reach Sentry when the app process has evaluated
+`_layout.tsx` (i.e. backgrounded, not killed); in the headless killed-app path they no-op.
