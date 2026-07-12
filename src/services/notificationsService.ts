@@ -714,7 +714,7 @@ export async function handleNotificationEvent(
     case EventType.DELIVERED:
       // Notification was delivered and shown to user
       console.log(`✅ ${prefix} Notification delivered`);
-      // Background sync handled in index.js
+      // Background sync handled in index.ts
 
       // Actions based on notification type
       // eslint-disable-next-line eqeqeq
@@ -735,7 +735,7 @@ export async function handleNotificationEvent(
         case 'done':
           // "✓ Prayed" action button pressed (prayers only)
           console.log(`🕌 ${prefix} Notification "Prayed" pressed`);
-          // Background tracking handled in index.js and foreground in useNotificationsSync
+          // Background tracking handled in index.ts and foreground in useNotificationsSync
           await cancelDisplayedNotification(notification.id);
           break;
 

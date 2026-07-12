@@ -52,7 +52,13 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
 
     // Handled in notificationsService for both foreground and background
     try {
-        await handleNotificationEvent(type, notification, pressAction, 'background', useNotificationsStore.getState().notifSettings);
+        await handleNotificationEvent(
+            type,
+            notification,
+            pressAction,
+            'background',
+            useNotificationsStore.getState().notifSettings
+        );
     } catch (err) {
         console.error('❌ [index.ts:Background] Failed to handle notification event:', err);
     }

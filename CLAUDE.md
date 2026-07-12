@@ -73,7 +73,7 @@ making cross-cutting changes. Key points to internalize:
   (prayers/aladhan, quran/alquran.cloud, location, notifications, sound, holidays). Stores call
   services; components call stores.
 
-- **`index.js`** registers the background handler that runs when the app is killed:
+- **`index.ts`** registers the background handler that runs when the app is killed:
   `notifee.onBackgroundEvent` (notification delivery → `syncNotificationsInBackground`,
   "done" action → mark prayer prayed). It calls `useStore.getState()` directly (not hooks)
   to **avoid the store ↔ service circular dependency** — preserve that pattern when adding
