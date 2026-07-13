@@ -246,9 +246,13 @@ export function getTriggerTime(
     triggerTime.setMinutes(triggerTime.getMinutes() + offsetMinutes);
   }
 
-  // If time has passed today, schedule for tomorrow
+  // If the time already passed, or is less than 2 min away, schedule for tomorrow.
+  // The buffer prevents duplicates: Fajr fires at 03:45 → the resync runs and today's
+  // Fajr is now 03:46 (times shift daily) → without the buffer 03:46 counts as "future",
+  // gets scheduled for today, and the same notification fires a second time at 03:46.
   const now = new Date();
-  if (triggerTime <= now) {
+  const BUFFER_MS = 120 * 1000; // 2 min
+  if (triggerTime.getTime() - now.getTime() <= BUFFER_MS) {
     // Use tomorrow's actual time if provided and valid, otherwise fall back to today's time
     if (tomorrowTimeStringRaw) {
       const tomorrowTimeString = tomorrowTimeStringRaw.replace(/\u00A0/g, ' ').trim();

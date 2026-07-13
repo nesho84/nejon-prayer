@@ -138,6 +138,31 @@ describe('getTriggerTime', () => {
     });
   });
 
+  describe('time less than 2 min away — advances to tomorrow', () => {
+    it('rolls a time less than 2 min away to tomorrow', () => {
+      // 12:01 is only 1 min away → tomorrow (prevents a prayer firing twice the same day)
+      const result = getTriggerTime('12:01');
+      expect(result!.getDate()).toBe(23);
+      expect(result!.getHours()).toBe(12);
+      expect(result!.getMinutes()).toBe(1);
+    });
+
+    it('uses tomorrow time string when rolling over', () => {
+      const result = getTriggerTime('12:01', 0, '12:02');
+      expect(result!.getDate()).toBe(23);
+      expect(result!.getHours()).toBe(12);
+      expect(result!.getMinutes()).toBe(2);
+    });
+
+    it('keeps a time more than 2 min away today', () => {
+      // 12:05 is 5 min away → stays today
+      const result = getTriggerTime('12:05');
+      expect(result!.getDate()).toBe(22);
+      expect(result!.getHours()).toBe(12);
+      expect(result!.getMinutes()).toBe(5);
+    });
+  });
+
   describe('non-breaking space normalization', () => {
     it('normalizes a non-breaking space in the time string', () => {
       // "\u00A0" is a non-breaking space — should be treated like a regular space

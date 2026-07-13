@@ -62,6 +62,8 @@ export const usePrayersStore = create<PrayersState>()(
           const { yearlyPrayerTimes, fetchedYear } = get();
 
           // Already have data for this year — derive today's times locally
+          // @Edge Case (Dec 31): this early return never fetches next year, so "tomorrow" (Jan 1)
+          // has no data and Jan 1 notifications use Dec 31 times until the first online reload.
           if (yearlyPrayerTimes && fetchedYear === currentYear) {
             const todaysTimes = yearlyPrayerTimes[todayKey] ?? null;
             if (todaysTimes) {
