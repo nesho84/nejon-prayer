@@ -2,7 +2,7 @@ import { PrayerName } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 import { resolveTrackingDate } from '@/utils/tracking';
 import notifee, { EventType } from 'react-native-notify-kit';
-import { handleNotificationEvent, sweepStaleDisplayedNotifications } from './src/services/notificationsService';
+import { handleNotificationEvent } from './src/services/notificationsService';
 import { useNotificationsStore } from './src/store/notificationsStore';
 import { usePrayersStore } from './src/store/prayersStore';
 import { usePrayersTrackingStore } from './src/store/prayersTrackingStore';
@@ -26,12 +26,6 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
             await useNotificationsStore.getState().syncNotificationsInBackground();
         } catch (err) {
             console.error('❌ [index.ts:Background] Failed to sync notifications in background:', err);
-        }
-
-        // On the daily Fajr delivery, clear yesterday's leftover notifications from the tray
-        // @Caution: best-effort — skipped if Fajr is disabled or its delivery is missed
-        if (notification.data?.prayerName === 'Fajr') {
-            await sweepStaleDisplayedNotifications();
         }
     }
 

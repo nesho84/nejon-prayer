@@ -1,5 +1,6 @@
-import { getTriggerTime, getVibrationChannelId, scheduleNotificationsService, sweepStaleDisplayedNotifications } from '@/services/notificationsService';
-import notifee from 'react-native-notify-kit';
+import { getTriggerTime, getVibrationChannelId, handleNotificationEvent, scheduleNotificationsService } from '@/services/notificationsService';
+import { stopSound } from '@/services/soundService';
+import notifee, { EventType } from 'react-native-notify-kit';
 
 jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
@@ -19,7 +20,6 @@ jest.mock('react-native-notify-kit', () => ({
     cancelTriggerNotification: jest.fn(() => Promise.resolve()),
     getNotificationSettings: jest.fn(() => Promise.resolve({ android: { alarm: 'enabled' } })),
     createTriggerNotification: jest.fn(() => Promise.resolve()),
-    getDisplayedNotifications: jest.fn(() => Promise.resolve([])),
     cancelDisplayedNotification: jest.fn(() => Promise.resolve()),
   },
   AndroidCategory: {},
@@ -29,13 +29,12 @@ jest.mock('react-native-notify-kit', () => ({
   AndroidVisibility: {},
   AndroidNotificationSetting: { ENABLED: 'enabled' },
   AuthorizationStatus: {},
-  EventType: {},
+  EventType: { DELIVERED: 'delivered', ACTION_PRESS: 'action_press', PRESS: 'press', DISMISSED: 'dismissed' },
   RepeatFrequency: { WEEKLY: 'weekly' },
   TriggerType: { TIMESTAMP: 'timestamp' },
 }));
 
 const mockCreateTrigger = notifee.createTriggerNotification as jest.Mock;
-const mockGetDisplayed = notifee.getDisplayedNotifications as jest.Mock;
 const mockCancelDisplayed = notifee.cancelDisplayedNotification as jest.Mock;
 
 beforeEach(() => {
@@ -300,35 +299,30 @@ describe('getVibrationChannelId', () => {
   });
 });
 
-describe('sweepStaleDisplayedNotifications', () => {
-  // System time fixed at 2026-05-22 05:00 local → toDateKey() === "2026-05-22"
-  const NOW = new Date(2026, 4, 22, 5, 0, 0);
-  const yesterday = new Date(2026, 4, 21, 13, 0, 0).getTime();
-  const todayMorning = new Date(2026, 4, 22, 4, 50, 0).getTime();
-
+describe('handleNotificationEvent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.setSystemTime(NOW);
-    mockGetDisplayed.mockResolvedValue([
-      { notification: { id: 'prayer-dhuhr', data: { type: 'prayer' } }, date: String(yesterday) },               // earlier day → cancel
-      { notification: { id: 'special-friday', data: { type: 'special' } }, date: String(yesterday) },            // earlier day → cancel
-      { notification: { id: 'prayer-reminder-x', data: { type: 'prayer-reminder' } }, date: String(yesterday) }, // earlier day → cancel
-      { notification: { id: '0', data: {} }, date: String(yesterday) },                                          // earlier day → cancel
-      { notification: { id: 'prayer-fajr', data: { type: 'prayer' } }, date: String(todayMorning) },             // today → keep
-    ]);
   });
 
-  it('cancels every notification shown on an earlier day, regardless of type', async () => {
-    await sweepStaleDisplayedNotifications();
-    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-dhuhr');
-    expect(mockCancelDisplayed).toHaveBeenCalledWith('special-friday');
-    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-reminder-x');
-    expect(mockCancelDisplayed).toHaveBeenCalledWith('0');
-    expect(mockCancelDisplayed).toHaveBeenCalledTimes(4);
+  it('on DISMISSED, stops the sound but does not cancel any displayed notification', async () => {
+    const notification = { id: 'prayer-maghrib', data: { type: 'prayer', prayerName: 'Maghrib' } };
+    await handleNotificationEvent(EventType.DISMISSED, notification, undefined, 'foreground');
+
+    expect(stopSound).toHaveBeenCalledTimes(1);
+    expect(mockCancelDisplayed).not.toHaveBeenCalled();
   });
 
-  it("keeps today's notifications", async () => {
-    await sweepStaleDisplayedNotifications();
-    expect(mockCancelDisplayed).not.toHaveBeenCalledWith('prayer-fajr');
+  it('on ACTION_PRESS "done", cancels the notification that was acted on', async () => {
+    const notification = { id: 'prayer-fajr', data: { type: 'prayer', prayerName: 'Fajr' } };
+    await handleNotificationEvent(EventType.ACTION_PRESS, notification, { id: 'done' }, 'foreground');
+
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-fajr');
+  });
+
+  it('on ACTION_PRESS "dismiss", cancels the notification that was acted on', async () => {
+    const notification = { id: 'prayer-isha', data: { type: 'prayer', prayerName: 'Isha' } };
+    await handleNotificationEvent(EventType.ACTION_PRESS, notification, { id: 'dismiss' }, 'foreground');
+
+    expect(mockCancelDisplayed).toHaveBeenCalledWith('prayer-isha');
   });
 });

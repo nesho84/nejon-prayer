@@ -1,4 +1,4 @@
-import { createNotificationCategories, createNotificationsChannels, handleNotificationEvent, sweepStaleDisplayedNotifications } from '@/services/notificationsService';
+import { createNotificationCategories, createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -73,12 +73,6 @@ export function useNotificationsSync() {
       const { notification, pressAction } = detail;
 
       if (!notification) return;
-
-      // On the daily Fajr delivery, clear yesterday's leftover notifications from the tray
-      // @Caution: best-effort — skipped if Fajr is disabled or its delivery is missed
-      if (type === EventType.DELIVERED && notification.data?.prayerName === 'Fajr') {
-        await sweepStaleDisplayedNotifications();
-      }
 
       // Prayer tracking on 'done' action — done here to avoid circular dependency (store ↔ service)
       if (type === EventType.ACTION_PRESS && pressAction?.id === 'done') {
