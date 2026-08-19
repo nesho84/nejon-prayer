@@ -34,7 +34,7 @@ export const QURAN_FONTS: Record<QuranFontKey, QuranFontDefinition> = {
   amiri: {
     key: "amiri",
     labelKey: "quranFontAmiri",
-    family: "AmiriQuran-Regular",
+    family: "Amiri-Regular",
     sizeScale: 1.15,
     lineHeightRatio: 2.1,
   },

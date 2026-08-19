@@ -1068,7 +1068,7 @@ export const GLOBAL_TR = {
             quranTranslator: "Prevodilac",
             quranPreviewTranslation: "U ime Allaha, Milostivog, Samilosnog.",
             quranFontTitle: "Arapski font",
-            quranFontSystem: "Zadano",
+            quranFontSystem: "Standard",
             quranFontUthmani: "Uthmani",
             quranFontAmiri: "Amiri",
             myProgress: "Moj napredak",

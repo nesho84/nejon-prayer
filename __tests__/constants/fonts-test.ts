@@ -24,7 +24,7 @@ describe('QURAN_FONTS families', () => {
 
   it('defines a family for both embedded fonts', () => {
     expect(getQuranFont('uthmani').family).toBe('KFGQPCUthmanicScriptHAFS');
-    expect(getQuranFont('amiri').family).toBe('AmiriQuran-Regular');
+    expect(getQuranFont('amiri').family).toBe('Amiri-Regular');
   });
 
   it('matches a real file in assets/fonts', () => {
