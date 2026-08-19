@@ -1,3 +1,4 @@
+import { DEFAULT_QURAN_FONT, QuranFontKey } from "@/constants/fonts";
 import { fetchAyahsFromApi, loadQuranTransliterationJson, QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
@@ -35,6 +36,7 @@ type AyahFavoritesData = {
 type QuranSettings = {
   arabicFontSize: number;
   translationFontSize: number;
+  quranFontKey: QuranFontKey;
   selectedEditions: Record<string, string>;
 }
 
@@ -91,6 +93,7 @@ export const useQuranStore = create<QuranState>()(
       // Settings
       arabicFontSize: 19,
       translationFontSize: 15,
+      quranFontKey: DEFAULT_QURAN_FONT,
       selectedEditions: DEFAULT_EDITIONS,
 
       // Favorites
@@ -209,6 +212,7 @@ export const useQuranStore = create<QuranState>()(
         khatamCount: state.khatamCount,
         arabicFontSize: state.arabicFontSize,
         translationFontSize: state.translationFontSize,
+        quranFontKey: state.quranFontKey,
         selectedEditions: state.selectedEditions,
         favoriteAyahs: state.favoriteAyahs,
       }),

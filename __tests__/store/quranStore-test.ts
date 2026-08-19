@@ -1,6 +1,7 @@
 import { fetchAyahsFromApi, loadQuranTransliterationJson } from '@/services/quranService';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
+import { mmkvStorage } from '@/store/storage';
 import { FavoriteAyah } from '@/types/quran.types';
 
 jest.mock('@/store/storage', () => ({
@@ -44,7 +45,7 @@ beforeEach(() => {
     lastReadSurahId: null, lastReadSurahName: null, lastReadAyahId: null,
     lastKhatamSurahId: null, lastKhatamSurahName: null, lastKhatamAyahId: null,
     khatamCount: 0, favoriteAyahs: [],
-    arabicFontSize: 26, translationFontSize: 18,
+    arabicFontSize: 26, translationFontSize: 18, quranFontKey: 'system',
   });
   mockLanguageGetState.mockReturnValue({ language: 'en' });
 });
@@ -149,5 +150,28 @@ describe('quranStore — setQuranSettings', () => {
     useQuranStore.getState().setQuranSettings({ translationFontSize: 20 });
     expect(useQuranStore.getState().translationFontSize).toBe(20);
     expect(useQuranStore.getState().arabicFontSize).toBe(26);
+  });
+
+  it('updates quranFontKey without touching the font sizes', () => {
+    useQuranStore.getState().setQuranSettings({ quranFontKey: 'amiri' });
+    expect(useQuranStore.getState().quranFontKey).toBe('amiri');
+    expect(useQuranStore.getState().arabicFontSize).toBe(26);
+    expect(useQuranStore.getState().translationFontSize).toBe(18);
+  });
+});
+
+describe('quranStore — persistence', () => {
+  // Reading a value that was never persisted has bitten this store before,
+  // so assert the key actually reaches the storage adapter.
+  it('writes quranFontKey into the persisted blob', async () => {
+    useQuranStore.getState().setQuranSettings({ quranFontKey: 'uthmani' });
+    await Promise.resolve(); // createJSONStorage wraps the write in a promise
+
+    const setItem = mmkvStorage.setItem as jest.Mock;
+    expect(setItem).toHaveBeenCalled();
+
+    const [name, blob] = setItem.mock.calls[setItem.mock.calls.length - 1];
+    expect(name).toBe('quran-storage');
+    expect(JSON.parse(blob).state.quranFontKey).toBe('uthmani');
   });
 });

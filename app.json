@@ -72,13 +72,22 @@
       "./src/plugins/resBuild.js",
       "expo-router",
       "expo-status-bar",
-      "expo-font",
       "@react-native-vector-icons/ionicons",
       "@react-native-vector-icons/material-icons",
       "@react-native-vector-icons/material-design-icons",
       "@react-native-vector-icons/feather",
       "@react-native-community/datetimepicker",
       "react-native-notify-kit",
+      "expo-asset",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/KFGQPCUthmanicScriptHAFS.otf",
+            "./assets/fonts/AmiriQuran-Regular.ttf"
+          ]
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -136,8 +145,7 @@
         {
           "enableBackgroundPlayback": true
         }
-      ],
-      "expo-asset"
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

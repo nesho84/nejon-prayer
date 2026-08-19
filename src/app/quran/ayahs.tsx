@@ -40,6 +40,7 @@ export default function AyahsScreen() {
   const lastKhatamAyahId = useQuranStore((state) => state.lastKhatamAyahId);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
+  const quranFontKey = useQuranStore((state) => state.quranFontKey);
   const selectedEditions = useQuranStore((state) => state.selectedEditions);
   const getSurahById = useQuranStore((state) => state.getSurahById);
   const fetchAyahs = useQuranStore((state) => state.fetchAyahs);
@@ -142,6 +143,7 @@ export default function AyahsScreen() {
         theme={theme}
         arabicFontSize={arabicFontSize}
         translationFontSize={translationFontSize}
+        quranFontKey={quranFontKey}
         isSelected={selectedAyah === item.id}
         isAyahFavorited={isAyahFavorite(surahIdNum, item.id)}
         onPress={() => {
@@ -163,7 +165,7 @@ export default function AyahsScreen() {
       />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
+  }, [surahIdNum, surahNameStr, mode, theme, arabicFontSize, translationFontSize, quranFontKey, selectedAyah, translationMap, setLastRead, setLastKhatam, favoriteAyahs, toggleAyahFavorite, isAyahFavorite]);
 
   // ------------------------------------------------------------
   // Share the Khatam celebration

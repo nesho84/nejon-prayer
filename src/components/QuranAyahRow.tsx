@@ -1,3 +1,4 @@
+import { getQuranFont, QuranFontKey } from "@/constants/fonts";
 import { Verse } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
 import { copyText, shareText } from "@/utils/system";
@@ -13,6 +14,7 @@ interface Props {
   theme: ThemeColors;
   arabicFontSize: number;
   translationFontSize: number;
+  quranFontKey: QuranFontKey;
   isSelected: boolean;
   isAyahFavorited: boolean;
   onPress: () => void;
@@ -28,11 +30,16 @@ const QuranAyahRow = React.memo(({
   theme,
   arabicFontSize,
   translationFontSize,
+  quranFontKey,
   isSelected,
   isAyahFavorited,
   onPress,
   onToggleAyahFavorite,
 }: Props) => {
+  // Each face has its own optical size, so scale the user's chosen size per font
+  const arabicFont = getQuranFont(quranFontKey);
+  const arabicSize = arabicFontSize * arabicFont.sizeScale;
+
   // ------------------------------------------------------------
   // Share text cross-platform
   // ------------------------------------------------------------
@@ -94,7 +101,7 @@ const QuranAyahRow = React.memo(({
         </View>
 
         {/* Arabic text */}
-        <Text style={[styles.arabicText, { color: theme.accent, fontSize: arabicFontSize, lineHeight: arabicFontSize * 1.85 }]}>
+        <Text style={[styles.arabicText, { color: theme.accent, fontFamily: arabicFont.family, fontSize: arabicSize, lineHeight: arabicSize * arabicFont.lineHeightRatio }]}>
           {verse.text}
         </Text>
 

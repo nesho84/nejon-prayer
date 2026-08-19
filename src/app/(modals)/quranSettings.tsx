@@ -1,5 +1,6 @@
 import AppCard from "@/components/AppCard";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
+import { getQuranFont, QURAN_FONTS } from "@/constants/fonts";
 import { globalStyles } from "@/constants/styles";
 import { QURAN_TEXT_EDITIONS } from "@/services/quranService";
 import { useLanguageStore } from "@/store/languageStore";
@@ -14,6 +15,9 @@ const ARABIC_MAX = 40;
 const TRANSLATION_MIN = 12;
 const TRANSLATION_MAX = 30;
 
+// Only used if the Quran JSON failed to load — the preview normally shows the real 1:1 text
+const PREVIEW_FALLBACK = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
+
 export default function QuranSettingsScreen() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
@@ -21,12 +25,22 @@ export default function QuranSettingsScreen() {
   const language = useLanguageStore((state) => state.language);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
+  const quranFontKey = useQuranStore((state) => state.quranFontKey);
   const selectedEditions = useQuranStore((state) => state.selectedEditions);
+  const getSurahById = useQuranStore((state) => state.getSurahById);
 
   // Local state (preview before saving)
   const [tempArabicSize, setTempArabicSize] = useState(arabicFontSize);
   const [tempTranslationSize, setTempTranslationSize] = useState(translationFontSize);
+  const [tempFontKey, setTempFontKey] = useState(quranFontKey);
   const [tempSelectedEdition, setTempSelectedEdition] = useState(selectedEditions[language]);
+
+  // Drives the Arabic preview below — same helper the ayah rows use
+  const previewFont = getQuranFont(tempFontKey);
+  const previewArabicSize = tempArabicSize * previewFont.sizeScale;
+  // Real ayah text, not a hand-typed basmala — the JSON uses Quranic marks (U+06E1
+  // and friends) that shape differently, so a literal would preview the wrong thing
+  const previewAyah = getSurahById(1)?.verses?.[0]?.text ?? PREVIEW_FALLBACK;
 
   // Refs
   const ModalSheetRef = useRef<ModalSheetRef>(null);
@@ -35,7 +49,7 @@ export default function QuranSettingsScreen() {
   // Save changes to store and dismiss the Modal
   // ------------------------------------------------------------
   const handleSave = () => {
-    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize && tempSelectedEdition === selectedEditions[language]) {
+    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize && tempFontKey === quranFontKey && tempSelectedEdition === selectedEditions[language]) {
       console.log("No changes detected, skipping save.");
       ModalSheetRef.current?.close();
       return;
@@ -43,11 +57,12 @@ export default function QuranSettingsScreen() {
     useQuranStore.getState().setQuranSettings({
       arabicFontSize: tempArabicSize,
       translationFontSize: tempTranslationSize,
+      quranFontKey: tempFontKey,
       ...(tempSelectedEdition !== selectedEditions[language] && {
         selectedEditions: { ...selectedEditions, [language]: tempSelectedEdition },
       }),
     });
-    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px, Edition: ${tempSelectedEdition}`);
+    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px, Font: ${tempFontKey}, Edition: ${tempSelectedEdition}`);
     ModalSheetRef.current?.close();
   };
 
@@ -135,6 +150,31 @@ export default function QuranSettingsScreen() {
           </AppCard>
         )}
 
+        {/* ------ Arabic Font ------ */}
+        <AppCard style={[styles.settingCard, styles.translatorCard]}>
+          <View style={styles.statusRow}>
+            <Text style={[styles.settingTitle, { color: theme.text2, marginBottom: 2 }]}>
+              {tr.labels.quranFontTitle}:
+            </Text>
+          </View>
+          <View style={styles.chipRow}>
+            {Object.values(QURAN_FONTS).map((font) => {
+              const isActive = tempFontKey === font.key;
+              return (
+                <TouchableOpacity
+                  key={font.key}
+                  onPress={() => setTempFontKey(font.key)}
+                  style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlayLight : 'transparent' }]}
+                >
+                  <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>
+                    {tr.labels[font.labelKey]}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </AppCard>
+
         {/* ------ Arabic Font Size ------ */}
         <AppCard style={[styles.settingCard, styles.fontSizeCard]}>
           <Text style={[styles.settingTitle, { color: theme.text2, paddingHorizontal: 8, marginBottom: 16 }]}>
@@ -162,8 +202,8 @@ export default function QuranSettingsScreen() {
           />
           {/* Arabic Preview */}
           <View style={[styles.previewContainer, { backgroundColor: theme.overlayLight, borderColor: theme.divider2 }]}>
-            <Text style={[styles.previewArabic, { color: theme.accent, fontSize: tempArabicSize, lineHeight: tempArabicSize * 1.85 }]}>
-              بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+            <Text style={[styles.previewArabic, { color: theme.accent, fontFamily: previewFont.family, fontSize: previewArabicSize, lineHeight: previewArabicSize * previewFont.lineHeightRatio }]}>
+              {previewAyah}
             </Text>
           </View>
 
