@@ -1,12 +1,12 @@
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import { globalStyles } from "@/constants/styles";
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
 
@@ -189,21 +189,33 @@ export default function TesbihScreen() {
 
                 {/* Bottom Controls - Inside pill container */}
                 <View style={[styles.controls, { backgroundColor: theme.card }]}>
-                    <TouchableOpacity style={styles.controlBtn} onPress={decrementTotal}>
+                    <Pressable
+                        style={({ pressed }) => [styles.controlBtn, pressed && { backgroundColor: theme.pressed }]}
+                        hitSlop={HIT_SLOP_8}
+                        onPress={decrementTotal}
+                    >
                         <MaterialDesignIcons name="minus" size={24} color={theme.text2} />
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <Text style={[styles.controlValue, { color: theme.text2 }]}>
                         {totalCount}
                     </Text>
 
-                    <TouchableOpacity style={styles.controlBtn} onPress={incrementTotal}>
+                    <Pressable
+                        style={({ pressed }) => [styles.controlBtn, pressed && { backgroundColor: theme.pressed }]}
+                        hitSlop={HIT_SLOP_8}
+                        onPress={incrementTotal}
+                    >
                         <MaterialDesignIcons name="plus" size={24} color={theme.text2} />
-                    </TouchableOpacity>
+                    </Pressable>
 
-                    <TouchableOpacity style={styles.controlBtn} onPress={handleReset}>
+                    <Pressable
+                        style={({ pressed }) => [styles.controlBtn, pressed && { backgroundColor: theme.pressed }]}
+                        hitSlop={HIT_SLOP_8}
+                        onPress={handleReset}
+                    >
                         <MaterialDesignIcons name="reload" size={26} color={theme.primary} />
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
 
             </ScrollView>
@@ -311,10 +323,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-evenly",
         borderRadius: 40,
-        paddingVertical: 14,
+        paddingVertical: 6,
     },
     controlBtn: {
         width: 52,
+        height: 48,
         borderRadius: 20,
         alignItems: "center",
         justifyContent: "center",

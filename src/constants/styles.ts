@@ -1,4 +1,7 @@
-import { StyleSheet } from 'react-native';
+import { Insets, StyleSheet } from 'react-native';
+
+// Extra touch area for small icon buttons.
+export const HIT_SLOP_8: Insets = { top: 8, bottom: 8, left: 8, right: 8 };
 
 // Static, theme-independent styles shared across the app.
 export const globalStyles = StyleSheet.create({
@@ -139,6 +142,12 @@ export const globalStyles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+
+  // Icon-only buttons (pair with HIT_SLOP_8 and a theme.pressed tint)
+  iconButton: {
+    padding: 8,
+    borderRadius: 999,
   },
 
   // Dividers

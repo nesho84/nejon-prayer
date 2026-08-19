@@ -66,6 +66,7 @@ export const LIGHT_COLORS = {
     overlay: "#00000030",
     overlayLight: "#00000012",
     surfaceBg: "#d9dbde",
+    pressed: "#0000001f",
 
     // Utility
     white: "#ffffff",
@@ -143,6 +144,7 @@ export const DARK_COLORS = {
     overlay: "#00000060",
     overlayLight: "#00000033",
     surfaceBg: "#2a3244",
+    pressed: "#ffffff1f",
 
     // Utility
     white: "#ffffff",

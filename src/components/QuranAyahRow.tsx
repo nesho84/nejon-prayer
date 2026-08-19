@@ -1,10 +1,11 @@
 import { getQuranFont, QuranFontKey } from "@/constants/fonts";
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { Verse } from '@/types/quran.types';
 import { ThemeColors } from "@/types/theme.types";
 import { copyText, shareText } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Props {
   surahId: number;
@@ -82,21 +83,33 @@ const QuranAyahRow = React.memo(({
           {/* Share + Copy + Bookmark */}
           <View style={styles.icons}>
             {/* Share button */}
-            <TouchableOpacity onPress={handleShare} hitSlop={8}>
+            <Pressable
+              style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+              hitSlop={HIT_SLOP_8}
+              onPress={handleShare}
+            >
               <Ionicons name="share-social-outline" size={22} color={theme.accent} />
-            </TouchableOpacity>
+            </Pressable>
             {/* Copy button */}
-            <TouchableOpacity onPress={handleCopy} hitSlop={8}>
+            <Pressable
+              style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+              hitSlop={HIT_SLOP_8}
+              onPress={handleCopy}
+            >
               <Ionicons name="copy-outline" size={22} color={theme.accent} />
-            </TouchableOpacity>
+            </Pressable>
             {/* Bookmark button */}
-            <TouchableOpacity onPress={onToggleAyahFavorite} hitSlop={8}>
+            <Pressable
+              style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+              hitSlop={HIT_SLOP_8}
+              onPress={onToggleAyahFavorite}
+            >
               <Ionicons
                 name={isAyahFavorited ? "bookmark" : "bookmark-outline"}
                 size={22}
                 color={isAyahFavorited ? theme.linkHover : theme.accent}
               />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -135,7 +148,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginRight: -8,
+    marginBottom: 8,
   },
   badge: {
     paddingHorizontal: 10,
@@ -149,7 +163,7 @@ const styles = StyleSheet.create({
   },
   icons: {
     flexDirection: "row",
-    gap: 36,
+    gap: 20,
   },
   arabicText: {
     fontSize: 26,

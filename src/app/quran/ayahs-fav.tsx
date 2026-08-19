@@ -1,5 +1,6 @@
 import AppLayout from '@/components/AppLayout';
 import QuranAyahRow from '@/components/QuranAyahRow';
+import { globalStyles, HIT_SLOP_8 } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useQuranStore } from '@/store/quranStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -8,7 +9,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList } from '@shopify/flash-list';
 import { router, Stack } from 'expo-router';
 import { useCallback } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AyahsFavoritesScreen() {
@@ -62,14 +63,13 @@ export default function AyahsFavoritesScreen() {
         options={{
           title: tr.labels.ayahsFavorites,
           headerRight: () => (
-            <TouchableOpacity
-              delayPressIn={0}
-              delayPressOut={0}
-              activeOpacity={0.3}
+            <Pressable
+              style={({ pressed }) => [globalStyles.iconButton, { marginRight: -8 }, pressed && { backgroundColor: theme.pressed }]}
+              hitSlop={HIT_SLOP_8}
               onPress={() => router.navigate('/(modals)/quranSettings')}
             >
               <Ionicons name="settings-outline" size={24} color={theme.text2} />
-            </TouchableOpacity>
+            </Pressable>
           ),
         }}
       />

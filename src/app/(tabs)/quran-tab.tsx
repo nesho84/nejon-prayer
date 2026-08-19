@@ -4,7 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import QuranReadingCard from "@/components/QuranReadingCard";
 import QuranSurahRow from "@/components/QuranSurahRow";
-import { globalStyles } from "@/constants/styles";
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { getQuranPlayer, isSurahLoaded, pausePlayback, playSurah, replayFromStart, resumePlayback, stopPlayback } from "@/services/quranAudioService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranAudioStore } from "@/store/quranAudioStore";
@@ -16,7 +16,7 @@ import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-
 import { useAudioPlayerStatus } from "expo-audio";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function QuranTabScreen() {
@@ -102,7 +102,7 @@ export default function QuranTabScreen() {
       console.error('❌ [quran-tab] Playback failed:', err);
       syncPlayback({ playbackError: err instanceof Error ? err.message : String(err), isPlaying: false, isBuffering: false, isSwitching: false });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId, isPlaying, hasFinished]);
 
   // ------------------------------------------------------------
@@ -128,7 +128,7 @@ export default function QuranTabScreen() {
     } catch (err) {
       console.error('❌ [quran-tab] Stop failed:', err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSurahId]);
 
   // ------------------------------------------------------------
@@ -177,7 +177,7 @@ export default function QuranTabScreen() {
   // ------------------------------------------------------------
   useEffect(() => {
     scrollToPlaying(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   // ------------------------------------------------------------
@@ -225,22 +225,20 @@ export default function QuranTabScreen() {
 
         {/* Right: Favorites + Settings */}
         <View style={styles.headerRightIcons}>
-          <TouchableOpacity
-            delayPressIn={0}
-            delayPressOut={0}
-            activeOpacity={0.3}
+          <Pressable
+            style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+            hitSlop={HIT_SLOP_8}
             onPress={() => router.navigate('/quran/ayahs-fav')}
           >
             <Ionicons name="bookmarks-outline" size={22} color={theme.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            delayPressIn={0}
-            delayPressOut={0}
-            activeOpacity={0.3}
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+            hitSlop={HIT_SLOP_8}
             onPress={() => router.navigate('/(modals)/quranSettings')}
           >
             <Ionicons name="settings-outline" size={24} color={theme.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
@@ -293,7 +291,7 @@ export default function QuranTabScreen() {
         onStop={handleStop}
       />
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, tr, activeSurahId, isPlaying, isBufferingActive, hasFinished, playbackError, currentTime, duration]);
 
   // Loading state
@@ -337,6 +335,7 @@ export default function QuranTabScreen() {
             { paddingTop: isLandscape ? topInset : 0, paddingBottom: bottomInset }
           ]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           initialNumToRender={10}
           maxToRenderPerBatch={10}
           windowSize={21}
@@ -369,6 +368,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
+    marginRight: -4,
   },
   headerIconContainer: {
     width: 58,
@@ -395,10 +395,9 @@ const styles = StyleSheet.create({
   headerRightIcons: {
     marginLeft: 'auto',
     // alignSelf: 'flex-start',
-    marginRight: 4,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 22
+    gap: 6
   },
   divider: {
     height: 1,

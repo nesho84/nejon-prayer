@@ -3,7 +3,7 @@ import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import CheckForUpdate from "@/components/CheckForUpdate";
 import CustomPicker from "@/components/CustomPicker";
-import { globalStyles } from "@/constants/styles";
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import DebugPanel from "@/debug/DebugPanel";
 import { useDebugStore } from "@/debug/debugStore";
 import { restoreDefaults } from "@/services/resetAppService";
@@ -419,7 +419,7 @@ export default function SettingsScreen() {
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
-                    <View style={styles.statusRow}>
+                    <View style={[styles.statusRow, { marginRight: -8 }]}>
                         {/* Prayers Status */}
                         <Text style={[styles.statusText, { color: theme.text2 }]}>
                             {prayerTimes ? (tr.labels.loaded) : (tr.labels.notLoaded)}
@@ -432,8 +432,14 @@ export default function SettingsScreen() {
                         )}
                         {/* Prayers loading icon */}
                         {(prayersLoading || localLoading)
-                            ? (<ActivityIndicator size="small" color={theme.accent} />)
-                            : (<Ionicons name="refresh" size={24} color={theme.accent} onPress={handlePrayersRefresh} />)}
+                            ? (<ActivityIndicator size="small" color={theme.accent} style={globalStyles.iconButton} />)
+                            : (<Pressable
+                                style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+                                hitSlop={HIT_SLOP_8}
+                                onPress={handlePrayersRefresh}
+                            >
+                                <Ionicons name="refresh" size={24} color={theme.accent} />
+                            </Pressable>)}
                     </View>
 
                     {/* prayersError */}

@@ -3,7 +3,7 @@ import AppLayout from '@/components/AppLayout';
 import AppLoading from '@/components/AppLoading';
 import QuranAyahRow from '@/components/QuranAyahRow';
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
-import { globalStyles } from '@/constants/styles';
+import { globalStyles, HIT_SLOP_8 } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
@@ -15,7 +15,7 @@ import { FlashList, FlashListRef, ViewToken } from "@shopify/flash-list";
 import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AyahsScreen() {
@@ -300,15 +300,14 @@ export default function AyahsScreen() {
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 32 }}>
               {/* Quran Settings Icon */}
-              <TouchableOpacity
-                delayPressIn={0}
-                delayPressOut={0}
-                activeOpacity={0.3}
+              <Pressable
+                style={({ pressed }) => [globalStyles.iconButton, { marginRight: -8 }, pressed && { backgroundColor: theme.pressed }]}
+                hitSlop={HIT_SLOP_8}
                 disabled={isLoadingAyahs}
                 onPress={() => router.navigate('/(modals)/quranSettings')}
               >
                 <Ionicons name="settings-outline" size={24} color={theme.text2} />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ),
         }}
