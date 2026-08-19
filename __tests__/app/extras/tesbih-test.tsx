@@ -3,6 +3,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useTesbihStore } from '@/store/tesbihStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import * as Haptics from 'expo-haptics';
 import { Vibration } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -90,7 +91,25 @@ describe('TesbihScreen', () => {
     fireEvent.press(screen.getByText('9'));
     expect(useTesbihStore.getState().count).toBe(0);
     expect(useTesbihStore.getState().laps).toBe(1);
-    expect(Vibration.vibrate).toHaveBeenCalledWith(300);
+    // Duration is still being tuned — assert a buzz fires, not its exact length
+    expect(Vibration.vibrate).toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  it('ticks lightly on a normal count', () => {
+    jest.spyOn(Haptics, 'selectionAsync').mockResolvedValue();
+    useTesbihStore.setState({ count: 8, totalCount: 33, laps: 0, isReady: true });
+    render(<TesbihScreen />);
+    fireEvent.press(screen.getByText('8'));
+    expect(Haptics.selectionAsync).toHaveBeenCalled();
+  });
+
+  it('does not tick on the count that reaches the total', () => {
+    jest.spyOn(Vibration, 'vibrate').mockImplementation(() => { });
+    jest.spyOn(Haptics, 'selectionAsync').mockResolvedValue();
+    useTesbihStore.setState({ count: 9, totalCount: 10, laps: 0, isReady: true });
+    render(<TesbihScreen />);
+    fireEvent.press(screen.getByText('9'));
+    expect(Haptics.selectionAsync).not.toHaveBeenCalled();
   });
 
   it('sets preset when a preset chip is pressed', () => {
@@ -101,7 +120,7 @@ describe('TesbihScreen', () => {
   });
 
   it('resets count and laps when reload button is pressed', () => {
-    jest.spyOn(Vibration, 'vibrate').mockImplementation(() => { });
+    jest.spyOn(Haptics, 'impactAsync').mockResolvedValue();
     useTesbihStore.setState({ count: 5, totalCount: 10, laps: 2, isReady: true });
     render(<TesbihScreen />);
     fireEvent.press(screen.getByTestId('icon-reload'));

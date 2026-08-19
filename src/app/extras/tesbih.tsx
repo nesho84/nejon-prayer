@@ -6,6 +6,7 @@ import { useTesbihStore } from "@/store/tesbihStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import * as Haptics from "expo-haptics";
 import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle } from "react-native-svg";
@@ -40,7 +41,10 @@ export default function TesbihScreen() {
     const handleCount = () => {
         const countReachedTotal = useTesbihStore.getState().setCount();
         if (countReachedTotal) {
-            Vibration.vibrate(300);
+            Vibration.vibrate(500);
+        } else {
+            // Light tick per bead
+            Haptics.selectionAsync();
         }
     };
 
@@ -48,7 +52,7 @@ export default function TesbihScreen() {
     // Reset count to 0
     // ------------------------------------------------------------
     const handleReset = () => {
-        Vibration.vibrate(100);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         useTesbihStore.getState().reset();
     };
 
