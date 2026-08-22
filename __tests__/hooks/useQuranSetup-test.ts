@@ -88,6 +88,35 @@ describe('useQuranSetup — status → store mapping', () => {
     expect(s.isBuffering).toBe(true);
   });
 
+  it('holds the spinner and the switching lock while the new surah downloads', async () => {
+    const { cb } = await renderWithListener();
+    useQuranAudioStore.setState({ activeSurahId: 2, isSwitching: true, isBuffering: true });
+    // Android reports the *intended* play state during STATE_BUFFERING, so the old surah keeps
+    // sending playing:true for the whole download. That tick must not land on the playing branch
+    act(() => cb(makeStatus({ playing: true, isLoaded: false, isBuffering: true })));
+    const s = useQuranAudioStore.getState();
+    expect(s.isBuffering).toBe(true);
+    expect(s.isSwitching).toBe(true);
+    expect(s.isPlaying).toBe(false);
+  });
+
+  it('shows the spinner for a mid-stream stall outside a switch', async () => {
+    const { cb } = await renderWithListener();
+    useQuranAudioStore.setState({ activeSurahId: 1, isPlaying: true, isSwitching: false });
+    // isBuffering alone drives the spinner here — the switching lock is not involved
+    act(() => cb(makeStatus({ playing: true, isLoaded: false, isBuffering: true })));
+    expect(useQuranAudioStore.getState().isBuffering).toBe(true);
+  });
+
+  it('maps a paused tick to a resting row (play icon, no spinner)', async () => {
+    const { cb } = await renderWithListener();
+    useQuranAudioStore.setState({ activeSurahId: 1, isPlaying: true });
+    act(() => cb(makeStatus({ playing: false, isLoaded: true, isBuffering: false })));
+    const s = useQuranAudioStore.getState();
+    expect(s.isPlaying).toBe(false);
+    expect(s.isBuffering).toBe(false);
+  });
+
   it('clears the spinner when a torn-down player reports unloaded (media notification dismissed)', async () => {
     const { cb } = await renderWithListener();
     useQuranAudioStore.setState({ activeSurahId: 1, isPlaying: true });

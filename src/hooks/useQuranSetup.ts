@@ -15,7 +15,7 @@ export function useQuranSetup() {
     requestAnimationFrame(() => {
       loadFullQuran();
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ------------------------------------------------------------
@@ -54,12 +54,15 @@ export function useQuranSetup() {
         return;
       }
 
-      if (status.playing) {
+      // isLoaded is required: during a switch ExoPlayer keeps reporting playing:true for the
+      // OLD surah while the new source downloads. Without the guard those ticks land here and
+      // wipe isBuffering, killing the spinner for the whole download (and any mid-stream stall).
+      if (status.playing && status.isLoaded) {
         syncPlayback({ isPlaying: true, isBuffering: false, hasFinished: false, playbackError: null, isSwitching: false });
       } else {
-        // Only a real stall counts as buffering. !isLoaded must NOT feed the spinner: a torn-down
-        // player reports it too (media notification dismissed → ExoPlayer idle) and no further
-        // ticks follow, so the spinner would hang forever. isSwitching owns the load window.
+        // !isLoaded must NOT feed the spinner: a torn-down player reports it too (media
+        // notification dismissed → ExoPlayer idle) and no further ticks follow, so the spinner
+        // would hang forever. A real load or stall sets isBuffering, which is enough on its own.
         // The error guard stays for iOS, where a failed item keeps reporting isBuffering.
         const hasError = useQuranAudioStore.getState().playbackError !== null;
         syncPlayback({ isPlaying: false, isBuffering: !hasError && status.isBuffering });
@@ -67,6 +70,6 @@ export function useQuranSetup() {
     });
 
     return () => subscription.remove();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
