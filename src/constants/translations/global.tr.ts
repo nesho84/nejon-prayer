@@ -46,6 +46,7 @@ export const GLOBAL_TR = {
             jummah: "Jumu'ah",
             // Settings
             theme: "Theme",
+            surfaceColor: "Surface color",
             language: "Language",
             location: "Location",
             notifications: "Notifications",
@@ -273,6 +274,7 @@ export const GLOBAL_TR = {
             jummah: "Freitagsgebet",
             // Settings
             theme: "Darstellung",
+            surfaceColor: "Oberflächenfarbe",
             language: "Sprache",
             location: "Standort",
             notifications: "Benachrichtigungen",
@@ -500,6 +502,7 @@ export const GLOBAL_TR = {
             jummah: "Joumou'a",
             // Settings
             theme: "Thème",
+            surfaceColor: "Couleur des surfaces",
             language: "Langue",
             location: "Localisation",
             notifications: "Notifications",
@@ -727,6 +730,7 @@ export const GLOBAL_TR = {
             jummah: "Xhumaja",
             // Settings
             theme: "Pamja",
+            surfaceColor: "Ngjyra e sipërfaqes",
             language: "Gjuha",
             location: "Lokacioni",
             notifications: "Njoftimet",
@@ -951,6 +955,7 @@ export const GLOBAL_TR = {
             khatamFinish: "Završi Hatmu",
             jummah: "Džuma",
             theme: "Tema",
+            surfaceColor: "Boja površine",
             language: "Jezik",
             location: "Lokacija",
             notifications: "Obavještenja",
@@ -1161,6 +1166,7 @@ export const GLOBAL_TR = {
             khatamFinish: "Заврши Хатма",
             jummah: "Џума",
             theme: "Тема",
+            surfaceColor: "Боја на површината",
             language: "Јазик",
             location: "Локација",
             notifications: "Известувања",
@@ -1374,6 +1380,7 @@ export const GLOBAL_TR = {
             jummah: "Cuma",
             // Settings
             theme: "Tema",
+            surfaceColor: "Yüzey rengi",
             language: "Dil",
             location: "Konum",
             notifications: "Bildirimler",
@@ -1601,6 +1608,7 @@ export const GLOBAL_TR = {
             jummah: "الجمعة",
             // Settings
             theme: "المظهر",
+            surfaceColor: "لون السطح",
             language: "اللغة",
             location: "الموقع",
             notifications: "الإشعارات",

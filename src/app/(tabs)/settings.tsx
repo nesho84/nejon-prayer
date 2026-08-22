@@ -15,7 +15,7 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Language, LANGUAGES } from "@/types/language.types";
 import { SpecialType } from "@/types/notification.types";
-import { Theme, THEMES } from "@/types/theme.types";
+import { SURFACE_THEMES, SurfaceId, Theme, THEMES } from "@/types/theme.types";
 import { openAlarmPermissionSettings, openBatteryOptimizationSettings, openNotificationSettings } from "@/utils/system";
 import Slider from '@react-native-community/slider';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
@@ -42,6 +42,8 @@ export default function SettingsScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const themeMode = useThemeStore((state) => state.themeMode);
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
+    const surface = useThemeStore((state) => state.surface);
     const language = useLanguageStore((state) => state.language);
     const tr = useLanguageStore((state) => state.tr);
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
@@ -355,6 +357,33 @@ export default function SettingsScreen() {
                         backgroundColor={theme.overlay}
                         modalBackgroundColor={theme.card}
                     />
+
+                    <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+
+                    {/* ------ Surface Color ------ */}
+                    <Text style={[styles.surfaceLabel, { color: theme.text2 }]}>
+                        {tr.labels.surfaceColor}
+                    </Text>
+                    <View style={styles.surfaces}>
+                        {(Object.keys(SURFACE_THEMES[resolvedTheme]) as SurfaceId[]).map((id) => (
+                            <TouchableOpacity
+                                key={id}
+                                style={[
+                                    styles.surfaceBtn,
+                                    {
+                                        backgroundColor: SURFACE_THEMES[resolvedTheme][id].card,
+                                        borderColor: surface === id ? theme.primary : theme.border,
+                                        borderWidth: surface === id ? 2 : 1,
+                                    }
+                                ]}
+                                onPress={() => useThemeStore.getState().setSurface(id)}
+                                disabled={localLoading}
+                                accessibilityRole="radio"
+                                accessibilityState={{ selected: surface === id }}
+                                accessibilityLabel={id}
+                            />
+                        ))}
+                    </View>
                 </AppCard>
 
                 {/* ------ Language Setting ------ */}
@@ -791,6 +820,25 @@ const styles = StyleSheet.create({
     },
     fetchedDateText: {
         fontSize: 12,
+    },
+
+    // Surface picker
+    surfaceLabel: {
+        fontSize: 13.5,
+        fontWeight: '600',
+        letterSpacing: 0.1,
+        marginBottom: 11,
+        marginLeft: 1,
+    },
+    surfaces: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    surfaceBtn: {
+        flex: 1,
+        height: 34,
+        borderRadius: 17,
+        borderWidth: 1,
     },
 
     // Presets

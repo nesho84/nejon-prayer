@@ -153,3 +153,12 @@ export const DARK_COLORS = {
     islamicGreen: "#009000",
     transparent: "transparent",
 };
+
+// Surface variants
+export const DARK_NEUTRAL = { ...DARK_COLORS, card: "#2b2b2b", card2: "#383838", card3: "#4a4a4a", borderCard: "#393939" };
+export const DARK_WARM = { ...DARK_COLORS, card: "#312822", card2: "#413630", card3: "#57483e", borderCard: "#3f342c" };
+export const DARK_GREEN = { ...DARK_COLORS, card: "#232f28", card2: "#303f36", card3: "#41564a", borderCard: "#2e3c33" };
+
+export const LIGHT_NEUTRAL = { ...LIGHT_COLORS, card: "#e9eff8", card2: "#dde6f3", card3: "#cdd9ec", borderCard: "#d4dfef" };
+export const LIGHT_WARM = { ...LIGHT_COLORS, card: "#f8f1e2", card2: "#f0e7d4", card3: "#e5d8bf", borderCard: "#e8dcc2" };
+export const LIGHT_GREEN = { ...LIGHT_COLORS, card: "#e8f4ec", card2: "#d8ebde", card3: "#c9e0d1", borderCard: "#d3e6da" };
