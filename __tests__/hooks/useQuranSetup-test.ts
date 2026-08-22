@@ -88,11 +88,12 @@ describe('useQuranSetup — status → store mapping', () => {
     expect(s.isBuffering).toBe(true);
   });
 
-  it('treats a not-yet-loaded tick as buffering (no flicker between switch and playback)', async () => {
+  it('clears the spinner when a torn-down player reports unloaded (media notification dismissed)', async () => {
     const { cb } = await renderWithListener();
-    useQuranAudioStore.setState({ activeSurahId: 1, isBuffering: true });
+    useQuranAudioStore.setState({ activeSurahId: 1, isPlaying: true });
+    // ExoPlayer goes idle and stops ticking — a spinner here would never resolve
     act(() => cb(makeStatus({ isLoaded: false })));
-    expect(useQuranAudioStore.getState().isBuffering).toBe(true);
+    expect(useQuranAudioStore.getState().isBuffering).toBe(false);
   });
 
   it('keeps hasFinished sticky across a trailing paused tick', async () => {

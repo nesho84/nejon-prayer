@@ -57,12 +57,12 @@ export function useQuranSetup() {
       if (status.playing) {
         syncPlayback({ isPlaying: true, isBuffering: false, hasFinished: false, playbackError: null, isSwitching: false });
       } else {
-        // A not-yet-loaded source counts as buffering (replaces RNTP's Loading state).
-        // But a failed source stays unloaded forever — once an error is showing, don't let
-        // !isLoaded resurrect the spinner (it also disables the retry button). The user's
-        // retry clears playbackError and re-enters buffering.
+        // Only a real stall counts as buffering. !isLoaded must NOT feed the spinner: a torn-down
+        // player reports it too (media notification dismissed → ExoPlayer idle) and no further
+        // ticks follow, so the spinner would hang forever. isSwitching owns the load window.
+        // The error guard stays for iOS, where a failed item keeps reporting isBuffering.
         const hasError = useQuranAudioStore.getState().playbackError !== null;
-        syncPlayback({ isPlaying: false, isBuffering: !hasError && (status.isBuffering || !status.isLoaded) });
+        syncPlayback({ isPlaying: false, isBuffering: !hasError && status.isBuffering });
       }
     });
 
