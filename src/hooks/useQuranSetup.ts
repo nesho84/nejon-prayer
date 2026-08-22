@@ -38,8 +38,8 @@ export function useQuranSetup() {
       // Idle/stopped — handlers own the store reset; late ticks must not resurrect state
       if (useQuranAudioStore.getState().activeSurahId === null) return;
 
-      // The listener owns releasing isSwitching: the switch is only over once the player
-      // reports playing (or fails) — the handler releasing it earlier flickers the row
+      // The listener owns releasing isSwitching: the switch is only over once the player reports
+      // playing *and loaded* (or fails) — the handler releasing it earlier flickers the row
 
       // Fires on network failure, bad audio URL, or stream interruption
       if (status.error) {

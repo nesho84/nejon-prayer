@@ -38,13 +38,33 @@ in `app.json` and `setActiveForLockScreen` (called in `playSurah`), otherwise An
 audio after ~3 min in background.
 
 - `isSwitching` in `quranAudioStore` is released by the **status listener** in `useQuranSetup`
-  (first playing/error/finish tick), not by the tab handlers — releasing it earlier flickers the
-  row's progress bar while stale duration ticks arrive.
-- **Known regression vs RNTP (SDK-57 limitation):** swiping the app from recents stops audio
-  (correct) but leaves a **stale media notification** in the tray. RNTP removed it via
-  `AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification`; expo-audio's `AudioControlsService`
-  has no `onTaskRemoved` handler, and the JS process is dead so there's no JS-side fix. Re-check on
-  the next expo-audio upgrade (upstream MediaSession fixes are queued in the unpublished changelog).
+  (first *loaded* playing / error / finish tick), not by the tab handlers — releasing it earlier
+  flickers the row's progress bar while stale duration ticks arrive. The `isLoaded` half matters:
+  during a switch ExoPlayer reports `playing: true` for the OLD surah for the whole download
+  (`playing` is the *intended* state while `STATE_BUFFERING`), so a bare `status.playing` check
+  releases the lock and kills the spinner. Only visible on slow connections.
+- **Known regression vs RNTP — investigated Aug 2026, accepted, not being chased.** Swiping the
+  app from recents is **not consistent**: the first kill in a session tears down audio and the
+  notification, a later kill leaves both running. Stopping from the tray then reopening shows a
+  stale "playing" icon that pressing stop clears — low frequency, no data loss, hence parked.
+  **The JS runtime is not dead** — the media foreground service keeps the process alive, so
+  `quranAudioStore` (not persisted) is never reset and freezes at the last tick received. Do not
+  assume a dead process here; a JS-side *recovery* is possible. What was ruled out and found:
+  - expo-audio 57.0.4 / expo 57.0.15 — the fix for expo#46137 shipped as expo#46147 in 56.0.10
+    and is already in our copy. **Upgrading is not the answer.**
+  - `AudioControlsService.setPlayerOptions` branches on player identity: the first activation
+    calls `startForeground()`, later activations with the *same* player only call `notify()`.
+    With a module-singleton player, a second `playSurah` in a surviving runtime always takes the
+    weaker branch.
+  - `stopPlayback()` → `clearLockScreenControls()` → `unregisterPlayer()` calls
+    `stopForeground(STOP_FOREGROUND_REMOVE)` but never unbinds, and media3 treats `stopSelf` as a
+    no-op while a controller is still bound.
+  - `AudioControlsService` has no `onTaskRemoved` handler (RNTP used
+    `AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification`), so *clearing the notification*
+    still needs native work. Upstream: androidx/media#805 — `onTaskRemoved` not called on recents
+    dismissal, OEM-conditional.
+  - Starting point if a frozen-state report ever comes in: `player.currentStatus` is a
+    synchronous property read that needs no live subscription.
 
 ## Path aliases
 
