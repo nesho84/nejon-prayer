@@ -12,6 +12,9 @@ export default function QuranLayout() {
       screenOptions={{
         headerStyle: { backgroundColor: theme.bg },
         headerTintColor: theme.text,
+        animation: "ios_from_right",
+        // replace defaults to a pop animation — Next Surah should read as forward
+        animationTypeForReplace: "push",
       }}
     >
       <Stack.Screen

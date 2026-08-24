@@ -12,6 +12,7 @@ export default function ExtrasLayout() {
             screenOptions={{
                 headerStyle: { backgroundColor: theme.bg },
                 headerTintColor: theme.text,
+                animation: "ios_from_right",
             }}
         >
             <Stack.Screen
