@@ -18,7 +18,6 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerCountdown } from "@/types/prayer.types";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-import { MaterialIcons } from "@react-native-vector-icons/material-icons/static";
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -193,7 +192,7 @@ export default function HomeScreen() {
                                 {formattedDateHeader}
                             </Text>
                             <View style={styles.locationInfoRow}>
-                                <MaterialIcons name="my-location" size={14} color={theme.accent} style={{ marginLeft: -4, marginTop: 0.8 }} />
+                                <Ionicons name="navigate-circle-outline" size={14} color={theme.accent} style={{ marginLeft: -4, marginTop: 0.8 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
                                     {timeZone?.location || "Location"}
                                 </Text>

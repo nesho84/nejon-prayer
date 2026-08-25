@@ -372,7 +372,7 @@ export default function SettingsScreen() {
                                     styles.surfaceBtn,
                                     {
                                         backgroundColor: SURFACE_THEMES[resolvedTheme][id].card,
-                                        borderColor: surface === id ? theme.primary : theme.border,
+                                        borderColor: surface === id ? theme.gray : theme.border,
                                         borderWidth: surface === id ? 2 : 1,
                                     }
                                 ]}
@@ -425,8 +425,8 @@ export default function SettingsScreen() {
                         onPress={updateLocation}
                         disabled={localLoading}
                     >
-                        <MaterialDesignIcons name="web-refresh" size={16} color={theme.text2} />
-                        <Text style={[styles.wideButtonText, { color: theme.text2 }]}>
+                        <Ionicons name="navigate-circle-outline" size={18} color={theme.accent} />
+                        <Text style={[styles.wideButtonText, { color: theme.accent }]}>
                             {location ? (tr.labels.locationButtonText1) : (tr.labels.locationButtonText2)}
                         </Text>
                     </TouchableOpacity>
@@ -739,8 +739,8 @@ export default function SettingsScreen() {
                         onPress={handleResetApp}
                         disabled={localLoading}
                     >
-                        <MaterialDesignIcons name="delete-restore" size={16} color={theme.textMuted} />
-                        <Text style={[styles.wideButtonText, { color: theme.textMuted }]}>
+                        <MaterialDesignIcons name="delete-restore" size={17} color={theme.danger + '90'} />
+                        <Text style={[styles.wideButtonText, { color: theme.danger + '90' }]}>
                             {tr.labels.resetAppButton}
                         </Text>
                     </TouchableOpacity>
@@ -832,12 +832,14 @@ const styles = StyleSheet.create({
     },
     surfaces: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-evenly',
         gap: 12,
     },
     surfaceBtn: {
         flex: 1,
-        height: 34,
-        borderRadius: 17,
+        height: 32,
+        borderRadius: 16,
         borderWidth: 1,
     },
 
@@ -846,8 +848,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-evenly',
-        gap: 6,
         marginVertical: 6,
+        gap: 6,
     },
     presetBtn: {
         width: 30,

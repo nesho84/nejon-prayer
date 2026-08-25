@@ -12,6 +12,7 @@ interface Props {
   isCurrent?: boolean;                  // 'card' variant only — current-prayer highlight
   isFriday?: boolean;                   // drives the Xhumaja badge on Dhuhr
   variant?: 'card' | 'plain';           // 'card' = home (border/bg), 'plain' = modal (borderless)
+  readOnly?: boolean;                   // informational row — no tracking icon, no press, full opacity
   notifState?: 'off' | 'on' | 'custom'; // bell icon state (home only); default 'off'
   onTrackingPress?: () => void;         // mark/unmark; row is a TouchableOpacity only when trackable
   onNotifIconPress?: () => void;        // present → render the right-side notification icon (home only)
@@ -29,6 +30,7 @@ export default function PrayerRow({
   isCurrent = false,
   isFriday = false,
   variant = 'card',
+  readOnly = false,
   notifState = 'off',
   onTrackingPress,
   onNotifIconPress,
@@ -44,9 +46,10 @@ export default function PrayerRow({
   const iconColor = isTrackable && isCurrent ? theme.accent : theme.text2;
 
   // ------------------------------------------------------------
-  // Tracking icon: dash (non-trackable), empty ring, or green check
+  // Tracking icon: dash (non-trackable), empty ring, or green check.
+  // Read-only rows drop it — nothing here is markable.
   // ------------------------------------------------------------
-  const trackingIcon = !isTrackable ? (
+  const trackingIcon = readOnly ? null : !isTrackable ? (
     <MaterialDesignIcons name="minus" size={TRACKING_ICON_SIZE} color={theme.placeholder} />
   ) : !isPrayed ? (
     <View style={[styles.trackCircle, { borderColor: isCurrent ? theme.placeholder : theme.divider2 }]} />
@@ -115,8 +118,12 @@ export default function PrayerRow({
       },
     ]}>
 
-      {/* Left: mark/unmark area (trackable) or plain view (non-trackable) */}
-      {isTrackable ? (
+      {/* Left: read-only view, mark/unmark area (trackable), or dimmed view (non-trackable) */}
+      {readOnly ? (
+        <View style={[styles.prayerRowLeft, isCard ? styles.leftCard : styles.leftPlain]}>
+          {rowContent}
+        </View>
+      ) : isTrackable ? (
         <TouchableOpacity
           style={[styles.prayerRowLeft, isCard ? styles.leftCard : styles.leftPlain]}
           delayPressIn={0}

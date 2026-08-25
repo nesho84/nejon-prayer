@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Critical: Design system
+
+For any UI or new-feature work, read `.claude/skills/nejon-design/SKILL.md` first.
+
 ## Critical: Expo SDK version
 
 This project is on **Expo SDK 57 / React Native 0.86 / React 19**. Expo APIs change between

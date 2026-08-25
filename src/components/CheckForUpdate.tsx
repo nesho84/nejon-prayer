@@ -128,8 +128,8 @@ export default function CheckForUpdate() {
           <ActivityIndicator size="small" color={theme.textSecondary} />
         ) : (
           <>
-            <MaterialDesignIcons name="update" size={16} color={theme.textSecondary} />
-            <Text style={[styles.wideButtonText, { color: theme.textSecondary }]}>
+            <MaterialDesignIcons name="update" size={18} color={theme.gray} />
+            <Text style={[styles.wideButtonText, { color: theme.gray }]}>
               {tr.labels.checkUpdateButton}
             </Text>
           </>
