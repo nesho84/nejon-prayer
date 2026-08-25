@@ -361,28 +361,30 @@ export default function SettingsScreen() {
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
                     {/* ------ Surface Color ------ */}
-                    <Text style={[styles.surfaceLabel, { color: theme.text2 }]}>
-                        {tr.labels.surfaceColor}
-                    </Text>
-                    <View style={styles.surfaces}>
-                        {(Object.keys(SURFACE_THEMES[resolvedTheme]) as SurfaceId[]).map((id) => (
-                            <TouchableOpacity
-                                key={id}
-                                style={[
-                                    styles.surfaceBtn,
-                                    {
-                                        backgroundColor: SURFACE_THEMES[resolvedTheme][id].card,
-                                        borderColor: surface === id ? theme.gray : theme.border,
-                                        borderWidth: surface === id ? 2 : 1,
-                                    }
-                                ]}
-                                onPress={() => useThemeStore.getState().setSurface(id)}
-                                disabled={localLoading}
-                                accessibilityRole="radio"
-                                accessibilityState={{ selected: surface === id }}
-                                accessibilityLabel={id}
-                            />
-                        ))}
+                    <View style={[styles.statusRow, { marginHorizontal: 4 }]}>
+                        <Text style={[styles.statusText, { color: theme.text2, opacity: 0.8 }]}>
+                            {tr.labels.surfaceColor}:
+                        </Text>
+                        <View style={styles.surfaces}>
+                            {(Object.keys(SURFACE_THEMES[resolvedTheme]) as SurfaceId[]).map((id) => (
+                                <TouchableOpacity
+                                    key={id}
+                                    style={[
+                                        styles.surfaceBtn,
+                                        {
+                                            backgroundColor: SURFACE_THEMES[resolvedTheme][id].card,
+                                            borderColor: surface === id ? theme.gray : theme.border,
+                                            borderWidth: surface === id ? 2 : 1,
+                                        }
+                                    ]}
+                                    onPress={() => useThemeStore.getState().setSurface(id)}
+                                    disabled={localLoading}
+                                    accessibilityRole="radio"
+                                    accessibilityState={{ selected: surface === id }}
+                                    accessibilityLabel={id}
+                                />
+                            ))}
+                        </View>
                     </View>
                 </AppCard>
 
@@ -823,21 +825,12 @@ const styles = StyleSheet.create({
     },
 
     // Surface picker
-    surfaceLabel: {
-        fontSize: 13.5,
-        fontWeight: '600',
-        letterSpacing: 0.1,
-        marginBottom: 11,
-        marginLeft: 1,
-    },
     surfaces: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-evenly',
-        gap: 12,
+        gap: 14,
     },
     surfaceBtn: {
-        flex: 1,
+        width: 32,
         height: 32,
         borderRadius: 16,
         borderWidth: 1,
