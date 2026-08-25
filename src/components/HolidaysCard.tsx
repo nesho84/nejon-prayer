@@ -10,12 +10,19 @@ import { formatDateKey, toDateKey } from "@/utils/datetime";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 
 type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
 type ThemeKey = keyof ThemeColors;
 
-const IslamicHolidaysCard = React.memo(() => {
+interface Props {
+  holiday?: Pick<UpcomingHoliday, 'name' | 'gregorianDate'>;  // omit → self-computed upcoming
+  right?: React.ReactNode;                                    // omit → days-until block
+  style?: ViewStyle | ViewStyle[];
+  testID?: string;
+}
+
+const HolidaysCard = React.memo(({ holiday, right, style, testID }: Props) => {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -30,6 +37,8 @@ const IslamicHolidaysCard = React.memo(() => {
   // Detect next upcoming holiday within its showFromDays window
   // ------------------------------------------------------------
   const upcoming = useMemo(() => {
+    // A holiday was handed in — nothing to look up
+    if (holiday) return null;
     if (!yearlyHolidays) return null;
 
     // DEBUG: force-show a fake upcoming holiday for UI testing (Debug Panel toggle)
@@ -39,24 +48,21 @@ const IslamicHolidaysCard = React.memo(() => {
 
     // Compute real upcoming holiday based on dates
     return getNextHoliday(yearlyHolidays, toDateKey());
-  }, [yearlyHolidays, forceHoliday]);
+  }, [holiday, yearlyHolidays, forceHoliday]);
+
+  const target = holiday ?? upcoming;
 
   // Nothing upcoming — render nothing
-  if (!upcoming) return null;
+  if (!target) return null;
 
   // Metadata + translations — both complete records, clean access
-  const meta = HOLIDAY_META[upcoming.name];
-  const holidayTr = holidaysTr.holidays[upcoming.name];
+  const meta = HOLIDAY_META[target.name];
+  const holidayTr = holidaysTr.holidays[target.name];
   // Format date "2027-02-08" → "08.02.2027"
-  const formattedDate = formatDateKey(upcoming.gregorianDate);
+  const formattedDate = formatDateKey(target.gregorianDate);
 
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() => router.navigate("/extras/holidays")}
-      style={[styles.container, { backgroundColor: theme.card }]}
-    >
-
+  const content = (
+    <>
       {/* Left - Icon Box */}
       <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
         {<MaterialDesignIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />}
@@ -71,26 +77,45 @@ const IslamicHolidaysCard = React.memo(() => {
         </Text>
       </View>
 
-      {/* Right — days and label */}
-      <View style={styles.rightRow}>
-        <Text style={[styles.days, { color: theme[meta.color as ThemeKey] }]}>{upcoming.daysUntil}</Text>
-        <Text style={[styles.daysLabel, { color: theme.placeholder }]}>{tr.labels.days}</Text>
-      </View>
+      {/* Right — caller's node, or days and label */}
+      {right ?? (
+        <View style={styles.rightRow}>
+          <Text style={[styles.days, { color: theme[meta.color as ThemeKey] }]}>{upcoming?.daysUntil}</Text>
+          <Text style={[styles.daysLabel, { color: theme.placeholder }]}>{tr.labels.days}</Text>
+        </View>
+      )}
+    </>
+  );
 
+  // A handed-in holiday is a plain row — the caller owns padding and any press behaviour
+  if (holiday) {
+    return (
+      <View testID={testID} style={[styles.container, { backgroundColor: theme.card }, style]}>
+        {content}
+      </View>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      testID={testID}
+      activeOpacity={0.7}
+      onPress={() => router.navigate("/extras/holidays")}
+      style={[styles.container, styles.containerPadding, { backgroundColor: theme.card }, style]}
+    >
+      {content}
     </TouchableOpacity>
   );
 });
 
-IslamicHolidaysCard.displayName = 'IslamicHolidaysCard';
+HolidaysCard.displayName = 'HolidaysCard';
 
-export default IslamicHolidaysCard;
+export default HolidaysCard;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 9,
-    paddingHorizontal: 12,
     gap: 14,
     // Card Shadow
     borderRadius: 16,
@@ -98,6 +123,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+  },
+  // Self-computing card only — a handed-in row sets its own
+  containerPadding: {
+    paddingVertical: 9,
+    paddingHorizontal: 12,
   },
 
   // Left - Icon Box

@@ -1,24 +1,20 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
+import HolidaysCard from "@/components/HolidaysCard";
 import { globalStyles } from "@/constants/styles";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { ALL_HOLIDAYS, HOLIDAY_META, HolidayName } from "@/types/holiday.types";
-import { ThemeColors } from "@/types/theme.types";
+import { ALL_HOLIDAYS, HolidayName } from "@/types/holiday.types";
 import { formatDateKey, toDateKey } from "@/utils/datetime";
 import { shareText } from "@/utils/system";
 import { Feather } from "@react-native-vector-icons/feather/static";
-import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
-type ThemeKey = keyof ThemeColors;
 
 interface HolidayItem {
     key: string;
@@ -113,39 +109,28 @@ export default function HolidaysScreen() {
     // Render item with actions
     // ------------------------------------------------------------
     const renderItem = useCallback(({ item }: { item: HolidayItem }) => {
-        const meta = HOLIDAY_META[item.name];
         const itemTr = holidaysTr.holidays[item.name];
         const formattedDate = formatDateKey(item.gregorianDate);
         const isShared = sharedKey === item.key;
 
         return (
-            <AppCard
+            <HolidaysCard
                 testID={`holiday-${item.key}`}
-                style={[styles.itemCard, { backgroundColor: theme.card, opacity: item.isPast ? 0.45 : 1 }]}
-            >
-                <View style={styles.itemRow}>
-                    {/* Left — icon box */}
-                    <View style={[styles.leftRow, { borderColor: theme.divider2 }]}>
-                        <MaterialDesignIcons name={meta.icon as MCIcon} size={meta.size} color={theme[meta.color as ThemeKey]} />
+                holiday={item}
+                style={[styles.itemCard, { opacity: item.isPast ? 0.45 : 1 }]}
+                right={
+                    // Right — action icons
+                    <View style={styles.actions}>
+                        <TouchableOpacity
+                            testID={`share-${item.key}`}
+                            onPress={() => handleShare(item.key, itemTr.name, itemTr.description, formattedDate)}
+                            style={styles.shareButton}
+                        >
+                            <Feather name={isShared ? "check" : "share-2"} size={18} color={isShared ? theme.success : theme.placeholder} />
+                        </TouchableOpacity>
                     </View>
-
-                    {/* Middle — name, desc, date */}
-                    <View style={styles.middleRow}>
-                        <Text style={[styles.itemName, { color: theme[meta.color as ThemeKey] }]}>{itemTr.name}</Text>
-                        <Text style={[styles.itemDesc, { color: theme.textMuted }]}>{itemTr.description}</Text>
-                        <Text style={[styles.itemDate, { color: theme.placeholder }]}>{formattedDate}</Text>
-                    </View>
-
-                    {/* Right — share icon */}
-                    <TouchableOpacity
-                        testID={`share-${item.key}`}
-                        onPress={() => handleShare(item.key, itemTr.name, itemTr.description, formattedDate)}
-                        style={styles.shareButton}
-                    >
-                        <Feather name={isShared ? "check" : "share-2"} size={18} color={isShared ? theme.success : theme.placeholder} />
-                    </TouchableOpacity>
-                </View>
-            </AppCard>
+                }
+            />
         );
     }, [sharedKey, theme, holidaysTr]);
 
@@ -219,38 +204,13 @@ const styles = StyleSheet.create({
         padding: 16,
         marginHorizontal: 8,
         marginBottom: 10,
-        gap: 10,
-    },
-    itemRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 14,
-    },
-    leftRow: {
-        width: 55,
-        height: 55,
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        borderWidth: 1.5,
-        borderRadius: 8,
-    },
-    middleRow: {
-        flex: 1,
-        gap: 2,
-    },
-    itemName: {
-        fontSize: 16,
-        fontWeight: "700",
-    },
-    itemDesc: {
-        fontSize: 12,
-    },
-    itemDate: {
-        fontSize: 11,
     },
 
     // Action Buttons
+    actions: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
     shareButton: {
         padding: 8,
     },

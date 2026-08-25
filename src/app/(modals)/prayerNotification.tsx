@@ -29,7 +29,7 @@ interface SoundsOptionType {
     file: string;
 }
 
-export default function PrayersSettingsScreen() {
+export default function PrayerNotificationScreen() {
     // Get prayer name from route params
     const params = useLocalSearchParams<{ prayer: PrayerName }>();
     const prayerName = params.prayer;

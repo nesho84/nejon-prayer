@@ -4,7 +4,11 @@ import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { YearlyHolidays } from '@/types/holiday.types';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
+import { Text } from 'react-native';
+
+jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -88,6 +92,43 @@ describe('HolidaysCard', () => {
       setHolidays({ eid_adha: ['2026-12-10'] }); // far beyond the 7-day window
       render(<HolidaysCard />);
       expect(screen.toJSON()).toBeNull();
+    });
+  });
+
+  // Used as a list row by extras/holidays.tsx
+  describe('given a holiday', () => {
+    it('renders the passed holiday even when nothing is upcoming', () => {
+      setHolidays({ eid_adha: ['2026-12-10'] }); // nothing in window → self-computing mode renders null
+      render(<HolidaysCard holiday={{ name: 'eid_fitr', gregorianDate: '2027-03-09' }} />);
+      expect(screen.getByText('Eid al-Fitr')).toBeTruthy();
+      expect(screen.getByText('09.03.2027')).toBeTruthy();
+      expect(screen.getByTestId('mci-creation-outline')).toBeTruthy();
+    });
+
+    it('renders the right node instead of the days block', () => {
+      setHolidays({ eid_adha: ['2026-06-19'] }); // would be 3 days away in self-computing mode
+      render(
+        <HolidaysCard
+          holiday={{ name: 'eid_adha', gregorianDate: '2026-06-19' }}
+          right={<Text>share</Text>}
+        />
+      );
+      expect(screen.getByText('share')).toBeTruthy();
+      expect(screen.queryByText('3')).toBeNull();
+      expect(screen.queryByText('days')).toBeNull();
+    });
+
+    it('is a plain row — only the self-computing card navigates on press', () => {
+      setHolidays({ eid_adha: ['2026-06-19'] });
+
+      render(<HolidaysCard testID="card" />);
+      fireEvent.press(screen.getByTestId('card'));
+      expect(router.navigate).toHaveBeenCalledWith('/extras/holidays');
+
+      screen.rerender(
+        <HolidaysCard testID="row" holiday={{ name: 'eid_adha', gregorianDate: '2026-06-19' }} />
+      );
+      expect(screen.getByTestId('row').props.onStartShouldSetResponder).toBeUndefined();
     });
   });
 });
