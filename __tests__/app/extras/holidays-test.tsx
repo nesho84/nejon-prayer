@@ -30,6 +30,15 @@ jest.mock('react-native-safe-area-context', () => ({
   },
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
+// Gesture.Pan() is built at render time — a chainable no-op is enough, the
+// swipe itself can only be exercised on a device.
+jest.mock('react-native-gesture-handler', () => {
+  const chain: any = new Proxy({}, { get: () => () => chain });
+  return {
+    Gesture: { Pan: () => chain },
+    GestureDetector: ({ children }: any) => children,
+  };
+});
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-navigation-bar', () => ({ NavigationBar: { setStyle: jest.fn() } }));
 jest.mock('@react-native-vector-icons/material-design-icons/static', () => {

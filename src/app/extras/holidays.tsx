@@ -14,6 +14,7 @@ import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
@@ -91,6 +92,24 @@ export default function HolidaysScreen() {
     };
 
     // ------------------------------------------------------------
+    // Swipe left → next year, right → previous. Clamped at both ends;
+    // the year badges are the indication that the year changed.
+    // ------------------------------------------------------------
+    const yearSwipe = useMemo(() =>
+        Gesture.Pan()
+            .enabled(AVAILABLE_YEARS.length > 1)
+            .activeOffsetX([-20, 20])
+            .failOffsetY([-15, 15])
+            // Plain state update, no UI-thread work
+            .runOnJS(true)
+            .onEnd((e) => {
+                if (Math.abs(e.translationX) < 60 && Math.abs(e.velocityX) < 500) return;
+                const dir = e.translationX < 0 ? 1 : -1;
+                setSelectedYear((prev) => AVAILABLE_YEARS[AVAILABLE_YEARS.indexOf(prev) + dir] ?? prev);
+            }),
+        [AVAILABLE_YEARS]);
+
+    // ------------------------------------------------------------
     // Render item with actions
     // ------------------------------------------------------------
     const renderItem = useCallback(({ item }: { item: HolidayItem }) => {
@@ -134,57 +153,61 @@ export default function HolidaysScreen() {
     return (
         <AppLayout>
 
-            {/* ITEMS List */}
-            <FlashList
-                data={ITEMS}
-                keyExtractor={(item) => item.key}
-                overrideProps={{ estimatedItemSize: 130 }}
-                ListHeaderComponent={
-                    // HEADER
-                    <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.gray }]}>
-                        <Text style={globalStyles.headerIcon}>✨</Text>
-                        <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{holidaysTr.headerTitle}</Text>
-                        <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{holidaysTr.headerSubtitle}</Text>
-                        {/* Year badges */}
-                        {AVAILABLE_YEARS.length > 1 && (
-                            <View style={styles.yearLinks}>
-                                {AVAILABLE_YEARS.map((year) => (
-                                    <TouchableOpacity
-                                        key={year}
-                                        activeOpacity={0.7}
-                                        onPress={() => setSelectedYear(year)}
-                                        style={[
-                                            styles.yearBadge,
-                                            {
-                                                backgroundColor: selectedYear === year ? theme.gray + '20' : theme.borderCard,
-                                                borderColor: selectedYear === year ? theme.gray : 'transparent',
-                                            },
-                                        ]}
-                                    >
-                                        <Text style={[
-                                            styles.yearBadgeText,
-                                            { color: selectedYear === year ? theme.gray : theme.placeholder },
-                                        ]}>
-                                            {year}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        )}
-                    </AppCard>
-                }
-                renderItem={renderItem}
-                ListFooterComponent={
-                    // FOOTER
-                    <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
-                        <Text style={[styles.footerText, { color: theme.placeholder }]}>
-                            {holidaysTr.footerText}
-                        </Text>
-                    </AppCard>
-                }
-                contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
-                showsVerticalScrollIndicator={false}
-            />
+            {/* ITEMS List — horizontal swipe switches the year */}
+            <GestureDetector gesture={yearSwipe}>
+                <View style={globalStyles.container}>
+                    <FlashList
+                        data={ITEMS}
+                        keyExtractor={(item) => item.key}
+                        overrideProps={{ estimatedItemSize: 130 }}
+                        ListHeaderComponent={
+                            // HEADER
+                            <AppCard style={[globalStyles.headerCard, { backgroundColor: theme.card, borderColor: theme.gray }]}>
+                                <Text style={globalStyles.headerIcon}>✨</Text>
+                                <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{holidaysTr.headerTitle}</Text>
+                                <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{holidaysTr.headerSubtitle}</Text>
+                                {/* Year badges */}
+                                {AVAILABLE_YEARS.length > 1 && (
+                                    <View style={styles.yearLinks}>
+                                        {AVAILABLE_YEARS.map((year) => (
+                                            <TouchableOpacity
+                                                key={year}
+                                                activeOpacity={0.7}
+                                                onPress={() => setSelectedYear(year)}
+                                                style={[
+                                                    styles.yearBadge,
+                                                    {
+                                                        backgroundColor: selectedYear === year ? theme.gray + '20' : theme.borderCard,
+                                                        borderColor: selectedYear === year ? theme.gray : 'transparent',
+                                                    },
+                                                ]}
+                                            >
+                                                <Text style={[
+                                                    styles.yearBadgeText,
+                                                    { color: selectedYear === year ? theme.gray : theme.placeholder },
+                                                ]}>
+                                                    {year}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                )}
+                            </AppCard>
+                        }
+                        renderItem={renderItem}
+                        ListFooterComponent={
+                            // FOOTER
+                            <AppCard style={[styles.footerCard, { backgroundColor: theme.card, borderLeftColor: theme.placeholder }]}>
+                                <Text style={[styles.footerText, { color: theme.placeholder }]}>
+                                    {holidaysTr.footerText}
+                                </Text>
+                            </AppCard>
+                        }
+                        contentContainerStyle={{ paddingTop: topInset, paddingBottom: bottomInset }}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </View>
+            </GestureDetector>
 
         </AppLayout>
     );
