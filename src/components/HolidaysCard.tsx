@@ -1,34 +1,39 @@
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
-import { getNextHoliday } from "@/services/holidaysService";
 import { useDebugStore } from "@/debug/debugStore";
+import { getNextHoliday } from "@/services/holidaysService";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
 import { HOLIDAY_META, UpcomingHoliday } from "@/types/holiday.types";
 import { ThemeColors } from "@/types/theme.types";
 import { formatDateKey, toDateKey } from "@/utils/datetime";
+import { shareText } from "@/utils/system";
+import { Feather } from "@react-native-vector-icons/feather/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { router } from "expo-router";
-import React, { useMemo } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
+import React, { useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 
 type MCIcon = React.ComponentProps<typeof MaterialDesignIcons>['name'];
 type ThemeKey = keyof ThemeColors;
 
 interface Props {
   holiday?: Pick<UpcomingHoliday, 'name' | 'gregorianDate'>;  // omit → self-computed upcoming
-  right?: React.ReactNode;                                    // omit → days-until block
   style?: ViewStyle | ViewStyle[];
   testID?: string;
 }
 
-const HolidaysCard = React.memo(({ holiday, right, style, testID }: Props) => {
+const HolidaysCard = React.memo(({ holiday, style, testID }: Props) => {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
   const yearlyHolidays = useHolidaysStore((state) => state.yearlyHolidays);
   const holidaysTr = HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en;
+
+  // Local state — share confirmation
+  const [isShared, setIsShared] = useState(false);
 
   // DEBUG: force-show the holiday card on any day (Debug Panel toggle)
   const forceHoliday = useDebugStore((state) => state.forceHoliday);
@@ -61,6 +66,38 @@ const HolidaysCard = React.memo(({ holiday, right, style, testID }: Props) => {
   // Format date "2027-02-08" → "08.02.2027"
   const formattedDate = formatDateKey(target.gregorianDate);
 
+  // ------------------------------------------------------------
+  // Info modal — same design as the prayer celebration modal
+  // ------------------------------------------------------------
+  const showInfo = () => {
+    useModalStore.getState().show({
+      type: 'alert',
+      component: (
+        <View style={globalStyles.bannerContainer}>
+          <Feather name="info" size={40} color={theme.accent} />
+          <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{holidayTr.name}</Text>
+          <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{holidayTr.info}</Text>
+        </View>
+      ),
+      buttons: [{
+        label: 'OK',
+        action: 'ok',
+        buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
+        labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
+      }],
+    });
+  };
+
+  // ------------------------------------------------------------
+  // Share — name, description and date; icon confirms for 10s
+  // ------------------------------------------------------------
+  const handleShare = async () => {
+    if (await shareText(holidayTr.name, `${holidayTr.description}\n\n${formattedDate}`)) {
+      setIsShared(true);
+      setTimeout(() => setIsShared(false), 10000);
+    }
+  };
+
   const content = (
     <>
       {/* Left - Icon Box */}
@@ -77,9 +114,29 @@ const HolidaysCard = React.memo(({ holiday, right, style, testID }: Props) => {
         </Text>
       </View>
 
-      {/* Right — caller's node, or days and label */}
-      {right ?? (
-        <View style={styles.rightRow}>
+      {/* Right — actions on a list row, countdown on the self-computing card */}
+      {holiday ? (
+        <View style={styles.iconsRow}>
+          <Pressable
+            testID={`info-${target.name}`}
+            style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+            hitSlop={HIT_SLOP_8}
+            onPress={showInfo}
+          >
+            <Feather name="info" size={21} color={theme.placeholder} />
+          </Pressable>
+          <Pressable
+            testID={`share-${target.name}`}
+            style={({ pressed }) => [globalStyles.iconButton, pressed && { backgroundColor: theme.pressed }]}
+            hitSlop={HIT_SLOP_8}
+            onPress={handleShare}
+          >
+            <Feather name={isShared ? "check" : "share-2"} size={18} color={isShared ? theme.success : theme.placeholder} />
+          </Pressable>
+        </View>
+      ) : (
+        // Self-computing card — shows countdown to the next holiday
+        <View style={styles.daysRow}>
           <Text style={[styles.days, { color: theme[meta.color as ThemeKey] }]}>{upcoming?.daysUntil}</Text>
           <Text style={[styles.daysLabel, { color: theme.placeholder }]}>{tr.labels.days}</Text>
         </View>
@@ -87,22 +144,15 @@ const HolidaysCard = React.memo(({ holiday, right, style, testID }: Props) => {
     </>
   );
 
-  // A handed-in holiday is a plain row — the caller owns padding and any press behaviour
+  const containerStyle = [styles.container, !style && styles.containerPadding, { backgroundColor: theme.card }, style];
+
+  // A list row carries its own info button — only the self-computing card is pressable
   if (holiday) {
-    return (
-      <View testID={testID} style={[styles.container, { backgroundColor: theme.card }, style]}>
-        {content}
-      </View>
-    );
+    return <View testID={testID} style={containerStyle}>{content}</View>;
   }
 
   return (
-    <TouchableOpacity
-      testID={testID}
-      activeOpacity={0.7}
-      onPress={() => router.navigate("/extras/holidays")}
-      style={[styles.container, styles.containerPadding, { backgroundColor: theme.card }, style]}
-    >
+    <TouchableOpacity testID={testID} activeOpacity={0.7} onPress={showInfo} style={containerStyle}>
       {content}
     </TouchableOpacity>
   );
@@ -124,7 +174,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  // Self-computing card only — a handed-in row sets its own
+  // Default only — pass `style` and you own the padding
   containerPadding: {
     paddingVertical: 9,
     paddingHorizontal: 12,
@@ -157,14 +207,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
 
-  // Right — days and label
-  rightRow: {
+  // Right — action icons (list row)
+  iconsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  // Right — days and label (self-computing card)
+  daysRow: {
     alignItems: "center",
   },
   days: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "800",
-    lineHeight: 28,
+    lineHeight: 26,
     includeFontPadding: false,
     marginRight: 9,
   },

@@ -2,14 +2,14 @@ import HolidaysCard from '@/components/HolidaysCard';
 import { useDebugStore } from '@/debug/debugStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
 import { YearlyHolidays } from '@/types/holiday.types';
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { router } from 'expo-router';
-import { Text } from 'react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import React from 'react';
 
-jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
-
+// system.ts (shareText) imports react-native-notify-kit directly, which is native/unavailable in jest.
+jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -28,10 +28,15 @@ jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   const { View } = require('react-native');
   return { MaterialDesignIcons: ({ name }: any) => React.createElement(View, { testID: `mci-${name}` }) };
 });
+jest.mock('@react-native-vector-icons/feather/static', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return { Feather: ({ name }: any) => React.createElement(View, { testID: `feather-${name}` }) };
+});
 
 const mockTheme = {
   card: '#f5f5f5', divider2: '#ddd', textMuted: '#888', placeholder: '#999',
-  islamicGreen: '#0a0', pink: '#f6a',
+  islamicGreen: '#0a0', pink: '#f6a', accent: '#07a', accentLight: '#cef', text2: '#333',
 } as any;
 
 const mockTr = { labels: { days: 'days' } } as any;
@@ -46,6 +51,7 @@ beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
   useDebugStore.setState({ forceHoliday: false });
+  useModalStore.setState({ visible: false, options: null, resolve: null });
   jest.clearAllMocks();
 });
 
@@ -70,7 +76,7 @@ describe('HolidaysCard', () => {
       setHolidays({ ramadan_start: ['2026-02-18'] });
       render(<HolidaysCard />);
       expect(screen.getByText('Ramadan')).toBeTruthy();
-      expect(screen.getByText('3')).toBeTruthy();          // daysUntil
+      expect(screen.getByText('3')).toBeTruthy();           // daysUntil
       expect(screen.getByText('15.06.2026')).toBeTruthy();  // formatted fake date
       expect(screen.getByText('days')).toBeTruthy();
       expect(screen.getByTestId('mci-star-crescent')).toBeTruthy();
@@ -86,12 +92,29 @@ describe('HolidaysCard', () => {
       expect(screen.getByText('3')).toBeTruthy();
       expect(screen.getByText('19.06.2026')).toBeTruthy();
       expect(screen.getByTestId('mci-sheep')).toBeTruthy();
+      // countdown replaces the action icons here
+      expect(screen.queryByTestId('share-eid_adha')).toBeNull();
     });
 
     it('renders nothing when no holiday is within its window', () => {
       setHolidays({ eid_adha: ['2026-12-10'] }); // far beyond the 7-day window
       render(<HolidaysCard />);
       expect(screen.toJSON()).toBeNull();
+    });
+
+    it('opens the info modal on press instead of navigating', () => {
+      setHolidays({ eid_adha: ['2026-06-19'] });
+      render(<HolidaysCard testID="card" />);
+      fireEvent.press(screen.getByTestId('card'));
+
+      const { visible, options } = useModalStore.getState();
+      expect(visible).toBe(true);
+
+      // The banner carries the info icon, the holiday name and its info text
+      render(options!.component as React.ReactElement);
+      expect(screen.getByTestId('feather-info')).toBeTruthy();
+      expect(screen.getByText('Eid al-Adha')).toBeTruthy();
+      expect(screen.getByText(/Ibrahim/)).toBeTruthy();
     });
   });
 
@@ -105,30 +128,41 @@ describe('HolidaysCard', () => {
       expect(screen.getByTestId('mci-creation-outline')).toBeTruthy();
     });
 
-    it('renders the right node instead of the days block', () => {
-      setHolidays({ eid_adha: ['2026-06-19'] }); // would be 3 days away in self-computing mode
+    it('opens the info modal from the info icon, and is not itself pressable', () => {
+      setHolidays({ eid_adha: ['2026-12-10'] }); // nothing upcoming — the row must still render
       render(
-        <HolidaysCard
-          holiday={{ name: 'eid_adha', gregorianDate: '2026-06-19' }}
-          right={<Text>share</Text>}
-        />
+        <HolidaysCard testID="row" holiday={{ name: 'eid_fitr', gregorianDate: '2027-03-09' }} />
       );
-      expect(screen.getByText('share')).toBeTruthy();
-      expect(screen.queryByText('3')).toBeNull();
-      expect(screen.queryByText('days')).toBeNull();
+
+      // the row is a plain view — no touch responder of its own
+      expect(screen.getByTestId('row').props.onStartShouldSetResponder).toBeUndefined();
+
+      expect(useModalStore.getState().visible).toBe(false);
+      fireEvent.press(screen.getByTestId('info-eid_fitr'));
+
+      const { visible, options } = useModalStore.getState();
+      expect(visible).toBe(true);
+      expect(options?.type).toBe('alert');
+      expect(options?.buttons).toHaveLength(1);
     });
 
-    it('is a plain row — only the self-computing card navigates on press', () => {
-      setHolidays({ eid_adha: ['2026-06-19'] });
+    it('shares the holiday and flips the icon to a checkmark', async () => {
+      const { Share } = require('react-native');
+      Share.share = jest.fn(() => Promise.resolve({ action: Share.sharedAction }));
+      setHolidays({ eid_adha: ['2026-12-10'] });
+      render(<HolidaysCard holiday={{ name: 'eid_fitr', gregorianDate: '2027-03-09' }} />);
 
-      render(<HolidaysCard testID="card" />);
-      fireEvent.press(screen.getByTestId('card'));
-      expect(router.navigate).toHaveBeenCalledWith('/extras/holidays');
+      expect(screen.getByTestId('feather-share-2')).toBeTruthy();
 
-      screen.rerender(
-        <HolidaysCard testID="row" holiday={{ name: 'eid_adha', gregorianDate: '2026-06-19' }} />
+      await act(async () => {
+        fireEvent.press(screen.getByTestId('share-eid_fitr'));
+      });
+
+      expect(Share.share).toHaveBeenCalledWith(
+        { title: 'Eid al-Fitr', message: 'Eid al-Fitr\n\nFeast of breaking the fast\n\n09.03.2027' },
+        { dialogTitle: 'Eid al-Fitr', subject: 'Eid al-Fitr' }
       );
-      expect(screen.getByTestId('row').props.onStartShouldSetResponder).toBeUndefined();
+      expect(screen.getByTestId('feather-check')).toBeTruthy();
     });
   });
 });

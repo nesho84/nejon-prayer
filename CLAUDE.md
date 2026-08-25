@@ -100,7 +100,8 @@ making cross-cutting changes. Key points to internalize:
   background logic.
 
 - **i18n**: `languageStore` holds the active language; strings live in `src/constants/translations/`
-  per feature and language (en/de/sq/tr). Supported: English, German, Albanian, Turkish.
+  per feature and language (en/de/fr/sq/bs/mk/tr/ar). Supported: English, German, French, Albanian,
+  Bosnian, Macedonian, Turkish, Arabic.
 
 - **`src/debug/notificationsTests.ts`** duplicates the notification payload shapes built in
   `src/services/notificationsService.ts` (used by the debug panel to fire test notifications).

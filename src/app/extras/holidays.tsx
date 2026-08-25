@@ -7,9 +7,7 @@ import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { ALL_HOLIDAYS, HolidayName } from "@/types/holiday.types";
-import { formatDateKey, toDateKey } from "@/utils/datetime";
-import { shareText } from "@/utils/system";
-import { Feather } from "@react-native-vector-icons/feather/static";
+import { toDateKey } from "@/utils/datetime";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -31,7 +29,6 @@ export default function HolidaysScreen() {
     const holidaysTr = HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en;
 
     // Local state
-    const [sharedKey, setSharedKey] = useState<string | null>(null);
     const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
 
     // Safe area insets
@@ -78,16 +75,6 @@ export default function HolidaysScreen() {
     }, [ALL_DATES, selectedYear, yearlyHolidays]);
 
     // ------------------------------------------------------------
-    // Share
-    // ------------------------------------------------------------
-    const handleShare = async (id: string, title: string, body: string, date: string) => {
-        if (await shareText(title, `${body}\n\n${date}`)) {
-            setSharedKey(id);
-            setTimeout(() => setSharedKey(null), 10000);
-        }
-    };
-
-    // ------------------------------------------------------------
     // Swipe left → next year, right → previous. Clamped at both ends;
     // the year badges are the indication that the year changed.
     // ------------------------------------------------------------
@@ -106,33 +93,15 @@ export default function HolidaysScreen() {
         [AVAILABLE_YEARS]);
 
     // ------------------------------------------------------------
-    // Render item with actions
+    // Render item — the card owns the info/share actions
     // ------------------------------------------------------------
-    const renderItem = useCallback(({ item }: { item: HolidayItem }) => {
-        const itemTr = holidaysTr.holidays[item.name];
-        const formattedDate = formatDateKey(item.gregorianDate);
-        const isShared = sharedKey === item.key;
-
-        return (
-            <HolidaysCard
-                testID={`holiday-${item.key}`}
-                holiday={item}
-                style={[styles.itemCard, { opacity: item.isPast ? 0.45 : 1 }]}
-                right={
-                    // Right — action icons
-                    <View style={styles.actions}>
-                        <TouchableOpacity
-                            testID={`share-${item.key}`}
-                            onPress={() => handleShare(item.key, itemTr.name, itemTr.description, formattedDate)}
-                            style={styles.shareButton}
-                        >
-                            <Feather name={isShared ? "check" : "share-2"} size={18} color={isShared ? theme.success : theme.placeholder} />
-                        </TouchableOpacity>
-                    </View>
-                }
-            />
-        );
-    }, [sharedKey, theme, holidaysTr]);
+    const renderItem = useCallback(({ item }: { item: HolidayItem }) => (
+        <HolidaysCard
+            testID={`holiday-${item.key}`}
+            holiday={item}
+            style={[styles.itemCard, { opacity: item.isPast ? 0.45 : 1 }]}
+        />
+    ), []);
 
     // Main Content
     return (
@@ -204,15 +173,6 @@ const styles = StyleSheet.create({
         padding: 16,
         marginHorizontal: 8,
         marginBottom: 10,
-    },
-
-    // Action Buttons
-    actions: {
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    shareButton: {
-        padding: 8,
     },
 
     // Year badges (inside header)

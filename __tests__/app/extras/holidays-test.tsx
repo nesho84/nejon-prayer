@@ -1,6 +1,7 @@
 import HolidaysScreen from '@/app/extras/holidays';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
 import { YearlyHolidays } from '@/types/holiday.types';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -85,6 +86,7 @@ beforeEach(() => {
   jest.setSystemTime(new Date('2026-06-16T12:00:00Z')); // "today" → past/future deterministic
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });
   useLanguageStore.setState({ language: 'en' as any });
+  useModalStore.setState({ visible: false, options: null, resolve: null });
   jest.clearAllMocks();
 });
 
@@ -158,5 +160,28 @@ describe('HolidaysScreen', () => {
       },
       { dialogTitle: 'Eid al-Fitr', subject: 'Eid al-Fitr' }
     );
+  });
+
+  it('opens the info modal from the info icon', () => {
+    setHolidays({ eid_fitr: ['2026-12-10'] });
+    render(<HolidaysScreen />);
+
+    fireEvent.press(screen.getByTestId('info-eid_fitr'));
+    expect(useModalStore.getState().visible).toBe(true);
+  });
+
+  // The share button is nested inside the row's touchable — the inner one must win
+  it('does not open the info modal when share is pressed', async () => {
+    const { Share } = require('react-native');
+    Share.share = jest.fn(() => Promise.resolve({ action: Share.sharedAction }));
+    setHolidays({ eid_fitr: ['2026-12-10'] });
+    render(<HolidaysScreen />);
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('share-eid_fitr'));
+    });
+
+    expect(Share.share).toHaveBeenCalledTimes(1);
+    expect(useModalStore.getState().visible).toBe(false);
   });
 });
