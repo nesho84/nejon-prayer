@@ -3,6 +3,7 @@ import { useDebugStore } from '@/debug/debugStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
+import NetInfo from '@react-native-community/netinfo';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import * as ExpoInAppUpdates from 'expo-in-app-updates';
 import { Linking, Platform } from 'react-native';
@@ -11,6 +12,7 @@ jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
+jest.mock('@react-native-community/netinfo', () => ({ fetch: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({ __esModule: true, default: {} }));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
@@ -43,6 +45,7 @@ const mockTr = {
 } as any;
 
 const checkForUpdate = ExpoInAppUpdates.checkForUpdate as jest.Mock;
+const netInfoFetch = NetInfo.fetch as jest.Mock;
 
 beforeEach(() => {
   (Platform as { OS: string }).OS = 'android';
@@ -51,6 +54,7 @@ beforeEach(() => {
   useDebugStore.setState({ updatePreview: 'idle' });
   useModalStore.setState({ visible: false, options: null, resolve: null });
   jest.clearAllMocks();
+  netInfoFetch.mockResolvedValue({ isConnected: true });
 });
 
 describe('CheckForUpdate', () => {
@@ -104,6 +108,18 @@ describe('CheckForUpdate', () => {
         expect.stringContaining('market://')
       );
     });
+  });
+
+  it('shows the error message without asking Play when there is no connection', async () => {
+    netInfoFetch.mockResolvedValueOnce({ isConnected: false });
+    render(<CheckForUpdate />);
+
+    fireEvent.press(screen.getByText('Check for Update'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Could not check for updates')).toBeTruthy();
+    });
+    expect(checkForUpdate).not.toHaveBeenCalled();
   });
 
   it('shows the error message when the check fails', async () => {

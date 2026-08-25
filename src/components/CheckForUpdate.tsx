@@ -6,6 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
 import { openStoreListing } from "@/utils/system";
+import NetInfo from "@react-native-community/netinfo";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
 import * as ExpoInAppUpdates from "expo-in-app-updates";
@@ -83,6 +84,15 @@ export default function CheckForUpdate() {
     setStatus("checking");
     setErrorDetail(null);
     try {
+      // Play serves appUpdateInfo from its own cache and resolves fine offline, reporting
+      // "no update" — bail out first, or we'd show that as "up to date".
+      const { isConnected } = await NetInfo.fetch();
+      if (!isConnected) {
+        setErrorDetail("No internet connection");
+        setStatus("error");
+        return;
+      }
+
       const { updateAvailable } = await ExpoInAppUpdates.checkForUpdate();
       if (updateAvailable) {
         openUpdateAvailableModal();
