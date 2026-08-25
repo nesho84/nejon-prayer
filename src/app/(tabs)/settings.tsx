@@ -361,7 +361,7 @@ export default function SettingsScreen() {
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
                     {/* ------ Surface Color ------ */}
-                    <View style={[styles.statusRow, { marginHorizontal: 4 }]}>
+                    <View style={[styles.statusRow, { marginTop: 2, marginHorizontal: 5 }]}>
                         <Text style={[styles.statusText, { color: theme.text2, opacity: 0.8 }]}>
                             {tr.labels.surfaceColor}:
                         </Text>
@@ -832,7 +832,7 @@ const styles = StyleSheet.create({
     surfaceBtn: {
         width: 32,
         height: 32,
-        borderRadius: 16,
+        borderRadius: 8,
         borderWidth: 1,
     },
 
