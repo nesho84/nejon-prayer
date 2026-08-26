@@ -1,7 +1,9 @@
+import AdBanner from "@/components/AdBanner";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { Tabs } from "expo-router";
+import { BottomTabBar } from "expo-router/js-tabs";
 import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,6 +17,12 @@ export default function TabLayout() {
 
     return (
         <Tabs
+            tabBar={(props) => (
+                <>
+                    <AdBanner />
+                    <BottomTabBar {...props} />
+                </>
+            )}
             screenOptions={{
                 headerShown: false,
                 headerStyle: { backgroundColor: theme.bg },

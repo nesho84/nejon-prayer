@@ -1,5 +1,6 @@
 import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
+import { useAdsSync } from "@/hooks/useAdsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
@@ -62,6 +63,7 @@ function RootLayout() {
   useHolidaysSync();
   useQuranSetup();
   useUpdatesSync();
+  useAdsSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

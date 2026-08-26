@@ -108,6 +108,12 @@
         }
       ],
       [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true
+        }
+      ],
+      [
         "expo-sensors",
         {
           "motionPermission": "Allow $(PRODUCT_NAME) to access device motion for Qibla direction"
@@ -141,9 +147,10 @@
         }
       ],
       [
-        "expo-audio",
+        "react-native-google-mobile-ads",
         {
-          "enableBackgroundPlayback": true
+          "androidAppId": "ca-app-pub-8752479739166396~8421436523",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
       ]
     ],

@@ -102,6 +102,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
+| `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
 
 ### External APIs
 
@@ -132,6 +133,43 @@ Three notification types:
 Two audio systems are used:
 - `react-native-sound` — for azan notification sounds played inside the notification
 - `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranAudioService.ts`)
+
+### Ads (AdMob)
+
+A single dismissible banner sits above the tab bar, injected via the `tabBar` prop in
+`src/app/(tabs)/_layout.tsx`. `BottomTabBar` is imported from **`expo-router/js-tabs`** —
+Expo Router v56 decoupled from React Navigation, so `@react-navigation/bottom-tabs` is not a
+dependency and must not be installed (a second copy would break theming). See the
+[SDK 55→56 migration mapping](https://docs.expo.dev/router/migrate/sdk-55-to-56/).
+
+Flow: `useAdsSync` → `adsStore.initializeAds()` → `adsService.gatherConsentAndInitialize()`.
+UMP consent is gathered **before** `mobileAds().initialize()`, since ads can preload the moment
+initialize is called. If `gatherConsent` throws, `canRequestAds` is still read — UMP falls back to
+the previous session's status. Consent status is **never persisted**; it is re-evaluated every launch.
+`AdBanner` renders `null` unless `canRequestAds` is true, so a consent failure means no ads rather
+than ungated ads.
+
+Four things to know:
+
+- **`iosAppId` in `app.json` is Google's TEST App ID** (`ca-app-pub-3940256099942544~1458002511`).
+  No iOS app is registered in AdMob yet. **Replace it with a real iOS App ID before any App Store
+  release.** It cannot simply be omitted — the native SDK reads it from `Info.plist` at init and
+  crashes on iOS without it. For the same reason `AdBanner` keeps iOS on `TestIds`: the live unit
+  is an Android unit and would never fill on iOS.
+- **A GDPR message must be published in the AdMob console** (Privacy & messaging → European
+  regulations, targeting EEA/UK/CH) and attached to the app. Without it `gatherConsent` throws
+  *"no form(s) configured for the input app ID"*, `canRequestAds` stays false, and the banner
+  silently renders nothing. Publishing a *draft* is not enough.
+- **`react-native-google-mobile-ads` is pinned to `16.3.4` exact — do not add a caret.** 16.4.0+
+  pulls `play-services-ads` 25.3+, which embeds Kotlin 2.3 metadata that RN 0.86's Kotlin 2.1.20
+  compiler cannot read. See Common Build Errors below.
+- **ATT is not configured for iOS.** UMP can present Apple's App Tracking Transparency prompt,
+  which needs `NSUserTrackingUsageDescription` — available as the plugin's
+  `userTrackingUsageDescription` option. Add it before an iOS release.
+
+The plugin also supports `delayAppMeasurementInit` (writes `DELAY_APP_MEASUREMENT_INIT` on Android
+and `GADDelayAppMeasurementInit` on iOS). Not currently enabled. Never hand-edit
+`AndroidManifest.xml` for this — `prebuild --clean` wipes it.
 
 ---
 
@@ -275,6 +313,36 @@ taskkill /F /IM java.exe
 # 3. Retry the build
 npx expo run:android
 ```
+
+### `Module was compiled with an incompatible version of Kotlin` (AdMob)
+
+**Symptom:**
+```
+Task :react-native-google-mobile-ads:compileDebugKotlin FAILED
+e: ...play-services-ads-25.4.0-api.jar!/META-INF/....kotlin_module
+   Module was compiled with an incompatible version of Kotlin.
+   The binary version of its metadata is 2.3.0, expected version is 2.1.0.
+```
+
+**Cause:** `react-native-google-mobile-ads` 16.4.0+ pulls `play-services-ads` 25.3+, which embeds
+Kotlin 2.3 metadata even though the module only consumes its public Java API. RN 0.86 pins Kotlin
+**2.1.20**, and Kotlin metadata is backward-readable only — a 2.1 compiler cannot read 2.3 metadata.
+
+**Fix:** stay pinned to `16.3.4` **exact** (pulls `play-services-ads` 25.0.0). A caret range
+resolves back to 16.5.0 and reintroduces the failure on any fresh `npm install` or CI checkout.
+
+```bash
+npx expo install react-native-google-mobile-ads@16.3.4 -- --save-exact
+```
+
+Upstream: [invertase#863](https://github.com/invertase/react-native-google-mobile-ads/issues/863)
+(open) and [invertase#866](https://github.com/invertase/react-native-google-mobile-ads/pull/866),
+which adds `-Xskip-metadata-version-check` for Kotlin < 2.3 — approved but blocked on a CLA, so
+there is no released fix yet. Re-check before unpinning.
+
+> Bumping the project's Kotlin via `expo-build-properties.android.kotlinVersion` is **not** the
+> fix — see [expo/expo#22464](https://github.com/expo/expo/issues/22464) for why it doesn't
+> reliably apply through prebuild.
 
 ---
 
