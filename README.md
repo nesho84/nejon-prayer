@@ -156,6 +156,11 @@ Four things to know:
   release.** It cannot simply be omitted — the native SDK reads it from `Info.plist` at init and
   crashes on iOS without it. For the same reason `AdBanner` keeps iOS on `TestIds`: the live unit
   is an Android unit and would never fill on iOS.
+- **Release builds serve the live unit.** `AdBanner` falls back to `TestIds` only when `__DEV__`
+  (and always on iOS), so a local release APK shows real ads — don't tap them during QA. To test
+  a release build safely, register the device via
+  `setRequestConfiguration({ testDeviceIdentifiers: [...] })`, which returns test ads even from
+  the live unit.
 - **A GDPR message must be published in the AdMob console** (Privacy & messaging → European
   regulations, targeting EEA/UK/CH) and attached to the app. Without it `gatherConsent` throws
   *"no form(s) configured for the input app ID"*, `canRequestAds` stays false, and the banner
@@ -167,9 +172,10 @@ Four things to know:
   which needs `NSUserTrackingUsageDescription` — available as the plugin's
   `userTrackingUsageDescription` option. Add it before an iOS release.
 
-The plugin also supports `delayAppMeasurementInit` (writes `DELAY_APP_MEASUREMENT_INIT` on Android
-and `GADDelayAppMeasurementInit` on iOS). Not currently enabled. Never hand-edit
-`AndroidManifest.xml` for this — `prebuild --clean` wipes it.
+`delayAppMeasurementInit` is **enabled** in the plugin config (writes `DELAY_APP_MEASUREMENT_INIT`
+on Android and `GADDelayAppMeasurementInit` on iOS). It postpones Google's app measurement so
+nothing is tracked before the consent form is answered — the same reason consent runs before
+`initialize()`. Never hand-edit `AndroidManifest.xml` for this — `prebuild --clean` wipes it.
 
 ---
 

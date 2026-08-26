@@ -150,7 +150,8 @@
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-8752479739166396~8421436523",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true
         }
       ]
     ],

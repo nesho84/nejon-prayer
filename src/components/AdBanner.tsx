@@ -6,12 +6,14 @@ import { useState } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { BannerAd, BannerAdSize, TestIds } from "react-native-google-mobile-ads";
 
-// TestIds while testing — clicking a live ad from your own device gets the AdMob account
-// suspended. No iOS ad unit is registered yet, so iOS stays on the test unit too.
-const BANNER_UNIT_ID =
-  __DEV__ || Platform.OS === "ios"
-    ? TestIds.BANNER
-    : "ca-app-pub-8752479739166396/7743991128";
+// Live ad units — no iOS app is registered in AdMob yet, so iOS holds the test unit until one is.
+const ANDROID_BANNER_UNIT_ID = "ca-app-pub-8752479739166396/7743991128";
+const IOS_BANNER_UNIT_ID = TestIds.BANNER;
+
+const PLATFORM_BANNER_UNIT_ID = Platform.OS === "android" ? ANDROID_BANNER_UNIT_ID : IOS_BANNER_UNIT_ID;
+
+// TestIds in dev — clicking a live ad from your own device risks the AdMob account.
+const BANNER_UNIT_ID = __DEV__ ? TestIds.BANNER : PLATFORM_BANNER_UNIT_ID;
 
 export default function AdBanner() {
   // Stores
