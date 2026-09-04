@@ -3,9 +3,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
-// Debug-only store backing the Debug Panel toggles. forceUpdateOnLaunch and
-// debugModeEnabled are persisted (need to survive a reload); the rest reset
-// to OFF on restart.
+// Debug-only store backing the Debug Panel toggles.
+// forceUpdateOnLaunch and debugModeEnabled persist across reloads; the rest reset to OFF.
 // ------------------------------------------------------------
 
 export type UpdatePreview = "idle" | "upToDate" | "error";

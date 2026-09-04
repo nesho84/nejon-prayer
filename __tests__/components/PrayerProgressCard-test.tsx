@@ -124,7 +124,7 @@ describe('PrayerProgressCard — week row follows prayerTimesDate, not the devic
   });
 
   it('badge always shows only the current month regardless of leading/trailing overflow cells', () => {
-    usePrayersStore.setState({ prayerTimesDate: '2026-07-01' } as any); // July has Jun 29-30 leading + Aug 1-2 trailing
+    usePrayersStore.setState({ prayerTimesDate: '2026-07-01' } as any); // Jun 29-30 lead, Aug 1-2 trail
     render(<PrayerProgressCard />);
 
     // Week view — "July 2026", not "June - July 2026"

@@ -58,7 +58,8 @@ export async function debugPrayerN({ options, notifSettings, seconds = 10 }: Deb
 
         await notifee.createTriggerNotification(
             {
-                id: "prayer-fajr", // this is good test case for fajr, because when fajr delieved it will sweep all other notifications, so we can test that too
+                // Fajr is the useful case — its delivery sweeps all other notifications
+                id: "prayer-fajr",
                 title: title,
                 body: body,
                 data: {
@@ -396,8 +397,7 @@ export async function debugDailyQuoteN({ options, notifSettings, seconds = 10 }:
 }
 
 // ------------------------------------------------------------
-// Returns all channels + scheduled notifications as a plain object
-// (for displaying in the debug JSON viewer modal)
+// All channels + scheduled notifications, for the debug JSON viewer modal
 // ------------------------------------------------------------
 export async function getScheduledNData(): Promise<object> {
     const channels = await notifee.getChannels();

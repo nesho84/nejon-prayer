@@ -50,10 +50,9 @@ async function fetchHolidaysForHijriYear(hijriYear: number): Promise<AladhanHoli
 }
 
 // ------------------------------------------------------------
-// Fetch and normalize all known holidays for the current and next
-// Hijri year. Fetched once per year — covers the full Gregorian
-// year ahead. Returns a map keyed by HolidayName:
-// { ramadan_start: ["2027-02-08", "2028-01-28"], ... }
+// Fetch and normalize all known holidays for the current and next Hijri year.
+// Fetched once per year — covers the full Gregorian year ahead.
+// Returns { ramadan_start: ["2027-02-08", "2028-01-28"], ... }
 // ------------------------------------------------------------
 export async function getYearlyHolidays(): Promise<{ holidays: YearlyHolidays; complete: boolean }> {
   let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -81,8 +80,8 @@ export async function getYearlyHolidays(): Promise<{ holidays: YearlyHolidays; c
     const gToHData: AladhanGToHResponse = await gToHRes.json();
     const hijriYear = parseInt(gToHData.data.hijri.year);
 
-    // Fetch all holidays for the previous, current and next Hijri year
-    // (prev covers Jan–Jun holidays that fall in the current Gregorian year)
+    // Previous, current and next Hijri year — prev covers Jan–Jun holidays
+    // that fall in the current Gregorian year
     const results = await Promise.allSettled([
       fetchHolidaysForHijriYear(hijriYear - 1),
       fetchHolidaysForHijriYear(hijriYear),

@@ -18,19 +18,15 @@ interface AladhanCalendarResponse {
     data?: Record<string, AladhanDayData[]>; // { "1": [...], "2": [...], ... }
 }
 
-// Latitude Adjustment Method 2: One Seventh of the Night
-// Required for high-latitude regions (Europe, Canada, northern US, Russia, etc.)
-// where standard angle-based Fajr/Isha calculation breaks down in summer due to
-// persistent twilight. ONE_SEVENTH divides the night into 7 equal parts and
-// derives Fajr/Isha proportionally. Has zero effect at normal latitudes —
-// angle-based calculation is used as-is there.
+// Latitude Adjustment Method 2: One Seventh of the Night — divides the night into 7 equal
+// parts and derives Fajr/Isha proportionally. Needed at high latitudes (Europe, Canada,
+// northern US, Russia) where persistent summer twilight breaks the angle-based calculation.
+// No effect at normal latitudes, where angle-based is used as-is.
 const ALADHAN_LATITUDE_ADJUSTMENT = 2;
 
 // ------------------------------------------------------------
-// Country → Aladhan calculation method mapping
-// Based on the closest Islamic authority per region.
-// Falls back to MWL (3) for unlisted countries.
-// Only countries with a non-MWL method are listed explicitly.
+// Country → Aladhan calculation method, by closest Islamic authority per region.
+// Only non-MWL countries are listed; everything else falls back to MWL (3).
 // ------------------------------------------------------------
 const COUNTRY_METHOD_MAP: Record<string, number> = {
     // North Africa
@@ -106,28 +102,22 @@ export function getMethodForCountry(countryCode: string | null | undefined): num
 // ------------------------------------------------------------
 // @TODO: Future — User Calculation Preferences (Advanced Settings)
 // ------------------------------------------------------------
-// Allow advanced users to override the default calculation settings:
+// Let advanced users override the three defaults above — stored in Zustand/MMKV and
+// passed into getYearlyPrayerTimes() instead of the constants:
 //
-// 1. Calculation Method: Default is per-country map above. Users could select
-//    their local authority (e.g. Diyanet for Turkey, Egyptian for Egypt, etc.)
-//    to match their neighborhood mosque exactly.
+//   1. Calculation Method — per-country map today; let users pick their local authority
+//      (Diyanet for Turkey, Egyptian for Egypt, …) to match their own mosque.
+//   2. Latitude Adjustment — ONE_SEVENTH (2) today; expose ANGLE_BASED (3) and
+//      MIDDLE_OF_NIGHT (1).
+//   3. Asr School — Standard/Shafi (0) today; toggle to Hanafi (1) for South Asia
+//      (Pakistan, India, Bangladesh).
 //
-// 2. Latitude Adjustment: Default is ONE_SEVENTH (2). Could be exposed for
-//    users who prefer ANGLE_BASED (3) or MIDDLE_OF_NIGHT (1).
-//
-// 3. Asr School: Default is Standard/Shafi (school=0). Should be toggleable
-//    to Hanafi (school=1) for users in South Asia (Pakistan, India, Bangladesh).
-//
-// These preferences would be stored in Zustand/MMKV and passed into the
-// getYearlyPrayerTimes() call, replacing the constants above.
-// A cache invalidation (bump storage key or reset fetchedYear) would be
-// required whenever the user changes any of these settings.
+// Any change needs a cache invalidation (bump the storage key or reset fetchedYear).
 // ------------------------------------------------------------
 
 // ------------------------------------------------------------
-// Fetch yearly prayer times from aladhan.com API
-// Fetched once per year, on first app start and on location change.
-// Returns a flat map of { "YYYY-MM-DD": PrayerTimes } for all 365 days.
+// Fetch a full year of prayer times from aladhan.com — once per year, on first app
+// start and on location change. Returns a flat { "YYYY-MM-DD": PrayerTimes } map.
 // ------------------------------------------------------------
 export async function getYearlyPrayerTimes(location: AppLocation, year: number, countryCode: string): Promise<YearlyPrayerTimes> {
     const { latitude, longitude } = location;

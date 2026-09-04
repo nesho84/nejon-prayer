@@ -31,8 +31,7 @@ jest.mock('react-native-reanimated', () => {
     withTiming: (value: number) => value,
   };
 });
-// Stub gesture-handler so the ImageViewer overlay renders without the
-// native gesture module.
+// Stub gesture-handler so the ImageViewer overlay renders without the native gesture module.
 jest.mock('react-native-gesture-handler', () => {
   const React = require('react');
   const { View } = require('react-native');

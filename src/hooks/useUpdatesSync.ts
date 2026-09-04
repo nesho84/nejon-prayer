@@ -5,10 +5,8 @@ import * as Updates from "expo-updates";
 import { useEffect } from "react";
 
 // ------------------------------------------------------------
-// Check for both OTA (expo-updates) and store (Play/App Store)
-// updates once on app mount. The OTA check silently reloads with
-// the new bundle; the store check shows the "Update available"
-// modal if one exists.
+// Check for OTA (expo-updates) and store (Play/App Store) updates once on mount.
+// OTA reloads silently; a store update opens the "Update available" modal.
 // ------------------------------------------------------------
 export function useUpdatesSync() {
   // Gate the dev check on the debug store's hydration (MMKV is sync, so this is already

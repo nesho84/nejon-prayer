@@ -99,9 +99,8 @@ describe('getNextHoliday', () => {
 });
 
 // Helpers — fetch responses + Aladhan "holiday day" factory
-// NOTE: Gregorian dates below are synthetic fixtures, chosen to
-// exercise the year-filter and cross-fetch merge — not real
-// astronomical dates.
+// NOTE: Gregorian dates below are synthetic fixtures chosen to exercise the year-filter
+// and cross-fetch merge — not real astronomical dates.
 function jsonResponse(data: unknown) {
   return Promise.resolve({ ok: true, json: async () => data });
 }

@@ -19,7 +19,8 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
 
     if (!notification) return;
 
-    // This ensures we have notifications with the latest prayer times — done here to avoid circular dependency (store ↔ service)
+    // Keeps notifications on the latest prayer times — done here to avoid the
+    // store ↔ service circular dependency
     // onBackgroundEvent only fires for our own notifee notifications, so any delivery is a valid sync trigger.
     if (type === EventType.DELIVERED) {
         try {

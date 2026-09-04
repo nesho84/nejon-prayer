@@ -58,8 +58,8 @@ export function useNotificationsSync() {
   // This runs on initial load and whenever something changes
   // ------------------------------------------------------------
   useEffect(() => {
-    // Permission off → what is armed is no longer knowable: an alarm that fires while denied is
-    // consumed without re-arming its repeat. Drop the hash so a re-enable can't skip as unchanged.
+    // Permission off → what is armed is no longer knowable: an alarm firing while denied
+    // is consumed without re-arming its repeat. Drop the hash so a re-enable can't skip.
     if (deviceSettingsReady && notificationsReady && !notificationPermission) {
       useNotificationsStore.setState({ lastScheduledHash: null });
     }

@@ -68,8 +68,8 @@ module.exports = function withNotifeeRepo(config) {
   }]);
 
   // ------------------------------------------------------------
-  // Register the copied iOS sound files as bundle resources in the
-  // Xcode project (required — iOS won't find them by filename otherwise)
+  // Register the copied iOS sound files as bundle resources in the Xcode project
+  // (required — iOS won't find them by filename otherwise)
   // ------------------------------------------------------------
   config = withXcodeProject(config, config => {
     const sourceRoot = IOSConfig.Paths.getSourceRoot(config.modRequest.projectRoot);

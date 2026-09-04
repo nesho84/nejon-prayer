@@ -17,9 +17,8 @@ export default function AppLayout({ children }: Props) {
     const statusBarStyle = resolvedTheme === "dark" ? "light" : "dark";
     const navigationBarStyle = resolvedTheme === "dark" ? "light" : "dark";
 
-    // Set the navigationBarStyle style imperatively;
-    // because the <NavigationBar> component's setHidden path throws:
-    // "[Error: Uncaught (in promise, id: 0) Error: Call to function 'ExpoNavigationBar.setHidden' has been rejected." during activity teardown.
+    // Set the style imperatively — the <NavigationBar> component's setHidden path
+    // throws "ExpoNavigationBar.setHidden has been rejected" during activity teardown
     useEffect(() => {
         NavigationBar.setStyle(navigationBarStyle);
     }, [navigationBarStyle]);

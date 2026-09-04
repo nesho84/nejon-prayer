@@ -114,8 +114,8 @@ export default function ImageViewer({ visible, source, onClose }: Props) {
             }
         });
 
-    // Pinch + pan + double tap all run together; dismissal is via the
-    // close button or the Android back gesture, not a single tap
+    // Pinch + pan + double tap all run together; dismissal is via the close button
+    // or the Android back gesture, not a single tap
     const gesture = Gesture.Simultaneous(pinch, pan, doubleTap);
 
     // ------------------------------------------------------------

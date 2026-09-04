@@ -9,10 +9,9 @@ export type RestoreResult =
     | { status: "failed" };         // wipe itself did not complete; data intact
 
 // ------------------------------------------------------------
-// Restores the app to a clean first-install state: cancels scheduled notifications,
-// stops audio, wipes MMKV (all persisted stores), then relaunches so the app boots
-// into onboarding. The relaunch is what actually reaches onboarding — clearing MMKV
-// alone doesn't reset the in-memory Zustand state already held by mounted stores.
+// Restore the app to a clean first-install state, then relaunch into onboarding.
+// The relaunch is what actually reaches onboarding — clearing MMKV alone doesn't reset
+// the in-memory Zustand state already held by mounted stores.
 // ------------------------------------------------------------
 export async function restoreDefaults(): Promise<RestoreResult> {
     await stopAudio();
