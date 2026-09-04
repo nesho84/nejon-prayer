@@ -69,6 +69,7 @@ export async function debugPrayerN({ options, notifSettings, seconds = 10 }: Deb
                     snooze: snooze,
                     prayerName: 'Fajr',
                     prayerDate: toDateKey(new Date(triggerTime)),
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                     reminderTitle: reminderTitle,
                     reminderBody: reminderBody,
                 },
@@ -145,6 +146,7 @@ export async function debugEventN({ options, notifSettings, seconds = 10 }: Debu
                     type: "prayer-event",
                     volume: volume,
                     sound: sound,
+                    scheduledFor: new Date(triggerTime).toLocaleString('en-GB'),
                 },
                 android: {
                     channelId: getVibrationChannelId(vibration),

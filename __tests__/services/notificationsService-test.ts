@@ -278,6 +278,37 @@ describe('scheduleNotificationsService — Islamic holiday reminders', () => {
   });
 });
 
+describe('scheduleNotificationsService — scheduledFor diagnostic', () => {
+  const NOW = new Date(2026, 5, 16, 12, 0, 0);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.setSystemTime(NOW);
+  });
+
+  function callFor(type: 'prayer' | 'prayer-event') {
+    return mockCreateTrigger.mock.calls.find((c) => c[0]?.data?.type === type);
+  }
+
+  it('stamps prayer notifications with their trigger time', async () => {
+    const params = buildParams({ holidaysEnabled: false });
+    params.config.prayers = { Fajr: { enabled: true, offset: 0, sound: 'azan.mp3' } };
+    await scheduleNotificationsService(params);
+
+    const [notification, trigger] = callFor('prayer')!;
+    expect(notification.data.scheduledFor).toBe(new Date(trigger.timestamp).toLocaleString('en-GB'));
+  });
+
+  it('stamps prayer-event notifications with their trigger time', async () => {
+    const params = buildParams({ holidaysEnabled: false });
+    params.config.events = { Sunrise: { enabled: true, offset: 0, sound: 'alarm.mp3' } };
+    await scheduleNotificationsService(params);
+
+    const [notification, trigger] = callFor('prayer-event')!;
+    expect(notification.data.scheduledFor).toBe(new Date(trigger.timestamp).toLocaleString('en-GB'));
+  });
+});
+
 describe('getVibrationChannelId', () => {
   it('maps short/medium to the versioned channel ids', () => {
     expect(getVibrationChannelId('short')).toBe('nejonprayer-vib-short-v2');

@@ -58,6 +58,12 @@ export function useNotificationsSync() {
   // This runs on initial load and whenever something changes
   // ------------------------------------------------------------
   useEffect(() => {
+    // Permission off → what is armed is no longer knowable: an alarm that fires while denied is
+    // consumed without re-arming its repeat. Drop the hash so a re-enable can't skip as unchanged.
+    if (deviceSettingsReady && notificationsReady && !notificationPermission) {
+      useNotificationsStore.setState({ lastScheduledHash: null });
+    }
+
     if (!deviceSettingsReady || !notificationsReady || !prayerTimes || !notificationPermission) return;
     // Store coalesces concurrent syncs and never rejects — fire-and-forget.
     // yearlyHolidays/language are re-trigger keys only — the sync reads them via getState.

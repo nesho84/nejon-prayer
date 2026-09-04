@@ -289,6 +289,7 @@ async function schedulePrayerNotifications(params: ScheduleParams) {
           snooze: snooze, // for the reminder to set the right trigger time
           prayerName: prayer, // ex. "Fajr"
           prayerDate: toDateKey(triggerTime), // diagnostic only; goes stale across DAILY repeats — tracking uses the tap moment (see resolveTrackingDate)
+          scheduledFor: triggerTime.toLocaleString('en-GB'), // diagnostic only; same DAILY staleness as prayerDate
           reminderTitle: title,
           reminderBody: tr.labels?.prayerRemindBody || 'Prayer Reminder',
         },
@@ -368,6 +369,7 @@ async function scheduleEventNotifications(params: ScheduleParams) {
           type: 'prayer-event',
           volume: volume,
           sound: sound ?? '',
+          scheduledFor: triggerTime.toLocaleString('en-GB'), // diagnostic only; goes stale across DAILY repeats
         },
         android: {
           channelId: getVibrationChannelId(vibration),
