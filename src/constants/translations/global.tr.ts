@@ -77,6 +77,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
             prayerTimesOutdatedShort: "Prayer times are outdated. Tap to open settings.",
+            locationChanged: "⚠️ You seem to have moved from your saved location. Prayer times may be wrong. Tap 'Update Location' above to refresh them.",
+            locationChangedShort: "You seem to have moved from your saved location. Prayer times may be wrong. Tap to open settings.",
             loaded: "🟢  Loaded",
             notLoaded: "🔴  Not Loaded",
             // Notifications
@@ -306,6 +308,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Status der Gebetszeiten",
             prayerTimesOutdated: "⚠️ Die Gebetszeiten sind nicht aktuell. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
             prayerTimesOutdatedShort: "Die Gebetszeiten sind nicht aktuell. Tippe, um die Einstellungen zu öffnen.",
+            locationChanged: "⚠️ Du scheinst dich von deinem gespeicherten Standort entfernt zu haben. Die Gebetszeiten könnten falsch sein. Tippe oben auf 'Standort aktualisieren'.",
+            locationChangedShort: "Du bist weit von deinem gespeicherten Standort entfernt. Gebetszeiten könnten falsch sein. Tippe, um die Einstellungen zu öffnen.",
             loaded: "🟢  Geladen",
             notLoaded: "🔴  Nicht Geladen",
             // Notifications
@@ -535,6 +539,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Statut des horaires de prière",
             prayerTimesOutdated: "⚠️ Les horaires de prière ne sont pas à jour. Appuyez sur l'icône de rechargement ci-dessus pour actualiser.",
             prayerTimesOutdatedShort: "Les horaires de prière ne sont pas à jour. Appuyez pour ouvrir les paramètres.",
+            locationChanged: "⚠️ Vous semblez vous être éloigné de votre localisation enregistrée. Les horaires de prière peuvent être erronés. Appuyez sur 'Mettre à jour la localisation' ci-dessus.",
+            locationChangedShort: "Vous semblez loin de votre localisation enregistrée. Les horaires peuvent être erronés. Appuyez pour ouvrir les paramètres.",
             loaded: "🟢  Chargé",
             notLoaded: "🔴  Non chargé",
             // Notifications
@@ -764,6 +770,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
             prayerTimesOutdated: "⚠️ Oraret e namazit nuk janë përditësuar. Shtyp ikonën e rifreskimit lart.",
             prayerTimesOutdatedShort: "Oraret e namazit nuk janë përditësuar. Shtyp për të hapur cilësimet.",
+            locationChanged: "⚠️ Duket se je larguar nga lokacioni yt i ruajtur. Oraret e namazit mund të jenë të gabuara. Shtyp 'Përditëso Lokacionin' më lart.",
+            locationChangedShort: "Duket se je larguar nga lokacioni yt i ruajtur. Oraret e namazit mund të jenë të gabuara. Shtyp për të hapur cilësimet.",
             loaded: "🟢  Ngarkuar",
             notLoaded: "🔴  Jo i Ngarkuar",
             // Notifications
@@ -987,6 +995,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Status vremena namaza",
             prayerTimesOutdated: "⚠️ Vremena namaza nisu ažurna. Dodirnite ikonu za ponovno učitavanje iznad.",
             prayerTimesOutdatedShort: "Vremena namaza nisu ažurna. Dodirnite za otvaranje postavki.",
+            locationChanged: "⚠️ Izgleda da ste se udaljili od sačuvane lokacije. Vremena namaza mogu biti netačna. Dodirnite 'Ažuriraj lokaciju' iznad.",
+            locationChangedShort: "Izgleda da ste se udaljili od sačuvane lokacije. Vremena namaza mogu biti netačna. Dodirnite za otvaranje postavki.",
             loaded: "🟢  Učitano",
             notLoaded: "🔴  Nije učitano",
             prayerNotifBody: "Vrijeme je za namaz",
@@ -1199,6 +1209,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Статус на времиња на намаз",
             prayerTimesOutdated: "⚠️ Времињата на намаз не се ажурирани. Допрете на иконата за повторно вчитување погоре.",
             prayerTimesOutdatedShort: "Времињата на намаз не се ажурирани. Допрете за отворање поставки.",
+            locationChanged: "⚠️ Изгледа дека сте се оддалечиле од зачуваната локација. Времињата на намаз може да се неточни. Допрете 'Ажурирај локација' погоре.",
+            locationChangedShort: "Изгледа дека сте се оддалечиле од зачуваната локација. Времињата на намаз може да се неточни. Допрете за отворање поставки.",
             loaded: "🟢  Вчитано",
             notLoaded: "🔴  Не е вчитано",
             prayerNotifBody: "Време е за намаз",
@@ -1417,6 +1429,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "Namaz vakitleri durumu",
             prayerTimesOutdated: "⚠️ Namaz vakitleri güncel değil. Güncellemek için yukarıdaki yenileme simgesine basın.",
             prayerTimesOutdatedShort: "Namaz vakitleri güncel değil. Ayarları açmak için basın.",
+            locationChanged: "⚠️ Kayıtlı konumunuzdan uzaklaşmış görünüyorsunuz. Namaz vakitleri yanlış olabilir. Yukarıdaki 'Konumu Güncelle' düğmesine basın.",
+            locationChangedShort: "Kayıtlı konumunuzdan uzaklaşmış görünüyorsunuz. Namaz vakitleri yanlış olabilir. Ayarları açmak için basın.",
             loaded: "🟢  Yüklendi",
             notLoaded: "🔴  Yüklenmedi",
             // Notifications
@@ -1646,6 +1660,8 @@ export const GLOBAL_TR = {
             prayerTimesStatus: "حالة أوقات الصلاة",
             prayerTimesOutdated: "⚠️ أوقات الصلاة غير محدَّثة. اضغط على أيقونة التحديث في الأعلى.",
             prayerTimesOutdatedShort: "أوقات الصلاة غير محدَّثة. اضغط لفتح الإعدادات.",
+            locationChanged: "⚠️ يبدو أنك ابتعدت عن موقعك المحفوظ. قد تكون أوقات الصلاة غير صحيحة. اضغط على 'تحديث الموقع' في الأعلى.",
+            locationChangedShort: "يبدو أنك ابتعدت عن موقعك المحفوظ. قد تكون أوقات الصلاة غير صحيحة. اضغط لفتح الإعدادات.",
             loaded: "🟢  تم التحميل",
             notLoaded: "🔴  غير محمّل",
             // Notifications

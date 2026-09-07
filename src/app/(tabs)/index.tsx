@@ -19,6 +19,7 @@ import { usePrayersStore } from "@/store/prayersStore";
 import { useThemeStore } from "@/store/themeStore";
 import { PrayerCountdown } from "@/types/prayer.types";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -34,6 +35,7 @@ export default function HomeScreen() {
     const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
     const locationReady = useLocationStore((state) => state.isReady);
+    const locationChanged = useLocationStore((state) => state.locationChanged);
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayerTimesDate = usePrayersStore((state) => state.prayerTimesDate);
     const prayersError = usePrayersStore((state) => state.prayersError);
@@ -43,6 +45,9 @@ export default function HomeScreen() {
 
     // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
     const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
+
+    // DEBUG: force-show the location changed warning (Debug Panel toggle)
+    const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
 
     // Local State
     const [refreshKey, setRefreshKey] = useState(0);
@@ -210,16 +215,35 @@ export default function HomeScreen() {
                         </View>
                     </TouchableOpacity>
 
-                    {/* Outdated prayer times warning */}
+                    {/* Bottom: Outdated prayer times warning */}
                     {(prayersOutdated || forcePrayersOutdated) && (
                         <TouchableOpacity
-                            style={[styles.prayersOutdatedStrip, { backgroundColor: theme.warning + '20' }]}
+                            style={[styles.warningStrip, { backgroundColor: theme.warning + '18' }]}
                             activeOpacity={0.3}
                             onPress={() => router.navigate("/(tabs)/settings")}
                         >
-                            <Ionicons name="alert-circle-outline" size={16} color={theme.accent2} />
-                            <Text style={[styles.prayersOutdatedText, { color: theme.accent2 }]} numberOfLines={2}>
+                            <Ionicons name="alert-circle-outline" size={22} color={theme.accent2} />
+                            <Text style={[styles.warningStripText, { color: theme.accent2 }]} numberOfLines={2}>
                                 {tr.labels.prayerTimesOutdatedShort}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+
+                    {/* Divider */}
+                    {(prayersOutdated || forcePrayersOutdated) && (locationChanged || forceLocationChange) && (
+                        <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2, marginVertical: 2 }]} />
+                    )}
+
+                    {/* Bottom: Location changed warning */}
+                    {(locationChanged || forceLocationChange) && (
+                        <TouchableOpacity
+                            style={[styles.warningStrip, { backgroundColor: theme.warning + '18' }]}
+                            activeOpacity={0.3}
+                            onPress={() => router.navigate("/(tabs)/settings")}
+                        >
+                            <MaterialDesignIcons name="map-marker-radius" size={22} color={theme.accent2} />
+                            <Text style={[styles.warningStripText, { color: theme.accent2 }]} numberOfLines={3}>
+                                {tr.labels.locationChangedShort}
                             </Text>
                         </TouchableOpacity>
                     )}
@@ -294,14 +318,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     // Prayer List - Outdated warning
-    prayersOutdatedStrip: {
+    warningStrip: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
         paddingVertical: 8,
         paddingHorizontal: 12,
+        gap: 8,
     },
-    prayersOutdatedText: {
+    warningStripText: {
         flex: 1,
         fontSize: 13,
         letterSpacing: 0.3,

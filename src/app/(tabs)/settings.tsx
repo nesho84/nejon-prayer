@@ -55,6 +55,7 @@ export default function SettingsScreen() {
     const location = useLocationStore((state) => state.location);
     const fullAddress = useLocationStore((state) => state.fullAddress);
     const locationReady = useLocationStore((state) => state.isReady);
+    const locationChanged = useLocationStore((state) => state.locationChanged);
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayersError = usePrayersStore((state) => state.prayersError);
     const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
@@ -67,6 +68,9 @@ export default function SettingsScreen() {
 
     // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
     const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
+
+    // DEBUG: force-show the location changed warning (Debug Panel toggle)
+    const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
 
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
@@ -126,6 +130,8 @@ export default function SettingsScreen() {
         setLocalLoading(true);
         try {
             await usePrayersStore.getState().reloadPrayerTimes();
+            // Clear the "you have travelled" warning and re-arm the check for the next foreground
+            useLocationStore.getState().resetLocationCheck();
         } catch (err) {
             console.warn("Prayers refresh failed:", err);
         } finally {
@@ -442,6 +448,17 @@ export default function SettingsScreen() {
                             {fullAddress || (tr.labels.loading)}
                         </Text>
                     )}
+
+                    {/* locationChanged */}
+                    {(locationChanged || forceLocationChange) &&
+                        <>
+                            {/* Divider */}
+                            <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 0 }]}>
+                                {tr.labels.locationChanged}
+                            </Text>
+                        </>
+                    }
                 </AppCard>
 
                 {/* ------ Prayer Times Status ------ */}

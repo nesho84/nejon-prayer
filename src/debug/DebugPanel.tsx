@@ -162,16 +162,18 @@ export default function DebugPanel() {
   const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
   // Debug toggles (force scenario-gated UI: holiday card, Friday badge, Quran now-playing,
-  // outdated prayer times warning)
+  // outdated prayer times warning, location changed warning)
   const forceHoliday = useDebugStore((state) => state.forceHoliday);
   const forceFriday = useDebugStore((state) => state.forceFriday);
   const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);
   const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
+  const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
   const forceUpdateOnLaunch = useDebugStore((state) => state.forceUpdateOnLaunch);
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
   const togglePrayersOutdated = useDebugStore((state) => state.togglePrayersOutdated);
+  const toggleLocationChange = useDebugStore((state) => state.toggleLocationChange);
   const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
   const updatePreview = useDebugStore((state) => state.updatePreview);
   const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
@@ -272,6 +274,7 @@ export default function DebugPanel() {
           <DebugToggle label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
           <DebugToggle label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
           <DebugToggle label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} onPress={togglePrayersOutdated} />
+          <DebugToggle label="Toggle Location Changed" value={forceLocationChange} onPress={toggleLocationChange} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />

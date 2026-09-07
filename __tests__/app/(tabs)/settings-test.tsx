@@ -5,7 +5,7 @@ import { useLocationStore } from '@/store/locationStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { useThemeStore } from '@/store/themeStore';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -109,6 +109,7 @@ const mockTr = {
     dailyReminders: 'Daily Reminders',
     locationButtonText1: 'Refresh Location',
     locationButtonText2: 'Set Location',
+    locationChanged: 'You seem to have moved',
     error: 'Error',
     themeError: 'Theme error',
     languageError: 'Language error',
@@ -136,6 +137,7 @@ const readyLocation = {
   location: { latitude: 35, longitude: 51 },
   fullAddress: 'Tehran, Iran',
   timeZone: null,
+  locationChanged: false,
 };
 const readyPrayers = {
   isLoading: false,
@@ -193,5 +195,29 @@ describe('SettingsScreen', () => {
   it('renders Location section', () => {
     render(<SettingsScreen />);
     expect(screen.getByText('Location')).toBeTruthy();
+  });
+
+  it('hides the location changed warning when the saved location still matches', () => {
+    render(<SettingsScreen />);
+    expect(screen.queryByText('You seem to have moved')).toBeNull();
+  });
+
+  it('shows the location changed warning when locationChanged is set', () => {
+    useLocationStore.setState({ locationChanged: true } as any);
+    render(<SettingsScreen />);
+    expect(screen.getByText('You seem to have moved')).toBeTruthy();
+  });
+
+  it('resets the location check after updating the location', async () => {
+    const mockReload = jest.fn();
+    const mockReset = jest.fn();
+    usePrayersStore.setState({ reloadPrayerTimes: mockReload } as any);
+    useLocationStore.setState({ locationChanged: true, resetLocationCheck: mockReset } as any);
+
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('Refresh Location'));
+
+    await waitFor(() => expect(mockReset).toHaveBeenCalled());
+    expect(mockReload).toHaveBeenCalled();
   });
 });

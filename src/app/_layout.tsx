@@ -3,6 +3,7 @@ import ModalProvider from "@/components/ModalProvider";
 import { useAdsSync } from "@/hooks/useAdsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
+import { useLocationSync } from "@/hooks/useLocationSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
@@ -58,6 +59,7 @@ function RootLayout() {
   // Initialization and global sync hooks
   useSystemThemeSync();
   useDeviceSettingsSync();
+  useLocationSync();
   useNotificationsSync();
   usePrayerTimesSync();
   useHolidaysSync();

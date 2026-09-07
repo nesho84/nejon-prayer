@@ -15,6 +15,7 @@ interface DebugState {
   forceFriday: boolean;
   forceQuranPlaying: boolean;
   forcePrayersOutdated: boolean;
+  forceLocationChange: boolean;
   forceUpdateOnLaunch: boolean;
   updatePreview: UpdatePreview;
   isReady: boolean;
@@ -22,6 +23,7 @@ interface DebugState {
   toggleFriday: () => void;
   toggleQuranPlaying: () => void;
   togglePrayersOutdated: () => void;
+  toggleLocationChange: () => void;
   toggleUpdateOnLaunch: () => void;
   toggleDebugMode: () => void;
   setUpdatePreview: (value: UpdatePreview) => void;
@@ -35,6 +37,7 @@ export const useDebugStore = create<DebugState>()(
       forceFriday: false,
       forceQuranPlaying: false,
       forcePrayersOutdated: false,
+      forceLocationChange: false,
       forceUpdateOnLaunch: false,
       updatePreview: "idle",
       isReady: false,
@@ -43,6 +46,7 @@ export const useDebugStore = create<DebugState>()(
       toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
       toggleQuranPlaying: () => set((s) => ({ forceQuranPlaying: !s.forceQuranPlaying })),
       togglePrayersOutdated: () => set((s) => ({ forcePrayersOutdated: !s.forcePrayersOutdated })),
+      toggleLocationChange: () => set((s) => ({ forceLocationChange: !s.forceLocationChange })),
       toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
       setUpdatePreview: (value) => set({ updatePreview: value }),

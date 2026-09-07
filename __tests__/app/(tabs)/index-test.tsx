@@ -89,6 +89,7 @@ const mockTr = {
     goToSettings: 'Go to Settings',
     prayersError: 'Failed to load prayer times',
     prayerTimesOutdatedShort: 'Prayer times are outdated',
+    locationChangedShort: 'You seem to have moved',
     localeDate: 'en-US',
   },
   buttons: { retry: 'Retry' },
@@ -112,6 +113,7 @@ beforeEach(() => {
     location: { latitude: 35, longitude: 51 },
     fullAddress: 'Lat: 35.0000, Lon: 51.0000',
     timeZone: { location: 'Tehran' },
+    locationChanged: false,
   } as any);
   usePrayersStore.setState({
     isLoading: false,
@@ -180,6 +182,32 @@ describe('HomeScreen', () => {
     render(<HomeScreen />);
     fireEvent.press(screen.getByText('Prayer times are outdated'));
     expect(router.navigate).toHaveBeenCalledWith('/(tabs)/settings');
+  });
+
+  it('hides the location changed warning when the saved location still matches', () => {
+    render(<HomeScreen />);
+    expect(screen.queryByText('You seem to have moved')).toBeNull();
+  });
+
+  it('shows the location changed warning when locationChanged is set', () => {
+    useLocationStore.setState({ locationChanged: true } as any);
+    render(<HomeScreen />);
+    expect(screen.getByText('You seem to have moved')).toBeTruthy();
+  });
+
+  it('navigates to settings when the location changed warning is pressed', () => {
+    useLocationStore.setState({ locationChanged: true } as any);
+    render(<HomeScreen />);
+    fireEvent.press(screen.getByText('You seem to have moved'));
+    expect(router.navigate).toHaveBeenCalledWith('/(tabs)/settings');
+  });
+
+  it('shows both warnings together when prayer times are outdated and the location changed', () => {
+    usePrayersStore.setState({ prayersOutdated: true } as any);
+    useLocationStore.setState({ locationChanged: true } as any);
+    render(<HomeScreen />);
+    expect(screen.getByText('Prayer times are outdated')).toBeTruthy();
+    expect(screen.getByText('You seem to have moved')).toBeTruthy();
   });
 
   it('shows the city name in the prayers header when reverse geocoding succeeded', () => {
