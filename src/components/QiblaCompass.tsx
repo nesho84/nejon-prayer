@@ -269,7 +269,7 @@ export default function QiblaCompass({
                 {Math.round(compassHeading)}°
             </Text>
             <Text style={[styles.locationText, { color: textColor }]}>
-                {timeZone || "Location"}
+                {timeZone || ""}
             </Text>
 
             {/* Compass */}

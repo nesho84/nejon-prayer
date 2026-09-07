@@ -79,7 +79,7 @@ describe('prayersStore — loadPrayerTimes', () => {
   });
 
   it('loads from cached yearly data when year matches', async () => {
-    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' } });
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' }, refreshAddress: jest.fn() });
     mockDeviceGetState.mockReturnValue({ internetConnection: true });
     usePrayersStore.setState({ yearlyPrayerTimes: YEARLY, fetchedYear: YEAR });
     await usePrayersStore.getState().loadPrayerTimes();
@@ -88,13 +88,48 @@ describe('prayersStore — loadPrayerTimes', () => {
   });
 
   it('fetches yearly data from API when online and no cache', async () => {
-    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' } });
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' }, refreshAddress: jest.fn() });
     mockDeviceGetState.mockReturnValue({ internetConnection: true });
     mockGetYearly.mockResolvedValue(YEARLY);
     await usePrayersStore.getState().loadPrayerTimes();
     expect(mockGetYearly).toHaveBeenCalledTimes(1);
     expect(usePrayersStore.getState().prayerTimes).toEqual(PRAYER_TIMES);
     expect(usePrayersStore.getState().fetchedYear).toBe(YEAR);
+  });
+
+  it('refreshes the address on the cache path when online', async () => {
+    const refreshAddress = jest.fn();
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' }, refreshAddress });
+    mockDeviceGetState.mockReturnValue({ internetConnection: true });
+    usePrayersStore.setState({ yearlyPrayerTimes: YEARLY, fetchedYear: YEAR });
+
+    await usePrayersStore.getState().loadPrayerTimes();
+
+    // Served from cache — no API call, but the address is still refreshed
+    expect(mockGetYearly).not.toHaveBeenCalled();
+    expect(refreshAddress).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the address refresh on the cache path when offline', async () => {
+    const refreshAddress = jest.fn();
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' }, refreshAddress });
+    mockDeviceGetState.mockReturnValue({ internetConnection: false });
+    usePrayersStore.setState({ yearlyPrayerTimes: YEARLY, fetchedYear: YEAR });
+
+    await usePrayersStore.getState().loadPrayerTimes();
+
+    expect(refreshAddress).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the address after a successful fetch', async () => {
+    const refreshAddress = jest.fn();
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' }, refreshAddress });
+    mockDeviceGetState.mockReturnValue({ internetConnection: true });
+    mockGetYearly.mockResolvedValue(YEARLY);
+
+    await usePrayersStore.getState().loadPrayerTimes();
+
+    expect(refreshAddress).toHaveBeenCalledTimes(1);
   });
 
   it('falls back to stale yearly data when offline', async () => {

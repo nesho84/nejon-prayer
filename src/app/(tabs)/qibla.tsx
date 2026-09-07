@@ -11,6 +11,7 @@ export default function QiblaScreen() {
     const theme = useThemeStore((state) => state.theme);
     const isReady = useLocationStore((state) => state.isReady);
     const location = useLocationStore((state) => state.location);
+    const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
 
     // Safe area insets
@@ -33,7 +34,7 @@ export default function QiblaScreen() {
                     loading={!isReady}
                     latitude={location?.latitude}
                     longitude={location?.longitude}
-                    timeZone={timeZone?.location}
+                    timeZone={timeZone?.location || fullAddress || undefined}
                     bgColor={theme.bg}
                     color={theme.primary}
                     textColor={theme.text}

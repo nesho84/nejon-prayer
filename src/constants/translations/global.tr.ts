@@ -76,6 +76,7 @@ export const GLOBAL_TR = {
             // Prayer Times
             prayerTimesStatus: "Prayer times status",
             prayerTimesOutdated: "⚠️ Prayer times are outdated. Tap the reload icon above to refresh.",
+            prayerTimesOutdatedShort: "Prayer times are outdated. Tap to open settings.",
             loaded: "🟢  Loaded",
             notLoaded: "🔴  Not Loaded",
             // Notifications
@@ -303,7 +304,8 @@ export const GLOBAL_TR = {
             compassWarning3: "Weg von der Elektronik",
             // Prayer Times
             prayerTimesStatus: "Status der Gebetszeiten",
-            prayerTimesOutdated: "⚠️ Die Gebetszeiten sind veraltet. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
+            prayerTimesOutdated: "⚠️ Die Gebetszeiten sind nicht aktuell. Tippe auf das Reload-Symbol oben, um sie zu aktualisieren.",
+            prayerTimesOutdatedShort: "Die Gebetszeiten sind nicht aktuell. Tippe, um die Einstellungen zu öffnen.",
             loaded: "🟢  Geladen",
             notLoaded: "🔴  Nicht Geladen",
             // Notifications
@@ -531,7 +533,8 @@ export const GLOBAL_TR = {
             compassWarning3: "Éloignez-vous des appareils électroniques",
             // Prayer Times
             prayerTimesStatus: "Statut des horaires de prière",
-            prayerTimesOutdated: "⚠️ Les horaires de prière sont obsolètes. Appuyez sur l'icône de rechargement ci-dessus pour actualiser.",
+            prayerTimesOutdated: "⚠️ Les horaires de prière ne sont pas à jour. Appuyez sur l'icône de rechargement ci-dessus pour actualiser.",
+            prayerTimesOutdatedShort: "Les horaires de prière ne sont pas à jour. Appuyez pour ouvrir les paramètres.",
             loaded: "🟢  Chargé",
             notLoaded: "🔴  Non chargé",
             // Notifications
@@ -759,7 +762,8 @@ export const GLOBAL_TR = {
             compassWarning3: "Largohuni nga elektronika",
             // Prayer Times
             prayerTimesStatus: "Gjendja e kohëve të lutjeve",
-            prayerTimesOutdated: "⚠️ Orari i namazit është i vjetëruar. Shtyp ikonën e rifreskimit lart për ta përditësuar.",
+            prayerTimesOutdated: "⚠️ Oraret e namazit nuk janë përditësuar. Shtyp ikonën e rifreskimit lart.",
+            prayerTimesOutdatedShort: "Oraret e namazit nuk janë përditësuar. Shtyp për të hapur cilësimet.",
             loaded: "🟢  Ngarkuar",
             notLoaded: "🔴  Jo i Ngarkuar",
             // Notifications
@@ -981,7 +985,8 @@ export const GLOBAL_TR = {
             compassWarning2: "Pomičite uređaj u obliku osmice za kalibraciju",
             compassWarning3: "Udaljite se od elektronike",
             prayerTimesStatus: "Status vremena namaza",
-            prayerTimesOutdated: "⚠️ Vremena namaza su zastarjela. Dodirnite ikonu za ponovno učitavanje iznad.",
+            prayerTimesOutdated: "⚠️ Vremena namaza nisu ažurna. Dodirnite ikonu za ponovno učitavanje iznad.",
+            prayerTimesOutdatedShort: "Vremena namaza nisu ažurna. Dodirnite za otvaranje postavki.",
             loaded: "🟢  Učitano",
             notLoaded: "🔴  Nije učitano",
             prayerNotifBody: "Vrijeme je za namaz",
@@ -1192,7 +1197,8 @@ export const GLOBAL_TR = {
             compassWarning2: "Движете го уредот во форма на осмица за калибрација",
             compassWarning3: "Оддалечете се од електроника",
             prayerTimesStatus: "Статус на времиња на намаз",
-            prayerTimesOutdated: "⚠️ Времињата на намаз се застарени. Допрете на иконата за повторно вчитување погоре.",
+            prayerTimesOutdated: "⚠️ Времињата на намаз не се ажурирани. Допрете на иконата за повторно вчитување погоре.",
+            prayerTimesOutdatedShort: "Времињата на намаз не се ажурирани. Допрете за отворање поставки.",
             loaded: "🟢  Вчитано",
             notLoaded: "🔴  Не е вчитано",
             prayerNotifBody: "Време е за намаз",
@@ -1410,6 +1416,7 @@ export const GLOBAL_TR = {
             // Prayer Times
             prayerTimesStatus: "Namaz vakitleri durumu",
             prayerTimesOutdated: "⚠️ Namaz vakitleri güncel değil. Güncellemek için yukarıdaki yenileme simgesine basın.",
+            prayerTimesOutdatedShort: "Namaz vakitleri güncel değil. Ayarları açmak için basın.",
             loaded: "🟢  Yüklendi",
             notLoaded: "🔴  Yüklenmedi",
             // Notifications
@@ -1637,7 +1644,8 @@ export const GLOBAL_TR = {
             compassWarning3: "ابتعد عن الأجهزة الإلكترونية",
             // Prayer Times
             prayerTimesStatus: "حالة أوقات الصلاة",
-            prayerTimesOutdated: "⚠️ أوقات الصلاة قديمة. اضغط على أيقونة التحديث.",
+            prayerTimesOutdated: "⚠️ أوقات الصلاة غير محدَّثة. اضغط على أيقونة التحديث في الأعلى.",
+            prayerTimesOutdatedShort: "أوقات الصلاة غير محدَّثة. اضغط لفتح الإعدادات.",
             loaded: "🟢  تم التحميل",
             notLoaded: "🔴  غير محمّل",
             // Notifications

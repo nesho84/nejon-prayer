@@ -1,3 +1,4 @@
+import { formatUserAddress, getTimeZoneInfo } from '@/services/locationService';
 import { useLocationStore } from '@/store/locationStore';
 import { Cords, TimeZone } from '@/types/location.types';
 
@@ -8,6 +9,14 @@ jest.mock('@/store/storage', () => ({
     removeItem: jest.fn(),
   },
 }));
+
+jest.mock('@/services/locationService', () => ({
+  formatUserAddress: jest.fn(),
+  getTimeZoneInfo: jest.fn(),
+}));
+
+const mockFormatAddress = formatUserAddress as jest.Mock;
+const mockGetTimeZone = getTimeZoneInfo as jest.Mock;
 
 const COORDS: Cords = { latitude: 48.2085, longitude: 16.3721 };
 
@@ -22,7 +31,12 @@ const TIMEZONE: TimeZone = {
   offline: false,
 };
 
+const OFFLINE_TIMEZONE: TimeZone = {
+  ...TIMEZONE, city: '', country: '', countryCode: '', location: '', offline: true,
+};
+
 beforeEach(() => {
+  jest.clearAllMocks();
   useLocationStore.setState({ location: null, fullAddress: null, timeZone: null });
 });
 
@@ -59,5 +73,58 @@ describe('locationStore — setLocation', () => {
     expect(state.location).toBeNull();
     expect(state.fullAddress).toBeNull();
     expect(state.timeZone).toBeNull();
+  });
+});
+
+describe('locationStore — refreshAddress', () => {
+  it('resolves the address when the stored geocode was offline', async () => {
+    useLocationStore.getState().setLocation(COORDS, 'Lat: 48.2085, Lon: 16.3721', OFFLINE_TIMEZONE);
+    mockFormatAddress.mockResolvedValue('Stephansplatz, 1010, Vienna, Austria');
+    mockGetTimeZone.mockResolvedValue(TIMEZONE);
+
+    await useLocationStore.getState().refreshAddress();
+
+    const state = useLocationStore.getState();
+    expect(state.fullAddress).toBe('Stephansplatz, 1010, Vienna, Austria');
+    expect(state.timeZone).toEqual(TIMEZONE);
+    expect(state.location).toEqual(COORDS);
+  });
+
+  it('keeps the coordinates when the geocode fails again', async () => {
+    useLocationStore.getState().setLocation(COORDS, 'Lat: 48.2085, Lon: 16.3721', OFFLINE_TIMEZONE);
+    mockFormatAddress.mockResolvedValue('Lat: 48.2085, Lon: 16.3721');
+    mockGetTimeZone.mockResolvedValue(OFFLINE_TIMEZONE);
+
+    await useLocationStore.getState().refreshAddress();
+
+    expect(useLocationStore.getState().fullAddress).toBe('Lat: 48.2085, Lon: 16.3721');
+  });
+
+  it('keeps the stored address when the geocode returns null', async () => {
+    useLocationStore.getState().setLocation(COORDS, 'Lat: 48.2085, Lon: 16.3721', OFFLINE_TIMEZONE);
+    mockFormatAddress.mockResolvedValue(null);
+    mockGetTimeZone.mockResolvedValue(null);
+
+    await useLocationStore.getState().refreshAddress();
+
+    const state = useLocationStore.getState();
+    expect(state.fullAddress).toBe('Lat: 48.2085, Lon: 16.3721');
+    expect(state.timeZone).toEqual(OFFLINE_TIMEZONE);
+  });
+
+  it('does nothing when the stored geocode already succeeded', async () => {
+    useLocationStore.getState().setLocation(COORDS, 'Vienna, Austria', TIMEZONE);
+
+    await useLocationStore.getState().refreshAddress();
+
+    expect(mockGetTimeZone).not.toHaveBeenCalled();
+    expect(mockFormatAddress).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when there is no location', async () => {
+    await useLocationStore.getState().refreshAddress();
+
+    expect(mockGetTimeZone).not.toHaveBeenCalled();
+    expect(mockFormatAddress).not.toHaveBeenCalled();
   });
 });

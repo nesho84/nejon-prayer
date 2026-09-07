@@ -490,7 +490,7 @@ export default function SettingsScreen() {
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
 
-                            <Text style={[styles.statusSubText, { color: theme.text2 }]}>
+                            <Text style={[styles.statusSubText, { color: theme.text2, marginBottom: 0 }]}>
                                 {tr.labels.prayerTimesOutdated}
                             </Text>
                         </>

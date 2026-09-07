@@ -5,7 +5,8 @@ import { useLocationStore } from '@/store/locationStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { useThemeStore } from '@/store/themeStore';
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -77,7 +78,7 @@ jest.mock('@/components/AppError', () => {
 
 const mockTheme = {
   bg: '#fff', text: '#111', text2: '#555', accent: '#007AFF',
-  border: '#ccc', divider2: '#ddd', danger: '#FF3B30',
+  border: '#ccc', divider2: '#ddd', danger: '#FF3B30', warning: '#facc15',
   overlay: 'rgba(0,0,0,0.05)', overlayLight: 'rgba(0,0,0,0.02)',
 } as any;
 
@@ -87,6 +88,7 @@ const mockTr = {
     locationSet: 'Please set your location',
     goToSettings: 'Go to Settings',
     prayersError: 'Failed to load prayer times',
+    prayerTimesOutdatedShort: 'Prayer times are outdated',
     localeDate: 'en-US',
   },
   buttons: { retry: 'Retry' },
@@ -108,6 +110,7 @@ beforeEach(() => {
   useLocationStore.setState({
     isReady: true,
     location: { latitude: 35, longitude: 51 },
+    fullAddress: 'Lat: 35.0000, Lon: 51.0000',
     timeZone: { location: 'Tehran' },
   } as any);
   usePrayersStore.setState({
@@ -115,6 +118,7 @@ beforeEach(() => {
     prayerTimes: mockPrayerTimes,
     prayerTimesDate: '2024-01-01',
     prayersError: null,
+    prayersOutdated: false,
     loadPrayerTimes: jest.fn(),
   } as any);
   useNotificationsStore.setState({ isReady: true } as any);
@@ -158,5 +162,34 @@ describe('HomeScreen', () => {
     expect(screen.queryByTestId('loading-Loading')).toBeNull();
     expect(screen.queryByTestId('error-Please set your location')).toBeNull();
     expect(screen.queryByTestId('error-Failed to load prayer times')).toBeNull();
+  });
+
+  it('hides the outdated warning when prayer times are current', () => {
+    render(<HomeScreen />);
+    expect(screen.queryByText('Prayer times are outdated')).toBeNull();
+  });
+
+  it('shows the outdated warning when prayersOutdated is set', () => {
+    usePrayersStore.setState({ prayersOutdated: true } as any);
+    render(<HomeScreen />);
+    expect(screen.getByText('Prayer times are outdated')).toBeTruthy();
+  });
+
+  it('navigates to settings when the outdated warning is pressed', () => {
+    usePrayersStore.setState({ prayersOutdated: true } as any);
+    render(<HomeScreen />);
+    fireEvent.press(screen.getByText('Prayer times are outdated'));
+    expect(router.navigate).toHaveBeenCalledWith('/(tabs)/settings');
+  });
+
+  it('shows the city name in the prayers header when reverse geocoding succeeded', () => {
+    render(<HomeScreen />);
+    expect(screen.getByText('Tehran')).toBeTruthy();
+  });
+
+  it('falls back to the stored coordinates when there is no city name', () => {
+    useLocationStore.setState({ timeZone: { location: '' } } as any);
+    render(<HomeScreen />);
+    expect(screen.getByText('Lat: 35.0000, Lon: 51.0000')).toBeTruthy();
   });
 });

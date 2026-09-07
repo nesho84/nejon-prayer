@@ -22,6 +22,7 @@ export default function PrayerTimingsScreen() {
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
     const location = useLocationStore((state) => state.location);
+    const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
     const tracking = usePrayersTrackingStore((state) => state.tracking);
     const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
@@ -89,7 +90,7 @@ export default function PrayerTimingsScreen() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             getPrayerTimesForDate(selectedDate);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDate, location]);
 
     // ------------------------------------------------------------
@@ -271,7 +272,7 @@ export default function PrayerTimingsScreen() {
                         <View style={styles.locationInfoRow}>
                             <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginLeft: -10 }} />
                             <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
-                                {timeZone?.location || ""}
+                                {timeZone?.location || fullAddress}
                             </Text>
                         </View>
                         <Text style={[styles.timezoneInfoText, { color: theme.text2 }]}>

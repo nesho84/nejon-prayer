@@ -30,11 +30,13 @@ export default function HomeScreen() {
     const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
     const location = useLocationStore((state) => state.location);
+    const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
     const locationReady = useLocationStore((state) => state.isReady);
     const prayerTimes = usePrayersStore((state) => state.prayerTimes);
     const prayerTimesDate = usePrayersStore((state) => state.prayerTimesDate);
     const prayersError = usePrayersStore((state) => state.prayersError);
+    const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
 
@@ -194,7 +196,7 @@ export default function HomeScreen() {
                             <View style={styles.locationInfoRow}>
                                 <Ionicons name="navigate-circle-outline" size={14} color={theme.accent} style={{ marginLeft: -4, marginTop: 0.8 }} />
                                 <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
-                                    {timeZone?.location || "Location"}
+                                    {timeZone?.location || fullAddress}
                                 </Text>
                             </View>
                         </View>
@@ -203,6 +205,20 @@ export default function HomeScreen() {
                             <Ionicons name="chevron-forward" size={22} color={theme.text} style={{ opacity: 0.5 }} />
                         </View>
                     </TouchableOpacity>
+
+                    {/* Outdated prayer times warning */}
+                    {prayersOutdated && (
+                        <TouchableOpacity
+                            style={[styles.prayersOutdatedStrip, { backgroundColor: theme.warning + '20' }]}
+                            activeOpacity={0.3}
+                            onPress={() => router.navigate("/(tabs)/settings")}
+                        >
+                            <Ionicons name="alert-circle-outline" size={16} color={theme.warning} />
+                            <Text style={[styles.prayersOutdatedText, { color: theme.text2 }]} numberOfLines={2}>
+                                {tr.labels.prayerTimesOutdatedShort}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
 
                     {/* Divider */}
                     <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2 }]} />
@@ -272,5 +288,18 @@ const styles = StyleSheet.create({
         height: 32,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    // Prayer List - Outdated warning
+    prayersOutdatedStrip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+    },
+    prayersOutdatedText: {
+        flex: 1,
+        fontSize: 13,
+        letterSpacing: 0.3,
     },
 });

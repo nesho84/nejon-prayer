@@ -69,6 +69,8 @@ export const usePrayersStore = create<PrayersState>()(
             if (todaysTimes) {
               set({ prayerTimes: todaysTimes, prayerTimesDate: todayKey, prayersOutdated: false });
               console.log('💾 [prayersStore] Prayer times loaded from storage');
+
+              if (internetConnection) await useLocationStore.getState().refreshAddress();
               return;
             }
           }
@@ -91,6 +93,8 @@ export const usePrayersStore = create<PrayersState>()(
               });
 
               console.log('🌐 [prayersStore] Yearly prayer times fetched&loaded from API');
+
+              await useLocationStore.getState().refreshAddress();
               return;
             } catch (err) {
               console.warn("⚠️ Failed to fetch yearly prayer times:", err);
