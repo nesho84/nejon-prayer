@@ -9,6 +9,7 @@ import PrayersList from "@/components/PrayersList";
 import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
 import { globalStyles } from "@/constants/styles";
+import { useDebugStore } from "@/debug/debugStore";
 import useNextPrayer from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -39,6 +40,9 @@ export default function HomeScreen() {
     const prayersOutdated = usePrayersStore((state) => state.prayersOutdated);
     const prayersLoading = usePrayersStore((state) => state.isLoading);
     const notifReady = useNotificationsStore((state) => state.isReady);
+
+    // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
+    const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
 
     // Local State
     const [refreshKey, setRefreshKey] = useState(0);
@@ -207,14 +211,14 @@ export default function HomeScreen() {
                     </TouchableOpacity>
 
                     {/* Outdated prayer times warning */}
-                    {prayersOutdated && (
+                    {(prayersOutdated || forcePrayersOutdated) && (
                         <TouchableOpacity
                             style={[styles.prayersOutdatedStrip, { backgroundColor: theme.warning + '20' }]}
                             activeOpacity={0.3}
                             onPress={() => router.navigate("/(tabs)/settings")}
                         >
-                            <Ionicons name="alert-circle-outline" size={16} color={theme.warning} />
-                            <Text style={[styles.prayersOutdatedText, { color: theme.text2 }]} numberOfLines={2}>
+                            <Ionicons name="alert-circle-outline" size={16} color={theme.accent2} />
+                            <Text style={[styles.prayersOutdatedText, { color: theme.accent2 }]} numberOfLines={2}>
                                 {tr.labels.prayerTimesOutdatedShort}
                             </Text>
                         </TouchableOpacity>

@@ -65,6 +65,9 @@ export default function SettingsScreen() {
     const specials = useNotificationsStore((state) => state.specials);
     const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
+    // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
+    const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
+
     // Local state
     const [localLoading, setLocalLoading] = useState(false);
     const [tempVolume, setTempVolume] = useState(Number(notifSettings?.volume ?? 1.0));
@@ -485,7 +488,7 @@ export default function SettingsScreen() {
                         </>
                     }
                     {/* prayersOutdated */}
-                    {prayersOutdated &&
+                    {(prayersOutdated || forcePrayersOutdated) &&
                         <>
                             {/* Divider */}
                             <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>

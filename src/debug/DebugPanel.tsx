@@ -161,14 +161,17 @@ export default function DebugPanel() {
   const location = useLocationStore((state) => state.location);
   const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
-  // Debug toggles (force scenario-gated UI: holiday card, Friday badge, Quran now-playing)
+  // Debug toggles (force scenario-gated UI: holiday card, Friday badge, Quran now-playing,
+  // outdated prayer times warning)
   const forceHoliday = useDebugStore((state) => state.forceHoliday);
   const forceFriday = useDebugStore((state) => state.forceFriday);
   const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);
+  const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
   const forceUpdateOnLaunch = useDebugStore((state) => state.forceUpdateOnLaunch);
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
+  const togglePrayersOutdated = useDebugStore((state) => state.togglePrayersOutdated);
   const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
   const updatePreview = useDebugStore((state) => state.updatePreview);
   const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
@@ -268,6 +271,7 @@ export default function DebugPanel() {
           <DebugToggle label="Toggle Holiday Card" value={forceHoliday} onPress={toggleHoliday} />
           <DebugToggle label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
           <DebugToggle label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
+          <DebugToggle label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} onPress={togglePrayersOutdated} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />

@@ -14,12 +14,14 @@ interface DebugState {
   forceHoliday: boolean;
   forceFriday: boolean;
   forceQuranPlaying: boolean;
+  forcePrayersOutdated: boolean;
   forceUpdateOnLaunch: boolean;
   updatePreview: UpdatePreview;
   isReady: boolean;
   toggleHoliday: () => void;
   toggleFriday: () => void;
   toggleQuranPlaying: () => void;
+  togglePrayersOutdated: () => void;
   toggleUpdateOnLaunch: () => void;
   toggleDebugMode: () => void;
   setUpdatePreview: (value: UpdatePreview) => void;
@@ -32,6 +34,7 @@ export const useDebugStore = create<DebugState>()(
       forceHoliday: false,
       forceFriday: false,
       forceQuranPlaying: false,
+      forcePrayersOutdated: false,
       forceUpdateOnLaunch: false,
       updatePreview: "idle",
       isReady: false,
@@ -39,6 +42,7 @@ export const useDebugStore = create<DebugState>()(
       toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
       toggleFriday: () => set((s) => ({ forceFriday: !s.forceFriday })),
       toggleQuranPlaying: () => set((s) => ({ forceQuranPlaying: !s.forceQuranPlaying })),
+      togglePrayersOutdated: () => set((s) => ({ forcePrayersOutdated: !s.forcePrayersOutdated })),
       toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
       setUpdatePreview: (value) => set({ updatePreview: value }),
