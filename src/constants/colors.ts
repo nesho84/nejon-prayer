@@ -154,11 +154,12 @@ export const DARK_COLORS = {
     transparent: "transparent",
 };
 
-// Surface variants
-export const DARK_NEUTRAL = { ...DARK_COLORS, card: "#2b2b2b", card2: "#383838", card3: "#4a4a4a", borderCard: "#393939", surfaceBg: "#353535" };
-export const DARK_WARM = { ...DARK_COLORS, card: "#312822", card2: "#413630", card3: "#57483e", borderCard: "#3f342c", surfaceBg: "#3d332e" };
-export const DARK_GREEN = { ...DARK_COLORS, card: "#232f28", card2: "#303f36", card3: "#41564a", borderCard: "#2e3c33", surfaceBg: "#2e3c34" };
+// Surface variants - Dark
+export const DARK_NEUTRAL = { ...DARK_COLORS, card: "#2b2b2b", card2: "#383838", card3: "#4a4a4a", borderCard: "#393939", surfaceBg: "#353535", divider2: "#3d3d3d" };
+export const DARK_WARM = { ...DARK_COLORS, card: "#312822", card2: "#413630", card3: "#57483e", borderCard: "#3f342c", surfaceBg: "#3d332e", divider2: "#453a30" };
+export const DARK_GREEN = { ...DARK_COLORS, card: "#232f28", card2: "#303f36", card3: "#41564a", borderCard: "#2e3c33", surfaceBg: "#2e3c34", divider2: "#344639" };
 
-export const LIGHT_NEUTRAL = { ...LIGHT_COLORS, card: "#e9eff8", card2: "#dde6f3", card3: "#cdd9ec", borderCard: "#d4dfef", surfaceBg: "#ccd6e8" };
-export const LIGHT_WARM = { ...LIGHT_COLORS, card: "#f8f1e2", card2: "#f0e7d4", card3: "#e5d8bf", borderCard: "#e8dcc2", surfaceBg: "#e0d5bd" };
-export const LIGHT_GREEN = { ...LIGHT_COLORS, card: "#e8f4ec", card2: "#d8ebde", card3: "#c9e0d1", borderCard: "#d3e6da", surfaceBg: "#c9dfd2" };
+// Surface variants - Light
+export const LIGHT_NEUTRAL = { ...LIGHT_COLORS, card: "#e9eff8", card2: "#dde6f3", card3: "#cdd9ec", borderCard: "#d4dfef", surfaceBg: "#ccd6e8", divider2: "#cad6e8" };
+export const LIGHT_WARM = { ...LIGHT_COLORS, card: "#f8f1e2", card2: "#f0e7d4", card3: "#e5d8bf", borderCard: "#e8dcc2", surfaceBg: "#e0d5bd", divider2: "#e3d5b7" };
+export const LIGHT_GREEN = { ...LIGHT_COLORS, card: "#e8f4ec", card2: "#d8ebde", card3: "#c9e0d1", borderCard: "#d3e6da", surfaceBg: "#c9dfd2", divider2: "#c9e0d2" };

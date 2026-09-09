@@ -67,40 +67,40 @@ export default function NamaziTableScreen() {
             {
                 // Fajr: 2 sunnah + 2 farz (shortest prayer, no middle rak'ats)
                 name: tr.prayers.Fajr, summary: `2 ${sun} + 2 ${farz}`, sections: [
-                    { label: `${sun} (2 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatClosing] },
-                    { label: `${farz} (2 ${rek}):`, isFarz: true, rows: [rakatOpening, rakatClosing] },
+                    { label: `${sun} (2 ${rek}):`, rows: [rakatOpening, rakatClosing] },
+                    { label: `${farz} (2 ${rek}):`, rows: [rakatOpening, rakatClosing] },
                 ]
             },
             {
                 // Dhuhr: 4 sunnah + 4 farz + 2 sunnah
                 name: tr.prayers.Dhuhr, summary: `4 ${sun} + 4 ${farz} + 2 ${sun}`, sections: [
-                    { label: `${sun} (4 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
-                    { label: `${farz} (4 ${rek}):`, isFarz: true, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
-                    { label: `${sun} (2 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatClosing] },
+                    { label: `${sun} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
+                    { label: `${farz} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
+                    { label: `${sun} (2 ${rek}):`, rows: [rakatOpening, rakatClosing] },
                 ]
             },
             {
                 // Asr: 4 sunnah (optional) + 4 farz
-                name: tr.prayers.Asr, summary: `(4 ${sun}) + 4 ${farz}`, sections: [
-                    { label: `(4 ${sun}):`, isFarz: false, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
-                    { label: `${farz} (4 ${rek}):`, isFarz: true, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
+                name: tr.prayers.Asr, summary: `4 ${sun} + 4 ${farz}`, sections: [
+                    { label: `${sun} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
+                    { label: `${farz} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
                 ]
             },
             {
                 // Maghrib: 3 farz + 2 sunnah (only 3-rak'at farz, no 4th rak'at)
                 name: tr.prayers.Maghrib, summary: `3 ${farz} + 2 ${sun}`, sections: [
-                    { label: `${farz} (3 ${rek}):`, isFarz: true, rows: [rakatOpening, rakatMiddle, rakatFarzClosing] },
-                    { label: `${sun} (2 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatClosing] },
+                    { label: `${farz} (3 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatFarzClosing] },
+                    { label: `${sun} (2 ${rek}):`, rows: [rakatOpening, rakatClosing] },
                 ]
             },
             {
                 // Isha: 4 sunnah (optional) + 4 farz + 2 sunnah + 3 witr
-                name: tr.prayers.Isha, summary: `(4 ${sun}) + 4 ${farz} + 2 ${sun} + 3 ${vitr}`, sections: [
-                    { label: `(4 ${sun}):`, isFarz: false, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
-                    { label: `${farz} (4 ${rek}):`, isFarz: true, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
-                    { label: `${sun} (2 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatClosing] },
+                name: tr.prayers.Isha, summary: `4 ${sun} + 4 ${farz} + 2 ${sun} + 3 ${vitr}`, sections: [
+                    { label: `${sun} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatSunnahMid, rakatClosing] },
+                    { label: `${farz} (4 ${rek}):`, rows: [rakatOpening, rakatMiddle, rakatFarzThird, rakatFarzClosing] },
+                    { label: `${sun} (2 ${rek}):`, rows: [rakatOpening, rakatClosing] },
                     // Witr 3rd rak'at adds Kunut dua before the final tashahhud
-                    { label: `${vitr} (3 ${rek}):`, isFarz: false, rows: [rakatOpening, rakatMiddle, `${fatiha} » ${ikhlas} » Kunut » ${attahiyyatu} + ${sel}`] },
+                    { label: `${vitr} (3 ${rek}):`, rows: [rakatOpening, rakatMiddle, `${fatiha} » ${ikhlas} » Kunut » ${attahiyyatu} + ${sel}`] },
                 ]
             },
         ];
