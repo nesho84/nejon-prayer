@@ -1,4 +1,5 @@
 import AdBanner from '@/components/AdBanner';
+import { CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
 import { useAdsStore } from '@/store/adsStore';
 import { useThemeStore } from '@/store/themeStore';
 import NetInfo from '@react-native-community/netinfo';
@@ -34,7 +35,6 @@ jest.mock('react-native-google-mobile-ads', () => {
 });
 
 const mockLoad = jest.fn();
-const CONNECTIVITY_DEBOUNCE_MS = 2500;
 
 const mockTheme = {
   bg: '#000', border: '#333', placeholder: '#aaa', pressed: 'rgba(255,255,255,0.1)',
@@ -74,7 +74,7 @@ beforeEach(() => {
     return mockUnsubscribe;
   });
   useThemeStore.setState({ theme: mockTheme });
-  useAdsStore.setState({ canRequestAds: true });
+  useAdsStore.setState({ canRequestAds: true, bannerLoaded: false, bannerDismissed: false });
 });
 
 afterEach(() => {
