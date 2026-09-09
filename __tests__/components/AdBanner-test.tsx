@@ -31,10 +31,15 @@ jest.mock('react-native-google-mobile-ads', () => {
     BannerAd,
     BannerAdSize: { BANNER: 'BANNER' },
     TestIds: { BANNER: 'test-banner-id' },
+    // Captures the callback so a test can simulate the app returning to the foreground
+    useForeground: (callback: () => void) => {
+      mockForeground.current = callback;
+    },
   };
 });
 
 const mockLoad = jest.fn();
+const mockForeground: { current: (() => void) | undefined } = { current: undefined };
 
 const mockTheme = {
   bg: '#000', border: '#333', placeholder: '#aaa', pressed: 'rgba(255,255,255,0.1)',
@@ -69,6 +74,7 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.spyOn(console, 'warn').mockImplementation(() => undefined);
   netInfoListener = undefined;
+  mockForeground.current = undefined;
   (NetInfo.addEventListener as jest.Mock).mockImplementation((listener) => {
     netInfoListener = listener;
     return mockUnsubscribe;
@@ -189,6 +195,30 @@ describe('AdBanner — connectivity gating', () => {
     unmount();
 
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('AdBanner — foreground reload', () => {
+  // The ad's WebView can be reclaimed while suspended, leaving the container expanded but
+  // empty. The connectivity retry cannot cover this — it bails once an ad has loaded.
+  it('reloads on resume even after an ad has already loaded', () => {
+    render(<AdBanner />);
+    emitConnectivity(true);
+    fireEvent.press(screen.getByTestId('banner-ad'));
+    expect(mockLoad).not.toHaveBeenCalled();
+
+    act(() => mockForeground.current?.());
+
+    expect(mockLoad).toHaveBeenCalledTimes(1);
+  });
+
+  it('reloads on resume when nothing ever filled', () => {
+    render(<AdBanner />);
+    emitConnectivity(true);
+
+    act(() => mockForeground.current?.());
+
+    expect(mockLoad).toHaveBeenCalledTimes(1);
   });
 });
 

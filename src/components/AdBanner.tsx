@@ -6,7 +6,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { BannerAd, BannerAdSize } from "react-native-google-mobile-ads";
+import { BannerAd, BannerAdSize, useForeground } from "react-native-google-mobile-ads";
 
 export default function AdBanner() {
   // Stores
@@ -85,6 +85,9 @@ export default function AdBanner() {
     // mounts the banner would fire a second request for the same slot.
     if (prevOnline === false && wasMounted) bannerRef.current?.load();
   }, [online, loaded, shouldRenderBannerAd]);
+
+  // Reload on resume — the ad's WebView can be reclaimed while the app is suspended.
+  useForeground(() => bannerRef.current?.load());
 
   if (!canRequestAds || dismissed) return null;
 
