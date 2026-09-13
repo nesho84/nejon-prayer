@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nejon Prayer",
     "slug": "nejon-prayer",
-    "version": "2.3.2",
+    "version": "2.3.3",
     "orientation": "default",
     "icon": "./assets/icons/icon.png",
     "scheme": "nejonprayer",
@@ -20,7 +20,7 @@
       }
     },
     "android": {
-      "versionCode": 52,
+      "versionCode": 53,
       "package": "com.nejon.nejonprayer",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/android-icon-foreground.png",
@@ -44,7 +44,7 @@
       ]
     },
     "ios": {
-      "buildNumber": "52",
+      "buildNumber": "53",
       "bundleIdentifier": "com.nejon.nejonprayer",
       "supportsTablet": true,
       "infoPlist": {
@@ -71,14 +71,8 @@
     "plugins": [
       "./src/plugins/resBuild.js",
       "expo-router",
-      "expo-status-bar",
-      "@react-native-vector-icons/ionicons",
-      "@react-native-vector-icons/material-icons",
-      "@react-native-vector-icons/material-design-icons",
-      "@react-native-vector-icons/feather",
-      "@react-native-community/datetimepicker",
-      "react-native-notify-kit",
       "expo-asset",
+      "expo-status-bar",
       [
         "expo-font",
         {
@@ -138,6 +132,12 @@
           }
         }
       ],
+      "@react-native-community/datetimepicker",
+      "@react-native-vector-icons/ionicons",
+      "@react-native-vector-icons/material-icons",
+      "@react-native-vector-icons/material-design-icons",
+      "@react-native-vector-icons/feather",
+      "react-native-notify-kit",
       [
         "@sentry/react-native/expo",
         {
@@ -147,7 +147,7 @@
         }
       ],
       [
-        "react-native-google-mobile-ads",
+        "react-native-google-mobile-ads/app.plugin.js",
         {
           "androidAppId": "ca-app-pub-8752479739166396~8421436523",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
