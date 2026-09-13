@@ -15,7 +15,7 @@ interface Props {
   theme: ThemeColors;
   arabicFontSize: number;
   translationFontSize: number;
-  quranFontKey: QuranFontKey;
+  arabicFontKey: QuranFontKey;
   isSelected: boolean;
   isAyahFavorited: boolean;
   onPress: () => void;
@@ -31,14 +31,14 @@ const QuranAyahRow = React.memo(({
   theme,
   arabicFontSize,
   translationFontSize,
-  quranFontKey,
+  arabicFontKey,
   isSelected,
   isAyahFavorited,
   onPress,
   onToggleAyahFavorite,
 }: Props) => {
   // Each face has its own optical size, so scale the user's chosen size per font
-  const arabicFont = getQuranFont(quranFontKey);
+  const arabicFont = getQuranFont(arabicFontKey);
   const arabicSize = arabicFontSize * arabicFont.sizeScale;
 
   // ------------------------------------------------------------

@@ -56,7 +56,7 @@ beforeEach(() => {
   useQuranStore.setState({
     arabicFontSize: 24,
     translationFontSize: 16,
-    quranFontKey: 'system',
+    arabicFontKey: 'system',
     selectedEditions: { en: 'en.sahih' },
     quran: null, // preview falls back to the literal unless a test loads the JSON
   } as any);
@@ -123,14 +123,14 @@ describe('QuranSettingsScreen — font picker', () => {
 
     fireEvent.press(screen.getByText('Amiri'));
     expect(preview().fontFamily).toBe(getQuranFont('amiri').family);
-    expect(useQuranStore.getState().quranFontKey).toBe('system');
+    expect(useQuranStore.getState().arabicFontKey).toBe('system');
   });
 
   it('commits the selected font on Save', () => {
     render(<QuranSettingsScreen />);
     fireEvent.press(screen.getByText('Uthmani'));
     fireEvent.press(screen.getByText('Save'));
-    expect(useQuranStore.getState().quranFontKey).toBe('uthmani');
+    expect(useQuranStore.getState().arabicFontKey).toBe('uthmani');
   });
 
   it('scales the preview size with the selected font', () => {

@@ -25,7 +25,7 @@ beforeEach(() => {
 });
 
 describe('AppWarningStrip', () => {
-  it('renders the passed icon, the text and the chevron', () => {
+  it('renders the passed icon, the text and the settings icon', () => {
     render(
       <AppWarningStrip
         icon={<View testID="strip-icon" />}
@@ -35,7 +35,7 @@ describe('AppWarningStrip', () => {
     );
     expect(screen.getByTestId('strip-icon')).toBeTruthy();
     expect(screen.getByText('Prayer times are outdated')).toBeTruthy();
-    expect(screen.getByTestId('icon-chevron-forward')).toBeTruthy();
+    expect(screen.getByTestId('icon-settings-outline')).toBeTruthy();
   });
 
   it('calls onPress when pressed', () => {

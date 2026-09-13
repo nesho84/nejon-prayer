@@ -25,18 +25,18 @@ export default function QuranSettingsScreen() {
   const language = useLanguageStore((state) => state.language);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
-  const quranFontKey = useQuranStore((state) => state.quranFontKey);
+  const arabicFontKey = useQuranStore((state) => state.arabicFontKey);
   const selectedEditions = useQuranStore((state) => state.selectedEditions);
   const getSurahById = useQuranStore((state) => state.getSurahById);
 
   // Local state (preview before saving)
   const [tempArabicSize, setTempArabicSize] = useState(arabicFontSize);
   const [tempTranslationSize, setTempTranslationSize] = useState(translationFontSize);
-  const [tempFontKey, setTempFontKey] = useState(quranFontKey);
+  const [tempArabicFontKey, setTempArabicFontKey] = useState(arabicFontKey);
   const [tempSelectedEdition, setTempSelectedEdition] = useState(selectedEditions[language]);
 
   // Drives the Arabic preview below — same helper the ayah rows use
-  const previewFont = getQuranFont(tempFontKey);
+  const previewFont = getQuranFont(tempArabicFontKey);
   const previewArabicSize = tempArabicSize * previewFont.sizeScale;
   // Real ayah text, not a hand-typed basmala — the JSON uses Quranic marks (U+06E1
   // and friends) that shape differently, so a literal would preview the wrong thing
@@ -49,7 +49,7 @@ export default function QuranSettingsScreen() {
   // Save changes to store and dismiss the Modal
   // ------------------------------------------------------------
   const handleSave = () => {
-    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize && tempFontKey === quranFontKey && tempSelectedEdition === selectedEditions[language]) {
+    if (tempArabicSize === arabicFontSize && tempTranslationSize === translationFontSize && tempArabicFontKey === arabicFontKey && tempSelectedEdition === selectedEditions[language]) {
       console.log("No changes detected, skipping save.");
       ModalSheetRef.current?.close();
       return;
@@ -57,12 +57,12 @@ export default function QuranSettingsScreen() {
     useQuranStore.getState().setQuranSettings({
       arabicFontSize: tempArabicSize,
       translationFontSize: tempTranslationSize,
-      quranFontKey: tempFontKey,
+      arabicFontKey: tempArabicFontKey,
       ...(tempSelectedEdition !== selectedEditions[language] && {
         selectedEditions: { ...selectedEditions, [language]: tempSelectedEdition },
       }),
     });
-    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px, Font: ${tempFontKey}, Edition: ${tempSelectedEdition}`);
+    console.log(`✅ Quran settings saved — Arabic: ${tempArabicSize}px, Translation: ${tempTranslationSize}px, Font: ${tempArabicFontKey}, Edition: ${tempSelectedEdition}`);
     ModalSheetRef.current?.close();
   };
 
@@ -159,11 +159,11 @@ export default function QuranSettingsScreen() {
           </View>
           <View style={styles.chipRow}>
             {Object.values(QURAN_FONTS).map((font) => {
-              const isActive = tempFontKey === font.key;
+              const isActive = tempArabicFontKey === font.key;
               return (
                 <TouchableOpacity
                   key={font.key}
-                  onPress={() => setTempFontKey(font.key)}
+                  onPress={() => setTempArabicFontKey(font.key)}
                   style={[styles.chip, { borderColor: isActive ? theme.accent : theme.divider, backgroundColor: isActive ? theme.overlayLight : 'transparent' }]}
                 >
                   <Text style={[styles.chipText, { color: isActive ? theme.accent : theme.text2 }]}>

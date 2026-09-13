@@ -45,7 +45,7 @@ beforeEach(() => {
     lastReadSurahId: null, lastReadSurahName: null, lastReadAyahId: null,
     lastKhatamSurahId: null, lastKhatamSurahName: null, lastKhatamAyahId: null,
     khatamCount: 0, favoriteAyahs: [],
-    arabicFontSize: 26, translationFontSize: 18, quranFontKey: 'system',
+    arabicFontSize: 26, translationFontSize: 18, arabicFontKey: 'system',
   });
   mockLanguageGetState.mockReturnValue({ language: 'en' });
 });
@@ -152,9 +152,9 @@ describe('quranStore — setQuranSettings', () => {
     expect(useQuranStore.getState().arabicFontSize).toBe(26);
   });
 
-  it('updates quranFontKey without touching the font sizes', () => {
-    useQuranStore.getState().setQuranSettings({ quranFontKey: 'amiri' });
-    expect(useQuranStore.getState().quranFontKey).toBe('amiri');
+  it('updates arabicFontKey without touching the font sizes', () => {
+    useQuranStore.getState().setQuranSettings({ arabicFontKey: 'amiri' });
+    expect(useQuranStore.getState().arabicFontKey).toBe('amiri');
     expect(useQuranStore.getState().arabicFontSize).toBe(26);
     expect(useQuranStore.getState().translationFontSize).toBe(18);
   });
@@ -163,8 +163,8 @@ describe('quranStore — setQuranSettings', () => {
 describe('quranStore — persistence', () => {
   // Reading a value that was never persisted has bitten this store before,
   // so assert the key actually reaches the storage adapter.
-  it('writes quranFontKey into the persisted blob', async () => {
-    useQuranStore.getState().setQuranSettings({ quranFontKey: 'uthmani' });
+  it('writes arabicFontKey into the persisted blob', async () => {
+    useQuranStore.getState().setQuranSettings({ arabicFontKey: 'uthmani' });
     await Promise.resolve(); // createJSONStorage wraps the write in a promise
 
     const setItem = mmkvStorage.setItem as jest.Mock;
@@ -172,6 +172,6 @@ describe('quranStore — persistence', () => {
 
     const [name, blob] = setItem.mock.calls[setItem.mock.calls.length - 1];
     expect(name).toBe('quran-storage');
-    expect(JSON.parse(blob).state.quranFontKey).toBe('uthmani');
+    expect(JSON.parse(blob).state.arabicFontKey).toBe('uthmani');
   });
 });

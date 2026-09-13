@@ -36,7 +36,7 @@ type AyahFavoritesData = {
 type QuranSettings = {
   arabicFontSize: number;
   translationFontSize: number;
-  quranFontKey: QuranFontKey;
+  arabicFontKey: QuranFontKey;
   selectedEditions: Record<string, string>;
 }
 
@@ -93,7 +93,7 @@ export const useQuranStore = create<QuranState>()(
       // Settings
       arabicFontSize: 19,
       translationFontSize: 15,
-      quranFontKey: DEFAULT_QURAN_FONT,
+      arabicFontKey: DEFAULT_QURAN_FONT,
       selectedEditions: DEFAULT_EDITIONS,
 
       // Favorites
@@ -212,7 +212,7 @@ export const useQuranStore = create<QuranState>()(
         khatamCount: state.khatamCount,
         arabicFontSize: state.arabicFontSize,
         translationFontSize: state.translationFontSize,
-        quranFontKey: state.quranFontKey,
+        arabicFontKey: state.arabicFontKey,
         selectedEditions: state.selectedEditions,
         favoriteAyahs: state.favoriteAyahs,
       }),

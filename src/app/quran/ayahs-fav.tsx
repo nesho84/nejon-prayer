@@ -21,7 +21,7 @@ export default function AyahsFavoritesScreen() {
   const favoriteAyahs = useQuranStore((state) => state.favoriteAyahs);
   const arabicFontSize = useQuranStore((state) => state.arabicFontSize);
   const translationFontSize = useQuranStore((state) => state.translationFontSize);
-  const quranFontKey = useQuranStore((state) => state.quranFontKey);
+  const arabicFontKey = useQuranStore((state) => state.arabicFontKey);
   const toggleAyahFavorite = useQuranStore((state) => state.toggleAyahFavorite);
 
   // Safe area insets
@@ -41,7 +41,7 @@ export default function AyahsFavoritesScreen() {
       theme={theme}
       arabicFontSize={arabicFontSize}
       translationFontSize={translationFontSize}
-      quranFontKey={quranFontKey}
+      arabicFontKey={arabicFontKey}
       isSelected={false}
       isAyahFavorited={true}
       onPress={() => { }}
@@ -53,7 +53,7 @@ export default function AyahsFavoritesScreen() {
         translation: item.translation,
       })}
     />
-  ), [theme, arabicFontSize, translationFontSize, quranFontKey, toggleAyahFavorite]);
+  ), [theme, arabicFontSize, translationFontSize, arabicFontKey, toggleAyahFavorite]);
 
   return (
     <AppLayout>

@@ -27,7 +27,7 @@ const baseProps = {
   theme: mockTheme,
   arabicFontSize: 24,
   translationFontSize: 14,
-  quranFontKey: 'system' as const,
+  arabicFontKey: 'system' as const,
   isSelected: false,
   isAyahFavorited: false,
   onPress: jest.fn(),
@@ -74,7 +74,7 @@ describe('QuranAyahRow — Arabic font', () => {
   const translationStyle = () => StyleSheet.flatten(screen.getByText('In the name of Allah').props.style);
 
   it('leaves fontFamily unset for the system font', () => {
-    render(<QuranAyahRow {...baseProps} quranFontKey="system" />);
+    render(<QuranAyahRow {...baseProps} arabicFontKey="system" />);
     const style = arabicStyle();
     expect(style.fontFamily).toBeUndefined();
     expect(style.fontSize).toBe(24);
@@ -82,7 +82,7 @@ describe('QuranAyahRow — Arabic font', () => {
   });
 
   it('applies the family and scaled metrics for a custom font', () => {
-    render(<QuranAyahRow {...baseProps} quranFontKey="amiri" />);
+    render(<QuranAyahRow {...baseProps} arabicFontKey="amiri" />);
     const amiri = getQuranFont('amiri');
     const style = arabicStyle();
     expect(style.fontFamily).toBe(amiri.family);
@@ -91,13 +91,13 @@ describe('QuranAyahRow — Arabic font', () => {
   });
 
   it('never sets includeFontPadding — false clips tashkeel on Android', () => {
-    render(<QuranAyahRow {...baseProps} quranFontKey="uthmani" />);
+    render(<QuranAyahRow {...baseProps} arabicFontKey="uthmani" />);
     expect(arabicStyle().includeFontPadding).toBeUndefined();
   });
 
   it('leaves the translation text untouched in every mode', () => {
     (['system', 'uthmani', 'amiri'] as const).forEach((key) => {
-      render(<QuranAyahRow {...baseProps} quranFontKey={key} />);
+      render(<QuranAyahRow {...baseProps} arabicFontKey={key} />);
       const style = translationStyle();
       expect(style.fontFamily).toBeUndefined();
       expect(style.fontSize).toBe(14);

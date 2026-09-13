@@ -205,6 +205,7 @@ export default function DebugPanel() {
       khatamCount,
       arabicFontSize,
       translationFontSize,
+      arabicFontKey,
       selectedEditions,
       favoriteAyahs,
     } = useQuranStore.getState();
@@ -216,6 +217,7 @@ export default function DebugPanel() {
       khatamCount,
       arabicFontSize,
       translationFontSize,
+      arabicFontKey,
       selectedEditions,
       favoriteAyahs,
     });
