@@ -2,6 +2,7 @@ import AppCard from "@/components/AppCard";
 import AppError from "@/components/AppError";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
+import AppWarningStrip from "@/components/AppWarningStrip";
 import HolidaysCard from "@/components/HolidaysCard";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
@@ -215,41 +216,26 @@ export default function HomeScreen() {
                         </View>
                     </TouchableOpacity>
 
-                    {/* Bottom: Outdated prayer times warning */}
-                    {(prayersOutdated || forcePrayersOutdated) && (
-                        <TouchableOpacity
-                            style={[styles.warningStrip, { backgroundColor: theme.warning + '18' }]}
-                            activeOpacity={0.3}
-                            onPress={() => router.navigate("/(tabs)/settings")}
-                        >
-                            <Ionicons name="alert-circle-outline" size={22} color={theme.accent2} />
-                            <Text style={[styles.warningStripText, { color: theme.accent2 }]} numberOfLines={2}>
-                                {tr.labels.prayerTimesOutdatedShort}
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-
-                    {/* Divider */}
-                    {(prayersOutdated || forcePrayersOutdated) && (locationChanged || forceLocationChange) && (
-                        <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2, marginVertical: 2 }]} />
-                    )}
-
-                    {/* Bottom: Location changed warning */}
-                    {(locationChanged || forceLocationChange) && (
-                        <TouchableOpacity
-                            style={[styles.warningStrip, { backgroundColor: theme.warning + '18' }]}
-                            activeOpacity={0.3}
-                            onPress={() => router.navigate("/(tabs)/settings")}
-                        >
-                            <MaterialDesignIcons name="map-marker-radius" size={22} color={theme.accent2} />
-                            <Text style={[styles.warningStripText, { color: theme.accent2 }]} numberOfLines={3}>
-                                {tr.labels.locationChangedShort}
-                            </Text>
-                        </TouchableOpacity>
-                    )}
-
                     {/* Divider */}
                     <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2 }]} />
+
+                    {/* Warning 1: Outdated prayer times warning */}
+                    {(prayersOutdated || forcePrayersOutdated) && (
+                        <AppWarningStrip
+                            icon={<Ionicons name="alert-circle-outline" size={20} color={theme.accent2} />}
+                            text={tr.labels.prayerTimesOutdatedShort}
+                            onPress={() => router.navigate("/(tabs)/settings")}
+                        />
+                    )}
+
+                    {/* Warning 2: Location changed warning */}
+                    {(locationChanged || forceLocationChange) && (
+                        <AppWarningStrip
+                            icon={<MaterialDesignIcons name="map-marker-radius" size={20} color={theme.accent2} />}
+                            text={tr.labels.locationChangedShort}
+                            onPress={() => router.navigate("/(tabs)/settings")}
+                        />
+                    )}
 
                     {/* Prayers List */}
                     <PrayersList
@@ -316,18 +302,5 @@ const styles = StyleSheet.create({
         height: 32,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    // Prayer List - Outdated warning
-    warningStrip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        gap: 8,
-    },
-    warningStripText: {
-        flex: 1,
-        fontSize: 13,
-        letterSpacing: 0.3,
     },
 });

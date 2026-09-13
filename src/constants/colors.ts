@@ -22,7 +22,7 @@ export const LIGHT_COLORS = {
     // Status
     danger: "#dc2626",
     success: "#16a34a",
-    warning: "#facc15de",
+    warning: "#facc15",
     info: "#0284c7",
     pink: "#db2777",
     violet: "#7c3aed",
