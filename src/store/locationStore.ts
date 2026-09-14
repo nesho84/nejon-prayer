@@ -64,7 +64,7 @@ const getProbeLocation = async (): Promise<Cords | null> => {
     });
     return current?.coords ?? null;
   } catch (err) {
-    console.warn("⚠️ [locationStore] Location probe failed:", err);
+    // console.warn("⚠️ [locationStore] Location probe failed:", err);
     return null;
   }
 };

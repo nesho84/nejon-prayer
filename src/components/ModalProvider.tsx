@@ -5,6 +5,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import {
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -82,6 +83,28 @@ export default function ModalProvider() {
   );
 
   // ------------------------------------------------------------
+  // Render scrollable body (content + component) — title and buttons stay fixed
+  // ------------------------------------------------------------
+  const renderBody = () => {
+    if (!options?.content && !options?.component) return null;
+
+    return (
+      <ScrollView
+        contentContainerStyle={styles.bodyContent}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+      >
+        {options.content && (
+          <Text style={[styles.content, { color: theme.text2 }, options.contentStyle]}>
+            {options.content}
+          </Text>
+        )}
+        {options.component}
+      </ScrollView>
+    );
+  };
+
+  // ------------------------------------------------------------
   // ---- Alert ----
   // ------------------------------------------------------------
   if (options?.type === 'alert') {
@@ -93,7 +116,7 @@ export default function ModalProvider() {
         statusBarTranslucent
         onRequestClose={handleDismiss}
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24, paddingLeft: insets.left + 24, paddingRight: insets.right + 24 }]}>
           <Pressable style={StyleSheet.absoluteFill} onPress={handleDismiss} />
           <View style={[styles.alertContainer, { backgroundColor: theme.bg2, shadowColor: theme.black }, options.containerStyle]}>
             {renderCloseIcon()}
@@ -102,12 +125,7 @@ export default function ModalProvider() {
                 {options.title}
               </Text>
             )}
-            {options.content && (
-              <Text style={[styles.content, { color: theme.text2 }, options.contentStyle]}>
-                {options.content}
-              </Text>
-            )}
-            {options.component}
+            {renderBody()}
             {options.buttons && renderButtons()}
             {options.celebrationAnimation && <CelebrationFx />}
           </View>
@@ -128,7 +146,7 @@ export default function ModalProvider() {
         statusBarTranslucent
         onRequestClose={() => hide('cancel')}
       >
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24, paddingLeft: insets.left + 24, paddingRight: insets.right + 24 }]}>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => hide('cancel')} />
           <View style={[styles.alertContainer, { backgroundColor: theme.bg2, shadowColor: theme.black }, options.containerStyle]}>
             {renderCloseIcon()}
@@ -137,12 +155,7 @@ export default function ModalProvider() {
                 {options.title}
               </Text>
             )}
-            {options.content && (
-              <Text style={[styles.content, { color: theme.text2 }, options.contentStyle]}>
-                {options.content}
-              </Text>
-            )}
-            {options.component}
+            {renderBody()}
             {options.buttons && renderButtons()}
           </View>
         </View>
@@ -208,10 +221,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
   },
   alertContainer: {
     width: '100%',
+    flexShrink: 1,
     borderRadius: 16,
     padding: 20,
     gap: 12,
@@ -252,6 +265,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   closeIconBtn: {
+  },
+  bodyContent: {
+    gap: 12,
   },
   title: {
     fontSize: 17,
