@@ -125,7 +125,8 @@
           "android": {
             "compileSdkVersion": 36,
             "targetSdkVersion": 36,
-            "buildToolsVersion": "36.0.0"
+            "buildToolsVersion": "36.0.0",
+            "enableMinifyInReleaseBuilds": true
           },
           "ios": {
             "deploymentTarget": "16.4"
@@ -143,7 +144,10 @@
         {
           "url": "https://sentry.io/",
           "project": "react-native",
-          "organization": "nejonnet"
+          "organization": "nejonnet",
+          "experimental_android": {
+            "enableAndroidGradlePlugin": true
+          }
         }
       ],
       [
