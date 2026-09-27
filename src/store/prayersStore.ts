@@ -98,7 +98,10 @@ export const usePrayersStore = create<PrayersState>()(
               return;
             } catch (err) {
               console.warn("⚠️ Failed to fetch yearly prayer times:", err);
-              Sentry.captureException(err);
+              // Timeout/offline is expected — not a bug
+              if (!(err instanceof Error && err.message.startsWith('fetch failed:'))) {
+                Sentry.captureException(err);
+              }
             }
           }
 

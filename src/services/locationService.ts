@@ -95,7 +95,11 @@ export async function getUserLocation(tr: Translations | null): Promise<Location
         };
     } catch (err) {
         console.warn('❌ Location error:', err);
-        Sentry.captureException(err);
+        // Location off / no GPS fix is expected — not a bug
+        const code = (err as { code?: string }).code;
+        if (code !== 'ERR_CURRENT_LOCATION_IS_UNAVAILABLE' && code !== 'ERR_LOCATION_SETTINGS_UNSATISFIED' && code !== 'ERR_LOCATION_UNAVAILABLE') {
+            Sentry.captureException(err);
+        }
         const title = tr?.labels.error ?? "Error";
         const message = tr?.labels.locationError ?? "Failed to get location.";
         Alert.alert(title, message);

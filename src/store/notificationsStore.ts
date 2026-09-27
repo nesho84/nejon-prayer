@@ -204,23 +204,18 @@ export const useNotificationsStore = create<NotificationsState>()(
             set({ lastBackgroundSync: today });
           }
 
+          // Log the actual result — console calls become breadcrumbs on real errors
           const prayerTimes = usePrayersStore.getState().prayerTimes;
 
-          // Log result to Sentry for monitoring
-          const extra = { at: new Date().toISOString(), today, prayerTimes };
-
           if (result === 'rescheduled') {
-            // Confirms the reschedule ran
-            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule OK', { level: 'info', extra });
+            console.log('✅ [notificationsStore:Background] Daily reschedule OK', { today, prayerTimes });
           } else if (result === 'skipped') {
             // Settings/times unchanged since last schedule — existing DAILY triggers re-fire
-            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule SKIPPED (hash unchanged)', { level: 'info', extra });
+            console.log('⏸️ [notificationsStore:Background] Daily reschedule skipped (hash unchanged)', { today });
           } else {
-            // Clear failure signal for diagnosing missed notifications ('failed' or missing prayerTimes)
-            Sentry.captureMessage('[notificationsStore:Background] Daily reschedule FAILED', { level: 'warning', extra });
+            // Cause already warned or captured in syncNotifications
+            console.warn('⚠️ [notificationsStore:Background] Daily reschedule failed, retrying on next delivery', { today, prayerTimes });
           }
-
-          console.log('✅ [notificationsStore:Background] Notifications synced successfully');
         } catch (err) {
           console.error('❌ [notificationsStore:Background] Notifications sync failed:', err);
           Sentry.captureException(err);

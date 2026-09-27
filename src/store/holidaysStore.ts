@@ -62,7 +62,10 @@ export const useHolidaysStore = create<HolidaysState>()(
             console.log('🌐 [holidaysStore] Yearly holidays fetched & stored');
           } catch (err) {
             console.warn('⚠️ [holidaysStore] Failed to fetch yearly holidays:', err);
-            Sentry.captureException(err);
+            // Timeout/offline is expected — not a bug
+            if (!(err instanceof Error && err.message.startsWith('fetch failed:'))) {
+              Sentry.captureException(err);
+            }
           }
 
         } catch (err: unknown) {
