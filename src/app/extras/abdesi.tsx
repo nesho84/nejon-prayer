@@ -7,8 +7,9 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
 import { useCallback, useMemo, useState } from "react";
-import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
+import { ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface StepType {
@@ -39,14 +40,14 @@ export default function AbdesiScreen() {
     const STEPS: StepType[] = useMemo(() => {
         return [
             { id: 1, text: abdesiTr.step1 },
-            { id: 2, text: abdesiTr.step2, image: require("../../../assets/images/abdesi/step2.png") },
-            { id: 3, text: abdesiTr.step3, image: require("../../../assets/images/abdesi/step3.png") },
-            { id: 4, text: abdesiTr.step4, image: require("../../../assets/images/abdesi/step4.png") },
-            { id: 5, text: abdesiTr.step5, image: require("../../../assets/images/abdesi/step5.png") },
-            { id: 6, text: abdesiTr.step6, image: require("../../../assets/images/abdesi/step6.png") },
-            { id: 7, text: abdesiTr.step7, image: require("../../../assets/images/abdesi/step7.png") },
-            { id: 8, text: abdesiTr.step8, image: require("../../../assets/images/abdesi/step8.png") },
-            { id: 9, text: abdesiTr.step9, image: require("../../../assets/images/abdesi/step9.png") },
+            { id: 2, text: abdesiTr.step2, image: require("../../../assets/images/abdesi/step2.svg") },
+            { id: 3, text: abdesiTr.step3, image: require("../../../assets/images/abdesi/step3.svg") },
+            { id: 4, text: abdesiTr.step4, image: require("../../../assets/images/abdesi/step4.svg") },
+            { id: 5, text: abdesiTr.step5, image: require("../../../assets/images/abdesi/step5.svg") },
+            { id: 6, text: abdesiTr.step6, image: require("../../../assets/images/abdesi/step6.svg") },
+            { id: 7, text: abdesiTr.step7, image: require("../../../assets/images/abdesi/step7.svg") },
+            { id: 8, text: abdesiTr.step8, image: require("../../../assets/images/abdesi/step8.svg") },
+            { id: 9, text: abdesiTr.step9, image: require("../../../assets/images/abdesi/step9.svg") },
             { id: 10, text: abdesiTr.step10 },
         ];
     }, [abdesiTr]);
@@ -80,7 +81,7 @@ export default function AbdesiScreen() {
                     android_ripple={{ color: theme.overlayLight, borderless: false }}
                     onPress={() => setViewerSource(item.image!)}
                 >
-                    <Image source={item.image} style={styles.stepImage} />
+                    <Image source={item.image} style={styles.stepImage} contentFit="cover" />
                     <View style={[styles.zoomBadge, { backgroundColor: theme.secondary }]}>
                         <Ionicons name="expand" size={13} color={theme.card} />
                     </View>
@@ -183,7 +184,6 @@ const styles = StyleSheet.create({
         width: 141,
         height: 141,
         borderRadius: 70.5,
-        resizeMode: "cover",
     },
     zoomBadge: {
         position: "absolute",

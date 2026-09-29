@@ -1,4 +1,7 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
+// @ts-expect-error - registry ships no type declarations
+import { getAssetByID } from "@react-native/assets-registry/registry";
+import { Image as ExpoImage } from "expo-image";
 import { Image, ImageSourcePropType, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -14,12 +17,18 @@ interface Props {
 const MAX_SCALE = 4;
 const DOUBLE_TAP_SCALE = 2.5;
 
+// RN's Image can't render SVG. require()d sources are asset ids (type comes from the registry), remote ones carry a uri
+const isSvgSource = (source: ImageSourcePropType) => {
+    if (typeof source === "number") {
+        return getAssetByID(source)?.type === "svg";
+    }
+    return !Array.isArray(source) && !!source.uri?.split("?")[0].endsWith(".svg");
+};
+
 export default function ImageViewer({ visible, source, onClose }: Props) {
     // Safe area insets
     const insets = useSafeAreaInsets();
-    const topInset = insets.top + 12;
-    const bottomInset = insets.bottom + 12;
-    const rightInset = insets.right + 16;
+    const bottomInset = insets.bottom + 24;
 
     // Layout
     const { width, height } = useWindowDimensions();
@@ -139,18 +148,20 @@ export default function ImageViewer({ visible, source, onClose }: Props) {
                     {/* Zoomable image */}
                     <GestureDetector gesture={gesture}>
                         <Animated.View style={[styles.imageWrapper, { width, height }, animatedStyle]}>
-                            <Image source={source} style={{ width, height }} resizeMode="contain" />
+                            {isSvgSource(source)
+                                ? <ExpoImage source={source} style={{ width, height }} contentFit="contain" />
+                                : <Image source={source} style={{ width, height }} resizeMode="contain" />}
                         </Animated.View>
                     </GestureDetector>
 
                     {/* Close button */}
                     <Pressable
                         testID="image-viewer-close"
-                        style={[styles.closeButton, { top: topInset, bottom: bottomInset, right: rightInset }]}
+                        style={[styles.closeButton, { bottom: bottomInset }]}
                         hitSlop={12}
                         onPress={handleClose}
                     >
-                        <Ionicons name="close" size={28} color="#fff" />
+                        <Ionicons name="close" size={28} color="rgba(255, 255, 255, 0.5)" />
                     </Pressable>
 
                 </View>
@@ -166,9 +177,9 @@ const styles = StyleSheet.create({
     },
     backdrop: {
         flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.92)",
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.92)",
     },
     imageWrapper: {
         alignItems: "center",
@@ -178,11 +189,13 @@ const styles = StyleSheet.create({
     // Close button
     closeButton: {
         position: "absolute",
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 50,
+        height: 50,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        borderWidth: 1,
+        borderRadius: 25,
+        borderColor: "rgba(255, 255, 255, 0.2)",
+        backgroundColor: "rgba(0, 0, 0, 0.2)",
     },
 });

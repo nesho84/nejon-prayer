@@ -73,6 +73,7 @@
       "./src/plugins/resBuild.js",
       "expo-router",
       "expo-asset",
+      "expo-image",
       "expo-status-bar",
       [
         "expo-font",
