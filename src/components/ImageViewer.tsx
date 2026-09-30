@@ -157,7 +157,7 @@ export default function ImageViewer({ visible, source, onClose }: Props) {
                     {/* Close button */}
                     <Pressable
                         testID="image-viewer-close"
-                        style={[styles.closeButton, { bottom: bottomInset }]}
+                        style={({ pressed }) => [styles.closeButton, { bottom: bottomInset }, { opacity: pressed ? 0.5 : 1 }]}
                         hitSlop={12}
                         onPress={handleClose}
                     >

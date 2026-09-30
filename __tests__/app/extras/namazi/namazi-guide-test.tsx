@@ -2,7 +2,7 @@ import NamaziGuideScreen from '@/app/extras/namazi/namazi-guide';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Image } from 'react-native';
+import { Image } from 'expo-image';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },

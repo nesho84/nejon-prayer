@@ -7,8 +7,9 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList } from "@shopify/flash-list";
+import { Image } from "expo-image";
 import { useCallback, useMemo, useState } from "react";
-import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
+import { ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface StepType {
@@ -39,21 +40,21 @@ export default function NamaziGuideScreen() {
     // ------------------------------------------------------------
     const STEPS: StepType[] = useMemo(() => {
         return [
-            { id: 1, text: namaziTr.step1, image: require("../../../../assets/images/namazi/step1.png") },
-            { id: 2, text: namaziTr.step2, image: require("../../../../assets/images/namazi/step2.png") },
-            { id: 3, text: namaziTr.step3, image: require("../../../../assets/images/namazi/step3.png") },
-            { id: 4, text: namaziTr.step4, image: require("../../../../assets/images/namazi/step4.png") },
-            { id: 5, text: namaziTr.step5, image: require("../../../../assets/images/namazi/step5.png") },
-            { id: 6, text: namaziTr.step6, image: require("../../../../assets/images/namazi/step6.png") },
-            { id: 7, text: namaziTr.step7, image: require("../../../../assets/images/namazi/step5.png") },
-            { id: 8, text: namaziTr.step8, image: require("../../../../assets/images/namazi/step2.png") },
-            { id: 9, text: namaziTr.step9, image: require("../../../../assets/images/namazi/step3.png") },
-            { id: 10, text: namaziTr.step10, image: require("../../../../assets/images/namazi/step4.png") },
-            { id: 11, text: namaziTr.step11, image: require("../../../../assets/images/namazi/step5.png") },
-            { id: 12, text: namaziTr.step12, image: require("../../../../assets/images/namazi/step6.png") },
-            { id: 13, text: namaziTr.step13, image: require("../../../../assets/images/namazi/step5.png") },
-            { id: 14, text: namaziTr.step14, image: require("../../../../assets/images/namazi/step14.png") },
-            { id: 15, text: namaziTr.step15, image: require("../../../../assets/images/namazi/step15.png") },
+            { id: 1, text: namaziTr.step1, image: require("../../../../assets/images/namazi/step1.svg") },
+            { id: 2, text: namaziTr.step2, image: require("../../../../assets/images/namazi/step2.svg") },
+            { id: 3, text: namaziTr.step3, image: require("../../../../assets/images/namazi/step3.svg") },
+            { id: 4, text: namaziTr.step4, image: require("../../../../assets/images/namazi/step4.svg") },
+            { id: 5, text: namaziTr.step5, image: require("../../../../assets/images/namazi/step5.svg") },
+            { id: 6, text: namaziTr.step6, image: require("../../../../assets/images/namazi/step6.svg") },
+            { id: 7, text: namaziTr.step7, image: require("../../../../assets/images/namazi/step5.svg") },
+            { id: 8, text: namaziTr.step8, image: require("../../../../assets/images/namazi/step2.svg") },
+            { id: 9, text: namaziTr.step9, image: require("../../../../assets/images/namazi/step3.svg") },
+            { id: 10, text: namaziTr.step10, image: require("../../../../assets/images/namazi/step4.svg") },
+            { id: 11, text: namaziTr.step11, image: require("../../../../assets/images/namazi/step5.svg") },
+            { id: 12, text: namaziTr.step12, image: require("../../../../assets/images/namazi/step6.svg") },
+            { id: 13, text: namaziTr.step13, image: require("../../../../assets/images/namazi/step5.svg") },
+            { id: 14, text: namaziTr.step14, image: require("../../../../assets/images/namazi/step14.svg") },
+            { id: 15, text: namaziTr.step15, image: require("../../../../assets/images/namazi/step15.svg") },
         ];
     }, [namaziTr]);
 
@@ -130,7 +131,7 @@ export default function NamaziGuideScreen() {
                     onPress={() => setViewerSource(item.image!)}
                 >
                     <View style={styles.stepImageWrap}>
-                        <Image source={item.image} style={styles.stepImage} />
+                        <Image source={item.image} style={styles.stepImage} contentFit="contain" />
                         <View style={[styles.zoomBadge, { backgroundColor: theme.islamicGreen }]}>
                             <Ionicons name="expand" size={13} color={theme.card} />
                         </View>
@@ -265,7 +266,6 @@ const styles = StyleSheet.create({
         width: 241,
         height: 241,
         borderRadius: 12,
-        resizeMode: "contain",
     },
     zoomBadge: {
         position: "absolute",
