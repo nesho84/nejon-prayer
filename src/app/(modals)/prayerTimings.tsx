@@ -7,9 +7,11 @@ import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
+import { useStoreReviewStore } from "@/store/storeReviewStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from "@/types/prayer.types";
 import { isTimePast, toDateKey } from "@/utils/datetime";
+import { getDayPrayedCount } from "@/utils/tracking";
 import DateTimePicker, { DateTimePickerChangeEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import * as Haptics from 'expo-haptics';
@@ -146,6 +148,11 @@ export default function PrayerTimingsScreen() {
         isPrayed
             ? unmarkPrayed(prayerName as PrayerName, selectedDateKey, 'calendar')
             : await markPrayed(prayerName as PrayerName, selectedDateKey, 'calendar');
+
+        // 3rd prayer marked for this day (any day) — ask for a store review
+        if (!isPrayed && getDayPrayedCount(usePrayersTrackingStore.getState().tracking, selectedDateKey) === 3) {
+            useStoreReviewStore.getState().maybeRequestStoreReview();
+        }
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
 
     // ------------------------------------------------------------

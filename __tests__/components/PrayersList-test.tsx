@@ -1,9 +1,10 @@
 import PrayersList from '@/components/PrayersList';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
+import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { toDateKey } from '@/utils/datetime';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
@@ -48,6 +49,9 @@ const mockPrayerTimes = {
   Imsak: '04:30', Fajr: '04:50', Sunrise: '06:15',
   Dhuhr: '12:00', Asr: '15:30', Maghrib: '19:45', Isha: '21:15',
 };
+
+// Real action captured before any test replaces it with a mock — those mocks outlive their tests
+const realMarkPrayed = usePrayersTrackingStore.getState().markPrayed;
 
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme as any });
@@ -113,5 +117,68 @@ describe('PrayersList — past / future / unmark logic', () => {
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={today} currentPrayerName={null} />);
     fireEvent.press(screen.getByText('Fajr')); // already prayed → unmark
     expect(unmarkPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
+  });
+});
+
+describe('PrayersList — store review trigger', () => {
+  const maybeRequestStoreReview = jest.fn();
+
+  // 21:30 — every main prayer (last: Isha 21:15) is past, so every row is tappable
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-05-28T21:30:00'));
+    maybeRequestStoreReview.mockClear();
+    useStoreReviewStore.setState({ maybeRequestStoreReview } as any);
+    usePrayersTrackingStore.setState({ markPrayed: realMarkPrayed } as any);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  // Presses `next` with `prayed` already marked today
+  const pressWith = async (prayed: string[], next: string) => {
+    usePrayersTrackingStore.setState({
+      tracking: { [toDateKey()]: Object.fromEntries(prayed.map((p) => [p, { status: 'prayed' }])) },
+    } as any);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
+    fireEvent.press(screen.getByText(next));
+    await act(async () => { });
+  };
+
+  it('requests on the 3rd prayer of the day', async () => {
+    await pressWith(['Fajr', 'Dhuhr'], 'Asr');
+
+    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not request on the 1st prayer', async () => {
+    await pressWith([], 'Fajr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request on the 2nd prayer', async () => {
+    await pressWith(['Fajr'], 'Dhuhr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request on the 4th prayer', async () => {
+    await pressWith(['Fajr', 'Dhuhr', 'Asr'], 'Maghrib');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request on the 5th prayer — that one shows the celebration', async () => {
+    await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Isha');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request when unmarking a prayer (4 marked → 3 left)', async () => {
+    await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Fajr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
   });
 });

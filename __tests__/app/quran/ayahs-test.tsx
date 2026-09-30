@@ -3,9 +3,10 @@ import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
+import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { shareText } from '@/utils/system';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
@@ -36,18 +37,22 @@ jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
+// Latest FlashList props, so a test can drive the scroll callbacks
+let mockFlashListProps: any;
 jest.mock('@shopify/flash-list', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
-    FlashList: React.forwardRef(({ data, renderItem, ListFooterComponent }: any, _ref: any) =>
-      React.createElement(
+    FlashList: React.forwardRef((props: any, _ref: any) => {
+      mockFlashListProps = props;
+      const { data, renderItem, ListFooterComponent } = props;
+      return React.createElement(
         View,
         null,
         data?.map((item: any, i: number) => React.createElement(View, { key: i }, renderItem({ item }))),
         ListFooterComponent ? React.createElement(ListFooterComponent) : null,
-      )
-    ),
+      );
+    }),
   };
 });
 jest.mock('@/components/QuranAyahRow', () => {
@@ -212,5 +217,77 @@ describe('AyahsScreen khatam completion', () => {
       `${mockTr.labels.khatamShareMessage}\n\n${mockTr.labels.khatamShareVia}\n${storeUrl}`,
     );
     expect(require('expo-router').router.back).toHaveBeenCalled();
+  });
+});
+
+describe('AyahsScreen — store review milestone', () => {
+  const maybeRequestStoreReview = jest.fn();
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    maybeRequestStoreReview.mockClear();
+    useStoreReviewStore.setState({ maybeRequestStoreReview } as any);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  // Makes ayah `id` the first visible one, past the 200ms debounce. Touches the list first unless told not to.
+  const scrollTo = (id: number, touched = true) => {
+    act(() => {
+      if (touched) {
+        mockFlashListProps.onScrollBeginDrag();
+      }
+      mockFlashListProps.onViewableItemsChanged({ viewableItems: [{ item: { id } }] });
+      jest.advanceTimersByTime(200);
+    });
+  };
+
+  it('requests when reading reaches ayah 20', () => {
+    useQuranStore.setState({ lastReadAyahId: 19 } as any);
+    render(<AyahsScreen />);
+
+    scrollTo(20);
+
+    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not request below ayah 20', () => {
+    useQuranStore.setState({ lastReadAyahId: 10 } as any);
+    render(<AyahsScreen />);
+
+    scrollTo(19);
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request once reading is already past ayah 20', () => {
+    useQuranStore.setState({ lastReadAyahId: 30 } as any);
+    render(<AyahsScreen />);
+
+    scrollTo(40);
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('uses the khatam position in khatam mode', () => {
+    const { useLocalSearchParams } = require('expo-router');
+    useLocalSearchParams.mockImplementation(() => ({ surahId: '2', surahName: 'Al-Baqarah', readingMode: 'khatam' }));
+    useQuranStore.setState({ lastKhatamAyahId: 19, lastReadAyahId: 30 } as any);
+    render(<AyahsScreen />);
+
+    scrollTo(20);
+
+    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing before the user touches the list', () => {
+    useQuranStore.setState({ lastReadAyahId: 19 } as any);
+    render(<AyahsScreen />);
+
+    scrollTo(20, false);
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
   });
 });

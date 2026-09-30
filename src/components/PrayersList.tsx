@@ -7,10 +7,12 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
+import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { PrayerEventType, PrayerType } from '@/types/notification.types';
 import { MAIN_PRAYERS, PrayerName, PrayerTimeEntry, PrayerTimes } from '@/types/prayer.types';
 import { isTimePast, toDateKey } from '@/utils/datetime';
+import { getDayPrayedCount } from '@/utils/tracking';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useCallback } from 'react';
@@ -57,6 +59,12 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     const prayersComplete = await markPrayed(prayerName, undefined, 'home');
 
     const today = toDateKey();
+
+    // 3rd prayer of today — ask for a store review (never the 5th, which shows the celebration)
+    if (getDayPrayedCount(usePrayersTrackingStore.getState().tracking, today) === 3) {
+      useStoreReviewStore.getState().maybeRequestStoreReview();
+    }
+
     const alreadyCelebrated = celebratedDate === today;
     const shouldCelebrate = prayersComplete && (!alreadyCelebrated || prayerName === 'Isha');
 

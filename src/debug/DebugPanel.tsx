@@ -9,6 +9,7 @@ import { useOnboardingStore } from "@/store/onboardingStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useQuranStore } from "@/store/quranStore";
+import { selectStoreReviewEligible, useStoreReviewStore } from "@/store/storeReviewStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
@@ -26,6 +27,7 @@ import {
   getScheduledNData,
   logScheduledN,
 } from "./debugNotifs";
+import { debugStoreReviewPrompt, getStoreReviewDiagnostics } from "./debugStoreReview";
 
 interface ToggleProps {
   label: string;
@@ -223,6 +225,21 @@ export default function DebugPanel() {
     });
   };
 
+  const showStoreReviewModal = async () => {
+    const state = useStoreReviewStore.getState();
+    const { openDays, lastOpenDate, promptCount, lastPromptAt, lastPromptVersion } = state;
+    showJsonViewerModal("Store Review", {
+      eligible: selectStoreReviewEligible(state),
+      eligibleNote: "Our gates only — StoreReview.hasAction() is not checked, so this can be true while no dialog appears",
+      ...(await getStoreReviewDiagnostics()),
+      openDays,
+      lastOpenDate,
+      promptCount,
+      lastPromptAt: lastPromptAt ? new Date(lastPromptAt).toLocaleString("en-GB") : null,
+      lastPromptVersion,
+    });
+  };
+
   // Main component
   return (
     <>
@@ -293,12 +310,28 @@ export default function DebugPanel() {
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
 
+          {/* Store Review
+              The gates, counters and triggers can be tested on any build. The native dialog itself is
+              drawn by the Play Store app and only appears on a build installed from Play — on a dev
+              client requestReview() rejects and the service logs a warning instead.
+              To test it for real: release build → Play internal testing track → install via the Play
+              link → "Allow Next Trigger" → mark a 3rd prayer on Home or in the calendar, or read past ayah 20. */}
+          <Text style={{ fontSize: 12, color: theme.placeholder, margin: 4, marginTop: 0 }}>
+            Gates, counters and triggers work on any build. The dialog only appears on a build installed from Play (internal testing track).
+          </Text>
+          <DebugButton label="Store Review: Prompt Now (skips gates)" color={theme.violet} onPress={debugStoreReviewPrompt} />
+          <DebugButton label="Store Review: Allow Next Trigger" color={theme.violet} onPress={() => useStoreReviewStore.getState().makeEligible()} />
+
+          {/* Divider */}
+          <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+
           {/* JSON data in full screen modals */}
           <DebugButton label="Show 'Prayer Times - JSON' Modal" color={theme.gray} onPress={showPrayerTimesModal} />
           <DebugButton label="Show 'Prayer Tracking - JSON' Modal" color={theme.gray} onPress={showPrayerTrackingModal} />
           <DebugButton label="Show 'Scheduled Notifications - JSON' Modal" color={theme.gray} onPress={showScheduledNModal} />
           <DebugButton label="Show 'Islamic Holidays - JSON' Modal" color={theme.gray} onPress={showHolidaysModal} />
           <DebugButton label="Show 'Quran - JSON' Modal" color={theme.gray} onPress={showQuranModal} />
+          <DebugButton label="Show 'Store Review - JSON' Modal" color={theme.gray} onPress={showStoreReviewModal} />
 
         </View>
       )}

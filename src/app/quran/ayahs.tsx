@@ -7,6 +7,7 @@ import { globalStyles, HIT_SLOP_8 } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
+import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Verse } from '@/types/quran.types';
 import { shareText } from '@/utils/system';
@@ -17,6 +18,9 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Reading position (ayah number within the surah) that triggers the store review request
+const REVIEW_AYAH = 20;
 
 export default function AyahsScreen() {
   const { surahId, surahName, readingMode } = useLocalSearchParams();
@@ -118,11 +122,20 @@ export default function AyahsScreen() {
     }
 
     scrollTimeoutRef.current = setTimeout(() => {
+      // Stored position before this write, to spot the moment reading reaches REVIEW_AYAH
+      const { lastReadAyahId, lastKhatamAyahId } = useQuranStore.getState();
+      const previousAyahId = (mode === "reading" ? lastReadAyahId : lastKhatamAyahId) ?? 0;
+
       // setSelectedAyah(firstVisible.id); // <-- optional: update selected on scroll
       if (mode === "reading") {
         setLastRead(surahIdNum, surahNameStr, firstVisible.id);
       } else {
         setLastKhatam(surahIdNum, surahNameStr, firstVisible.id);
+      }
+
+      // Reading reached ayah REVIEW_AYAH — ask for a store review
+      if (previousAyahId < REVIEW_AYAH && firstVisible.id >= REVIEW_AYAH) {
+        useStoreReviewStore.getState().maybeRequestStoreReview();
       }
     }, 200);
   }, [mode, surahIdNum, surahNameStr, setLastRead, setLastKhatam]);

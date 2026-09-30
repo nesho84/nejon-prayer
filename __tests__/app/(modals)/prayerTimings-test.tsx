@@ -3,7 +3,9 @@ import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
+import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
+import { toDateKey } from '@/utils/datetime';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
@@ -71,6 +73,10 @@ const mockPrayerTimes = {
 };
 
 const mockLocation = { lat: 51.5, lng: -0.1, city: 'London' } as any;
+
+// Real actions captured before any test spies on them — those spies outlive their tests
+const realMarkPrayed = usePrayersTrackingStore.getState().markPrayed;
+const realUnmarkPrayed = usePrayersTrackingStore.getState().unmarkPrayed;
 
 beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme, resolvedTheme: 'light' as any });
@@ -167,5 +173,65 @@ describe('PrayerTimingsScreen', () => {
     await act(async () => { fireEvent.press(screen.getByText('Fajr')); });
 
     expect(unmarkPrayed).toHaveBeenCalledWith('Fajr', yesterdayKey(), 'calendar');
+  });
+});
+
+describe('PrayerTimingsScreen — store review trigger', () => {
+  const maybeRequestStoreReview = jest.fn();
+
+  const yesterday = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return toDateKey(d);
+  };
+
+  // Opens on yesterday so every prayer is past and tappable, then presses `next`
+  // with `prayed` already marked that day
+  const pressWith = async (prayed: string[], next: string) => {
+    usePrayersTrackingStore.setState({
+      tracking: { [yesterday()]: Object.fromEntries(prayed.map((p) => [p, { status: 'prayed' }])) },
+    } as any);
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Fajr')).toBeTruthy());
+    await act(async () => { fireEvent.press(screen.getByTestId('icon-chevron-back')); });
+    await waitFor(() => expect(screen.getByText('Fajr')).toBeTruthy());
+
+    await act(async () => { fireEvent.press(screen.getByText(next)); });
+  };
+
+  beforeEach(() => {
+    maybeRequestStoreReview.mockClear();
+    useStoreReviewStore.setState({ maybeRequestStoreReview } as any);
+    usePrayersTrackingStore.setState({ markPrayed: realMarkPrayed, unmarkPrayed: realUnmarkPrayed } as any);
+  });
+
+  it("requests on a past day's 3rd prayer", async () => {
+    await pressWith(['Fajr', 'Dhuhr'], 'Asr');
+
+    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not request on the 1st prayer', async () => {
+    await pressWith([], 'Fajr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request on the 2nd prayer', async () => {
+    await pressWith(['Fajr'], 'Dhuhr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request on the 4th prayer', async () => {
+    await pressWith(['Fajr', 'Dhuhr', 'Asr'], 'Maghrib');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+  });
+
+  it('does not request when unmarking a prayer (4 marked → 3 left)', async () => {
+    await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Fajr');
+
+    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
   });
 });

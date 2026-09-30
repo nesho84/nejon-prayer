@@ -90,6 +90,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `languageStore` | Active language + translation strings |
 | `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
 | `tesbihStore` | Counter value, lap count, target |
+| `storeReviewStore` | Store-review gating counters (open days, prompt count, last prompt time/version) |
 | `modalStore` | Global bottom-sheet modal visibility |
 
 ### Sync Hooks (run once at root layout)
@@ -103,6 +104,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
+| `useStoreReviewSync` | Counts distinct app-open days (mount + every foreground) for the store-review gate |
 
 ### External APIs
 
@@ -133,6 +135,38 @@ Three notification types:
 Two audio systems are used:
 - `react-native-sound` — for azan notification sounds played inside the notification
 - `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranAudioService.ts`)
+
+### Store review (expo-store-review)
+
+The native in-app review dialog (Play / App Store) is requested at three direct triggers — the 3rd
+prayer marked as prayed on Home (`PrayersList`; one attempt per day, and never the 5th, which shows
+the celebration modal), the same rule for any day in the calendar (`prayerTimings`, past days
+included; counted with `getDayPrayedCount`), and reading reaching ayah 20 of the surah being read
+(`quran/ayahs.tsx`, reading and khatam mode alike; it compares the stored position before and after
+the write, so it fires once per crossing and only for surahs longer than 20 ayahs). No trigger chains
+on a modal. All call
+`storeReviewStore.maybeRequestStoreReview()`, which awaits `StoreReview.hasAction()` first, then
+requires **≥5 distinct open days, >14 days since the last prompt, and a version not yet prompted
+on**. There is no lifetime cap — the platforms enforce their own quota.
+`storeReviewService` is the only file importing `expo-store-review` (plus the `debugStoreReview` debug helper, which reads it directly to show the raw values and the rejection).
+
+- **No callback, no success signal.** Counters are written *before* `requestReview()` and
+  `promptCount` counts attempts, not dialogs shown. It gates nothing (debug modal only), and nothing
+  may depend on the outcome.
+- **`hasAction()` is true on sideloaded Android builds too** (true on any 5.0+ install), so it does
+  not prove the dialog will show. The Debug Panel's `eligible` flag likewise covers our gates only,
+  not `hasAction()`, so it can read true while no dialog appears.
+- **The dialog can't be tested on a dev client.** The gates, counters and triggers can be tested on
+  any build, but the dialog itself is drawn by the Play Store app and only appears on a build
+  installed from Play; on a dev client `requestReview()` rejects and the service logs a warning. To
+  test it for real: release build → Play **internal testing track** (quota is not enforced there) →
+  install via the Play link → Debug Panel "Allow Next Trigger" → mark a 3rd prayer or read past ayah 20.
+- **Needs a new binary.** Native module, and `runtimeVersion.policy` is `appVersion` — don't
+  publish this JS as an OTA to an older version.
+- Debug Panel: "Prompt Now" (skips gates), "Allow Next Trigger" (sets the counters so the next trigger
+  passes every gate), and a JSON view with the counters, a computed `eligible` flag (all gates except
+  `hasAction()`) and the raw `hasAction` / `isAvailableAsync` / `storeUrl` values.
+- The "Rate the app" row in About is a plain store link and is unrelated.
 
 ### Ads (AdMob)
 
