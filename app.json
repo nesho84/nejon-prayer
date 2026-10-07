@@ -155,6 +155,7 @@
       [
         "react-native-google-mobile-ads/app.plugin.js",
         {
+          "androidSdk": "classic",
           "androidAppId": "ca-app-pub-8752479739166396~8421436523",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
           "delayAppMeasurementInit": true

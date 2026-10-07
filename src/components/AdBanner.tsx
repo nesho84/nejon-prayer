@@ -134,10 +134,12 @@ export default function AdBanner() {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    paddingVertical: 3,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   collapsed: {
     height: 0,
+    paddingVertical: 0,
     borderTopWidth: 0,
     overflow: "hidden",
     // opacity is belt-and-braces: the banner is a native view that paints its own background,
