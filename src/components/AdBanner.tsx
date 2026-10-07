@@ -1,17 +1,27 @@
-import { BANNER_UNIT_ID, CONNECTIVITY_DEBOUNCE_MS } from "@/constants/ads";
-import { HIT_SLOP_8 } from "@/constants/styles";
+import { BANNER_CLOSE_DELAY_MS, BANNER_UNIT_ID, CONNECTIVITY_DEBOUNCE_MS } from "@/constants/ads";
+import { HIT_SLOP_6_4 } from "@/constants/styles";
 import { useAdsStore } from "@/store/adsStore";
 import { useThemeStore } from "@/store/themeStore";
 import NetInfo from "@react-native-community/netinfo";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { BannerAd, BannerAdSize, useForeground } from "react-native-google-mobile-ads";
+
+// BannerAdSize.BANNER is a fixed 320dp wide
+const BANNER_WIDTH = 320;
+// Room the close button needs right of the ad: 4 gap + 18 button + 4 gap
+const CLOSE_SLOT = 26;
 
 export default function AdBanner() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const canRequestAds = useAdsStore((state) => state.canRequestAds);
+
+  // Narrow phones (360dp) lack room beside a centered ad, so the ad shifts left just enough
+  const { width } = useWindowDimensions();
+  const closeFits = width >= BANNER_WIDTH + CLOSE_SLOT;
+  const adShift = closeFits ? Math.max(0, CLOSE_SLOT - (width - BANNER_WIDTH) / 2) : 0;
 
   // Load/dismiss state lives in the store. bannerLoaded is a one-way latch, so a failed
   // refresh never collapses a visible ad.
@@ -24,6 +34,8 @@ export default function AdBanner() {
   const [online, setOnline] = useState<boolean | null>(null);
   // One-way latch: gates only the *start* of rendering. Going offline later never unmounts.
   const [shouldRenderBannerAd, setShouldRenderBannerAd] = useState(false);
+  // Close button waits BANNER_CLOSE_DELAY_MS after the first ad instead of popping in with it
+  const [showClose, setShowClose] = useState(false);
 
   const bannerRef = useRef<BannerAd>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,6 +101,13 @@ export default function AdBanner() {
   // Reload on resume — the ad's WebView can be reclaimed while the app is suspended.
   useForeground(() => bannerRef.current?.load());
 
+  // Reveal the close button once the first ad has been on screen for a moment
+  useEffect(() => {
+    if (!loaded) return;
+    const timer = setTimeout(() => setShowClose(true), BANNER_CLOSE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [loaded]);
+
   if (!canRequestAds || dismissed) return null;
 
   return (
@@ -98,15 +117,20 @@ export default function AdBanner() {
       testID="ad-banner-container"
       style={[
         styles.container,
-        { backgroundColor: theme.bg, borderTopColor: theme.border },
+        {
+          backgroundColor: theme.bg,
+          borderTopColor: theme.border,
+          // Padding on one side moves the centered ad left by half of it
+          paddingRight: adShift * 2,
+        },
         !loaded && styles.collapsed,
       ]}
     >
-      {loaded && (
+      {showClose && closeFits && (
         // Absolute, so it adds no height — sits in the gap beside the 320dp ad, never over it
         <Pressable
           onPress={dismissBanner}
-          hitSlop={HIT_SLOP_8}
+          hitSlop={HIT_SLOP_6_4}
           style={({ pressed }) => [styles.closeButton, pressed && { backgroundColor: theme.pressed }]}
         >
           <Ionicons name="close" size={14} color={theme.placeholder} />

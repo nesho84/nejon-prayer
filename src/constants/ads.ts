@@ -15,3 +15,6 @@ export const BANNER_UNIT_ID = __DEV__ ? TestIds.BANNER : PLATFORM_BANNER_UNIT_ID
 // doesn't repeatedly retry the ad. The first reading skips it — a cold start that is
 // already online shouldn't wait.
 export const CONNECTIVITY_DEBOUNCE_MS = 2500;
+
+// The banner's close button appears this long after the first ad renders, not together with it.
+export const BANNER_CLOSE_DELAY_MS = 3000;

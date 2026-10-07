@@ -2,6 +2,7 @@ import { Insets, StyleSheet } from 'react-native';
 
 // Extra touch area for small icon buttons.
 export const HIT_SLOP_8: Insets = { top: 8, bottom: 8, left: 8, right: 8 };
+export const HIT_SLOP_6_4: Insets = { top: 6, bottom: 6, left: 4, right: 4 };
 
 // Static, theme-independent styles shared across the app.
 export const globalStyles = StyleSheet.create({
