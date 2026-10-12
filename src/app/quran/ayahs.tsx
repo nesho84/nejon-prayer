@@ -2,12 +2,12 @@ import AppError from '@/components/AppError';
 import AppLayout from '@/components/AppLayout';
 import AppLoading from '@/components/AppLoading';
 import QuranAyahRow from '@/components/QuranAyahRow';
+import { openRateAppModal } from '@/components/RateApp';
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
 import { globalStyles, HIT_SLOP_8 } from '@/constants/styles';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
-import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { Verse } from '@/types/quran.types';
 import { shareText } from '@/utils/system';
@@ -135,7 +135,7 @@ export default function AyahsScreen() {
 
       // Reading reached ayah REVIEW_AYAH — ask for a store review
       if (previousAyahId < REVIEW_AYAH && firstVisible.id >= REVIEW_AYAH) {
-        useStoreReviewStore.getState().maybeRequestStoreReview();
+        openRateAppModal();
       }
     }, 200);
   }, [mode, surahIdNum, surahNameStr, setLastRead, setLastKhatam]);

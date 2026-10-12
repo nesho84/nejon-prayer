@@ -1,14 +1,15 @@
 import AyahsScreen from '@/app/quran/ayahs';
+import { openRateAppModal } from '@/components/RateApp';
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from '@/constants/links';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useQuranStore } from '@/store/quranStore';
-import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { shareText } from '@/utils/system';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Platform } from 'react-native';
 
+jest.mock('@/components/RateApp', () => ({ openRateAppModal: jest.fn() }));
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -220,13 +221,10 @@ describe('AyahsScreen khatam completion', () => {
   });
 });
 
-describe('AyahsScreen — store review milestone', () => {
-  const maybeRequestStoreReview = jest.fn();
-
+describe('AyahsScreen — rate app trigger', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    maybeRequestStoreReview.mockClear();
-    useStoreReviewStore.setState({ maybeRequestStoreReview } as any);
+    (openRateAppModal as jest.Mock).mockClear();
   });
 
   afterEach(() => {
@@ -244,31 +242,31 @@ describe('AyahsScreen — store review milestone', () => {
     });
   };
 
-  it('requests when reading reaches ayah 20', () => {
+  it('opens the modal when reading reaches ayah 20', () => {
     useQuranStore.setState({ lastReadAyahId: 19 } as any);
     render(<AyahsScreen />);
 
     scrollTo(20);
 
-    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+    expect(openRateAppModal).toHaveBeenCalledTimes(1);
   });
 
-  it('does not request below ayah 20', () => {
+  it('does not open the modal below ayah 20', () => {
     useQuranStore.setState({ lastReadAyahId: 10 } as any);
     render(<AyahsScreen />);
 
     scrollTo(19);
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 
-  it('does not request once reading is already past ayah 20', () => {
+  it('does not open the modal once reading is already past ayah 20', () => {
     useQuranStore.setState({ lastReadAyahId: 30 } as any);
     render(<AyahsScreen />);
 
     scrollTo(40);
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 
   it('uses the khatam position in khatam mode', () => {
@@ -279,7 +277,7 @@ describe('AyahsScreen — store review milestone', () => {
 
     scrollTo(20);
 
-    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+    expect(openRateAppModal).toHaveBeenCalledTimes(1);
   });
 
   it('does nothing before the user touches the list', () => {
@@ -288,6 +286,6 @@ describe('AyahsScreen — store review milestone', () => {
 
     scrollTo(20, false);
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 });

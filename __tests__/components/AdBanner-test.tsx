@@ -1,5 +1,5 @@
 import AdBanner from '@/components/AdBanner';
-import { CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
+import { BANNER_CLOSE_DELAY_MS, CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
 import { useAdsStore } from '@/store/adsStore';
 import { useThemeStore } from '@/store/themeStore';
 import NetInfo from '@react-native-community/netinfo';
@@ -60,6 +60,14 @@ function emitConnectivity(isConnected: boolean, { settle = true } = {}) {
       jest.advanceTimersByTime(CONNECTIVITY_DEBOUNCE_MS);
     });
   }
+}
+
+// Simulates the ad loading, then waits out the close button's delay
+function loadAdAndRevealClose() {
+  fireEvent.press(screen.getByTestId('banner-ad'));
+  act(() => {
+    jest.advanceTimersByTime(BANNER_CLOSE_DELAY_MS);
+  });
 }
 
 // The wrapper collapses to zero height until an ad has actually rendered
@@ -235,10 +243,39 @@ describe('AdBanner — collapse', () => {
     render(<AdBanner />);
     emitConnectivity(true);
 
-    fireEvent.press(screen.getByTestId('banner-ad'));
+    loadAdAndRevealClose();
 
     expect(isCollapsed()).toBe(false);
     expect(screen.getByTestId('icon-close')).toBeTruthy();
+  });
+
+  it('shows the close button only after the delay, not together with the ad', () => {
+    render(<AdBanner />);
+    emitConnectivity(true);
+    fireEvent.press(screen.getByTestId('banner-ad'));
+
+    act(() => {
+      jest.advanceTimersByTime(BANNER_CLOSE_DELAY_MS - 1);
+    });
+    expect(screen.queryByTestId('icon-close')).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.getByTestId('icon-close')).toBeTruthy();
+  });
+
+  it('hides the close button on screens too narrow to fit it beside the ad', () => {
+    const RN = require('react-native');
+    const dimensions = jest.spyOn(RN, 'useWindowDimensions').mockReturnValue({ width: 340, height: 700, scale: 2, fontScale: 1 });
+    render(<AdBanner />);
+    emitConnectivity(true);
+
+    loadAdAndRevealClose();
+
+    expect(isCollapsed()).toBe(false);
+    expect(screen.queryByTestId('icon-close')).toBeNull();
+    dimensions.mockRestore();
   });
 
   it('stays collapsed but keeps the ad mounted when the first load fails', () => {
@@ -255,7 +292,7 @@ describe('AdBanner — collapse', () => {
   it('keeps a visible ad expanded when a later refresh fails', () => {
     render(<AdBanner />);
     emitConnectivity(true);
-    fireEvent.press(screen.getByTestId('banner-ad'));
+    loadAdAndRevealClose();
 
     fireEvent(screen.getByTestId('banner-ad'), 'longPress');
 
@@ -300,7 +337,7 @@ describe('AdBanner — dismissal', () => {
   it('removes the banner entirely when dismissed', () => {
     render(<AdBanner />);
     emitConnectivity(true);
-    fireEvent.press(screen.getByTestId('banner-ad'));
+    loadAdAndRevealClose();
 
     fireEvent.press(screen.getByTestId('icon-close').parent!);
 
@@ -311,7 +348,7 @@ describe('AdBanner — dismissal', () => {
   it('stays dismissed across re-renders — dismissal is per-session', () => {
     const { rerender } = render(<AdBanner />);
     emitConnectivity(true);
-    fireEvent.press(screen.getByTestId('banner-ad'));
+    loadAdAndRevealClose();
     fireEvent.press(screen.getByTestId('icon-close').parent!);
 
     rerender(<AdBanner />);

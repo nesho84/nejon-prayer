@@ -7,7 +7,6 @@ import { useLocationSync } from "@/hooks/useLocationSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
-import { useStoreReviewSync } from "@/hooks/useStoreReviewSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useUpdatesSync } from "@/hooks/useUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -67,7 +66,6 @@ function RootLayout() {
   useQuranSetup();
   useUpdatesSync();
   useAdsSync();
-  useStoreReviewSync();
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>

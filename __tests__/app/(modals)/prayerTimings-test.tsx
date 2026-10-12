@@ -1,14 +1,15 @@
 import PrayerTimingsScreen from '@/app/(modals)/prayerTimings';
+import { openRateAppModal } from '@/components/RateApp';
 import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
-import { useStoreReviewStore } from '@/store/storeReviewStore';
 import { useThemeStore } from '@/store/themeStore';
 import { toDateKey } from '@/utils/datetime';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
+jest.mock('@/components/RateApp', () => ({ openRateAppModal: jest.fn() }));
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
@@ -176,9 +177,7 @@ describe('PrayerTimingsScreen', () => {
   });
 });
 
-describe('PrayerTimingsScreen — store review trigger', () => {
-  const maybeRequestStoreReview = jest.fn();
-
+describe('PrayerTimingsScreen — rate app trigger', () => {
   const yesterday = () => {
     const d = new Date();
     d.setDate(d.getDate() - 1);
@@ -200,38 +199,37 @@ describe('PrayerTimingsScreen — store review trigger', () => {
   };
 
   beforeEach(() => {
-    maybeRequestStoreReview.mockClear();
-    useStoreReviewStore.setState({ maybeRequestStoreReview } as any);
+    (openRateAppModal as jest.Mock).mockClear();
     usePrayersTrackingStore.setState({ markPrayed: realMarkPrayed, unmarkPrayed: realUnmarkPrayed } as any);
   });
 
-  it("requests on a past day's 3rd prayer", async () => {
+  it("opens the modal on a past day's 3rd prayer", async () => {
     await pressWith(['Fajr', 'Dhuhr'], 'Asr');
 
-    expect(maybeRequestStoreReview).toHaveBeenCalledTimes(1);
+    expect(openRateAppModal).toHaveBeenCalledTimes(1);
   });
 
-  it('does not request on the 1st prayer', async () => {
+  it('does not open the modal on the 1st prayer', async () => {
     await pressWith([], 'Fajr');
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 
-  it('does not request on the 2nd prayer', async () => {
+  it('does not open the modal on the 2nd prayer', async () => {
     await pressWith(['Fajr'], 'Dhuhr');
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 
-  it('does not request on the 4th prayer', async () => {
+  it('does not open the modal on the 4th prayer', async () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr'], 'Maghrib');
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 
-  it('does not request when unmarking a prayer (4 marked → 3 left)', async () => {
+  it('does not open the modal when unmarking a prayer (4 marked → 3 left)', async () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Fajr');
 
-    expect(maybeRequestStoreReview).not.toHaveBeenCalled();
+    expect(openRateAppModal).not.toHaveBeenCalled();
   });
 });

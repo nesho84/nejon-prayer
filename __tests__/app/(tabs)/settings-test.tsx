@@ -56,6 +56,8 @@ jest.mock('@/components/AppLoading', () => {
   const { ActivityIndicator } = require('react-native');
   return ({ text }: any) => React.createElement(ActivityIndicator, { testID: `loading-${text}` });
 });
+// DebugPanel → RateApp imports CelebrationFx → reanimated, whose worklets need native code
+jest.mock('@/components/CelebrationFx', () => () => null);
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: any) => {
     const React = require('react');
