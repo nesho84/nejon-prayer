@@ -1,4 +1,4 @@
-import { openRateAppModal } from '@/components/RateApp';
+import { openRateAppModal, showRateAppModal } from '@/components/RateApp';
 import { useModalStore } from '@/store/modalStore';
 import { useRateAppStore } from '@/store/rateAppStore';
 import { openStoreListing } from '@/utils/system';
@@ -97,6 +97,20 @@ describe('openRateAppModal — after updating to a new version', () => {
     openRateAppModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('showRateAppModal', () => {
+  it('shows with no checks — even on iOS and after "Already rated" — and "Later" still waits 7 days', () => {
+    Object.defineProperty(Platform, 'OS', { value: 'ios', writable: true, configurable: true });
+    useRateAppStore.setState({ rateAppDone: true, rateAppVersion: '2.3.5', rateAppRemindAt: NOW + DAY_MS });
+    showRateAppModal();
+
+    expect(show()).toHaveBeenCalledTimes(1);
+    renderShownModal();
+    fireEvent.press(screen.getByText('Later'));
+    expect(useRateAppStore.getState().rateAppRemindAt).toBe(NOW + 7 * DAY_MS);
+    expect(hide()).toHaveBeenCalledWith('later');
   });
 });
 

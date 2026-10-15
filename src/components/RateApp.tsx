@@ -9,9 +9,9 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import Constants from "expo-constants";
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// Days to wait after "Later", and after updating to a new version
+const DAY_MS = 24 * 60 * 60 * 1000;
+// Wait after "Later", and after updating to a new version
 const REMIND_AFTER_DAYS = 7;
-const REMIND_AFTER_MS = REMIND_AFTER_DAYS * 24 * 60 * 60 * 1000;
 
 // Star sizes, left to right — the middle one is the biggest
 const STAR_SIZES = [26, 34, 44, 34, 26];
@@ -24,7 +24,7 @@ export function openRateAppModal() {
     return;
   }
 
-  const { rateAppDone, rateAppVersion, rateAppRemindAt, setRateAppDone, setRateAppVersion, setRateAppRemindAt } = useRateAppStore.getState();
+  const { rateAppDone, rateAppVersion, rateAppRemindAt, setRateAppVersion, setRateAppRemindAt } = useRateAppStore.getState();
   const version = Constants.expoConfig?.version ?? null;
 
   // Tapped "Already rated"
@@ -42,10 +42,19 @@ export function openRateAppModal() {
   // Went to the store on an older version — wait a week on this one first
   if (rateAppVersion) {
     setRateAppVersion(null);
-    setRateAppRemindAt(Date.now() + REMIND_AFTER_MS);
+    setRateAppRemindAt(Date.now() + REMIND_AFTER_DAYS * DAY_MS);
     return;
   }
 
+  showRateAppModal();
+}
+
+// ------------------------------------------------------------
+// Show the "Rate the App" modal — no checks (the Debug Panel calls this directly)
+// ------------------------------------------------------------
+export function showRateAppModal() {
+  const { setRateAppDone, setRateAppVersion, setRateAppRemindAt } = useRateAppStore.getState();
+  const version = Constants.expoConfig?.version ?? null;
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
   const { hide } = useModalStore.getState();
@@ -89,7 +98,7 @@ export function openRateAppModal() {
             style={[styles.button, { backgroundColor: theme.overlay }]}
             activeOpacity={0.8}
             onPress={() => {
-              setRateAppRemindAt(Date.now() + REMIND_AFTER_MS);
+              setRateAppRemindAt(Date.now() + REMIND_AFTER_DAYS * DAY_MS);
               hide("later");
             }}
           >

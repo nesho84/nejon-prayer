@@ -5,6 +5,7 @@ import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
 import { useLocationSync } from "@/hooks/useLocationSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
+import { useNotifReminderSync } from "@/hooks/useNotifReminderSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSetup } from "@/hooks/useQuranSetup";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
@@ -65,6 +66,7 @@ function RootLayout() {
   useHolidaysSync();
   useQuranSetup();
   useUpdatesSync();
+  useNotifReminderSync();
   useAdsSync();
 
   return (
