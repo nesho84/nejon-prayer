@@ -158,8 +158,10 @@ export const DARK_COLORS = {
 export const DARK_NEUTRAL = { ...DARK_COLORS, card: "#2b2b2b", card2: "#383838", card3: "#4a4a4a", borderCard: "#393939", surfaceBg: "#353535", divider2: "#3d3d3d" };
 export const DARK_WARM = { ...DARK_COLORS, card: "#312822", card2: "#413630", card3: "#57483e", borderCard: "#3f342c", surfaceBg: "#3d332e", divider2: "#453a30" };
 export const DARK_GREEN = { ...DARK_COLORS, card: "#232f28", card2: "#303f36", card3: "#41564a", borderCard: "#2e3c33", surfaceBg: "#2e3c34", divider2: "#344639" };
+export const DARK_VIOLET = { ...DARK_COLORS, card: "#2f2447", card2: "#3c2f5a", card3: "#514075", borderCard: "#3a2d55", surfaceBg: "#392c52", divider2: "#43355f" };
 
 // Surface variants - Light
 export const LIGHT_NEUTRAL = { ...LIGHT_COLORS, card: "#e9eff8", card2: "#dde6f3", card3: "#cdd9ec", borderCard: "#d4dfef", surfaceBg: "#ccd6e8", divider2: "#cad6e8" };
 export const LIGHT_WARM = { ...LIGHT_COLORS, card: "#f8f1e2", card2: "#f0e7d4", card3: "#e5d8bf", borderCard: "#e8dcc2", surfaceBg: "#e0d5bd", divider2: "#e3d5b7" };
 export const LIGHT_GREEN = { ...LIGHT_COLORS, card: "#e8f4ec", card2: "#d8ebde", card3: "#c9e0d1", borderCard: "#d3e6da", surfaceBg: "#c9dfd2", divider2: "#c9e0d2" };
+export const LIGHT_VIOLET = { ...LIGHT_COLORS, card: "#f3e3f8", card2: "#ead5f2", card3: "#dcc0e8", borderCard: "#e6cfee", surfaceBg: "#dabde6", divider2: "#ddc3e9" };

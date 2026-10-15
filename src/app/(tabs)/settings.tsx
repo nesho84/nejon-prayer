@@ -371,7 +371,7 @@ export default function SettingsScreen() {
 
                     {/* ------ Surface Color ------ */}
                     <View style={[styles.statusRow, { marginTop: 2, marginHorizontal: 5 }]}>
-                        <Text style={[styles.statusText, { color: theme.text2, opacity: 0.8 }]}>
+                        <Text style={[styles.statusText, styles.surfaceLabel, { color: theme.text2, opacity: 0.8 }]}>
                             {tr.labels.surfaceColor}:
                         </Text>
                         <View style={styles.surfaces}>
@@ -845,13 +845,17 @@ const styles = StyleSheet.create({
     },
 
     // Surface picker
+    surfaceLabel: {
+        flexShrink: 1,
+        marginRight: 10,
+    },
     surfaces: {
         flexDirection: 'row',
-        gap: 14,
+        gap: 10,
     },
     surfaceBtn: {
-        width: 32,
-        height: 32,
+        width: 30,
+        height: 30,
         borderRadius: 8,
         borderWidth: 1,
     },
