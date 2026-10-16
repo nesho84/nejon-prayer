@@ -1,5 +1,6 @@
 import { openNotifReminderModal } from "@/components/NotifReminder";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useNotifReminderStore } from "@/store/notifReminderStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useEffect } from "react";
 
@@ -11,10 +12,12 @@ export function useNotifReminderSync() {
   const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
   const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
   const notificationPermission = useDeviceSettingsStore((state) => state.notificationPermission);
+  // Wait for the reminder store's hydration (MMKV is sync, so this is already true by read time)
+  const notifReminderReady = useNotifReminderStore((state) => state.isReady);
 
   useEffect(() => {
-    if (!onboardingComplete || !deviceSettingsReady) return;
+    if (!onboardingComplete || !deviceSettingsReady || !notifReminderReady) return;
 
     openNotifReminderModal();
-  }, [onboardingComplete, deviceSettingsReady, notificationPermission]);
+  }, [onboardingComplete, deviceSettingsReady, notifReminderReady, notificationPermission]);
 }

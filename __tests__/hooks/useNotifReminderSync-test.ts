@@ -1,6 +1,7 @@
 import { openNotifReminderModal } from '@/components/NotifReminder';
 import { useNotifReminderSync } from '@/hooks/useNotifReminderSync';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
+import { useNotifReminderStore } from '@/store/notifReminderStore';
 import { useOnboardingStore } from '@/store/onboardingStore';
 import { act, renderHook } from '@testing-library/react-native';
 
@@ -21,6 +22,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   useOnboardingStore.setState({ onboardingComplete: true });
   useDeviceSettingsStore.setState({ isReady: true, notificationPermission: false });
+  useNotifReminderStore.setState({ isReady: true });
 });
 
 describe('useNotifReminderSync', () => {
@@ -37,6 +39,12 @@ describe('useNotifReminderSync', () => {
 
   it('does nothing until device settings are ready', () => {
     useDeviceSettingsStore.setState({ isReady: false });
+    renderHook(() => useNotifReminderSync());
+    expect(openNotifReminderModal).not.toHaveBeenCalled();
+  });
+
+  it('does nothing until the reminder store has hydrated', () => {
+    useNotifReminderStore.setState({ isReady: false });
     renderHook(() => useNotifReminderSync());
     expect(openNotifReminderModal).not.toHaveBeenCalled();
   });
