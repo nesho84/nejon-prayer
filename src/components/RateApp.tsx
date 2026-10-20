@@ -1,5 +1,7 @@
 import CelebrationFx from "@/components/CelebrationFx";
+import { PROMPT_GAP_DAYS } from "@/components/Feedback";
 import { globalStyles } from "@/constants/styles";
+import { useFeedbackStore } from "@/store/feedbackStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
 import { useRateAppStore } from "@/store/rateAppStore";
@@ -45,6 +47,11 @@ export function openRateAppModal() {
     setRateAppRemindAt(Date.now() + REMIND_AFTER_DAYS * DAY_MS);
     return;
   }
+  // Feedback modal shown recently — keep the two apart, try at a later trigger
+  const feedbackShownAt = useFeedbackStore.getState().feedbackShownAt;
+  if (feedbackShownAt && Date.now() < feedbackShownAt + PROMPT_GAP_DAYS * DAY_MS) {
+    return;
+  }
 
   showRateAppModal();
 }
@@ -53,11 +60,14 @@ export function openRateAppModal() {
 // Show the "Rate the App" modal — no checks (the Debug Panel calls this directly)
 // ------------------------------------------------------------
 export function showRateAppModal() {
-  const { setRateAppDone, setRateAppVersion, setRateAppRemindAt } = useRateAppStore.getState();
+  const { setRateAppDone, setRateAppVersion, setRateAppRemindAt, setRateAppShownAt } = useRateAppStore.getState();
   const version = Constants.expoConfig?.version ?? null;
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
   const { hide } = useModalStore.getState();
+
+  // Keeps the feedback modal from showing soon after this one
+  setRateAppShownAt(Date.now());
 
   useModalStore.getState().show({
     type: "fullscreen",

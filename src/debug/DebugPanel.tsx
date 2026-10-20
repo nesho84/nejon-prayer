@@ -1,4 +1,5 @@
 import { openUpdateAvailableModal } from "@/components/CheckForUpdate";
+import { showFeedbackModal } from "@/components/Feedback";
 import { MAX_SHOWS, showNotifReminderModal } from "@/components/NotifReminder";
 import { showRateAppModal } from "@/components/RateApp";
 import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
@@ -330,6 +331,7 @@ export default function DebugPanel() {
           <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.teal} onPress={previewKhatamCelebrationModal} />
           <DebugButton label="Show 'Rate the App' Modal" color={theme.teal} onPress={previewRateAppModal} />
           <DebugButton label="Show 'Notif Reminder' Modal" color={theme.teal} onPress={previewNotifReminderModal} />
+          <DebugButton label="Show 'Feedback' Modal" color={theme.teal} onPress={() => showFeedbackModal()} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />

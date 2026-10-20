@@ -1,4 +1,5 @@
 import { openRateAppModal, showRateAppModal } from '@/components/RateApp';
+import { useFeedbackStore } from '@/store/feedbackStore';
 import { useModalStore } from '@/store/modalStore';
 import { useRateAppStore } from '@/store/rateAppStore';
 import { openStoreListing } from '@/utils/system';
@@ -34,7 +35,8 @@ beforeEach(() => {
   jest.setSystemTime(NOW);
   Object.defineProperty(Platform, 'OS', { value: 'android', writable: true, configurable: true });
   useModalStore.setState({ show: jest.fn(), hide: jest.fn() } as any);
-  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null });
+  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null });
+  useFeedbackStore.setState({ feedbackShownAt: null });
 });
 
 afterEach(() => {
@@ -149,5 +151,39 @@ describe('openRateAppModal — buttons', () => {
     expect(useRateAppStore.getState().rateAppDone).toBe(true);
     expect(hide()).toHaveBeenCalledWith('alreadyRated');
     expect(openStoreListing).not.toHaveBeenCalled();
+  });
+});
+
+describe('openRateAppModal — kept apart from the feedback modal', () => {
+  it('shows as before when the feedback modal was never shown', () => {
+    openRateAppModal();
+    expect(show()).toHaveBeenCalledTimes(1);
+  });
+
+  it('does nothing within 14 days of the feedback modal', () => {
+    useFeedbackStore.setState({ feedbackShownAt: NOW - 13 * DAY_MS });
+    openRateAppModal();
+    expect(show()).not.toHaveBeenCalled();
+  });
+
+  it('shows again once 14 days have passed since the feedback modal', () => {
+    useFeedbackStore.setState({ feedbackShownAt: NOW - 14 * DAY_MS - 1 });
+    openRateAppModal();
+    expect(show()).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves its own state untouched when it skips', () => {
+    useFeedbackStore.setState({ feedbackShownAt: NOW - DAY_MS });
+    openRateAppModal();
+
+    const { rateAppDone, rateAppVersion, rateAppRemindAt, rateAppShownAt } = useRateAppStore.getState();
+    expect({ rateAppDone, rateAppVersion, rateAppRemindAt, rateAppShownAt }).toEqual({
+      rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null,
+    });
+  });
+
+  it('records when it was shown, so the feedback modal can keep its distance', () => {
+    showRateAppModal();
+    expect(useRateAppStore.getState().rateAppShownAt).toBe(NOW);
   });
 });

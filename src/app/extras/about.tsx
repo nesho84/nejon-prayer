@@ -1,4 +1,5 @@
 import AppLayout from "@/components/AppLayout";
+import { showFeedbackModal } from "@/components/Feedback";
 import {
     APPLE_STORE_URL,
     CONTACT_EMAIL,
@@ -151,6 +152,21 @@ export default function AboutScreen() {
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
                         </View>
                         <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
+
+                    {/* Divider */}
+                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
+
+                    {/* Send Feedback (opens the questionnaire directly, skipping the intro) */}
+                    <TouchableOpacity style={styles.cardRow} onPress={() => showFeedbackModal("rating")} activeOpacity={0.3}>
+                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
+                            <MaterialDesignIcons name="message-draw" size={22} color={theme.primary} />
+                        </View>
+                        <View style={styles.cardTextContainer}>
+                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.feedback}</Text>
+                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.feedbackDesc}</Text>
+                        </View>
+                        <MaterialDesignIcons name="chevron-right" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}

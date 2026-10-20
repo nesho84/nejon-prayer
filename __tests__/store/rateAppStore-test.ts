@@ -9,7 +9,7 @@ jest.mock('@/store/storage', () => ({
 }));
 
 beforeEach(() => {
-  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null });
+  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null });
 });
 
 describe('rateAppStore — setRateAppDone', () => {
@@ -48,5 +48,16 @@ describe('rateAppStore — setRateAppRemindAt', () => {
   it('stores the timestamp', () => {
     useRateAppStore.getState().setRateAppRemindAt(1234);
     expect(useRateAppStore.getState().rateAppRemindAt).toBe(1234);
+  });
+});
+
+describe('rateAppStore — setRateAppShownAt', () => {
+  it('starts with rateAppShownAt as null', () => {
+    expect(useRateAppStore.getState().rateAppShownAt).toBeNull();
+  });
+
+  it('stores the timestamp', () => {
+    useRateAppStore.getState().setRateAppShownAt(1234);
+    expect(useRateAppStore.getState().rateAppShownAt).toBe(1234);
   });
 });

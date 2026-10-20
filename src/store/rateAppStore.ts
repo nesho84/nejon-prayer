@@ -6,10 +6,12 @@ interface RateAppState {
   rateAppDone: boolean;
   rateAppVersion: string | null;
   rateAppRemindAt: number | null;
+  rateAppShownAt: number | null;
   isReady: boolean;
   setRateAppDone: (rateAppDone: boolean) => void;
   setRateAppVersion: (rateAppVersion: string | null) => void;
   setRateAppRemindAt: (rateAppRemindAt: number | null) => void;
+  setRateAppShownAt: (rateAppShownAt: number | null) => void;
 }
 
 export const useRateAppStore = create<RateAppState>()(
@@ -18,6 +20,7 @@ export const useRateAppStore = create<RateAppState>()(
       rateAppDone: false,
       rateAppVersion: null,
       rateAppRemindAt: null,
+      rateAppShownAt: null,
       isReady: false,
 
       // User tapped "Already rated" — never show again
@@ -34,6 +37,11 @@ export const useRateAppStore = create<RateAppState>()(
       setRateAppRemindAt: (rateAppRemindAt) => {
         set({ rateAppRemindAt });
       },
+
+      // Last time the "Rate the App" modal was shown — keeps it apart from the feedback modal
+      setRateAppShownAt: (rateAppShownAt) => {
+        set({ rateAppShownAt });
+      },
     }),
     {
       name: "rate-app-storage",
@@ -42,6 +50,7 @@ export const useRateAppStore = create<RateAppState>()(
         rateAppDone: state.rateAppDone,
         rateAppVersion: state.rateAppVersion,
         rateAppRemindAt: state.rateAppRemindAt,
+        rateAppShownAt: state.rateAppShownAt,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

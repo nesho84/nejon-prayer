@@ -2,6 +2,7 @@ import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
 import { useAdsSync } from "@/hooks/useAdsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
+import { useFeedbackSync } from "@/hooks/useFeedbackSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
 import { useLocationSync } from "@/hooks/useLocationSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
@@ -67,6 +68,7 @@ function RootLayout() {
   useQuranSetup();
   useUpdatesSync();
   useNotifReminderSync();
+  useFeedbackSync();
   useAdsSync();
 
   return (
