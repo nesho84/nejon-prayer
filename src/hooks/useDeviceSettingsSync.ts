@@ -13,7 +13,7 @@ export function useDeviceSettingsSync() {
 
     // Sync when app comes to foreground
     const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+      if (appStateRef.current?.match(/inactive|background/) && nextAppState === 'active') {
         // console.log('👁‍🗨 AppState → active, syncing device settings...');
         syncDeviceSettings();
       }

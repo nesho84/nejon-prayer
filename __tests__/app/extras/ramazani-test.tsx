@@ -27,6 +27,23 @@ jest.mock('@react-native-vector-icons/feather/static', () => {
       React.createElement('View', { testID: `icon-${name}` }),
   };
 });
+// Render header, items and footer so they're queryable.
+jest.mock('@shopify/flash-list', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    FlashList: React.forwardRef(
+      ({ data, renderItem, ListHeaderComponent, ListFooterComponent }: any, _ref: any) =>
+        React.createElement(
+          View,
+          null,
+          ListHeaderComponent ?? null,
+          data?.map((item: any, i: number) => React.createElement(View, { key: i }, renderItem({ item, index: i }))),
+          ListFooterComponent ?? null,
+        )
+    ),
+  };
+});
 
 const mockTheme = {
   bg: '#fff', text: '#111', text2: '#555', placeholder: '#999',

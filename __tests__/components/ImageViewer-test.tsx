@@ -1,7 +1,7 @@
 import ImageViewer from '@/components/ImageViewer';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { Image } from 'react-native';
+import { AssetRegistry, Image } from 'react-native';
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -9,19 +9,16 @@ jest.mock('react-native-safe-area-context', () => ({
 
 // require()d assets are numeric ids; jest-expo doesn't register them, so fake a full
 // registry entry (expo-image resolves it too). Id 2 = svg, anything else = png.
-jest.mock('@react-native/assets-registry/registry', () => ({
-  ...jest.requireActual('@react-native/assets-registry/registry'),
-  getAssetByID: (id: number) => ({
-    __packager_asset: true,
-    name: 'step',
-    type: id === 2 ? 'svg' : 'png',
-    hash: 'hash',
-    scales: [1],
-    width: 10,
-    height: 10,
-    httpServerLocation: '/assets',
-    fileSystemLocation: '/assets',
-  }),
+jest.spyOn(AssetRegistry, 'getAssetByID').mockImplementation((id: number) => ({
+  __packager_asset: true,
+  name: 'step',
+  type: id === 2 ? 'svg' : 'png',
+  hash: 'hash',
+  scales: [1],
+  width: 10,
+  height: 10,
+  httpServerLocation: '/assets',
+  fileSystemLocation: '/assets',
 }));
 
 // Reanimated 4's worklets runtime can't initialise under Jest, so stub the

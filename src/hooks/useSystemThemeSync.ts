@@ -10,7 +10,7 @@ export function useSystemThemeSync() {
     // Only set up listener if mode is 'system'
     if (themeMode !== "system") return;
 
-    const listener = ({ colorScheme }: { colorScheme: ColorSchemeName }) => {
+    const listener = ({ colorScheme }: { colorScheme: ColorSchemeName | null }) => {
       const isDark = colorScheme === "dark";
       applySystemTheme(isDark);
     };

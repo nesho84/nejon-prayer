@@ -9,13 +9,13 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useCallback, useMemo, useState } from "react";
-import { ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
+import { ImageRequireSource, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface StepType {
     id: number;
     text: string;
-    image?: ImageSourcePropType;
+    image?: ImageRequireSource;
 }
 
 export default function NamaziGuideScreen() {
@@ -28,7 +28,7 @@ export default function NamaziGuideScreen() {
     // Local state
     const [currentStep, setCurrentStep] = useState(1);
     const [expandedSurahs, setExpandedSurahs] = useState<Set<string>>(new Set());
-    const [viewerSource, setViewerSource] = useState<ImageSourcePropType | null>(null);
+    const [viewerSource, setViewerSource] = useState<ImageRequireSource | null>(null);
 
     // Safe area insets
     const insets = useSafeAreaInsets();

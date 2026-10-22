@@ -16,7 +16,7 @@ export function useLocationSync() {
 
     // Re-check when app comes to foreground
     const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+      if (appStateRef.current?.match(/inactive|background/) && nextAppState === 'active') {
         useLocationStore.getState().checkLocationChange();
       }
 

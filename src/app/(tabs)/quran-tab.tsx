@@ -16,7 +16,7 @@ import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-
 import { useAudioPlayerStatus } from "expo-audio";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, TextInputInstance, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function QuranTabScreen() {
@@ -47,7 +47,7 @@ export default function QuranTabScreen() {
   // Local state / refs
   const [searchQuery, setSearchQuery] = useState("");
   const [headerHeight, setHeaderHeight] = useState(0);
-  const textInputRef = useRef<TextInput>(null);
+  const textInputRef = useRef<TextInputInstance>(null);
   const flatListRef = useRef<FlatList<Surah>>(null);
 
   // Orientation
@@ -328,7 +328,7 @@ export default function QuranTabScreen() {
           ref={flatListRef}
           data={filteredSurahs}
           keyExtractor={(item) => String(item.id)}
-          ListHeaderComponent={isLandscape ? renderHeader : null}
+          ListHeaderComponent={isLandscape ? renderHeader : undefined}
           renderItem={renderSurahItem}
           contentContainerStyle={[
             styles.surahList,

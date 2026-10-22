@@ -14,6 +14,12 @@ jest.mock('react-native-safe-area-context', () => ({
   },
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
+jest.mock('@sentry/react-native', () => ({
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  init: jest.fn(),
+}));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('@/components/QiblaCompass', () => {
   const React = require('react');

@@ -1,15 +1,13 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-// @ts-expect-error - registry ships no type declarations
-import { getAssetByID } from "@react-native/assets-registry/registry";
 import { Image as ExpoImage } from "expo-image";
-import { Image, ImageSourcePropType, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import { AssetRegistry, Image, ImageRequireSource, ImageURISource, Modal, Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
     visible: boolean;
-    source: ImageSourcePropType | null;
+    source: ImageRequireSource | ImageURISource | null;
     onClose: () => void;
 }
 
@@ -18,11 +16,11 @@ const MAX_SCALE = 4;
 const DOUBLE_TAP_SCALE = 2.5;
 
 // RN's Image can't render SVG. require()d sources are asset ids (type comes from the registry), remote ones carry a uri
-const isSvgSource = (source: ImageSourcePropType) => {
+const isSvgSource = (source: ImageRequireSource | ImageURISource) => {
     if (typeof source === "number") {
-        return getAssetByID(source)?.type === "svg";
+        return AssetRegistry.getAssetByID(source)?.type === "svg";
     }
-    return !Array.isArray(source) && !!source.uri?.split("?")[0].endsWith(".svg");
+    return !!source.uri?.split("?")[0].endsWith(".svg");
 };
 
 export default function ImageViewer({ visible, source, onClose }: Props) {

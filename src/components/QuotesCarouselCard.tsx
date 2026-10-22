@@ -42,7 +42,7 @@ const QuotesCarouselCard = React.memo(({ refreshKey }: Props) => {
     const flatListRef = useRef<FlatList>(null);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const activeIndexRef = useRef(0);
-    const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+    const appStateRef = useRef(AppState.currentState);
 
     // Calculate item width based on container width and spacing
     const itemWidth = containerWidth !== null ? containerWidth - INSET * 2 : 0;

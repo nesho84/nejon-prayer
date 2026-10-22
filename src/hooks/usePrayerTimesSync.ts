@@ -30,7 +30,7 @@ export function usePrayerTimesSync() {
     // Reload when app comes to foreground on a new day (background case)
     // ------------------------------------------------------------
     const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
+      if (appStateRef.current?.match(/inactive|background/) && nextAppState === 'active') {
         reloadOnDayChange();
       }
 

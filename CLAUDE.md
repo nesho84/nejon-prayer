@@ -8,8 +8,8 @@ For any UI or new-feature work, read `.claude/skills/nejon-design/SKILL.md` firs
 
 ## Critical: Expo SDK version
 
-This project is on **Expo SDK 57 / React Native 0.86 / React 19**. Expo APIs change between
-major versions — consult the versioned docs at https://docs.expo.dev/versions/v57.0.0/ before
+This project is on **Expo SDK 58 / React Native 0.88 / React 19.3**. Expo APIs change between
+major versions — consult the versioned docs at https://docs.expo.dev/versions/v58.0.0/ before
 writing any Expo/RN code (see `AGENTS.md`). Do not assume APIs from other SDK versions.
 
 ## Commands
