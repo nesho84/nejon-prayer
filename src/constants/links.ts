@@ -20,4 +20,4 @@ export const PAYPAL_DONATE_URL = "https://paypal.me/NeshatAdemi?locale.x=de_DE&c
 export const PRIVACY_POLICY_URL = "https://nejon-prayer.nejon.net/privacy.html";
 
 // Feedback questionnaire (POST) — public by design, the API has no key
-export const FEEDBACK_URL = "https://nejon.net/api/integrations/nejon-prayer/feedback";
+export const FEEDBACK_URL = "https://nejon.net/api/apps/nejon-prayer/feedback";
