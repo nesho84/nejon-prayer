@@ -40,7 +40,7 @@ const RootStack = () => {
       </Stack.Protected>
 
       {/* Main app only after onboarding */}
-      <Stack.Protected guard={onboardingComplete}>
+      <Stack.Protected guard={onboardingComplete} redirectTo="/onboarding">
         <Stack.Screen name="(tabs)" options={{ animation: "default" }} />
         <Stack.Screen name="extras" options={{ animation: "ios_from_right" }} />
         <Stack.Screen name="quran" options={{ animation: "ios_from_right" }} />
