@@ -5,7 +5,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialIcons } from "@react-native-vector-icons/material-icons/static";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type ReadingMode = "reading" | "khatam";
 
@@ -80,16 +80,19 @@ export default function QuranReadingCard() {
       {/* View Mode toggle Buttons */}
       <View style={[styles.toggleRow, { backgroundColor: theme.overlayLight, borderColor: theme.border }]}>
         {(["reading", "khatam"] as ReadingMode[]).map((m) => (
-          <TouchableOpacity
+          <Pressable
             key={m}
-            activeOpacity={0.7}
-            style={[styles.toggleBtn, mode === m && { backgroundColor: theme.card, borderColor: theme.borderCard, borderWidth: 0.4 }]}
+            style={({ pressed }) => [
+              styles.toggleBtn,
+              mode === m && { backgroundColor: theme.card, borderColor: theme.borderCard, borderWidth: 0.4 },
+              pressed && { backgroundColor: theme.pressed },
+            ]}
             onPress={() => setMode(m)}
           >
             <Text style={[styles.toggleBtnText, { color: mode === m ? theme.text : theme.text2 }]}>
               {m === "reading" ? tr.labels.read : tr.labels.khatam}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
