@@ -1,3 +1,4 @@
+import { APPLE_STORE_URL } from '@/constants/links';
 import { copyText, openAlarmPermissionSettings, openBatteryOptimizationSettings, openExternalUrl, openNotificationSettings, openStoreListing, shareText } from '@/utils/system';
 import * as Clipboard from 'expo-clipboard';
 import * as IntentLauncher from 'expo-intent-launcher';
@@ -155,13 +156,13 @@ describe('openStoreListing', () => {
     expect(mockOpenURL).toHaveBeenNthCalledWith(2, 'https://play.google.com/store/apps/details?id=com.nejon.nejonprayer');
   });
 
-  it('opens the website on iOS while the App Store ID is unset', async () => {
+  it('opens the App Store URL on iOS (app website while unpublished)', async () => {
     (Platform as { OS: string }).OS = 'ios';
     mockOpenURL.mockResolvedValue(undefined);
 
     await openStoreListing();
 
-    expect(mockOpenURL).toHaveBeenCalledWith('https://nejon.net');
+    expect(mockOpenURL).toHaveBeenCalledWith(APPLE_STORE_URL);
   });
 });
 

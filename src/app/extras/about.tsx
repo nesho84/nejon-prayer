@@ -1,6 +1,7 @@
 import AppLayout from "@/components/AppLayout";
 import { showFeedbackModal } from "@/components/Feedback";
 import {
+    APP_WEBSITE_URL,
     APPLE_STORE_URL,
     CONTACT_EMAIL,
     GOOGLE_PLAY_URL,
@@ -222,6 +223,9 @@ export default function AboutScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => openExternalUrl(HELP_EMAIL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Help</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => openExternalUrl(APP_WEBSITE_URL)} activeOpacity={0.6}>
+                        <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>Website</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => openExternalUrl(NEJON_WEBSITE_URL)} activeOpacity={0.6}>
                         <Text style={[styles.bottomLinkText, { color: theme.textMuted }]}>nejon.net</Text>
