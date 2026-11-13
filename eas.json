@@ -7,6 +7,7 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "node": "24.19.0",
       "android": {
         "buildType": "apk"
       },
@@ -15,6 +16,7 @@
     },
     "release-apk": {
       "distribution": "internal",
+      "node": "24.19.0",
       "android": {
         "buildType": "apk"
       },
@@ -23,6 +25,7 @@
     },
     "preview": {
       "distribution": "internal",
+      "node": "24.19.0",
       "android": {
         "buildType": "app-bundle"
       },
@@ -31,6 +34,7 @@
     },
     "ios-sim": {
       "distribution": "internal",
+      "node": "24.19.0",
       "ios": {
         "simulator": true
       },
@@ -39,6 +43,7 @@
     },
     "ios-device": {
       "distribution": "internal",
+      "node": "24.19.0",
       "ios": {
         "simulator": false
       },
@@ -47,6 +52,7 @@
     },
     "production": {
       "distribution": "store",
+      "node": "24.19.0",
       "android": {
         "buildType": "app-bundle"
       },
