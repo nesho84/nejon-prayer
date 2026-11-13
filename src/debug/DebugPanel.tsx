@@ -4,6 +4,7 @@ import { MAX_SHOWS, showNotifReminderModal } from "@/components/NotifReminder";
 import { showRateAppModal } from "@/components/RateApp";
 import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { useFeedbackStore } from "@/store/feedbackStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -168,19 +169,21 @@ export default function DebugPanel() {
   const location = useLocationStore((state) => state.location);
   const notifSettings = useNotificationsStore((state) => state.notifSettings);
 
-  // Debug toggles (force scenario-gated UI: holiday card, Friday badge, Quran now-playing,
+  // Debug toggles (force scenario-gated UI: holiday card, Friday badge, Quran now-playing, no-prayer-times placeholder,
   // outdated prayer times warning, location changed warning)
   const forceHoliday = useDebugStore((state) => state.forceHoliday);
   const forceFriday = useDebugStore((state) => state.forceFriday);
   const forceQuranPlaying = useDebugStore((state) => state.forceQuranPlaying);
   const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
   const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
+  const forceNoPrayerTimes = useDebugStore((state) => state.forceNoPrayerTimes);
   const forceUpdateOnLaunch = useDebugStore((state) => state.forceUpdateOnLaunch);
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
   const togglePrayersOutdated = useDebugStore((state) => state.togglePrayersOutdated);
   const toggleLocationChange = useDebugStore((state) => state.toggleLocationChange);
+  const toggleNoPrayerTimes = useDebugStore((state) => state.toggleNoPrayerTimes);
   const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
   const updatePreview = useDebugStore((state) => state.updatePreview);
   const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
@@ -264,6 +267,18 @@ export default function DebugPanel() {
       return;
     }
     showRateAppModal();
+  };
+
+  const showFeedbackJsonModal = () => {
+    const { feedbackFirstSeenAt, feedbackLaunchCount, feedbackShownCount, feedbackShownAt, feedbackSnoozedUntil, feedbackDone } = useFeedbackStore.getState();
+    showJsonViewerModal("Feedback", {
+      feedbackFirstSeenAt: feedbackFirstSeenAt ? new Date(feedbackFirstSeenAt).toLocaleString("en-GB") : null,
+      feedbackLaunchCount,
+      feedbackShownCount,
+      feedbackShownAt: feedbackShownAt ? new Date(feedbackShownAt).toLocaleString("en-GB") : null,
+      feedbackSnoozedUntil: feedbackSnoozedUntil ? new Date(feedbackSnoozedUntil).toLocaleString("en-GB") : null,
+      feedbackDone,
+    });
   };
 
   const showNotifReminderJsonModal = () => {
@@ -351,6 +366,7 @@ export default function DebugPanel() {
           <DebugToggle label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
           <DebugToggle label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} onPress={togglePrayersOutdated} />
           <DebugToggle label="Toggle Location Changed" value={forceLocationChange} onPress={toggleLocationChange} />
+          <DebugToggle label="Toggle No Prayer Times (Fresh Install)" value={forceNoPrayerTimes} onPress={toggleNoPrayerTimes} />
 
           {/* Divider */}
           <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
@@ -374,6 +390,7 @@ export default function DebugPanel() {
           <DebugButton label="Show 'Islamic Holidays - JSON' Modal" color={theme.gray} onPress={showHolidaysModal} />
           <DebugButton label="Show 'Quran - JSON' Modal" color={theme.gray} onPress={showQuranModal} />
           <DebugButton label="Show 'Rate App - JSON' Modal" color={theme.gray} onPress={showRateAppJsonModal} />
+          <DebugButton label="Show 'Feedback - JSON' Modal" color={theme.gray} onPress={showFeedbackJsonModal} />
           <DebugButton label="Show 'Notif Reminder - JSON' Modal" color={theme.gray} onPress={showNotifReminderJsonModal} />
 
         </View>
