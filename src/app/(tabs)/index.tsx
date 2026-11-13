@@ -1,9 +1,9 @@
 import AppCard from "@/components/AppCard";
-import AppError from "@/components/AppError";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
 import AppWarningStrip from "@/components/AppWarningStrip";
 import HolidaysCard from "@/components/HolidaysCard";
+import HomePlaceholder from "@/components/HomePlaceholder";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
@@ -30,9 +30,7 @@ export default function HomeScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
-    const locationPermission = useDeviceSettingsStore((state) => state.locationPermission);
     const deviceSettingsReady = useDeviceSettingsStore((state) => state.isReady);
-    const location = useLocationStore((state) => state.location);
     const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
     const locationReady = useLocationStore((state) => state.isReady);
@@ -49,6 +47,9 @@ export default function HomeScreen() {
 
     // DEBUG: force-show the location changed warning (Debug Panel toggle)
     const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
+
+    // DEBUG: force-show the no-prayer-times placeholder, as on a fresh install (Debug Panel toggle)
+    const forceNoPrayerTimes = useDebugStore((state) => state.forceNoPrayerTimes);
 
     // Local State
     const [refreshKey, setRefreshKey] = useState(0);
@@ -111,32 +112,9 @@ export default function HomeScreen() {
         return <AppLoading text={tr.labels.loading} />;
     }
 
-    // No location set
-    if (!locationPermission && !location) {
-        return (
-            <AppError
-                icon="location-outline"
-                iconColor={theme.danger}
-                message={tr.labels.locationSet}
-                buttonText={tr.labels.goToSettings}
-                buttonColor={theme.danger}
-                onPress={() => router.navigate("/(tabs)/settings")}
-            />
-        );
-    }
-
-    // Prayer times error
-    if (!prayerTimes || prayersError) {
-        return (
-            <AppError
-                icon="time-outline"
-                iconColor={theme.danger}
-                message={prayersError || tr.labels.prayersError}
-                buttonText={tr.buttons.retry}
-                buttonColor={theme.danger}
-                onPress={handleOnRefresh}
-            />
-        );
+    // No prayer times (offline / no location) — explorable placeholder with a retry strip
+    if (!prayerTimes || prayersError || forceNoPrayerTimes) {
+        return <HomePlaceholder />;
     }
 
     // Main Content

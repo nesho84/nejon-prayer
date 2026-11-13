@@ -22,6 +22,7 @@ interface PrayersState {
   fetchedYear: number | null;
   loadPrayerTimes: () => Promise<void>;
   reloadPrayerTimes: () => Promise<void>;
+  retryPrayerTimes: () => Promise<void>;
   getPrayerTimesForDate: (dateKey: string) => Promise<PrayerTimes | null>;
 }
 
@@ -168,6 +169,16 @@ export const usePrayersStore = create<PrayersState>()(
         } finally {
           set({ isLoading: false });
         }
+      },
+
+      // Retry from the no-data UI — no location: ask for GPS first (reload would
+      // overwrite a manually set location otherwise); else load (storage → API)
+      retryPrayerTimes: async () => {
+        if (useLocationStore.getState().location) {
+          await get().loadPrayerTimes();
+          return;
+        }
+        await get().reloadPrayerTimes();
       },
 
       // Used by prayerTimings modal for offline date explorer

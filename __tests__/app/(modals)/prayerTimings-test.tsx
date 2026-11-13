@@ -64,8 +64,10 @@ const mockTr = {
     calendarSubtitle: 'Tap to track your prayers',
     loading: 'Loading...',
     localeDate: 'en-US',
+    prayersError: 'Prayer times could not be loaded',
+    locationUnknown: 'No location',
   },
-  buttons: { cancel: 'Cancel', today: 'Today' },
+  buttons: { cancel: 'Cancel', today: 'Today', retry: 'Retry' },
 } as any;
 
 const mockPrayerTimes = {
@@ -231,5 +233,37 @@ describe('PrayerTimingsScreen — rate app trigger', () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Fajr');
 
     expect(openRateAppModal).not.toHaveBeenCalled();
+  });
+});
+
+describe('PrayerTimingsScreen — no prayer times', () => {
+  it('shows the real error from the store, "No location", and no timezone line without a location', async () => {
+    useLocationStore.setState({ location: null, fullAddress: null, timeZone: null } as any);
+    usePrayersStore.setState({ prayersError: 'Please set your location' } as any);
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Please set your location')).toBeTruthy());
+    expect(screen.getByText('No location')).toBeTruthy();
+    expect(screen.queryByText(/•/)).toBeNull();
+  });
+
+  it('falls back to the generic error when the store has none', async () => {
+    usePrayersStore.setState({ prayersError: null } as any);
+    jest.spyOn(usePrayersStore.getState(), 'getPrayerTimesForDate').mockResolvedValue(null);
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Prayer times could not be loaded')).toBeTruthy());
+  });
+
+  it('Retry runs retryPrayerTimes, then reads the selected date again', async () => {
+    usePrayersStore.setState({ prayersError: 'No internet' } as any);
+    const getPrayerTimesForDate = jest.spyOn(usePrayersStore.getState(), 'getPrayerTimesForDate').mockResolvedValue(null);
+    const retryPrayerTimes = jest.spyOn(usePrayersStore.getState(), 'retryPrayerTimes').mockResolvedValue();
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Retry')).toBeTruthy());
+    const callsBefore = getPrayerTimesForDate.mock.calls.length;
+
+    fireEvent.press(screen.getByText('Retry'));
+
+    await waitFor(() => expect(retryPrayerTimes).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(getPrayerTimesForDate.mock.calls.length).toBeGreaterThan(callsBefore));
   });
 });

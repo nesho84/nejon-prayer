@@ -9,9 +9,13 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const PrayerProgressCard = React.memo(() => {
+interface Props {
+  daysDisabled?: boolean; // day cells don't open the timings modal (no prayer times yet)
+}
+
+const PrayerProgressCard = React.memo(({ daysDisabled = false }: Props) => {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -90,7 +94,7 @@ const PrayerProgressCard = React.memo(() => {
       </>
     );
 
-    if (isPast) {
+    if (isPast && !daysDisabled) {
       return (
         <TouchableOpacity
           key={dateKey}
@@ -126,16 +130,19 @@ const PrayerProgressCard = React.memo(() => {
         {/* Right: View toggle Buttons */}
         <View style={[styles.toggleRow, { backgroundColor: theme.surfaceBg, borderColor: theme.borderCard }]}>
           {(['week', 'month'] as const).map((v) => (
-            <TouchableOpacity
+            <Pressable
               key={v}
-              activeOpacity={0.7}
-              style={[styles.toggleBtn, v === progressView && { backgroundColor: theme.overlayLight }]}
+              style={({ pressed }) => [
+                styles.toggleBtn,
+                v === progressView && { backgroundColor: theme.overlayLight },
+                pressed && { backgroundColor: theme.pressed },
+              ]}
               onPress={() => setProgressView(v)}
             >
               <Text style={[styles.toggleBtnText, { color: v === progressView ? theme.white : theme.textSecondary }]}>
                 {v === 'week' ? tr.labels.week : tr.labels.month}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       </View>

@@ -177,3 +177,28 @@ describe('prayersStore — getPrayerTimesForDate', () => {
     expect(result).toBeNull();
   });
 });
+describe('prayersStore — retryPrayerTimes', () => {
+  it('loads (storage → API) without asking for GPS when a location is set', async () => {
+    const loadPrayerTimes = jest.fn();
+    const reloadPrayerTimes = jest.fn();
+    usePrayersStore.setState({ loadPrayerTimes, reloadPrayerTimes });
+    mockLocationGetState.mockReturnValue({ location: { latitude: 1, longitude: 2 } });
+
+    await usePrayersStore.getState().retryPrayerTimes();
+
+    expect(loadPrayerTimes).toHaveBeenCalledTimes(1);
+    expect(reloadPrayerTimes).not.toHaveBeenCalled();
+  });
+
+  it('asks for the location first (reload) when none is set', async () => {
+    const loadPrayerTimes = jest.fn();
+    const reloadPrayerTimes = jest.fn();
+    usePrayersStore.setState({ loadPrayerTimes, reloadPrayerTimes });
+    mockLocationGetState.mockReturnValue({ location: null });
+
+    await usePrayersStore.getState().retryPrayerTimes();
+
+    expect(reloadPrayerTimes).toHaveBeenCalledTimes(1);
+    expect(loadPrayerTimes).not.toHaveBeenCalled();
+  });
+});

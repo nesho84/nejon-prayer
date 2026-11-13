@@ -26,6 +26,7 @@ export default function PrayerTimingsScreen() {
     const location = useLocationStore((state) => state.location);
     const fullAddress = useLocationStore((state) => state.fullAddress);
     const timeZone = useLocationStore((state) => state.timeZone);
+    const prayersError = usePrayersStore((state) => state.prayersError);
     const tracking = usePrayersTrackingStore((state) => state.tracking);
     const markPrayed = usePrayersTrackingStore((state) => state.markPrayed);
     const unmarkPrayed = usePrayersTrackingStore((state) => state.unmarkPrayed);
@@ -81,6 +82,15 @@ export default function PrayerTimingsScreen() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // ------------------------------------------------------------
+    // Retry — downloads again (asks for location first if missing), then
+    // re-reads the date; a newly set location re-reads via the effect below
+    // ------------------------------------------------------------
+    const handleRetry = async () => {
+        await usePrayersStore.getState().retryPrayerTimes();
+        getPrayerTimesForDate(selectedDate);
     };
 
     // ------------------------------------------------------------
@@ -279,12 +289,14 @@ export default function PrayerTimingsScreen() {
                         <View style={styles.locationInfoRow}>
                             <Ionicons name="globe-outline" size={17} color={theme.accent} style={{ marginLeft: -10 }} />
                             <Text style={[styles.locationInfoText, { color: theme.text2 }]} numberOfLines={1} ellipsizeMode="tail">
-                                {timeZone?.location || fullAddress}
+                                {timeZone?.location || fullAddress || tr.labels.locationUnknown}
                             </Text>
                         </View>
-                        <Text style={[styles.timezoneInfoText, { color: theme.text2 }]}>
-                            {timeZone?.zoneName || ""} • {timeZone?.offset || ""}
-                        </Text>
+                        {timeZone && (
+                            <Text style={[styles.timezoneInfoText, { color: theme.text2 }]}>
+                                {timeZone.zoneName || ""} • {timeZone.offset || ""}
+                            </Text>
+                        )}
                     </View>
 
                     {/* Divider */}
@@ -325,11 +337,11 @@ export default function PrayerTimingsScreen() {
                             <View style={styles.noDataContainer}>
                                 <Ionicons name="calendar-outline" size={48} color={theme.text2} />
                                 <Text style={[styles.noDataText, { color: theme.text2 }]}>
-                                    {tr.labels.prayersError}
+                                    {prayersError || tr.labels.prayersError}
                                 </Text>
                                 <TouchableOpacity
                                     style={[globalStyles.modalButton, { backgroundColor: theme.overlay, marginTop: 8 }]}
-                                    onPress={() => getPrayerTimesForDate(selectedDate)}
+                                    onPress={handleRetry}
                                 >
                                     <Ionicons name="refresh" size={18} color={theme.text} />
                                     <Text style={[globalStyles.modalButtonText, { color: theme.text }]}>

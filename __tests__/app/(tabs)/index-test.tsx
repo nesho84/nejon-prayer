@@ -70,10 +70,10 @@ jest.mock('@/components/AppLoading', () => {
   const { ActivityIndicator } = require('react-native');
   return ({ text }: any) => React.createElement(ActivityIndicator, { testID: `loading-${text}` });
 });
-jest.mock('@/components/AppError', () => {
+jest.mock('@/components/HomePlaceholder', () => {
   const React = require('react');
   const { View } = require('react-native');
-  return ({ message }: any) => React.createElement(View, { testID: `error-${message}` });
+  return () => React.createElement(View, { testID: 'home-placeholder' });
 });
 
 const mockTheme = {
@@ -140,30 +140,31 @@ describe('HomeScreen', () => {
     expect(screen.getByTestId('loading-Loading')).toBeTruthy();
   });
 
-  it('shows location error when no permission and no location', () => {
+  // loadPrayerTimes clears prayerTimes and sets locationSet when there is no location
+  it('shows the placeholder when there is no location', () => {
     useDeviceSettingsStore.setState({ isReady: true, locationPermission: false } as any);
     useLocationStore.setState({ isReady: true, location: null } as any);
+    usePrayersStore.setState({ prayerTimes: null, prayersError: 'Please set your location' } as any);
     render(<HomeScreen />);
-    expect(screen.getByTestId('error-Please set your location')).toBeTruthy();
+    expect(screen.getByTestId('home-placeholder')).toBeTruthy();
   });
 
-  it('shows prayer times error when prayerTimes is null', () => {
+  it('shows the placeholder when prayerTimes is null', () => {
     usePrayersStore.setState({ prayerTimes: null, prayersError: null } as any);
     render(<HomeScreen />);
-    expect(screen.getByTestId('error-Failed to load prayer times')).toBeTruthy();
+    expect(screen.getByTestId('home-placeholder')).toBeTruthy();
   });
 
-  it('shows prayer times error message when prayersError is set', () => {
+  it('shows the placeholder when prayersError is set', () => {
     usePrayersStore.setState({ prayerTimes: null, prayersError: 'Network error' } as any);
     render(<HomeScreen />);
-    expect(screen.getByTestId('error-Network error')).toBeTruthy();
+    expect(screen.getByTestId('home-placeholder')).toBeTruthy();
   });
 
-  it('renders main content (no loading or error) when everything is ready', () => {
+  it('renders main content (no loading or placeholder) when everything is ready', () => {
     render(<HomeScreen />);
     expect(screen.queryByTestId('loading-Loading')).toBeNull();
-    expect(screen.queryByTestId('error-Please set your location')).toBeNull();
-    expect(screen.queryByTestId('error-Failed to load prayer times')).toBeNull();
+    expect(screen.queryByTestId('home-placeholder')).toBeNull();
   });
 
   it('hides the outdated warning when prayer times are current', () => {

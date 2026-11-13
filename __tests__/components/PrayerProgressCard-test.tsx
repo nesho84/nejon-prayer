@@ -4,6 +4,7 @@ import { usePrayersStore } from '@/store/prayersStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
@@ -135,5 +136,27 @@ describe('PrayerProgressCard — week row follows prayerTimesDate, not the devic
     fireEvent.press(screen.getByText('Month'));
     expect(screen.getAllByText(/July 2026/i).length).toBeGreaterThan(0);
     expect(screen.queryByText(/-/)).toBeNull();
+  });
+});
+
+// prayerTimesDate is '2026-05-26' (Tue) → Mon May 25 is a past, pressable day
+describe('PrayerProgressCard — daysDisabled', () => {
+  beforeEach(() => {
+    (router.navigate as jest.Mock).mockClear();
+  });
+
+  it('opens the timings modal from a past day by default', () => {
+    render(<PrayerProgressCard />);
+    fireEvent.press(screen.getByText('25'));
+    expect(router.navigate).toHaveBeenCalledWith('/(modals)/prayerTimings?date=2026-05-25');
+  });
+
+  it('does not open the modal from day cells when daysDisabled, but Week/Month still switch', () => {
+    render(<PrayerProgressCard daysDisabled />);
+    fireEvent.press(screen.getByText('25'));
+    expect(router.navigate).not.toHaveBeenCalled();
+
+    fireEvent.press(screen.getByText('Month'));
+    expect(screen.getAllByText('25').length).toBeGreaterThan(0);
   });
 });
