@@ -25,7 +25,7 @@ const flushMicrotasks = () => new Promise<void>((resolve) => setImmediate(resolv
 
 beforeEach(() => {
   jest.clearAllMocks();
-  useDebugStore.setState({ forceUpdateOnLaunch: false });
+  useDebugStore.setState({ forceUpdateOnLaunch: false, debugModeEnabled: false });
 });
 
 describe('useUpdatesSync — dev mode', () => {
@@ -44,10 +44,16 @@ describe('useUpdatesSync — dev mode', () => {
     expect(openUpdateAvailableModal).not.toHaveBeenCalled();
   });
 
-  it('calls openUpdateAvailableModal when forceUpdateOnLaunch is true', () => {
-    useDebugStore.setState({ forceUpdateOnLaunch: true });
+  it('calls openUpdateAvailableModal when forceUpdateOnLaunch is true and debug mode is on', () => {
+    useDebugStore.setState({ forceUpdateOnLaunch: true, debugModeEnabled: true });
     renderHook(() => useUpdatesSync());
     expect(openUpdateAvailableModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores forceUpdateOnLaunch when debug mode is off, even in a dev build', () => {
+    useDebugStore.setState({ forceUpdateOnLaunch: true });
+    renderHook(() => useUpdatesSync());
+    expect(openUpdateAvailableModal).not.toHaveBeenCalled();
   });
 
   it('does not call the real OTA or store checks', () => {
@@ -66,6 +72,26 @@ describe('useUpdatesSync — production mode', () => {
 
   afterEach(() => {
     (globalThis as any).__DEV__ = originalDev;
+  });
+
+  it('opens the modal on launch when forceUpdateOnLaunch is on and debug mode is on', async () => {
+    checkForUpdateAsync.mockResolvedValueOnce({ isAvailable: false });
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: false });
+    useDebugStore.setState({ forceUpdateOnLaunch: true, debugModeEnabled: true });
+    renderHook(() => useUpdatesSync());
+    await flushMicrotasks();
+
+    expect(openUpdateAvailableModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores forceUpdateOnLaunch when debug mode is off', async () => {
+    checkForUpdateAsync.mockResolvedValueOnce({ isAvailable: false });
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: false });
+    useDebugStore.setState({ forceUpdateOnLaunch: true });
+    renderHook(() => useUpdatesSync());
+    await flushMicrotasks();
+
+    expect(openUpdateAvailableModal).not.toHaveBeenCalled();
   });
 
   it('fetches and reloads when an OTA update is available', async () => {

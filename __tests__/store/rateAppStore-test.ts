@@ -9,55 +9,34 @@ jest.mock('@/store/storage', () => ({
 }));
 
 beforeEach(() => {
-  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null });
+  useRateAppStore.setState({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
 });
 
-describe('rateAppStore — setRateAppDone', () => {
-  it('starts with rateAppDone as false', () => {
-    expect(useRateAppStore.getState().rateAppDone).toBe(false);
+describe('rateAppStore — setters', () => {
+  it('starts with nothing recorded', () => {
+    const state = useRateAppStore.getState();
+    expect(state.rateAppNextShowAt).toBeNull();
+    expect(state.rateAppShownAt).toBeNull();
+    expect(state.rateAppShownCount).toBe(0);
+    expect(state.rateAppDone).toBe(false);
+  });
+
+  it('stores and clears the next-show time', () => {
+    useRateAppStore.getState().setRateAppNextShowAt(9999);
+    expect(useRateAppStore.getState().rateAppNextShowAt).toBe(9999);
+    useRateAppStore.getState().setRateAppNextShowAt(null);
+    expect(useRateAppStore.getState().rateAppNextShowAt).toBeNull();
+  });
+
+  it('stores the shown timestamp and count', () => {
+    useRateAppStore.getState().setRateAppShownAt(5678);
+    useRateAppStore.getState().setRateAppShownCount(2);
+    expect(useRateAppStore.getState().rateAppShownAt).toBe(5678);
+    expect(useRateAppStore.getState().rateAppShownCount).toBe(2);
   });
 
   it('sets rateAppDone to true', () => {
     useRateAppStore.getState().setRateAppDone(true);
     expect(useRateAppStore.getState().rateAppDone).toBe(true);
-  });
-});
-
-describe('rateAppStore — setRateAppVersion', () => {
-  it('starts with rateAppVersion as null', () => {
-    expect(useRateAppStore.getState().rateAppVersion).toBeNull();
-  });
-
-  it('stores the version', () => {
-    useRateAppStore.getState().setRateAppVersion('2.3.5');
-    expect(useRateAppStore.getState().rateAppVersion).toBe('2.3.5');
-  });
-
-  it('clears it back to null', () => {
-    useRateAppStore.setState({ rateAppVersion: '2.3.5' });
-    useRateAppStore.getState().setRateAppVersion(null);
-    expect(useRateAppStore.getState().rateAppVersion).toBeNull();
-  });
-});
-
-describe('rateAppStore — setRateAppRemindAt', () => {
-  it('starts with rateAppRemindAt as null', () => {
-    expect(useRateAppStore.getState().rateAppRemindAt).toBeNull();
-  });
-
-  it('stores the timestamp', () => {
-    useRateAppStore.getState().setRateAppRemindAt(1234);
-    expect(useRateAppStore.getState().rateAppRemindAt).toBe(1234);
-  });
-});
-
-describe('rateAppStore — setRateAppShownAt', () => {
-  it('starts with rateAppShownAt as null', () => {
-    expect(useRateAppStore.getState().rateAppShownAt).toBeNull();
-  });
-
-  it('stores the timestamp', () => {
-    useRateAppStore.getState().setRateAppShownAt(1234);
-    expect(useRateAppStore.getState().rateAppShownAt).toBe(1234);
   });
 });

@@ -26,7 +26,7 @@ jest.mock('expo-location', () => ({
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
-jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFeedbackType: { Success: 'success' }, impactAsync: jest.fn(), ImpactFeedbackStyle: { Medium: 'medium' } }));
+jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFeedbackType: { Success: 'success', Warning: 'warning' }, impactAsync: jest.fn(), ImpactFeedbackStyle: { Medium: 'medium' } }));
 jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
@@ -98,12 +98,13 @@ describe('PrayersList — past / future / unmark logic', () => {
     expect(markPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
   });
 
-  it('pressing a future prayer does nothing', () => {
+  it('pressing a future prayer flashes the red lock instead of marking', () => {
     const markPrayed = jest.fn(() => false);
     usePrayersTrackingStore.setState({ tracking: {}, celebratedDate: null, markPrayed } as any);
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={toDateKey()} currentPrayerName={null} />);
     fireEvent.press(screen.getByText('Isha')); // 21:15 — future at noon
     expect(markPrayed).not.toHaveBeenCalled();
+    expect(screen.getByTestId('mci-lock-outline')).toBeTruthy();
   });
 
   it('pressing an already-prayed prayer calls unmarkPrayed', () => {
@@ -118,6 +119,20 @@ describe('PrayersList — past / future / unmark logic', () => {
     render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={today} currentPrayerName={null} />);
     fireEvent.press(screen.getByText('Fajr')); // already prayed → unmark
     expect(unmarkPrayed).toHaveBeenCalledWith('Fajr', undefined, 'home');
+  });
+
+  it('pressing an already-prayed future prayer calls unmarkPrayed', () => {
+    const unmarkPrayed = jest.fn();
+    const today = toDateKey();
+    usePrayersTrackingStore.setState({
+      tracking: { [today]: { Isha: { status: 'prayed' } } },
+      celebratedDate: null,
+      markPrayed: jest.fn(() => false),
+      unmarkPrayed,
+    } as any);
+    render(<PrayersList prayerTimes={mockPrayerTimes as any} prayerTimesDate={today} currentPrayerName={null} />);
+    fireEvent.press(screen.getByText('Isha')); // 21:15: future at noon, but marked → unmark
+    expect(unmarkPrayed).toHaveBeenCalledWith('Isha', undefined, 'home');
   });
 });
 

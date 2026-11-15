@@ -41,7 +41,7 @@ beforeEach(() => {
   jest.spyOn(Alert, 'alert').mockImplementation(() => { });
   useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
   useDeviceSettingsStore.setState({ notificationPermission: false });
-  useNotifReminderStore.setState({ notifReminderAt: NOW - 1, notifReminderCount: 0 });
+  useNotifReminderStore.setState({ notifReminderNextShowAt: NOW - 1, notifReminderShownAt: null, notifReminderShownCount: 0, notifReminderDone: false });
 });
 
 // Shows the modal and presses "Not now"
@@ -65,71 +65,76 @@ describe('openNotifReminderModal — when it shows', () => {
     expect(show().mock.calls[0][0]).toMatchObject({ type: 'alert', dismissable: false });
   });
 
-  it('does not record a wait just by showing', () => {
+  it('counts the show but does not record a wait just by showing', () => {
     openNotifReminderModal();
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW - 1);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(1);
+    expect(useNotifReminderStore.getState().notifReminderShownAt).toBe(NOW);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW - 1);
   });
 
-  it('does nothing when notifications are granted, and resets the wait and count', () => {
-    useNotifReminderStore.setState({ notifReminderCount: 3 });
+  it('does nothing when notifications are granted, and resets the wait, count and done', () => {
+    useNotifReminderStore.setState({ notifReminderShownCount: 3, notifReminderDone: true });
     useDeviceSettingsStore.setState({ notificationPermission: true });
     openNotifReminderModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useNotifReminderStore.getState().notifReminderAt).toBeNull();
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(0);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBeNull();
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(0);
+    expect(useNotifReminderStore.getState().notifReminderDone).toBe(false);
   });
 
   it('yields when another modal is open, leaving the store untouched', () => {
     useModalStore.setState({ visible: true });
-    useNotifReminderStore.setState({ notifReminderAt: null });
+    useNotifReminderStore.setState({ notifReminderNextShowAt: null });
     openNotifReminderModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useNotifReminderStore.getState().notifReminderAt).toBeNull();
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBeNull();
   });
 
   it('first time seen off — does not show and starts the 3-day wait', () => {
-    useNotifReminderStore.setState({ notifReminderAt: null });
+    useNotifReminderStore.setState({ notifReminderNextShowAt: null });
     openNotifReminderModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 3 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 3 * DAY_MS);
   });
 
   it('does nothing while still waiting', () => {
-    useNotifReminderStore.setState({ notifReminderAt: NOW + DAY_MS });
+    useNotifReminderStore.setState({ notifReminderNextShowAt: NOW + DAY_MS });
     openNotifReminderModal();
     expect(show()).not.toHaveBeenCalled();
   });
 
   it('starts over with the 3-day wait after granting and disabling again', () => {
-    useNotifReminderStore.setState({ notifReminderCount: 3 });
+    useNotifReminderStore.setState({ notifReminderShownCount: 3, notifReminderDone: true });
     useDeviceSettingsStore.setState({ notificationPermission: true });
     openNotifReminderModal();
     useDeviceSettingsStore.setState({ notificationPermission: false });
     openNotifReminderModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 3 * DAY_MS);
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(0);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 3 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(0);
   });
 });
 
 describe('openNotifReminderModal — schedule', () => {
-  it('1st close waits 7 days, 2nd close 14 days, 3rd close stops it for good', () => {
+  it('1st close waits 7 days, 2nd close 14 days, 3rd show marks it done for good', () => {
     showAndSkip();
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(1);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 7 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(1);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 7 * DAY_MS);
 
     jest.setSystemTime(NOW + 7 * DAY_MS + 1);
     showAndSkip();
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(2);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 21 * DAY_MS + 1);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(2);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 21 * DAY_MS + 1);
+    expect(useNotifReminderStore.getState().notifReminderDone).toBe(false);
 
     jest.setSystemTime(NOW + 21 * DAY_MS + 2);
     showAndSkip();
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(3);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(3);
+    expect(useNotifReminderStore.getState().notifReminderDone).toBe(true);
 
     (show() as jest.Mock).mockClear();
     jest.setSystemTime(NOW + 365 * DAY_MS);
@@ -138,7 +143,7 @@ describe('openNotifReminderModal — schedule', () => {
   });
 
   it('does not show within 14 days of the 2nd close', () => {
-    useNotifReminderStore.setState({ notifReminderCount: 1 });
+    useNotifReminderStore.setState({ notifReminderShownCount: 1 });
     showAndSkip();
     (show() as jest.Mock).mockClear();
 
@@ -149,16 +154,16 @@ describe('openNotifReminderModal — schedule', () => {
 });
 
 describe('showNotifReminderModal', () => {
-  it('shows with no checks — even when granted and over the limit — and still counts the close', () => {
+  it('shows with no checks — even when granted and done — and still counts the show', () => {
     useDeviceSettingsStore.setState({ notificationPermission: true });
-    useNotifReminderStore.setState({ notifReminderAt: NOW + DAY_MS, notifReminderCount: 1 });
+    useNotifReminderStore.setState({ notifReminderNextShowAt: NOW + DAY_MS, notifReminderShownCount: 1, notifReminderDone: true });
     showNotifReminderModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(2);
     renderShownModal();
     fireEvent.press(screen.getByText('Not now'));
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(2);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 14 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 14 * DAY_MS);
   });
 });
 
@@ -179,23 +184,23 @@ describe('openNotifReminderModal — content and buttons', () => {
     expect(screen.getByText('Not now')).toBeTruthy();
   });
 
-  it('"Not now" counts a close, waits 7 days and closes without asking for permission', () => {
+  it('"Not now" waits 7 days and closes without asking for permission', () => {
     fireEvent.press(screen.getByText('Not now'));
 
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(1);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 7 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(1);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 7 * DAY_MS);
     expect(hide()).toHaveBeenCalledWith('notNow');
     expect(requestPermission).not.toHaveBeenCalled();
   });
 
-  it('"Enable" counts a close, waits 7 days, closes and asks for permission — granted, no alert', async () => {
+  it('"Enable" waits 7 days, closes and asks for permission — granted, no alert', async () => {
     requestPermission.mockResolvedValue({ authorizationStatus: 1 });
     await act(async () => {
       fireEvent.press(screen.getByText('Enable notifications'));
     });
 
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(1);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(NOW + 7 * DAY_MS);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(1);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(NOW + 7 * DAY_MS);
     expect(hide()).toHaveBeenCalledWith('enable');
     expect(requestPermission).toHaveBeenCalledTimes(1);
     expect(Alert.alert).not.toHaveBeenCalled();

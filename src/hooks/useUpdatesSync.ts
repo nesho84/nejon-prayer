@@ -13,11 +13,12 @@ export function useUpdatesSync() {
   // true by read time — kept for parity with nejon-tasker's async-storage version)
   const isReady = useDebugStore((state) => state.isReady);
 
-  // Dev-only test for the auto-launch flow — see DebugPanel's -> "Toggle 'Update available' On Launch".
-  // Runs once the debug store has rehydrated, so forceUpdateOnLaunch is its persisted value.
+  // Debug test for the auto-launch flow (only while debug mode is on) — see DebugPanel's
+  // "Toggle 'Update available' On Launch". Runs once the debug store has rehydrated, so both flags are persisted values.
   useEffect(() => {
-    if (!__DEV__ || !isReady) return;
-    if (useDebugStore.getState().forceUpdateOnLaunch) {
+    if (!isReady) return;
+    const { debugModeEnabled, forceUpdateOnLaunch } = useDebugStore.getState();
+    if (debugModeEnabled && forceUpdateOnLaunch) {
       openUpdateAvailableModal();
     }
   }, [isReady]);

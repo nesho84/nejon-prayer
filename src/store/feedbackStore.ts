@@ -6,36 +6,48 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface FeedbackState {
-  feedbackFirstSeenAt: number | null;
-  feedbackLaunchCount: number;
-  feedbackShownCount: number;
+  feedbackNextShowAt: number | null;
   feedbackShownAt: number | null;
-  feedbackSnoozedUntil: number | null;
+  feedbackShownCount: number;
   feedbackDone: boolean;
+  feedbackLaunchCount: number;
   isReady: boolean;
-  setFeedbackFirstSeenAt: (feedbackFirstSeenAt: number | null) => void;
-  setFeedbackLaunchCount: (feedbackLaunchCount: number) => void;
-  setFeedbackShownCount: (feedbackShownCount: number) => void;
+  setFeedbackNextShowAt: (feedbackNextShowAt: number | null) => void;
   setFeedbackShownAt: (feedbackShownAt: number | null) => void;
-  setFeedbackSnoozedUntil: (feedbackSnoozedUntil: number | null) => void;
+  setFeedbackShownCount: (feedbackShownCount: number) => void;
   setFeedbackDone: (feedbackDone: boolean) => void;
+  setFeedbackLaunchCount: (feedbackLaunchCount: number) => void;
   submitFeedback: (input: Omit<FeedbackInput, "language">) => Promise<FeedbackResult>;
 }
 
 export const useFeedbackStore = create<FeedbackState>()(
   persist(
     (set) => ({
-      feedbackFirstSeenAt: null,
-      feedbackLaunchCount: 0,
-      feedbackShownCount: 0,
+      feedbackNextShowAt: null,
       feedbackShownAt: null,
-      feedbackSnoozedUntil: null,
+      feedbackShownCount: 0,
       feedbackDone: false,
+      feedbackLaunchCount: 0,
       isReady: false,
 
-      // First launch after onboarding — the "used it long enough" wait starts here
-      setFeedbackFirstSeenAt: (feedbackFirstSeenAt) => {
-        set({ feedbackFirstSeenAt });
+      // Earliest time the modal may show — null until the first app start after onboarding
+      setFeedbackNextShowAt: (feedbackNextShowAt) => {
+        set({ feedbackNextShowAt });
+      },
+
+      // Last time the modal was shown — keeps it apart from the "Rate the App" modal
+      setFeedbackShownAt: (feedbackShownAt) => {
+        set({ feedbackShownAt });
+      },
+
+      // How many times the modal was shown
+      setFeedbackShownCount: (feedbackShownCount) => {
+        set({ feedbackShownCount });
+      },
+
+      // Stopped for good — sent, tapped "Don't ask again", or shown the max times
+      setFeedbackDone: (feedbackDone) => {
+        set({ feedbackDone });
       },
 
       // App launches since onboarding
@@ -43,27 +55,7 @@ export const useFeedbackStore = create<FeedbackState>()(
         set({ feedbackLaunchCount });
       },
 
-      // How many times the prompt was shown — stops for good at the limit
-      setFeedbackShownCount: (feedbackShownCount) => {
-        set({ feedbackShownCount });
-      },
-
-      // Last time the prompt was shown — keeps it apart from the "Rate the App" modal
-      setFeedbackShownAt: (feedbackShownAt) => {
-        set({ feedbackShownAt });
-      },
-
-      // User tapped "Maybe later" — earliest time the prompt may show again
-      setFeedbackSnoozedUntil: (feedbackSnoozedUntil) => {
-        set({ feedbackSnoozedUntil });
-      },
-
-      // Sent the questionnaire, or tapped "Don't ask again" — never show the prompt again
-      setFeedbackDone: (feedbackDone) => {
-        set({ feedbackDone });
-      },
-
-      // Send the questionnaire — a successful send stops the prompt for good
+      // Send the questionnaire — a successful send stops the modal for good
       submitFeedback: async (input) => {
         const language = useLanguageStore.getState().language;
         const result = await sendFeedback({ ...input, language });
@@ -78,12 +70,11 @@ export const useFeedbackStore = create<FeedbackState>()(
       name: "feedback-storage",
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
-        feedbackFirstSeenAt: state.feedbackFirstSeenAt,
-        feedbackLaunchCount: state.feedbackLaunchCount,
-        feedbackShownCount: state.feedbackShownCount,
+        feedbackNextShowAt: state.feedbackNextShowAt,
         feedbackShownAt: state.feedbackShownAt,
-        feedbackSnoozedUntil: state.feedbackSnoozedUntil,
+        feedbackShownCount: state.feedbackShownCount,
         feedbackDone: state.feedbackDone,
+        feedbackLaunchCount: state.feedbackLaunchCount,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

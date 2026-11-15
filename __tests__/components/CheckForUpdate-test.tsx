@@ -134,16 +134,26 @@ describe('CheckForUpdate', () => {
   });
 
   describe('debug preview override', () => {
-    it('shows the up-to-date line without a real check', () => {
-      useDebugStore.setState({ updatePreview: 'upToDate' });
+    afterEach(() => {
+      useDebugStore.setState({ debugModeEnabled: false });
+    });
+
+    it('shows the up-to-date line without a real check when debug mode is on', () => {
+      useDebugStore.setState({ updatePreview: 'upToDate', debugModeEnabled: true });
       render(<CheckForUpdate />);
       expect(screen.getByText('You are up to date')).toBeTruthy();
     });
 
-    it('shows the error line without a real check', () => {
-      useDebugStore.setState({ updatePreview: 'error' });
+    it('shows the error line without a real check when debug mode is on', () => {
+      useDebugStore.setState({ updatePreview: 'error', debugModeEnabled: true });
       render(<CheckForUpdate />);
       expect(screen.getByText('Could not check for updates')).toBeTruthy();
+    });
+
+    it('ignores the preview when debug mode is off, even in a dev build', () => {
+      useDebugStore.setState({ updatePreview: 'upToDate', debugModeEnabled: false });
+      render(<CheckForUpdate />);
+      expect(screen.queryByText('You are up to date')).toBeNull();
     });
   });
 });

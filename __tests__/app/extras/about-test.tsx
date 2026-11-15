@@ -1,4 +1,6 @@
 import AboutScreen from '@/app/extras/about';
+import { showFeedbackModal } from '@/components/Feedback';
+import { showRateAppModal } from '@/components/RateApp';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
@@ -20,6 +22,10 @@ jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
+jest.mock('@/components/RateApp', () => ({ showRateAppModal: jest.fn() }));
+jest.mock('@/components/Feedback', () => ({ showFeedbackModal: jest.fn() }));
+// DebugPanel renders under __DEV__ and pulls in native-only modules (in-app updates, notifications)
+jest.mock('@/debug/DebugPanel', () => () => null);
 jest.mock('react-native-notify-kit', () => ({
   __esModule: true,
   default: {},
@@ -46,7 +52,7 @@ const mockTr = {
   labels: {
     about: 'About', shareApp: 'Share App', shareAppDesc: 'Share with friends',
     supportDesc: 'Support us', rateApp: 'Rate the App', rateAppDesc: 'On Google Play',
-    contactUs: 'Contact Us',
+    feedback: 'Send Feedback', contactUs: 'Contact Us',
   },
 } as any;
 
@@ -95,27 +101,15 @@ describe('AboutScreen', () => {
     });
   });
 
-  it('calls Linking.openURL with the native Play Store deep link when rate card is pressed', async () => {
-    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+  it('opens the "Rate the App" modal from About when the rate card is pressed', () => {
     render(<AboutScreen />);
     fireEvent.press(screen.getByText('Rate the App'));
-    await waitFor(() => {
-      expect(Linking.openURL).toHaveBeenCalledWith(
-        expect.stringContaining('market://')
-      );
-    });
+    expect(showRateAppModal).toHaveBeenCalledWith(true);
   });
 
-  it('falls back to the Play Store web listing when the native deep link fails', async () => {
-    jest.spyOn(Linking, 'openURL')
-      .mockRejectedValueOnce(new Error('no Play Store'))
-      .mockResolvedValueOnce(undefined);
+  it('opens the feedback modal from About when the feedback card is pressed', () => {
     render(<AboutScreen />);
-    fireEvent.press(screen.getByText('Rate the App'));
-    await waitFor(() => {
-      expect(Linking.openURL).toHaveBeenLastCalledWith(
-        expect.stringContaining('play.google.com')
-      );
-    });
+    fireEvent.press(screen.getByText('Send Feedback'));
+    expect(showFeedbackModal).toHaveBeenCalledWith(true);
   });
 });

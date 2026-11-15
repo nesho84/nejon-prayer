@@ -70,6 +70,7 @@ export default function CheckForUpdate() {
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
   const preview = useDebugStore((state) => state.updatePreview);
+  const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
   // Local state
   const [status, setStatus] = useState<CheckStatus>("idle");
@@ -110,9 +111,9 @@ export default function CheckForUpdate() {
   };
 
   // ------------------------------------------------------------
-  // A dev preview overrides the real status when set
+  // A debug preview (only while debug mode is on) overrides the real status when set
   // ------------------------------------------------------------
-  const shown: UpdatePreview | CheckStatus = __DEV__ && preview !== "idle" ? preview : status;
+  const shown: UpdatePreview | CheckStatus = debugModeEnabled && preview !== "idle" ? preview : status;
   const { color: statusColor, message: statusMessage } = getStatusDisplay(shown, theme, tr);
 
   return (

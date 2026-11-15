@@ -146,10 +146,9 @@ export default function PrayerTimingsScreen() {
 
     // ------------------------------------------------------------
     // Handle marking/unmarking prayers as prayed
+    // (future prayers never get here — their row flashes red instead)
     // ------------------------------------------------------------
-    const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean) => {
-        if (!isPast) return;
-
+    const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean) => {
         // Tactile feedback on a valid mark/unmark tap
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -314,6 +313,8 @@ export default function PrayerTimingsScreen() {
                                 const isTrackable = MAIN_PRAYERS.includes(prayerName as PrayerName);
                                 const isPast = isTrackable && (isSelectedPastDay || (isSelectedToday && isTimePast(prayerTime)));
                                 const isPrayed = isTrackable && tracking[selectedDateKey]?.[prayerName as PrayerName]?.status === 'prayed';
+                                // Future prayers can't be marked, but a wrong mark can always be undone
+                                const isLocked = isTrackable && !isPast && !isPrayed;
 
                                 return (
                                     <View key={prayerName}>
@@ -323,7 +324,8 @@ export default function PrayerTimingsScreen() {
                                             isTrackable={isTrackable}
                                             isPrayed={isPrayed}
                                             variant="plain"
-                                            onTrackingPress={() => handleMark(prayerName as PrayerName, isPrayed, isPast)}
+                                            isLocked={isLocked}
+                                            onTrackingPress={() => handleMark(prayerName as PrayerName, isPrayed)}
                                         />
 
                                         {/* Prayer Divider */}

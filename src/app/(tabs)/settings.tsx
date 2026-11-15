@@ -4,7 +4,6 @@ import AppLoading from "@/components/AppLoading";
 import CheckForUpdate from "@/components/CheckForUpdate";
 import CustomPicker from "@/components/CustomPicker";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
-import DebugPanel from "@/debug/DebugPanel";
 import { useDebugStore } from "@/debug/debugStore";
 import { restoreDefaults } from "@/services/resetAppService";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
@@ -64,7 +63,6 @@ export default function SettingsScreen() {
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const specials = useNotificationsStore((state) => state.specials);
-    const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
     // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
     const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
@@ -341,14 +339,6 @@ export default function SettingsScreen() {
                 ]}
                 showsVerticalScrollIndicator={false}
             >
-
-                {/* ------ Debug Tools (dev only) ------ */}
-                {(__DEV__ || debugModeEnabled) && (
-                    <AppCard style={styles.settingCard}>
-                        <Text style={[styles.settingTitle, { color: theme.danger }]}>Debug Tools</Text>
-                        <DebugPanel />
-                    </AppCard>
-                )}
 
                 {/* ------ Theme Setting ------ */}
                 <AppCard style={styles.settingCard}>

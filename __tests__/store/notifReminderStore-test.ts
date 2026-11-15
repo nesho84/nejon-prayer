@@ -9,33 +9,34 @@ jest.mock('@/store/storage', () => ({
 }));
 
 beforeEach(() => {
-  useNotifReminderStore.setState({ notifReminderAt: null, notifReminderCount: 0 });
+  useNotifReminderStore.setState({ notifReminderNextShowAt: null, notifReminderShownAt: null, notifReminderShownCount: 0, notifReminderDone: false });
 });
 
-describe('notifReminderStore — setNotifReminderAt', () => {
-  it('starts with notifReminderAt as null', () => {
-    expect(useNotifReminderStore.getState().notifReminderAt).toBeNull();
+describe('notifReminderStore — setters', () => {
+  it('starts with nothing recorded', () => {
+    const state = useNotifReminderStore.getState();
+    expect(state.notifReminderNextShowAt).toBeNull();
+    expect(state.notifReminderShownAt).toBeNull();
+    expect(state.notifReminderShownCount).toBe(0);
+    expect(state.notifReminderDone).toBe(false);
   });
 
-  it('stores the timestamp', () => {
-    useNotifReminderStore.getState().setNotifReminderAt(1234);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBe(1234);
+  it('stores and clears the next-show time', () => {
+    useNotifReminderStore.getState().setNotifReminderNextShowAt(9999);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBe(9999);
+    useNotifReminderStore.getState().setNotifReminderNextShowAt(null);
+    expect(useNotifReminderStore.getState().notifReminderNextShowAt).toBeNull();
   });
 
-  it('clears it back to null', () => {
-    useNotifReminderStore.setState({ notifReminderAt: 1234 });
-    useNotifReminderStore.getState().setNotifReminderAt(null);
-    expect(useNotifReminderStore.getState().notifReminderAt).toBeNull();
-  });
-});
-
-describe('notifReminderStore — setNotifReminderCount', () => {
-  it('starts with notifReminderCount as 0', () => {
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(0);
+  it('stores the shown timestamp and count', () => {
+    useNotifReminderStore.getState().setNotifReminderShownAt(5678);
+    useNotifReminderStore.getState().setNotifReminderShownCount(2);
+    expect(useNotifReminderStore.getState().notifReminderShownAt).toBe(5678);
+    expect(useNotifReminderStore.getState().notifReminderShownCount).toBe(2);
   });
 
-  it('stores the count', () => {
-    useNotifReminderStore.getState().setNotifReminderCount(2);
-    expect(useNotifReminderStore.getState().notifReminderCount).toBe(2);
+  it('sets notifReminderDone to true', () => {
+    useNotifReminderStore.getState().setNotifReminderDone(true);
+    expect(useNotifReminderStore.getState().notifReminderDone).toBe(true);
   });
 });

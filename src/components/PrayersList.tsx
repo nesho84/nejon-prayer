@@ -43,10 +43,9 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
 
   // ------------------------------------------------------------
   // Handle marking/unmarking prayers as prayed and show celebration modal
+  // (future prayers never get here — their row flashes red instead)
   // ------------------------------------------------------------
-  const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean, isPast: boolean, isCurrent: boolean) => {
-    if (!isPast && !isCurrent) return;
-
+  const handleMark = useCallback(async (prayerName: PrayerName, isPrayed: boolean) => {
     // Tactile feedback on a valid mark/unmark tap
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -119,6 +118,8 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         const isCurrent = isToday && currentPrayerName === prayerName;
         const isFriday = forceFriday || (prayerTimesDate != null && new Date(prayerTimesDate).getDay() === 5); // 0=Sun, 1=Mon, ..., 5=Fri
         const isPrayed = isTrackable && tracking[toDateKey()]?.[prayerName]?.status === 'prayed';
+        // Future prayers can't be marked, but a wrong mark (e.g. from yesterday's notification) can always be undone
+        const isLocked = isTrackable && !isPast && !isCurrent && !isPrayed;
 
         return (
           <PrayerRow
@@ -131,8 +132,9 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
             isFriday={isFriday}
             variant="card"
             notifState={getNotifState(prayerName)}
+            isLocked={isLocked}
             onTrackingPress={() => {
-              handleMark(prayerName as PrayerName, isPrayed, isPast, isCurrent);
+              handleMark(prayerName as PrayerName, isPrayed);
             }}
             onNotifIconPress={() => {
               router.navigate(`/(modals)/prayerNotification?prayer=${prayerName}`);

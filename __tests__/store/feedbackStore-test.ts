@@ -19,12 +19,11 @@ const mockSendFeedback = sendFeedback as jest.Mock;
 beforeEach(() => {
   jest.clearAllMocks();
   useFeedbackStore.setState({
-    feedbackFirstSeenAt: null,
-    feedbackLaunchCount: 0,
-    feedbackShownCount: 0,
+    feedbackNextShowAt: null,
     feedbackShownAt: null,
-    feedbackSnoozedUntil: null,
+    feedbackShownCount: 0,
     feedbackDone: false,
+    feedbackLaunchCount: 0,
   });
   useLanguageStore.setState({ language: 'en' });
 });
@@ -32,17 +31,11 @@ beforeEach(() => {
 describe('feedbackStore — setters', () => {
   it('starts with nothing recorded', () => {
     const state = useFeedbackStore.getState();
-    expect(state.feedbackFirstSeenAt).toBeNull();
-    expect(state.feedbackLaunchCount).toBe(0);
-    expect(state.feedbackShownCount).toBe(0);
+    expect(state.feedbackNextShowAt).toBeNull();
     expect(state.feedbackShownAt).toBeNull();
-    expect(state.feedbackSnoozedUntil).toBeNull();
+    expect(state.feedbackShownCount).toBe(0);
     expect(state.feedbackDone).toBe(false);
-  });
-
-  it('stores the first-seen timestamp', () => {
-    useFeedbackStore.getState().setFeedbackFirstSeenAt(1234);
-    expect(useFeedbackStore.getState().feedbackFirstSeenAt).toBe(1234);
+    expect(state.feedbackLaunchCount).toBe(0);
   });
 
   it('stores the launch count', () => {
@@ -57,11 +50,11 @@ describe('feedbackStore — setters', () => {
     expect(useFeedbackStore.getState().feedbackShownAt).toBe(5678);
   });
 
-  it('stores and clears the snooze', () => {
-    useFeedbackStore.getState().setFeedbackSnoozedUntil(9999);
-    expect(useFeedbackStore.getState().feedbackSnoozedUntil).toBe(9999);
-    useFeedbackStore.getState().setFeedbackSnoozedUntil(null);
-    expect(useFeedbackStore.getState().feedbackSnoozedUntil).toBeNull();
+  it('stores and clears the next-show time', () => {
+    useFeedbackStore.getState().setFeedbackNextShowAt(9999);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(9999);
+    useFeedbackStore.getState().setFeedbackNextShowAt(null);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBeNull();
   });
 
   it('sets feedbackDone to true', () => {

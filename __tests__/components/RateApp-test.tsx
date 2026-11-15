@@ -15,10 +15,6 @@ jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
-jest.mock('expo-constants', () => ({
-  __esModule: true,
-  default: { expoConfig: { version: '2.3.5' } },
-}));
 
 const NOW = new Date('2026-10-12T12:00:00').getTime();
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -34,8 +30,8 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.setSystemTime(NOW);
   Object.defineProperty(Platform, 'OS', { value: 'android', writable: true, configurable: true });
-  useModalStore.setState({ show: jest.fn(), hide: jest.fn() } as any);
-  useRateAppStore.setState({ rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null });
+  useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
+  useRateAppStore.setState({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
   useFeedbackStore.setState({ feedbackShownAt: null });
 });
 
@@ -58,46 +54,38 @@ describe('openRateAppModal — when it shows', () => {
   });
 
   it('does nothing within 7 days of "Later"', () => {
-    useRateAppStore.setState({ rateAppRemindAt: NOW + DAY_MS });
+    useRateAppStore.setState({ rateAppNextShowAt: NOW + DAY_MS });
     openRateAppModal();
     expect(show()).not.toHaveBeenCalled();
   });
 
   it('shows again once the 7 days have passed', () => {
-    useRateAppStore.setState({ rateAppRemindAt: NOW - 1 });
+    useRateAppStore.setState({ rateAppNextShowAt: NOW - 1 });
     openRateAppModal();
     expect(show()).toHaveBeenCalledTimes(1);
   });
 
-  it('does nothing after "Open Store" on the same version', () => {
-    useRateAppStore.setState({ rateAppVersion: '2.3.5' });
+  it('never shows once done ("Open Store", "Already rated", or the 3rd show) — not even after the wait', () => {
+    useRateAppStore.setState({ rateAppDone: true, rateAppNextShowAt: NOW - 1 });
     openRateAppModal();
     expect(show()).not.toHaveBeenCalled();
   });
 
-  it('never shows after "Already rated" — not even on a new version or after the wait', () => {
-    useRateAppStore.setState({ rateAppDone: true, rateAppVersion: '2.3.4', rateAppRemindAt: NOW - 1 });
-    openRateAppModal();
-    expect(show()).not.toHaveBeenCalled();
-  });
-});
-
-describe('openRateAppModal — after updating to a new version', () => {
-  it('does not show on the first trigger and starts the 7-day wait', () => {
-    useRateAppStore.setState({ rateAppVersion: '2.3.4' });
+  it('yields when another modal is already open, leaving its state untouched', () => {
+    useModalStore.setState({ visible: true });
     openRateAppModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useRateAppStore.getState().rateAppVersion).toBeNull();
-    expect(useRateAppStore.getState().rateAppRemindAt).toBe(NOW + 7 * DAY_MS);
+    expect(useRateAppStore.getState().rateAppShownCount).toBe(0);
   });
 
-  it('shows at a trigger after the 7-day wait', () => {
-    useRateAppStore.setState({ rateAppVersion: '2.3.4' });
+  it('the 3rd show marks it done, so it stops after 3 shows', () => {
+    useRateAppStore.setState({ rateAppShownCount: 2 });
     openRateAppModal();
-    jest.setSystemTime(NOW + 7 * DAY_MS + 1);
-    openRateAppModal();
+    expect(show()).toHaveBeenCalledTimes(1);
+    expect(useRateAppStore.getState().rateAppDone).toBe(true);
 
+    openRateAppModal();
     expect(show()).toHaveBeenCalledTimes(1);
   });
 });
@@ -105,13 +93,13 @@ describe('openRateAppModal — after updating to a new version', () => {
 describe('showRateAppModal', () => {
   it('shows with no checks — even on iOS and after "Already rated" — and "Later" still waits 7 days', () => {
     Object.defineProperty(Platform, 'OS', { value: 'ios', writable: true, configurable: true });
-    useRateAppStore.setState({ rateAppDone: true, rateAppVersion: '2.3.5', rateAppRemindAt: NOW + DAY_MS });
+    useRateAppStore.setState({ rateAppDone: true, rateAppNextShowAt: NOW + DAY_MS });
     showRateAppModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
     renderShownModal();
     fireEvent.press(screen.getByText('Later'));
-    expect(useRateAppStore.getState().rateAppRemindAt).toBe(NOW + 7 * DAY_MS);
+    expect(useRateAppStore.getState().rateAppNextShowAt).toBe(NOW + 7 * DAY_MS);
     expect(hide()).toHaveBeenCalledWith('later');
   });
 });
@@ -129,10 +117,10 @@ describe('openRateAppModal — buttons', () => {
     expect(screen.getByText('Already rated')).toBeTruthy();
   });
 
-  it('"Open Store" saves the version, closes and opens the store listing', () => {
+  it('"Open Store" stops it for good, closes and opens the store listing', () => {
     fireEvent.press(screen.getByText('Open Store'));
 
-    expect(useRateAppStore.getState().rateAppVersion).toBe('2.3.5');
+    expect(useRateAppStore.getState().rateAppDone).toBe(true);
     expect(hide()).toHaveBeenCalledWith('openStore');
     expect(openStoreListing).toHaveBeenCalledTimes(1);
   });
@@ -140,7 +128,7 @@ describe('openRateAppModal — buttons', () => {
   it('"Later" waits 7 days and closes', () => {
     fireEvent.press(screen.getByText('Later'));
 
-    expect(useRateAppStore.getState().rateAppRemindAt).toBe(NOW + 7 * DAY_MS);
+    expect(useRateAppStore.getState().rateAppNextShowAt).toBe(NOW + 7 * DAY_MS);
     expect(hide()).toHaveBeenCalledWith('later');
     expect(openStoreListing).not.toHaveBeenCalled();
   });
@@ -176,14 +164,46 @@ describe('openRateAppModal — kept apart from the feedback modal', () => {
     useFeedbackStore.setState({ feedbackShownAt: NOW - DAY_MS });
     openRateAppModal();
 
-    const { rateAppDone, rateAppVersion, rateAppRemindAt, rateAppShownAt } = useRateAppStore.getState();
-    expect({ rateAppDone, rateAppVersion, rateAppRemindAt, rateAppShownAt }).toEqual({
-      rateAppDone: false, rateAppVersion: null, rateAppRemindAt: null, rateAppShownAt: null,
+    const { rateAppNextShowAt, rateAppShownAt, rateAppShownCount, rateAppDone } = useRateAppStore.getState();
+    expect({ rateAppNextShowAt, rateAppShownAt, rateAppShownCount, rateAppDone }).toEqual({
+      rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false,
     });
   });
 
-  it('records when it was shown, so the feedback modal can keep its distance', () => {
+  it('records when it was shown and counts it, so the feedback modal can keep its distance', () => {
     showRateAppModal();
     expect(useRateAppStore.getState().rateAppShownAt).toBe(NOW);
+    expect(useRateAppStore.getState().rateAppShownCount).toBe(1);
+  });
+});
+
+describe('showRateAppModal — from About', () => {
+  beforeEach(() => {
+    showRateAppModal(true);
+    renderShownModal();
+  });
+
+  it('does not record the open', () => {
+    expect(useRateAppStore.getState().rateAppShownAt).toBeNull();
+    expect(useRateAppStore.getState().rateAppShownCount).toBe(0);
+  });
+
+  it('"Later" closes without starting a wait', () => {
+    fireEvent.press(screen.getByText('Later'));
+
+    expect(useRateAppStore.getState().rateAppNextShowAt).toBeNull();
+    expect(hide()).toHaveBeenCalledWith('later');
+  });
+
+  it('"Open Store" still stops it for good', () => {
+    fireEvent.press(screen.getByText('Open Store'));
+
+    expect(useRateAppStore.getState().rateAppDone).toBe(true);
+    expect(openStoreListing).toHaveBeenCalledTimes(1);
+  });
+
+  it('"Already rated" still stops it for good', () => {
+    fireEvent.press(screen.getByText('Already rated'));
+    expect(useRateAppStore.getState().rateAppDone).toBe(true);
   });
 });

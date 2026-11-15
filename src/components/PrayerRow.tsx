@@ -2,6 +2,8 @@ import PrayerIcon from '@/components/PrayerIcon';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons/static';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface Props {
@@ -16,9 +18,12 @@ interface Props {
   notifState?: 'off' | 'on' | 'custom'; // bell icon state (home only); default 'off'
   onTrackingPress?: () => void;         // mark/unmark; row is a TouchableOpacity only when trackable
   onNotifIconPress?: () => void;        // present → render the right-side notification icon (home only)
+  isLocked?: boolean;                   // can't be marked yet — a tap flashes the row red instead (border on 'card' only)
 }
 
 const TRACKING_ICON_SIZE = 18;
+// How long a locked row stays red after a tap
+const LOCKED_FLASH_MS = 1100;
 const CHECK_ICON_SIZE = 11;
 const BELL_ICON_SIZE = 20;
 
@@ -34,23 +39,49 @@ export default function PrayerRow({
   notifState = 'off',
   onTrackingPress,
   onNotifIconPress,
+  isLocked = false,
 }: Props) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
 
-  // Row variant
-  const isCard = variant === 'card';
-  // Name + time color: accent when current, else text2 (card) / text (plain); non-trackable always text2
-  const textColor = !isTrackable ? theme.text2 : isCurrent ? theme.accent : isCard ? theme.text2 : theme.text;
-  const iconColor = isTrackable && isCurrent ? theme.accent : theme.text2;
+  // Local state — red warning after tapping a locked row
+  const [showLocked, setShowLocked] = useState(false);
+  const lockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear a pending reset when the row unmounts
+  useEffect(() => () => {
+    if (lockedTimer.current) {
+      clearTimeout(lockedTimer.current);
+    }
+  }, []);
 
   // ------------------------------------------------------------
-  // Tracking icon: dash (non-trackable), empty ring, or green check.
+  // Flash the row red with a warning haptic — a repeat tap restarts the timer
+  // ------------------------------------------------------------
+  const handleLockedPress = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    if (lockedTimer.current) {
+      clearTimeout(lockedTimer.current);
+    }
+    setShowLocked(true);
+    lockedTimer.current = setTimeout(() => setShowLocked(false), LOCKED_FLASH_MS);
+  };
+
+  // Row variant
+  const isCard = variant === 'card';
+  // Name + time color: red while flashing locked, accent when current, else text2 (card) / text (plain); non-trackable always text2
+  const textColor = showLocked ? theme.danger : !isTrackable ? theme.text2 : isCurrent ? theme.accent : isCard ? theme.text2 : theme.text;
+  const iconColor = showLocked ? theme.danger : isTrackable && isCurrent ? theme.accent : theme.text2;
+
+  // ------------------------------------------------------------
+  // Tracking icon: dash (non-trackable), red lock (locked tap), empty ring, or green check.
   // Read-only rows drop it — nothing here is markable.
   // ------------------------------------------------------------
   const trackingIcon = readOnly ? null : !isTrackable ? (
     <MaterialDesignIcons name="minus" size={TRACKING_ICON_SIZE} color={theme.placeholder} />
+  ) : showLocked ? (
+    <MaterialDesignIcons name="lock-outline" size={TRACKING_ICON_SIZE} color={theme.danger} />
   ) : !isPrayed ? (
     <View style={[styles.trackCircle, { borderColor: isCurrent ? theme.placeholder : theme.divider2 }]} />
   ) : (
@@ -114,7 +145,7 @@ export default function PrayerRow({
       isCard && styles.cardRow,
       isCard && {
         backgroundColor: isCurrent ? theme.accentLight : theme.card,
-        borderColor: isCurrent ? theme.accentLight : theme.borderCard,
+        borderColor: showLocked ? theme.danger : isCurrent ? theme.accentLight : theme.borderCard,
       },
     ]}>
 
@@ -130,7 +161,7 @@ export default function PrayerRow({
           delayPressOut={0}
           activeOpacity={0.3}
           hitSlop={8}
-          onPress={onTrackingPress}
+          onPress={isLocked ? handleLockedPress : onTrackingPress}
         >
           {rowContent}
         </TouchableOpacity>

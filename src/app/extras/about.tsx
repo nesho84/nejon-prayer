@@ -1,5 +1,6 @@
 import AppLayout from "@/components/AppLayout";
 import { showFeedbackModal } from "@/components/Feedback";
+import { showRateAppModal } from "@/components/RateApp";
 import {
     APP_WEBSITE_URL,
     APPLE_STORE_URL,
@@ -13,10 +14,11 @@ import {
     PRIVACY_POLICY_URL
 } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
+import DebugPanel from "@/debug/DebugPanel";
 import { useDebugStore } from "@/debug/debugStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
-import { openExternalUrl, openStoreListing, shareText } from "@/utils/system";
+import { openExternalUrl, shareText } from "@/utils/system";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
@@ -49,8 +51,11 @@ export default function AboutScreen() {
         Linking.openSettings();
     };
 
+    // Taps still needed to toggle debug mode
+    const tapsLeft = DEBUG_MODE_TAP_THRESHOLD - tapCount;
+
     // ------------------------------------------------------------
-    // Tap the version number N times to toggle debug mode
+    // Tap the version number (or the debug badge) N times to toggle debug mode
     // ------------------------------------------------------------
     const handleVersionTap = () => {
         const nextCount = tapCount + 1;
@@ -108,23 +113,26 @@ export default function AboutScreen() {
                             Version {Constants?.expoConfig?.version}
                         </Text>
                     </TouchableOpacity>
-                    {/* Debug-mode hint */}
-                    {tapCount >= DEBUG_MODE_TAP_HINT_START && (
+                    {/* Debug-mode hint (activating only — while on, the badge on the debug box counts down) */}
+                    {!debugModeEnabled && tapCount >= DEBUG_MODE_TAP_HINT_START && (
                         <View style={[styles.debugBadge, { borderColor: 'transparent' }]}>
                             <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
-                                Tap {DEBUG_MODE_TAP_THRESHOLD - tapCount} more time{DEBUG_MODE_TAP_THRESHOLD - tapCount === 1 ? "" : "s"} to {debugModeEnabled ? "deactivate" : "activate"} debug mode.
-                            </Text>
-                        </View>
-                    )}
-                    {/* Debug-mode status badge*/}
-                    {tapCount < DEBUG_MODE_TAP_HINT_START && debugModeEnabled && (
-                        <View style={[styles.debugBadge, { borderColor: theme.danger }]}>
-                            <Text style={[styles.debugBadgeText, { color: theme.placeholder }]}>
-                                Debug mode activated. Tap {DEBUG_MODE_TAP_THRESHOLD} times to deactivate.
+                                Tap {tapsLeft} more time{tapsLeft === 1 ? "" : "s"} to activate debug mode.
                             </Text>
                         </View>
                     )}
                 </View>
+
+                {/* Debug tools box — only while debug mode is on (dev builds too). Its status badge sits on the
+                    top border; tapping it counts like tapping the version, and it counts down while you tap. */}
+                {debugModeEnabled && (
+                    <DebugPanel
+                        status={tapCount >= DEBUG_MODE_TAP_HINT_START
+                            ? `Tap ${tapsLeft} more time${tapsLeft === 1 ? "" : "s"} to deactivate debug mode.`
+                            : `Debug mode activated. Tap ${DEBUG_MODE_TAP_THRESHOLD} times to deactivate.`}
+                        onStatusPress={handleVersionTap}
+                    />
+                )}
 
                 {/* Action Cards */}
                 <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
@@ -144,7 +152,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Rate the App */}
-                    <TouchableOpacity style={styles.cardRow} onPress={openStoreListing} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => showRateAppModal(true)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialDesignIcons name="star-outline" size={22} color={theme.primary} />
                         </View>
@@ -152,14 +160,14 @@ export default function AboutScreen() {
                             <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.rateApp}</Text>
                             <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>{tr.labels.rateAppDesc}</Text>
                         </View>
-                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
+                        <MaterialDesignIcons name="chevron-right" size={16} color={theme.textMuted} />
                     </TouchableOpacity>
 
                     {/* Divider */}
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Send Feedback (opens the questionnaire directly, skipping the intro) */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => showFeedbackModal("rating")} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => showFeedbackModal(true)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialDesignIcons name="message-draw" size={22} color={theme.primary} />
                         </View>

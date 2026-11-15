@@ -47,7 +47,10 @@ jest.mock('@react-native-community/datetimepicker', () => () => null);
 jest.mock('expo-router', () => ({
   useLocalSearchParams: jest.fn(() => ({})),
 }));
-jest.mock('expo-haptics', () => ({ impactAsync: jest.fn(), ImpactFeedbackStyle: { Medium: 'medium' } }));
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(), ImpactFeedbackStyle: { Medium: 'medium' },
+  notificationAsync: jest.fn(), NotificationFeedbackType: { Warning: 'warning' },
+}));
 
 const mockTheme = {
   bg: '#fff', bg2: '#f5f5f5', text: '#111', text2: '#555', textMuted: '#888',
@@ -176,6 +179,35 @@ describe('PrayerTimingsScreen', () => {
     await act(async () => { fireEvent.press(screen.getByText('Fajr')); });
 
     expect(unmarkPrayed).toHaveBeenCalledWith('Fajr', yesterdayKey(), 'calendar');
+  });
+
+  it('tapping a future prayer today warns instead of marking', async () => {
+    jest.useFakeTimers({ advanceTimers: true });
+    jest.setSystemTime(new Date('2026-05-28T12:00:00')); // Isha 21:00 is future
+    const markPrayed = jest.spyOn(usePrayersTrackingStore.getState(), 'markPrayed').mockResolvedValue(false as any);
+
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Isha')).toBeTruthy());
+    await act(async () => { fireEvent.press(screen.getByText('Isha')); });
+
+    expect(markPrayed).not.toHaveBeenCalled();
+    expect(Haptics.notificationAsync).toHaveBeenCalledWith('warning');
+    jest.useRealTimers();
+  });
+
+  it('tapping an already-prayed future prayer today calls unmarkPrayed', async () => {
+    jest.useFakeTimers({ advanceTimers: true });
+    jest.setSystemTime(new Date('2026-05-28T12:00:00')); // Isha 21:00 is future
+    const today = '2026-05-28';
+    usePrayersTrackingStore.setState({ tracking: { [today]: { Isha: { status: 'prayed' } } } } as any);
+    const unmarkPrayed = jest.spyOn(usePrayersTrackingStore.getState(), 'unmarkPrayed').mockImplementation(() => {});
+
+    render(<PrayerTimingsScreen />);
+    await waitFor(() => expect(screen.getByText('Isha')).toBeTruthy());
+    await act(async () => { fireEvent.press(screen.getByText('Isha')); });
+
+    expect(unmarkPrayed).toHaveBeenCalledWith('Isha', today, 'calendar');
+    jest.useRealTimers();
   });
 });
 

@@ -31,6 +31,13 @@ const hide = () => useModalStore.getState().hide as jest.Mock;
 // Renders the content of the modal that was shown, so its buttons can be pressed
 const renderShownModal = () => render(show().mock.calls[0][0].component);
 
+// Shows the modal like the auto prompt does and moves past the intro to the rating step
+const showAtRating = () => {
+  showFeedbackModal();
+  renderShownModal();
+  fireEvent.press(screen.getByText('Share feedback'));
+};
+
 // Answers the rating step and moves on
 const rateAndNext = (stars = 4) => {
   fireEvent.press(screen.getByTestId(`star-${stars}`));
@@ -45,12 +52,11 @@ beforeEach(() => {
   useRateAppStore.setState({ rateAppShownAt: null });
   // Eligible by default — every test breaks one condition
   useFeedbackStore.setState({
-    feedbackFirstSeenAt: NOW - 15 * DAY_MS,
-    feedbackLaunchCount: 10,
-    feedbackShownCount: 0,
+    feedbackNextShowAt: NOW - 1,
     feedbackShownAt: null,
-    feedbackSnoozedUntil: null,
+    feedbackShownCount: 0,
     feedbackDone: false,
+    feedbackLaunchCount: 10,
   });
 });
 
@@ -75,15 +81,17 @@ describe('openFeedbackModal — when it shows', () => {
   });
 
   it('starts the wait on the first launch after onboarding, without showing', () => {
-    useFeedbackStore.setState({ feedbackFirstSeenAt: null });
+    useFeedbackStore.setState({ feedbackNextShowAt: null });
     openFeedbackModal();
 
     expect(show()).not.toHaveBeenCalled();
-    expect(useFeedbackStore.getState().feedbackFirstSeenAt).toBe(NOW);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 14 * DAY_MS);
   });
 
   it('does nothing before 14 days of use', () => {
-    useFeedbackStore.setState({ feedbackFirstSeenAt: NOW - 13 * DAY_MS });
+    useFeedbackStore.setState({ feedbackNextShowAt: null });
+    openFeedbackModal();
+    jest.setSystemTime(NOW + 13 * DAY_MS);
     openFeedbackModal();
     expect(show()).not.toHaveBeenCalled();
   });
@@ -95,25 +103,29 @@ describe('openFeedbackModal — when it shows', () => {
   });
 
   it('does nothing while snoozed, and shows once the snooze is over', () => {
-    useFeedbackStore.setState({ feedbackSnoozedUntil: NOW + DAY_MS });
+    useFeedbackStore.setState({ feedbackNextShowAt: NOW + DAY_MS });
     openFeedbackModal();
     expect(show()).not.toHaveBeenCalled();
 
-    useFeedbackStore.setState({ feedbackSnoozedUntil: NOW - 1 });
+    useFeedbackStore.setState({ feedbackNextShowAt: NOW - 1 });
     openFeedbackModal();
     expect(show()).toHaveBeenCalledTimes(1);
   });
 
-  it('never shows once done (sent, or "Don\'t ask again")', () => {
+  it('never shows once done (sent, "Don\'t ask again", or the 3rd show)', () => {
     useFeedbackStore.setState({ feedbackDone: true });
     openFeedbackModal();
     expect(show()).not.toHaveBeenCalled();
   });
 
-  it('stops after 3 shows', () => {
-    useFeedbackStore.setState({ feedbackShownCount: 3 });
+  it('the 3rd show marks it done, so it stops after 3 shows', () => {
+    useFeedbackStore.setState({ feedbackShownCount: 2 });
     openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
+    expect(show()).toHaveBeenCalledTimes(1);
+    expect(useFeedbackStore.getState().feedbackDone).toBe(true);
+
+    openFeedbackModal();
+    expect(show()).toHaveBeenCalledTimes(1);
   });
 
   it('does nothing within 14 days of the "Rate the App" modal', () => {
@@ -142,13 +154,30 @@ describe('showFeedbackModal', () => {
     expect(useFeedbackStore.getState().feedbackShownCount).toBe(4);
   });
 
-  it('opens directly at the first question when asked (About row)', () => {
-    showFeedbackModal('rating');
-    renderShownModal();
+});
 
+describe('showFeedbackModal — from About', () => {
+  beforeEach(() => {
+    showFeedbackModal(true);
+    renderShownModal();
+  });
+
+  it('opens directly at the first question', () => {
     expect(screen.queryByText('How do you like Nejon Prayer?')).toBeNull();
     expect(screen.getByText('How do you like the app?')).toBeTruthy();
     expect(screen.getByText('Step 1 / 5')).toBeTruthy();
+  });
+
+  it('does not record the open', () => {
+    expect(useFeedbackStore.getState().feedbackShownCount).toBe(0);
+    expect(useFeedbackStore.getState().feedbackShownAt).toBeNull();
+  });
+
+  it('the close icon closes without starting a wait', () => {
+    fireEvent.press(screen.getByTestId('icon-close'));
+
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW - 1);
+    expect(hide()).toHaveBeenCalledWith('close');
   });
 });
 
@@ -167,7 +196,7 @@ describe('intro buttons', () => {
   it('"Maybe later" snoozes for 30 days and closes', () => {
     fireEvent.press(screen.getByText('Maybe later'));
 
-    expect(useFeedbackStore.getState().feedbackSnoozedUntil).toBe(NOW + 30 * DAY_MS);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
     expect(useFeedbackStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('later');
   });
@@ -182,8 +211,7 @@ describe('intro buttons', () => {
 
 describe('question steps', () => {
   beforeEach(() => {
-    showFeedbackModal('rating');
-    renderShownModal();
+    showAtRating();
   });
 
   it('the rating has no Back, and Next only works once a star is picked', () => {
@@ -211,7 +239,7 @@ describe('question steps', () => {
   it('the close icon snoozes and closes without sending (not an opt-out)', () => {
     fireEvent.press(screen.getByTestId('icon-close'));
 
-    expect(useFeedbackStore.getState().feedbackSnoozedUntil).toBe(NOW + 30 * DAY_MS);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
     expect(useFeedbackStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
     expect(mockSendFeedback).not.toHaveBeenCalled();
@@ -220,8 +248,7 @@ describe('question steps', () => {
 
 describe('sending', () => {
   beforeEach(() => {
-    showFeedbackModal('rating');
-    renderShownModal();
+    showAtRating();
   });
 
   // Rating 4 → two "most used" chips → nothing on "improve" → "Maybe" → message
@@ -317,7 +344,7 @@ describe('sending', () => {
     // findByText advances the fake clock — measure the snooze from the press
     const pressedAt = Date.now();
     fireEvent.press(screen.getByText('Close'));
-    expect(useFeedbackStore.getState().feedbackSnoozedUntil).toBe(pressedAt + 30 * DAY_MS);
+    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(pressedAt + 30 * DAY_MS);
     expect(useFeedbackStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
   });

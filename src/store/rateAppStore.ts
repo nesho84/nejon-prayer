@@ -3,54 +3,54 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface RateAppState {
-  rateAppDone: boolean;
-  rateAppVersion: string | null;
-  rateAppRemindAt: number | null;
+  rateAppNextShowAt: number | null;
   rateAppShownAt: number | null;
+  rateAppShownCount: number;
+  rateAppDone: boolean;
   isReady: boolean;
-  setRateAppDone: (rateAppDone: boolean) => void;
-  setRateAppVersion: (rateAppVersion: string | null) => void;
-  setRateAppRemindAt: (rateAppRemindAt: number | null) => void;
+  setRateAppNextShowAt: (rateAppNextShowAt: number | null) => void;
   setRateAppShownAt: (rateAppShownAt: number | null) => void;
+  setRateAppShownCount: (rateAppShownCount: number) => void;
+  setRateAppDone: (rateAppDone: boolean) => void;
 }
 
 export const useRateAppStore = create<RateAppState>()(
   persist(
     (set) => ({
-      rateAppDone: false,
-      rateAppVersion: null,
-      rateAppRemindAt: null,
+      rateAppNextShowAt: null,
       rateAppShownAt: null,
+      rateAppShownCount: 0,
+      rateAppDone: false,
       isReady: false,
 
-      // User tapped "Already rated" — never show again
-      setRateAppDone: (rateAppDone) => {
-        set({ rateAppDone });
+      // Earliest time the modal may show again
+      setRateAppNextShowAt: (rateAppNextShowAt) => {
+        set({ rateAppNextShowAt });
       },
 
-      // App version on which the user tapped "Open Store"
-      setRateAppVersion: (rateAppVersion) => {
-        set({ rateAppVersion });
-      },
-
-      // Earliest time the "Rate the App" modal may show again
-      setRateAppRemindAt: (rateAppRemindAt) => {
-        set({ rateAppRemindAt });
-      },
-
-      // Last time the "Rate the App" modal was shown — keeps it apart from the feedback modal
+      // Last time the modal was shown — keeps it apart from the feedback modal
       setRateAppShownAt: (rateAppShownAt) => {
         set({ rateAppShownAt });
+      },
+
+      // How many times the modal was shown
+      setRateAppShownCount: (rateAppShownCount) => {
+        set({ rateAppShownCount });
+      },
+
+      // Stopped for good — tapped "Open Store" or "Already rated", or shown the max times
+      setRateAppDone: (rateAppDone) => {
+        set({ rateAppDone });
       },
     }),
     {
       name: "rate-app-storage",
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
-        rateAppDone: state.rateAppDone,
-        rateAppVersion: state.rateAppVersion,
-        rateAppRemindAt: state.rateAppRemindAt,
+        rateAppNextShowAt: state.rateAppNextShowAt,
         rateAppShownAt: state.rateAppShownAt,
+        rateAppShownCount: state.rateAppShownCount,
+        rateAppDone: state.rateAppDone,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

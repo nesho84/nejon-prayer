@@ -28,8 +28,8 @@ const FIRST_PROMPT_AFTER_DAYS = 14;
 const MIN_LAUNCHES = 10;
 // Wait after "Maybe later", or after closing the questionnaire without sending
 const SNOOZE_DAYS = 30;
-// Every open counts — the prompt stops for good at the limit
-export const MAX_SHOWS = 3;
+// Every open counts (except from About) — the limit marks it done
+export const FEEDBACK_MAX_SHOWS = 3;
 // Minimum gap between this modal and the "Rate the App" modal (checked on both sides)
 export const PROMPT_GAP_DAYS = 14;
 // Server limit for the free text
@@ -70,29 +70,25 @@ function getChoiceLabels(id: "most_used" | "improve" | "donation_interest", feed
 // Open the feedback modal on its intro step
 // ------------------------------------------------------------
 export function openFeedbackModal() {
-  const { feedbackFirstSeenAt, feedbackLaunchCount, feedbackShownCount, feedbackSnoozedUntil, feedbackDone, setFeedbackFirstSeenAt } = useFeedbackStore.getState();
+  const { feedbackNextShowAt, feedbackDone, feedbackLaunchCount, setFeedbackNextShowAt } = useFeedbackStore.getState();
   const rateAppShownAt = useRateAppStore.getState().rateAppShownAt;
   const now = Date.now();
 
-  // Sent, or tapped "Don't ask again"
+  // Sent, tapped "Don't ask again", or shown the max times
   if (feedbackDone) {
     return;
   }
-  // Shown 3 times — stopped for good
-  if (feedbackShownCount >= MAX_SHOWS) {
+  // First launch after onboarding — start the "used it long enough" wait
+  if (feedbackNextShowAt === null) {
+    setFeedbackNextShowAt(now + FIRST_PROMPT_AFTER_DAYS * DAY_MS);
     return;
   }
-  // First launch after onboarding — start the wait
-  if (feedbackFirstSeenAt === null) {
-    setFeedbackFirstSeenAt(now);
+  // Still waiting — the first 14 days, or after "Maybe later" / closing the questionnaire
+  if (now < feedbackNextShowAt) {
     return;
   }
-  // Not used long enough to have an opinion yet
-  if (now < feedbackFirstSeenAt + FIRST_PROMPT_AFTER_DAYS * DAY_MS || feedbackLaunchCount < MIN_LAUNCHES) {
-    return;
-  }
-  // Tapped "Maybe later", or closed the questionnaire
-  if (feedbackSnoozedUntil && now < feedbackSnoozedUntil) {
+  // Not started often enough to have an opinion yet
+  if (feedbackLaunchCount < MIN_LAUNCHES) {
     return;
   }
   // "Rate the App" shown recently — keep the two apart
@@ -108,28 +104,33 @@ export function openFeedbackModal() {
 }
 
 // ------------------------------------------------------------
-// Show the feedback modal — no checks (the About row opens it at "rating",
-// the Debug Panel at "intro"). Every open counts as shown.
+// Show the feedback modal — no checks (the Debug Panel and About call this directly).
+// From About it opens at "rating", and neither the open nor a close is recorded.
 // ------------------------------------------------------------
-export function showFeedbackModal(startStep: "intro" | "rating" = "intro") {
-  const { feedbackShownCount, setFeedbackShownCount, setFeedbackShownAt } = useFeedbackStore.getState();
+export function showFeedbackModal(fromAbout = false) {
+  const { feedbackShownCount, setFeedbackShownAt, setFeedbackShownCount, setFeedbackDone } = useFeedbackStore.getState();
 
-  setFeedbackShownCount(feedbackShownCount + 1);
-  setFeedbackShownAt(Date.now());
+  if (!fromAbout) {
+    setFeedbackShownAt(Date.now());
+    setFeedbackShownCount(feedbackShownCount + 1);
+    if (feedbackShownCount + 1 >= FEEDBACK_MAX_SHOWS) {
+      setFeedbackDone(true);
+    }
+  }
 
   useModalStore.getState().show({
     type: "fullscreen",
     animationType: "fade",
     // Only the buttons close it — so every close records a choice
     dismissable: false,
-    component: <FeedbackForm startStep={startStep} />,
+    component: <FeedbackForm fromAbout={fromAbout} />,
   });
 }
 
 // ------------------------------------------------------------
 // Modal content — intro → questions → thank-you (or error), all in the same modal
 // ------------------------------------------------------------
-function FeedbackForm({ startStep }: { startStep: FeedbackStep }) {
+function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -138,7 +139,7 @@ function FeedbackForm({ startStep }: { startStep: FeedbackStep }) {
   const { hide } = useModalStore.getState();
 
   // Local state
-  const [step, setStep] = useState<FeedbackStep>(startStep);
+  const [step, setStep] = useState<FeedbackStep>(fromAbout ? "rating" : "intro");
   const [rating, setRating] = useState<number | null>(null);
   const [answers, setAnswers] = useState<FeedbackAnswers>({});
   const [message, setMessage] = useState("");
@@ -160,7 +161,9 @@ function FeedbackForm({ startStep }: { startStep: FeedbackStep }) {
   // Close without sending — "Maybe later" and the close icon (not an opt-out)
   // ------------------------------------------------------------
   const handleLater = (action: string) => {
-    useFeedbackStore.getState().setFeedbackSnoozedUntil(Date.now() + SNOOZE_DAYS * DAY_MS);
+    if (!fromAbout) {
+      useFeedbackStore.getState().setFeedbackNextShowAt(Date.now() + SNOOZE_DAYS * DAY_MS);
+    }
     hide(action);
   };
 

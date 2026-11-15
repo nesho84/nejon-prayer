@@ -1,11 +1,13 @@
 import PrayerRow from '@/components/PrayerRow';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import * as Haptics from 'expo-haptics';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
+jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFeedbackType: { Warning: 'warning' } }));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return { Ionicons: ({ name }: { name: string }) => React.createElement('View', { testID: `ion-${name}` }) };
@@ -78,5 +80,46 @@ describe('PrayerRow', () => {
 
     rerender(<PrayerRow prayerName="Dhuhr" prayerTime="12:00" isTrackable isPrayed={false} isFriday={false} />);
     expect(screen.queryByText('Xhumaja')).toBeNull();
+  });
+});
+
+describe('PrayerRow — locked (time not reached)', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    (Haptics.notificationAsync as jest.Mock).mockClear();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('a tap flashes the red lock with a warning haptic instead of marking', () => {
+    const onTrackingPress = jest.fn();
+    render(<PrayerRow prayerName="Fajr" prayerTime="04:50" isTrackable isPrayed={false} isLocked onTrackingPress={onTrackingPress} />);
+    expect(screen.queryByTestId('mci-lock-outline')).toBeNull();
+
+    fireEvent.press(screen.getByText('Fajr'));
+
+    expect(screen.getByTestId('mci-lock-outline')).toBeTruthy();
+    expect(Haptics.notificationAsync).toHaveBeenCalledWith('warning');
+    expect(onTrackingPress).not.toHaveBeenCalled();
+  });
+
+  it('goes back to normal after 0.8 seconds', () => {
+    render(<PrayerRow prayerName="Fajr" prayerTime="04:50" isTrackable isPrayed={false} isLocked />);
+    fireEvent.press(screen.getByText('Fajr'));
+
+    act(() => { jest.advanceTimersByTime(1100); });
+    expect(screen.queryByTestId('mci-lock-outline')).toBeNull();
+  });
+
+  it('a repeat tap restarts the 0.8 seconds', () => {
+    render(<PrayerRow prayerName="Fajr" prayerTime="04:50" isTrackable isPrayed={false} isLocked />);
+    fireEvent.press(screen.getByText('Fajr'));
+    act(() => { jest.advanceTimersByTime(600); });
+    fireEvent.press(screen.getByText('Fajr'));
+    act(() => { jest.advanceTimersByTime(600); });
+
+    expect(screen.getByTestId('mci-lock-outline')).toBeTruthy();
   });
 });
