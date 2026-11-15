@@ -93,7 +93,7 @@ export const HOLIDAY_CARD_HINT =
 
 // How the three auto modals work — shown under their ⓘ
 export const RATE_APP_HINT =
-  "First show (Android only): the first time a 3rd prayer gets marked in one day (Home or Timings), " +
+  "First show (Android only): the first time a 3rd prayer gets marked in one day (Home: today; Timings: any day), " +
   "or Quran reading scrolls past ayah 20 — can already happen on day one.\n" +
   "\"Later\" → asks again 7 days later, at the next such moment.\n" +
   "Never again: \"Open Store\", \"Already rated\", or after 3 shows.\n" +
