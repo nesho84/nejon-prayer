@@ -85,7 +85,7 @@ export default function QuranReadingCard() {
             style={({ pressed }) => [
               styles.toggleBtn,
               mode === m && { backgroundColor: theme.card, borderColor: theme.borderCard, borderWidth: 0.4 },
-              pressed && { backgroundColor: theme.pressed },
+              pressed && mode !== m && { backgroundColor: theme.pressed },
             ]}
             onPress={() => setMode(m)}
           >

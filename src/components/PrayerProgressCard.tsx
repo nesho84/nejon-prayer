@@ -135,7 +135,7 @@ const PrayerProgressCard = React.memo(({ daysDisabled = false }: Props) => {
               style={({ pressed }) => [
                 styles.toggleBtn,
                 v === progressView && { backgroundColor: theme.overlayLight },
-                pressed && { backgroundColor: theme.pressed },
+                pressed && v !== progressView && { backgroundColor: theme.pressed },
               ]}
               onPress={() => setProgressView(v)}
             >
