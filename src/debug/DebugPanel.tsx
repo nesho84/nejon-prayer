@@ -14,21 +14,6 @@ import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
-  CHECK_FAILED_HINT,
-  FEEDBACK_HINT,
-  HOLIDAY_CARD_HINT,
-  KHATAM_HINT,
-  LOCATION_CHANGED_HINT,
-  NO_PRAYER_TIMES_HINT,
-  NOTIF_REMINDER_HINT,
-  OUTDATED_HINT,
-  PRAYER_CELEBRATION_HINT,
-  RATE_APP_HINT,
-  UP_TO_DATE_HINT,
-  UPDATE_LAUNCH_HINT,
-  UPDATE_MODAL_HINT,
-} from "./debugHints";
-import {
   previewFeedbackModal,
   previewKhatamCelebrationModal,
   previewNotifReminderModal,
@@ -48,7 +33,27 @@ import {
   getScheduledNData,
   logScheduledN,
 } from "./debugNotifs";
-import { AutoModalHead, Badge, DebugButton, DebugSection, DebugToggle, showJsonViewerModal } from "./debugUi";
+import {
+  AutoModalHead,
+  Badge,
+  CHECK_FAILED_HINT,
+  DebugButton,
+  DebugSection,
+  DebugToggle,
+  FEEDBACK_HINT,
+  HOLIDAY_CARD_HINT,
+  KHATAM_HINT,
+  LOCATION_CHANGED_HINT,
+  NO_PRAYER_TIMES_HINT,
+  NOTIF_REMINDER_HINT,
+  OUTDATED_HINT,
+  PRAYER_CELEBRATION_HINT,
+  RATE_APP_HINT,
+  showJsonViewerModal,
+  UP_TO_DATE_HINT,
+  UPDATE_LAUNCH_HINT,
+  UPDATE_MODAL_HINT,
+} from "./debugUi";
 
 interface DebugPanelProps {
   status: string;
