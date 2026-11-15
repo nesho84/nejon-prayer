@@ -132,13 +132,19 @@ describe('prayersStore — loadPrayerTimes', () => {
     expect(refreshAddress).toHaveBeenCalledTimes(1);
   });
 
-  it('falls back to stale yearly data when offline', async () => {
+  it('falls back to the same day of last year\'s data when offline', async () => {
     mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' } });
     mockDeviceGetState.mockReturnValue({ internetConnection: false });
-    usePrayersStore.setState({ yearlyPrayerTimes: YEARLY, fetchedYear: YEAR - 1 });
+    // Real shape: last year's data is keyed by last year's dates, so today's key isn't in it
+    const now = new Date();
+    const lastYearKey = toDateKey(new Date(YEAR - 1, now.getMonth(), now.getDate()));
+    usePrayersStore.setState({ yearlyPrayerTimes: { [lastYearKey]: PRAYER_TIMES }, fetchedYear: YEAR - 1 });
+
     await usePrayersStore.getState().loadPrayerTimes();
+
     expect(mockGetYearly).not.toHaveBeenCalled();
     expect(usePrayersStore.getState().prayerTimes).toEqual(PRAYER_TIMES);
+    expect(usePrayersStore.getState().prayerTimesDate).toBe(TODAY);
     expect(usePrayersStore.getState().prayersOutdated).toBe(true);
   });
 

@@ -106,10 +106,12 @@ export const usePrayersStore = create<PrayersState>()(
             }
           }
 
-          // OFFLINE: Fallback to saved data if fetch failed
+          // OFFLINE: Fallback to saved data if fetch failed. Data from an older year has no
+          // entry for today, so use the same day of that year (times move only a minute or two)
           if (yearlyPrayerTimes) {
+            const savedDayKey = toDateKey(new Date(fetchedYear ?? currentYear, now.getMonth(), now.getDate()));
             set({
-              prayerTimes: yearlyPrayerTimes[todayKey] ?? null,
+              prayerTimes: yearlyPrayerTimes[todayKey] ?? yearlyPrayerTimes[savedDayKey] ?? null,
               prayerTimesDate: todayKey,
               prayersOutdated: fetchedYear !== currentYear,
             });
