@@ -1,3 +1,4 @@
+import { HIT_SLOP_8 } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -131,7 +132,7 @@ export default function QuranReadingCard() {
                 </View>
                 <TouchableOpacity
                   onPress={handleReset}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  hitSlop={HIT_SLOP_8}
                 >
                   <Ionicons name="refresh-outline" size={18} color={theme.placeholder} />
                 </TouchableOpacity>
