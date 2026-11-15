@@ -3,6 +3,7 @@ import { stopPlayback } from '@/services/quranAudioService';
 import { restoreDefaults } from '@/services/resetAppService';
 import { storage } from '@/store/storage';
 import * as Updates from 'expo-updates';
+import { DevSettings } from 'react-native';
 
 jest.mock('expo-updates', () => ({ isEnabled: true, reloadAsync: jest.fn() }));
 jest.mock('@/services/quranAudioService', () => ({ stopPlayback: jest.fn() }));
@@ -41,14 +42,17 @@ describe('restoreDefaults', () => {
     expect(result).toEqual({ status: 'reloaded' });
   });
 
-  it('returns wiped-no-reload in dev', async () => {
+  it('reloads the JS bundle in dev (no reloadAsync)', async () => {
     (globalThis as any).__DEV__ = true;
+    const devReload = jest.spyOn(DevSettings, 'reload').mockImplementation(() => {});
 
     const result = await restoreDefaults();
 
     expect(mockClearAll).toHaveBeenCalledTimes(1);
+    expect(devReload).toHaveBeenCalledTimes(1);
     expect(mockReloadAsync).not.toHaveBeenCalled();
-    expect(result).toEqual({ status: 'wiped-no-reload' });
+    expect(result).toEqual({ status: 'reloaded' });
+    devReload.mockRestore();
   });
 
   it('returns wiped-no-reload when updates are disabled', async () => {

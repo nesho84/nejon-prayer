@@ -2,6 +2,7 @@ import { cancelAllNotifications } from "@/services/notificationsService";
 import { stopPlayback } from "@/services/quranAudioService";
 import { storage } from "@/store/storage";
 import * as Updates from "expo-updates";
+import { DevSettings } from "react-native";
 
 export type RestoreResult =
     | { status: "reloaded" }        // process is relaunching
@@ -60,11 +61,16 @@ function clearStorage(): boolean {
 }
 
 // ------------------------------------------------------------
-// Relaunch into onboarding. Dev builds and updates-disabled builds can't reload,
-// so the user must close and reopen the app manually.
+// Relaunch into onboarding. Dev builds can't use reloadAsync, so they reload the JS bundle;
+// updates-disabled builds can't reload at all — the user must close and reopen the app.
 // ------------------------------------------------------------
 async function reloadApp(): Promise<RestoreResult> {
-    if (__DEV__ || !Updates.isEnabled) {
+    if (__DEV__) {
+        DevSettings.reload();
+        return { status: "reloaded" };
+    }
+
+    if (!Updates.isEnabled) {
         return { status: "wiped-no-reload" };
     }
 
