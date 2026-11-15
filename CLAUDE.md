@@ -113,6 +113,22 @@ making cross-cutting changes. Key points to internalize:
   to a notification's `data`/`android`/`ios` payload (channels, categories, actions, fields) must
   be mirrored in both files, or the debug tool will silently test a stale shape.
 
+- **Known issue: a prayer notification is rarely missed (Android). Investigated Nov 2026, accepted,
+  not being chased.** About once a month a single prayer doesn't fire and is absent from Samsung's
+  notification history; its DAILY trigger is already on tomorrow. From the notify-kit 10.9.0 native source:
+  - A normal fire posts the notification first and only then advances the trigger, so a normal fire
+    can't skip.
+  - A trigger *can* advance without firing. That happens when a reschedule runs while the alarm is due
+    but not yet delivered:
+    - our cancel + recreate (the 2-min buffer in `getTriggerTime`)
+    - native `rescheduleNotifications` (reboot, exact-alarm permission change) → `setNextTimestamp`
+  - `alarmManager: true` defaults to `SET_EXACT_AND_ALLOW_WHILE_IDLE`, which Android may defer by
+    ~15 min in Doze, so that window exists.
+
+  The only fix on the table is `SET_ALARM_CLOCK` for the 5 prayers (never deferred; mirror it in
+  `src/debug/debugNotifs.ts`). It was rejected because it shows a permanent alarm icon and "next alarm"
+  on Samsung. Revisit only if misses become frequent.
+
 ## Refactoring checklist
 
 Before calling a rename/removal done, `grep` the **whole repo** for every removed/renamed
