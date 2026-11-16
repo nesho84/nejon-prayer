@@ -4,7 +4,7 @@ import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
 import PrayerRow from "@/components/PrayerRow";
 import { showRateAppModal } from "@/components/RateAppModal";
 import { globalStyles } from "@/constants/styles";
-import { canShowRateApp } from "@/hooks/useAutoModals";
+import { canShowRateApp } from "@/hooks/useAutoModalsSync";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";

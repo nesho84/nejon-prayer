@@ -196,7 +196,7 @@ export async function checkAutoModalsOnStart() {
 // ------------------------------------------------------------
 // Auto modals: notif reminder resets, and the startup check (once per launch)
 // ------------------------------------------------------------
-export function useAutoModals() {
+export function useAutoModalsSync() {
   const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
   const autoModalsReady = useAutoModalsStore((state) => state.isReady);
   // Not persisted — notificationPermission is only accurate after the first sync

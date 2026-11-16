@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 // ------------------------------------------------------------
 // Check for an OTA (expo-updates) update once on mount — downloads and reloads silently.
-// The store update check lives in useAutoModals.
+// The store update check lives in useAutoModalsSync.
 // ------------------------------------------------------------
 export function useOtaUpdatesSync() {
   useEffect(() => {

@@ -1,7 +1,7 @@
 import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
 import { useAdsSync } from "@/hooks/useAdsSync";
-import { useAutoModals } from "@/hooks/useAutoModals";
+import { useAutoModalsSync } from "@/hooks/useAutoModalsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
 import { useLocationSync } from "@/hooks/useLocationSync";
@@ -66,7 +66,7 @@ function RootLayout() {
   useHolidaysSync();
   useQuranSetup();
   useOtaUpdatesSync();
-  useAutoModals();
+  useAutoModalsSync();
   useAdsSync();
 
   return (

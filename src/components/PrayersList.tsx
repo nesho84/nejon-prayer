@@ -3,7 +3,7 @@ import { showRateAppModal } from '@/components/RateAppModal';
 import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
 import { useDebugStore } from '@/debug/debugStore';
-import { canShowRateApp } from '@/hooks/useAutoModals';
+import { canShowRateApp } from '@/hooks/useAutoModalsSync';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';

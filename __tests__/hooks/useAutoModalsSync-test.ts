@@ -8,8 +8,8 @@ import {
   canShowRateApp,
   canShowStoreUpdate,
   checkAutoModalsOnStart,
-  useAutoModals,
-} from '@/hooks/useAutoModals';
+  useAutoModalsSync,
+} from '@/hooks/useAutoModalsSync';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useModalStore } from '@/store/modalStore';
@@ -344,7 +344,7 @@ describe('checkAutoModalsOnStart — order', () => {
   });
 });
 
-describe('useAutoModals', () => {
+describe('useAutoModalsSync', () => {
   const flush = () => act(async () => {
     await Promise.resolve();
   });
@@ -352,7 +352,7 @@ describe('useAutoModals', () => {
   it('runs the startup check once, after onboarding and the first device-settings sync', async () => {
     useDeviceSettingsStore.setState({ isReady: false });
     useOnboardingStore.setState({ onboardingComplete: false });
-    const { rerender } = renderHook(() => useAutoModals());
+    const { rerender } = renderHook(() => useAutoModalsSync());
     await flush();
     expect(checkForUpdate).not.toHaveBeenCalled();
 
@@ -378,7 +378,7 @@ describe('useAutoModals', () => {
 
   it('starts the 3-day wait when notifications are seen off', async () => {
     useDeviceSettingsStore.setState({ notificationPermission: false });
-    renderHook(() => useAutoModals());
+    renderHook(() => useAutoModalsSync());
     await flush();
 
     expect(useAutoModalsStore.getState().notifReminderNextShowAt).toBe(NOW + 3 * DAY_MS);
@@ -388,7 +388,7 @@ describe('useAutoModals', () => {
   it('resets the reminder when granted, and starts over when turned off again', async () => {
     useDeviceSettingsStore.setState({ notificationPermission: false });
     useAutoModalsStore.setState({ notifReminderNextShowAt: NOW + DAY_MS, notifReminderShownCount: 3, notifReminderDone: true });
-    renderHook(() => useAutoModals());
+    renderHook(() => useAutoModalsSync());
     await flush();
 
     act(() => {
@@ -408,7 +408,7 @@ describe('useAutoModals', () => {
 
   it('does not start the reminder wait before the first device-settings sync', async () => {
     useDeviceSettingsStore.setState({ notificationPermission: false, isReady: false });
-    renderHook(() => useAutoModals());
+    renderHook(() => useAutoModalsSync());
     await flush();
 
     expect(useAutoModalsStore.getState().notifReminderNextShowAt).toBeNull();

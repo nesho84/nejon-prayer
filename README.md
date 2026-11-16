@@ -103,7 +103,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
-| `useAutoModals` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
+| `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
 
@@ -141,7 +141,7 @@ Two audio systems are used:
 
 Four modals open on their own. Their state lives in `autoModalsStore`; the waits are constants at the
 top of that file, and the rules (`canShowStoreUpdate`, `canShowNotifReminder`, `canShowRateApp`, `canShowFeedback`)
-live in `src/hooks/useAutoModals.ts`. Each `show…Modal()` in `src/components/*Modal.tsx` only shows the
+live in `src/hooks/useAutoModalsSync.ts`. Each `show…Modal()` in `src/components/*Modal.tsx` only shows the
 modal and records the show.
 
 | Modal | First wait | After closing / "Later" | Stops for good |

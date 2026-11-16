@@ -1,6 +1,6 @@
 import PrayerTimingsScreen from '@/app/(modals)/prayerTimings';
 import { showRateAppModal } from '@/components/RateAppModal';
-import { canShowRateApp } from '@/hooks/useAutoModals';
+import { canShowRateApp } from '@/hooks/useAutoModalsSync';
 import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { usePrayersStore } from '@/store/prayersStore';
@@ -11,7 +11,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-
 import * as Haptics from 'expo-haptics';
 
 jest.mock('@/components/RateAppModal', () => ({ showRateAppModal: jest.fn() }));
-jest.mock('@/hooks/useAutoModals', () => ({ canShowRateApp: jest.fn(() => true) }));
+jest.mock('@/hooks/useAutoModalsSync', () => ({ canShowRateApp: jest.fn(() => true) }));
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));

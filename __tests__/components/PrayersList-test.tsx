@@ -1,6 +1,6 @@
 import PrayersList from '@/components/PrayersList';
 import { showRateAppModal } from '@/components/RateAppModal';
-import { canShowRateApp } from '@/hooks/useAutoModals';
+import { canShowRateApp } from '@/hooks/useAutoModalsSync';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -8,7 +8,7 @@ import { toDateKey } from '@/utils/datetime';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 jest.mock('@/components/RateAppModal', () => ({ showRateAppModal: jest.fn() }));
-jest.mock('@/hooks/useAutoModals', () => ({ canShowRateApp: jest.fn(() => true) }));
+jest.mock('@/hooks/useAutoModalsSync', () => ({ canShowRateApp: jest.fn(() => true) }));
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
   __esModule: true,
