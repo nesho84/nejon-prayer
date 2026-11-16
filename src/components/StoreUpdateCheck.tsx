@@ -26,7 +26,7 @@ function getStatusDisplay(shown: StoreUpdatePreview | CheckStatus, theme: ThemeC
 }
 
 // Main component
-export default function CheckForStoreUpdate() {
+export default function StoreUpdateCheck() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -59,7 +59,7 @@ export default function CheckForStoreUpdate() {
     } catch (err) {
       // Most common cause is ERROR_APP_NOT_OWNED, which is expected on sideloaded/dev builds
       // (the Play In-App Update API only works for apps installed via Play) — not a crash.
-      console.warn("⚠️ [CheckForStoreUpdate] checkForUpdate failed:", err);
+      console.warn("⚠️ [StoreUpdateCheck] checkForUpdate failed:", err);
       setErrorDetail(err instanceof Error ? err.message : String(err));
       setStatus("error");
     }

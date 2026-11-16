@@ -2,6 +2,7 @@ import { showFeedbackModal } from "@/components/FeedbackModal";
 import { showNotifReminderModal } from "@/components/NotifReminderModal";
 import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { useDebugStore } from "@/debug/debugStore";
+import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import {
   DAY_MS,
   FEEDBACK_FIRST_WAIT_DAYS,
@@ -13,7 +14,6 @@ import {
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useModalStore } from "@/store/modalStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
-import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
