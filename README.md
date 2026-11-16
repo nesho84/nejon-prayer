@@ -90,8 +90,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `languageStore` | Active language + translation strings |
 | `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
 | `tesbihStore` | Counter value, lap count, target |
-| `rateAppStore` | "Rate the App" modal state (version the user went to the store on, remind-after time) |
-| `notifReminderStore` | Notification-permission reminder modal state (remind-after time) |
+| `autoModalsStore` | State of the 4 auto modals (Update, Notif reminder, Rate App, Feedback): next-show time, last show, show count, done |
 | `modalStore` | Global bottom-sheet modal visibility |
 
 ### Sync Hooks (run once at root layout)
@@ -104,7 +103,8 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
-| `useNotifReminderSync` | Opens the notification-permission reminder on launch and when the permission changes |
+| `useAutoModals` | Store update check + the launch modal (Update → Notif reminder → Feedback), notif reminder resets |
+| `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
 
 ### External APIs
@@ -137,25 +137,36 @@ Two audio systems are used:
 - `react-native-sound` — for azan notification sounds played inside the notification
 - `expo-audio` — for the in-app Quran audio player (background-capable, lock-screen controls; singleton wrapped in `src/services/quranAudioService.ts`)
 
-### Rate the App modal (Android only)
+### Auto modals
 
-`openRateAppModal()` (`src/components/RateApp.tsx`) is called at three moments: the 3rd prayer
-marked on Home or in the calendar, and reading reaching ayah 20. It opens a fullscreen "Enjoying Nejon
-Prayer?" modal (stars, app icon, sparkles) that only its buttons can close: **Open Store** (opens the
-Play listing via `openStoreListing()`; not asked again on this version, and 7 days after updating to a
-new one), **Later** (ask again in 7 days) and **Already rated** (never again). iOS shows nothing.
+Four modals open on their own. Their state lives in `autoModalsStore`; the waits are constants at the
+top of that file, and the rules (`canShowUpdate`, `canShowNotifReminder`, `canShowRateApp`, `canShowFeedback`)
+live in `src/hooks/useAutoModals.ts`. Each `show…Modal()` in `src/components/*Modal.tsx` only shows the
+modal and records the show.
 
-### Notification reminder modal
+| Modal | First wait | After closing / "Later" | Stops for good |
+|---|---|---|---|
+| Update | none | next launch, next launch, then every 3 days | never |
+| Enable notifications | 3 days | 7 days, then 14 | after 3 shows |
+| Rate App (Android only) | none | 7 days | after 3 shows, "Open Store", or "Already rated" |
+| Feedback | 7 days | 30 days | after 3 shows, sent, or "Don't ask again" |
 
-`useNotifReminderSync` calls `openNotifReminderModal()` (`src/components/NotifReminder.tsx`) on launch
-and whenever the permission changes (device settings re-sync on resume). While notifications are off it
-shows a "Never miss a reminder" alert that only its buttons can close: **Enable notifications**
-(requests permission; if no system dialog is possible anymore, offers system settings) and **Not now**.
-Schedule (`notifReminderStore`: remind-at time + close count): first seen off (after onboarding, after
-updating to this feature, or after re-disabling) → shows 3 days later; 1st close → 7 days; 2nd close →
-14 days; 3rd close → never again. Both buttons count as a close. Granting resets the time and count, so a
-later disable starts the cycle again. It never covers another modal — if one is open it yields until the
-next check, and if "Update available" replaces it, it comes back next launch since no close was recorded.
+Rate App and Feedback are always at least 7 days apart. No auto modal opens while another modal is open.
+
+**Launch order** (`checkAutoModalsOnStart`, once per launch after onboarding and the first device-settings
+sync) — at most one of:
+1. **Update** — if the store check (`expo-in-app-updates`, 5 s timeout, release builds only) reports
+   an update and it's due. "No update" while online resets its cycle; offline, a failed check (sideloaded
+   build, iOS without an AppStoreID) or a timeout change nothing.
+2. **Enable notifications** — if due. Granting resets it; turning notifications off again starts the
+   3-day wait.
+3. **Feedback** — if due. Its 7-day first wait starts once after onboarding (`startFirstWaits`).
+
+**Rate App** keeps its own triggers — the 3rd prayer marked on Home or in the calendar, and Quran reading
+reaching ayah 20 — and opens there when `canShowRateApp()`.
+
+**Manual opens** skip the checks and aren't recorded: Rate App and Feedback from About (`fromAbout`), and
+Settings → "Check for update" (`showUpdateModal(true)`). The debug panel previews count like a real show.
 
 ### Ads (AdMob)
 

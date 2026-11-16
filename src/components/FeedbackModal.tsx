@@ -1,10 +1,9 @@
 import { PAYPAL_DONATE_URL } from "@/constants/links";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { FEEDBACK_TR, FeedbackTranslations } from "@/constants/translations/feedback.tr";
-import { useFeedbackStore } from "@/store/feedbackStore";
+import { DAY_MS, FEEDBACK_MAX_SHOWS, FEEDBACK_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
-import { useRateAppStore } from "@/store/rateAppStore";
 import { useThemeStore } from "@/store/themeStore";
 import { FeedbackAnswers, FeedbackDonationId, FeedbackError, FeedbackImproveId, FeedbackMostUsedId } from "@/types/feedback.types";
 import { openExternalUrl } from "@/utils/system";
@@ -22,16 +21,6 @@ type FeedbackQuestion =
 
 type FeedbackStep = "intro" | FeedbackQuestion["id"] | "thanks" | "error";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-// Wait after onboarding before the first prompt — enough use to have an opinion
-const FIRST_PROMPT_AFTER_DAYS = 14;
-const MIN_LAUNCHES = 10;
-// Wait after "Maybe later", or after closing the questionnaire without sending
-const SNOOZE_DAYS = 30;
-// Every open counts (except from About) — the limit marks it done
-export const FEEDBACK_MAX_SHOWS = 3;
-// Minimum gap between this modal and the "Rate the App" modal (checked on both sides)
-export const PROMPT_GAP_DAYS = 14;
 // Server limit for the free text
 const MESSAGE_MAX_LENGTH = 2000;
 const STAR_COUNT = 5;
@@ -67,55 +56,19 @@ function getChoiceLabels(id: "most_used" | "improve" | "donation_interest", feed
 }
 
 // ------------------------------------------------------------
-// Open the feedback modal on its intro step
-// ------------------------------------------------------------
-export function openFeedbackModal() {
-  const { feedbackNextShowAt, feedbackDone, feedbackLaunchCount, setFeedbackNextShowAt } = useFeedbackStore.getState();
-  const rateAppShownAt = useRateAppStore.getState().rateAppShownAt;
-  const now = Date.now();
-
-  // Sent, tapped "Don't ask again", or shown the max times
-  if (feedbackDone) {
-    return;
-  }
-  // First launch after onboarding — start the "used it long enough" wait
-  if (feedbackNextShowAt === null) {
-    setFeedbackNextShowAt(now + FIRST_PROMPT_AFTER_DAYS * DAY_MS);
-    return;
-  }
-  // Still waiting — the first 14 days, or after "Maybe later" / closing the questionnaire
-  if (now < feedbackNextShowAt) {
-    return;
-  }
-  // Not started often enough to have an opinion yet
-  if (feedbackLaunchCount < MIN_LAUNCHES) {
-    return;
-  }
-  // "Rate the App" shown recently — keep the two apart
-  if (rateAppShownAt && now < rateAppShownAt + PROMPT_GAP_DAYS * DAY_MS) {
-    return;
-  }
-  // Another modal is open (e.g. "Update available") — yield, try next launch
-  if (useModalStore.getState().visible) {
-    return;
-  }
-
-  showFeedbackModal();
-}
-
-// ------------------------------------------------------------
-// Show the feedback modal — no checks (the Debug Panel and About call this directly).
+// Show the feedback modal — no checks (canShowFeedback runs at launch).
 // From About it opens at "rating", and neither the open nor a close is recorded.
 // ------------------------------------------------------------
 export function showFeedbackModal(fromAbout = false) {
-  const { feedbackShownCount, setFeedbackShownAt, setFeedbackShownCount, setFeedbackDone } = useFeedbackStore.getState();
+  const { feedbackShownCount, setAutoModals } = useAutoModalsStore.getState();
 
   if (!fromAbout) {
-    setFeedbackShownAt(Date.now());
-    setFeedbackShownCount(feedbackShownCount + 1);
-    if (feedbackShownCount + 1 >= FEEDBACK_MAX_SHOWS) {
-      setFeedbackDone(true);
-    }
+    setAutoModals({
+      feedbackShownAt: Date.now(),
+      feedbackShownCount: feedbackShownCount + 1,
+      // Every open counts — the limit marks it done
+      feedbackDone: feedbackShownCount + 1 >= FEEDBACK_MAX_SHOWS,
+    });
   }
 
   useModalStore.getState().show({
@@ -162,7 +115,7 @@ function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
   // ------------------------------------------------------------
   const handleLater = (action: string) => {
     if (!fromAbout) {
-      useFeedbackStore.getState().setFeedbackNextShowAt(Date.now() + SNOOZE_DAYS * DAY_MS);
+      useAutoModalsStore.getState().setAutoModals({ feedbackNextShowAt: Date.now() + FEEDBACK_WAIT_DAYS * DAY_MS });
     }
     hide(action);
   };
@@ -171,7 +124,7 @@ function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
   // "Don't ask again"
   // ------------------------------------------------------------
   const handleNever = () => {
-    useFeedbackStore.getState().setFeedbackDone(true);
+    useAutoModalsStore.getState().setAutoModals({ feedbackDone: true });
     hide("never");
   };
 
@@ -216,7 +169,7 @@ function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
   const handleSubmit = async (text: string) => {
     setIsSending(true);
 
-    const result = await useFeedbackStore.getState().submitFeedback({
+    const result = await useAutoModalsStore.getState().submitFeedback({
       rating: rating ?? undefined,
       answers: Object.keys(answers).length > 0 ? answers : undefined,
       message: text.trim() || undefined,

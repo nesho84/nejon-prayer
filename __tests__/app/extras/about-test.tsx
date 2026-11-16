@@ -1,6 +1,6 @@
 import AboutScreen from '@/app/extras/about';
-import { showFeedbackModal } from '@/components/Feedback';
-import { showRateAppModal } from '@/components/RateApp';
+import { showFeedbackModal } from '@/components/FeedbackModal';
+import { showRateAppModal } from '@/components/RateAppModal';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
@@ -22,8 +22,8 @@ jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
-jest.mock('@/components/RateApp', () => ({ showRateAppModal: jest.fn() }));
-jest.mock('@/components/Feedback', () => ({ showFeedbackModal: jest.fn() }));
+jest.mock('@/components/RateAppModal', () => ({ showRateAppModal: jest.fn() }));
+jest.mock('@/components/FeedbackModal', () => ({ showFeedbackModal: jest.fn() }));
 // DebugPanel renders under __DEV__ and pulls in native-only modules (in-app updates, notifications)
 jest.mock('@/debug/DebugPanel', () => () => null);
 jest.mock('react-native-notify-kit', () => ({

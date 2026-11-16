@@ -1,4 +1,3 @@
-import { openUpdateAvailableModal } from "@/components/CheckForUpdate";
 import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -18,9 +17,11 @@ import {
   previewNotifReminderModal,
   previewPrayerCelebrationModal,
   previewRateAppModal,
+  previewUpdateModal,
   showFeedbackJsonModal,
   showNotifReminderJsonModal,
   showRateAppJsonModal,
+  showUpdateJsonModal,
 } from "./debugModals";
 import {
   debugDailyQuoteN,
@@ -50,8 +51,8 @@ import {
   RATE_APP_HINT,
   showJsonViewerModal,
   UP_TO_DATE_HINT,
+  UPDATE_HINT,
   UPDATE_LAUNCH_HINT,
-  UPDATE_MODAL_HINT,
 } from "./debugUi";
 
 interface DebugPanelProps {
@@ -162,11 +163,10 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
         // The debug panel body
         <View style={styles.body}>
 
-          {/* App: onboarding + check-for-update previews (modal + the two inline status lines) */}
+          {/* App: onboarding + check-for-update toggles (the two inline status lines + update on launch) */}
           <DebugSection title="App">
             <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Update available' Modal" color={theme.green} hint={UPDATE_MODAL_HINT} onPress={openUpdateAvailableModal} />
             <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={updatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
             <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={updatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
             <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceUpdateOnLaunch} hint={UPDATE_LAUNCH_HINT} onPress={toggleUpdateOnLaunch} />
@@ -201,6 +201,20 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
 
           {/* Auto modals — one card, a block per modal */}
           <DebugSection title="Auto Modals">
+            <AutoModalHead title="Update" hint={UPDATE_HINT} />
+            <DebugButton label="Show 'Update' Modal" color={theme.violet} onPress={previewUpdateModal} />
+            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+            <DebugButton label="Show 'Update' JSON" color={theme.gray} onPress={showUpdateJsonModal} />
+
+            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
+
+            <AutoModalHead title="Notif Reminder" hint={NOTIF_REMINDER_HINT} />
+            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} onPress={previewNotifReminderModal} />
+            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+            <DebugButton label="Show 'Notif Reminder' JSON" color={theme.gray} onPress={showNotifReminderJsonModal} />
+
+            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
+
             <AutoModalHead title="Rate App" hint={RATE_APP_HINT} />
             <DebugButton label="Show 'Rate App' Modal" color={theme.violet} onPress={previewRateAppModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
@@ -212,13 +226,6 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugButton label="Show 'Feedback' Modal" color={theme.violet} onPress={previewFeedbackModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Feedback' JSON" color={theme.gray} onPress={showFeedbackJsonModal} />
-
-            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
-
-            <AutoModalHead title="Notif Reminder" hint={NOTIF_REMINDER_HINT} />
-            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} onPress={previewNotifReminderModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Notif Reminder' JSON" color={theme.gray} onPress={showNotifReminderJsonModal} />
           </DebugSection>
 
           {/* Test notifications */}

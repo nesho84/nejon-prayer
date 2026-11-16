@@ -1,5 +1,6 @@
 import CheckForUpdate from '@/components/CheckForUpdate';
 import { useDebugStore } from '@/debug/debugStore';
+import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -85,6 +86,20 @@ describe('CheckForUpdate', () => {
       expect(useModalStore.getState().visible).toBe(true);
     });
     expect(screen.getByText('Check if a new version is available')).toBeTruthy();
+  });
+
+  it('does not count a manual open toward the launch modal waits', async () => {
+    useAutoModalsStore.setState({ updateShownCount: 0, updateNextShowAt: null, updateShownAt: null });
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
+    render(<CheckForUpdate />);
+
+    fireEvent.press(screen.getByText('Check for Update'));
+
+    await waitFor(() => {
+      expect(useModalStore.getState().visible).toBe(true);
+    });
+    expect(useAutoModalsStore.getState().updateShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().updateShownAt).toBeNull();
   });
 
   it('opens the native Play Store deep link when "Open Store" is pressed in the update modal', async () => {

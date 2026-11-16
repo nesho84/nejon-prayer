@@ -1,6 +1,6 @@
 import AppLayout from "@/components/AppLayout";
-import { showFeedbackModal } from "@/components/Feedback";
-import { showRateAppModal } from "@/components/RateApp";
+import { showFeedbackModal } from "@/components/FeedbackModal";
+import { showRateAppModal } from "@/components/RateAppModal";
 import {
     APP_WEBSITE_URL,
     APPLE_STORE_URL,
