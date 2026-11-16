@@ -13,7 +13,7 @@ import {
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useModalStore } from "@/store/modalStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
-import { checkStoreUpdate } from "@/services/storeUpdateService";
+import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
@@ -28,7 +28,9 @@ export function canShowStoreUpdate() {
   const { storeUpdateNextShowAt } = useAutoModalsStore.getState();
 
   // 3-day wait running
-  if (storeUpdateNextShowAt !== null && Date.now() < storeUpdateNextShowAt) return false;
+  if (storeUpdateNextShowAt !== null && Date.now() < storeUpdateNextShowAt) {
+    return false;
+  }
 
   return true;
 }
@@ -40,7 +42,9 @@ export function canShowNotifReminder() {
   const { notifReminderNextShowAt, notifReminderDone } = useAutoModalsStore.getState();
 
   // Notifications are on
-  if (useDeviceSettingsStore.getState().notificationPermission) return false;
+  if (useDeviceSettingsStore.getState().notificationPermission) {
+    return false;
+  }
   // Shown 3 times
   if (notifReminderDone) return false;
   // First wait not started yet
@@ -63,16 +67,24 @@ export function canShowRateApp() {
   // "Open Store", "Already rated", or shown 3 times
   if (rateAppDone) return false;
   // Still waiting after "Later"
-  if (rateAppNextShowAt !== null && now < rateAppNextShowAt) return false;
+  if (rateAppNextShowAt !== null && now < rateAppNextShowAt) {
+    return false;
+  }
   // Feedback shown in the last 7 days
   if (feedbackShownAt !== null && now < feedbackShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
     return false;
   }
   // Store update or Notif reminder already showed this session
-  if (storeUpdateShownAt !== null && storeUpdateShownAt >= APP_START) return false;
-  if (notifReminderShownAt !== null && notifReminderShownAt >= APP_START) return false;
+  if (storeUpdateShownAt !== null && storeUpdateShownAt >= APP_START) {
+    return false;
+  }
+  if (notifReminderShownAt !== null && notifReminderShownAt >= APP_START) {
+    return false;
+  }
   // Another modal is open
-  if (useModalStore.getState().visible) return false;
+  if (useModalStore.getState().visible) {
+    return false;
+  }
 
   return true;
 }
@@ -124,14 +136,16 @@ async function getStoreUpdateResult(): Promise<StoreUpdateResult | null> {
   const { debugModeEnabled, forceStoreUpdateOnLaunch } = useDebugStore.getState();
 
   // Debug "Update available On Launch" — fake result, no real check
-  if (debugModeEnabled && forceStoreUpdateOnLaunch) return "available";
+  if (debugModeEnabled && forceStoreUpdateOnLaunch) {
+    return "available";
+  }
   // Dev builds aren't installed from Play — skip the check
   if (__DEV__) return null;
 
   // Real check — give up after 5 s, so the other startup modals aren't held up
   try {
     return await Promise.race([
-      checkStoreUpdate(),
+      checkForStoreUpdate(),
       new Promise<StoreUpdateResult>((resolve) => setTimeout(() => resolve("timeout"), STORE_UPDATE_CHECK_TIMEOUT_MS)),
     ]);
   } catch {
@@ -162,7 +176,9 @@ export async function checkAutoModalsOnStart() {
   }
 
   // Another modal is open (e.g. Rate App) — try next launch
-  if (useModalStore.getState().visible) return;
+  if (useModalStore.getState().visible) {
+    return;
+  }
 
   if (result === "available" && canShowStoreUpdate()) {
     showStoreUpdateModal();

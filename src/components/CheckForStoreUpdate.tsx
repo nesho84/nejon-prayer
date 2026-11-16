@@ -1,6 +1,6 @@
 import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
-import { checkStoreUpdate } from "@/services/storeUpdateService";
+import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
@@ -46,7 +46,7 @@ export default function CheckForStoreUpdate() {
     setStatus("checking");
     setErrorDetail(null);
     try {
-      const result = await checkStoreUpdate();
+      const result = await checkForStoreUpdate();
       if (result === "available") {
         showStoreUpdateModal(true);
         setStatus("idle");

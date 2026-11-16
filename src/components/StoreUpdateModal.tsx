@@ -20,7 +20,7 @@ export function showStoreUpdateModal(fromSettings = false) {
     setAutoModals({
       storeUpdateShownAt: Date.now(),
       storeUpdateShownCount: storeUpdateShownCount + 1,
-      // Next launch for the first shows, then every few days
+      // Shows 1 and 2 come back next launch, then every 3 days
       storeUpdateNextShowAt: storeUpdateShownCount + 1 <= STORE_UPDATE_NEXT_LAUNCH_SHOWS ? null : Date.now() + STORE_UPDATE_WAIT_DAYS * DAY_MS,
     });
   }
