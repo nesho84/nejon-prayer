@@ -71,16 +71,6 @@ export function canShowFeedback() {
 }
 
 // ------------------------------------------------------------
-// Start Feedback's first wait — once, after onboarding
-// ------------------------------------------------------------
-export function startFirstWaits() {
-  const { feedbackNextShowAt, feedbackDone, setAutoModals } = useAutoModalsStore.getState();
-  if (feedbackNextShowAt === null && !feedbackDone) {
-    setAutoModals({ feedbackNextShowAt: Date.now() + FEEDBACK_FIRST_WAIT_DAYS * DAY_MS });
-  }
-}
-
-// ------------------------------------------------------------
 // Notif reminder resets when granted, and starts its first wait when seen off
 // ------------------------------------------------------------
 function syncNotifReminder() {
@@ -120,7 +110,12 @@ async function checkStoreUpdate(): Promise<UpdateCheckResult> {
 // ------------------------------------------------------------
 export async function checkAutoModalsOnStart() {
   const { debugModeEnabled, forceUpdateOnLaunch } = useDebugStore.getState();
-  const { setAutoModals } = useAutoModalsStore.getState();
+  const { feedbackNextShowAt, feedbackDone, setAutoModals } = useAutoModalsStore.getState();
+
+  // Feedback: first show 7 days after onboarding
+  if (feedbackNextShowAt === null && !feedbackDone) {
+    setAutoModals({ feedbackNextShowAt: Date.now() + FEEDBACK_FIRST_WAIT_DAYS * DAY_MS });
+  }
 
   // Debug "Update on launch" fakes an available update; dev builds skip the real check
   const result: UpdateCheckResult | null = debugModeEnabled && forceUpdateOnLaunch
@@ -158,7 +153,7 @@ export async function checkAutoModalsOnStart() {
 }
 
 // ------------------------------------------------------------
-// Auto modals: first waits, notif reminder resets, and the launch modal (once per launch)
+// Auto modals: notif reminder resets, and the startup check (once per launch)
 // ------------------------------------------------------------
 export function useAutoModals() {
   const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
@@ -177,12 +172,11 @@ export function useAutoModals() {
     syncNotifReminder();
   }, [isReady, notificationPermission]);
 
-  // Launch modal — once per launch
+  // Startup check — once per launch
   useEffect(() => {
     if (!isReady || launchDone.current) return;
 
     launchDone.current = true;
-    startFirstWaits();
     checkAutoModalsOnStart();
   }, [isReady]);
 }

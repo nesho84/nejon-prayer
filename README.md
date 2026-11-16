@@ -103,7 +103,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
-| `useAutoModals` | Store update check + the launch modal (Update → Notif reminder → Feedback), notif reminder resets |
+| `useAutoModals` | Startup check: store update check, then at most one auto modal (Update → Notif reminder → Feedback); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
 
@@ -160,7 +160,7 @@ sync) — at most one of:
    build, iOS without an AppStoreID) or a timeout change nothing.
 2. **Enable notifications** — if due. Granting resets it; turning notifications off again starts the
    3-day wait.
-3. **Feedback** — if due. Its 7-day first wait starts once after onboarding (`startFirstWaits`).
+3. **Feedback** — if due. Its first show is set to 7 days after onboarding, once, at the top of `checkAutoModalsOnStart`.
 
 **Rate App** keeps its own triggers — the 3rd prayer marked on Home or in the calendar, and Quran reading
 reaching ayah 20 — and opens there when `canShowRateApp()`.

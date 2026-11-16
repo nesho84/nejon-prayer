@@ -8,7 +8,6 @@ import {
   canShowRateApp,
   canShowUpdate,
   checkAutoModalsOnStart,
-  startFirstWaits,
   useAutoModals,
 } from '@/hooks/useAutoModals';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
@@ -181,19 +180,20 @@ describe('canShowFeedback', () => {
   });
 });
 
-describe('startFirstWaits', () => {
-  it('starts the 7-day feedback wait once', () => {
-    startFirstWaits();
+describe('checkAutoModalsOnStart — Feedback first show', () => {
+  it('sets the first Feedback show 7 days ahead, only once', async () => {
+    await checkAutoModalsOnStart();
     expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 7 * DAY_MS);
+    expect(showFeedbackModal).not.toHaveBeenCalled();
 
     jest.setSystemTime(NOW + DAY_MS);
-    startFirstWaits();
+    await checkAutoModalsOnStart();
     expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 7 * DAY_MS);
   });
 
-  it('leaves a done feedback modal alone', () => {
+  it('leaves a done feedback modal alone', async () => {
     useAutoModalsStore.setState({ feedbackDone: true });
-    startFirstWaits();
+    await checkAutoModalsOnStart();
     expect(useAutoModalsStore.getState().feedbackNextShowAt).toBeNull();
   });
 });
@@ -335,7 +335,7 @@ describe('useAutoModals', () => {
     await Promise.resolve();
   });
 
-  it('runs the launch modal once, after onboarding and the first device-settings sync', async () => {
+  it('runs the startup check once, after onboarding and the first device-settings sync', async () => {
     useDeviceSettingsStore.setState({ isReady: false });
     useOnboardingStore.setState({ onboardingComplete: false });
     const { rerender } = renderHook(() => useAutoModals());

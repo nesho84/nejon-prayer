@@ -88,7 +88,7 @@ describe('CheckForUpdate', () => {
     expect(screen.getByText('Check if a new version is available')).toBeTruthy();
   });
 
-  it('does not count a manual open toward the launch modal waits', async () => {
+  it('does not count a manual open toward the startup check waits', async () => {
     useAutoModalsStore.setState({ updateShownCount: 0, updateNextShowAt: null, updateShownAt: null });
     checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
     render(<CheckForUpdate />);
