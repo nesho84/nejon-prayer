@@ -4,13 +4,14 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
 // Debug-only store backing the Debug Panel toggles.
-// forceUpdateOnLaunch and debugModeEnabled persist across reloads; the rest reset to OFF.
+// forceUpdateOnLaunch, debugModeEnabled and debugPanelExpanded persist across reloads; the rest reset to OFF.
 // ------------------------------------------------------------
 
 export type UpdatePreview = "idle" | "upToDate" | "error";
 
 interface DebugState {
   debugModeEnabled: boolean;
+  debugPanelExpanded: boolean;
   forceHoliday: boolean;
   forceFriday: boolean;
   forceQuranPlaying: boolean;
@@ -28,6 +29,7 @@ interface DebugState {
   toggleNoPrayerTimes: () => void;
   toggleUpdateOnLaunch: () => void;
   toggleDebugMode: () => void;
+  toggleDebugPanel: () => void;
   setUpdatePreview: (value: UpdatePreview) => void;
 }
 
@@ -35,6 +37,7 @@ export const useDebugStore = create<DebugState>()(
   persist(
     (set) => ({
       debugModeEnabled: false,
+      debugPanelExpanded: false,
       forceHoliday: false,
       forceFriday: false,
       forceQuranPlaying: false,
@@ -53,6 +56,7 @@ export const useDebugStore = create<DebugState>()(
       toggleNoPrayerTimes: () => set((s) => ({ forceNoPrayerTimes: !s.forceNoPrayerTimes })),
       toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
+      toggleDebugPanel: () => set((s) => ({ debugPanelExpanded: !s.debugPanelExpanded })),
       setUpdatePreview: (value) => set({ updatePreview: value }),
     }),
     {
@@ -60,6 +64,7 @@ export const useDebugStore = create<DebugState>()(
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         debugModeEnabled: state.debugModeEnabled,
+        debugPanelExpanded: state.debugPanelExpanded,
         forceUpdateOnLaunch: state.forceUpdateOnLaunch,
       }),
       onRehydrateStorage: () => (state) => {

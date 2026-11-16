@@ -11,7 +11,6 @@ import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   previewFeedbackModal,
@@ -86,9 +85,8 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
   const updatePreview = useDebugStore((state) => state.updatePreview);
   const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
-
-  // Local state
-  const [expanded, setExpanded] = useState(false);
+  const expanded = useDebugStore((state) => state.debugPanelExpanded);
+  const toggleDebugPanel = useDebugStore((state) => state.toggleDebugPanel);
 
   // Shared params and handlers
   const notifSeconds = 10; // seconds until the test notification fires
@@ -147,7 +145,7 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
       <TouchableOpacity
         style={[styles.selector, { backgroundColor: theme.danger + "15" }]}
         activeOpacity={0.7}
-        onPress={() => setExpanded((v) => !v)}
+        onPress={toggleDebugPanel}
       >
         <Ionicons name="bug" size={20} color={theme.danger} style={styles.selectorIcon} />
         <Text style={[styles.selectorText, { color: theme.danger }]}>
@@ -250,7 +248,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 16,
     padding: 8,
-    paddingTop: 22,
+    paddingHorizontal: 10,
+    paddingTop: 24,
   },
   statusWrap: {
     position: "absolute",
@@ -272,9 +271,9 @@ const styles = StyleSheet.create({
   selector: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   selectorIcon: {
     marginRight: 10,
@@ -282,11 +281,11 @@ const styles = StyleSheet.create({
   selectorText: {
     fontSize: 17,
     flex: 1,
+    fontWeight: "500",
   },
   body: {
     gap: 16,
     marginTop: 16,
-    marginBottom: 6,
   },
 
 
