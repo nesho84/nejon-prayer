@@ -1,16 +1,15 @@
 import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
 import { useAdsSync } from "@/hooks/useAdsSync";
+import { useAutoModalsSync } from "@/hooks/useAutoModalsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
-import { useFeedbackSync } from "@/hooks/useFeedbackSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
-import { useLocationSync } from "@/hooks/useLocationSync";
+import { useLocationChangeSync } from "@/hooks/useLocationChangeSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
-import { useNotifReminderSync } from "@/hooks/useNotifReminderSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
-import { useQuranSetup } from "@/hooks/useQuranSetup";
+import { useQuranSync } from "@/hooks/useQuranSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
-import { useUpdatesSync } from "@/hooks/useUpdatesSync";
+import { useOtaUpdatesSync } from "@/hooks/useOtaUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import * as Sentry from '@sentry/react-native';
 import { Stack } from "expo-router";
@@ -61,14 +60,13 @@ function RootLayout() {
   // Initialization and global sync hooks
   useSystemThemeSync();
   useDeviceSettingsSync();
-  useLocationSync();
+  useLocationChangeSync();
   useNotificationsSync();
   usePrayerTimesSync();
   useHolidaysSync();
-  useQuranSetup();
-  useUpdatesSync();
-  useNotifReminderSync();
-  useFeedbackSync();
+  useQuranSync();
+  useOtaUpdatesSync();
+  useAutoModalsSync();
   useAdsSync();
 
   return (

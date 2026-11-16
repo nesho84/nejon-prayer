@@ -7,7 +7,7 @@ import { AppState } from 'react-native';
 // Runs on mount and on every foreground — the check itself is throttled and
 // permission-gated inside the store, so it is safe to call on every event.
 // ------------------------------------------------------------
-export function useLocationSync() {
+export function useLocationChangeSync() {
   const appStateRef = useRef(AppState.currentState);
 
   useEffect(() => {

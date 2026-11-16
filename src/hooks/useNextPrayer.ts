@@ -121,7 +121,7 @@ const formatCountdown = (totalSec: number) => ({
     seconds: pad(totalSec % 60),
 });
 
-export default function useNextPrayer(prayerTimes: PrayerTimes | null): NextPrayerType {
+export function useNextPrayer(prayerTimes: PrayerTimes | null): NextPrayerType {
     const isFocused = useIsFocused();
 
     // State — all values that drive UI updates

@@ -1,4 +1,4 @@
-import { useQuranSetup } from '@/hooks/useQuranSetup';
+import { useQuranSync } from '@/hooks/useQuranSync';
 import { addStatusListener, configureAudioMode } from '@/services/quranAudioService';
 import { useQuranAudioStore } from '@/store/quranAudioStore';
 import { useQuranStore } from '@/store/quranStore';
@@ -34,12 +34,12 @@ beforeEach(() => {
 
 // Renders the hook and returns the captured status callback
 async function renderWithListener() {
-  const rendered = renderHook(() => useQuranSetup());
+  const rendered = renderHook(() => useQuranSync());
   await act(async () => {});
   return { ...rendered, cb: mockAddStatusListener.mock.calls[0][0] as (status: any) => void };
 }
 
-describe('useQuranSetup — audio setup', () => {
+describe('useQuranSync — audio setup', () => {
   it('configures the audio mode and attaches the status listener on mount', async () => {
     await renderWithListener();
     expect(mockConfigureAudioMode).toHaveBeenCalledTimes(1);
@@ -61,7 +61,7 @@ describe('useQuranSetup — audio setup', () => {
   });
 });
 
-describe('useQuranSetup — status → store mapping', () => {
+describe('useQuranSync — status → store mapping', () => {
   it('ignores updates while no surah is active (late ticks must not resurrect state)', async () => {
     const { cb } = await renderWithListener();
     act(() => cb(makeStatus({ playing: true })));

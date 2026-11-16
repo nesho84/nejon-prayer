@@ -1,15 +1,12 @@
-import { globalStyles } from "@/constants/styles";
-import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
+import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import { useLanguageStore } from "@/store/languageStore";
-import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
-import { openStoreListing } from "@/utils/system";
-import NetInfo from "@react-native-community/netinfo";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
-import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -18,7 +15,7 @@ type CheckStatus = "idle" | "checking" | "upToDate" | "error";
 // ------------------------------------------------------------
 // Color + message to show for the current status
 // ------------------------------------------------------------
-function getStatusDisplay(shown: UpdatePreview | CheckStatus, theme: ThemeColors, tr: Translations) {
+function getStatusDisplay(shown: StoreUpdatePreview | CheckStatus, theme: ThemeColors, tr: Translations) {
   if (shown === "upToDate") {
     return { color: theme.green, message: tr.labels.upToDateMessage };
   }
@@ -28,48 +25,12 @@ function getStatusDisplay(shown: UpdatePreview | CheckStatus, theme: ThemeColors
   return { color: theme.placeholder, message: tr.labels.checkUpdateInfo };
 }
 
-// ------------------------------------------------------------
-// Open "Update available" modal
-// ------------------------------------------------------------
-export function openUpdateAvailableModal() {
-  const tr = useLanguageStore.getState().tr;
-  const theme = useThemeStore.getState().theme;
-
-  useModalStore.getState().show({
-    type: "alert",
-    component: (
-      <View style={globalStyles.bannerContainer}>
-        <View style={[styles.modalIconCircle, { backgroundColor: theme.islamicGreen + "20" }]}>
-          <MaterialDesignIcons name="information-variant-circle" size={32} color={theme.islamicGreen} />
-        </View>
-        <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.updateAvailableTitle}</Text>
-        <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.updateAvailableMessage}</Text>
-      </View>
-    ),
-    buttons: [
-      {
-        label: tr.buttons.later,
-        action: "later",
-        buttonStyle: { backgroundColor: theme.overlay },
-        labelStyle: { color: theme.text2 },
-      },
-      {
-        label: tr.buttons.openStore,
-        action: "openStore",
-        onPress: openStoreListing,
-        buttonStyle: { backgroundColor: theme.islamicGreen + "20", borderWidth: 1, borderColor: theme.islamicGreen + "40" },
-        labelStyle: { color: theme.islamicGreen },
-      },
-    ],
-  });
-}
-
 // Main component
-export default function CheckForUpdate() {
+export default function StoreUpdateCheck() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
-  const preview = useDebugStore((state) => state.updatePreview);
+  const preview = useDebugStore((state) => state.storeUpdatePreview);
   const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
   // Local state
@@ -85,26 +46,20 @@ export default function CheckForUpdate() {
     setStatus("checking");
     setErrorDetail(null);
     try {
-      // Play serves appUpdateInfo from its own cache and resolves fine offline, reporting
-      // "no update" — bail out first, or we'd show that as "up to date".
-      const { isConnected } = await NetInfo.fetch();
-      if (!isConnected) {
+      const result = await checkForStoreUpdate();
+      if (result === "available") {
+        showStoreUpdateModal(true);
+        setStatus("idle");
+      } else if (result === "offline") {
         setErrorDetail("No internet connection");
         setStatus("error");
-        return;
-      }
-
-      const { updateAvailable } = await ExpoInAppUpdates.checkForUpdate();
-      if (updateAvailable) {
-        openUpdateAvailableModal();
-        setStatus("idle");
       } else {
         setStatus("upToDate");
       }
     } catch (err) {
       // Most common cause is ERROR_APP_NOT_OWNED, which is expected on sideloaded/dev builds
       // (the Play In-App Update API only works for apps installed via Play) — not a crash.
-      console.warn("⚠️ [CheckForUpdate] checkForUpdate failed:", err);
+      console.warn("⚠️ [StoreUpdateCheck] checkForUpdate failed:", err);
       setErrorDetail(err instanceof Error ? err.message : String(err));
       setStatus("error");
     }
@@ -113,7 +68,7 @@ export default function CheckForUpdate() {
   // ------------------------------------------------------------
   // A debug preview (only while debug mode is on) overrides the real status when set
   // ------------------------------------------------------------
-  const shown: UpdatePreview | CheckStatus = debugModeEnabled && preview !== "idle" ? preview : status;
+  const shown: StoreUpdatePreview | CheckStatus = debugModeEnabled && preview !== "idle" ? preview : status;
   const { color: statusColor, message: statusMessage } = getStatusDisplay(shown, theme, tr);
 
   return (
@@ -177,13 +132,6 @@ export default function CheckForUpdate() {
 }
 
 const styles = StyleSheet.create({
-  modalIconCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   divider: {
     width: "100%",
     borderWidth: 1,

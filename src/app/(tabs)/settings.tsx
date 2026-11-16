@@ -1,8 +1,8 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import CheckForUpdate from "@/components/CheckForUpdate";
 import CustomPicker from "@/components/CustomPicker";
+import StoreUpdateCheck from "@/components/StoreUpdateCheck";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { useDebugStore } from "@/debug/debugStore";
 import { restoreDefaults } from "@/services/resetAppService";
@@ -736,7 +736,7 @@ export default function SettingsScreen() {
                     </Text>
                     {/* Divider */}
                     <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
-                    <CheckForUpdate />
+                    <StoreUpdateCheck />
                 </AppCard>
 
                 {/* ------ Reset App ------ */}

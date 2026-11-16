@@ -1,15 +1,14 @@
-import { FEEDBACK_MAX_SHOWS, showFeedbackModal } from "@/components/Feedback";
-import { NOTIF_REMINDER_MAX_SHOWS, showNotifReminderModal } from "@/components/NotifReminder";
-import { RATE_APP_MAX_SHOWS, showRateAppModal } from "@/components/RateApp";
+import { showFeedbackModal } from "@/components/FeedbackModal";
+import { showNotifReminderModal } from "@/components/NotifReminderModal";
+import { showRateAppModal } from "@/components/RateAppModal";
+import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
+import { FEEDBACK_MAX_SHOWS, NOTIF_REMINDER_MAX_SHOWS, RATE_APP_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
-import { useFeedbackStore } from "@/store/feedbackStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
-import { useNotifReminderStore } from "@/store/notifReminderStore";
-import { useRateAppStore } from "@/store/rateAppStore";
 import { useThemeStore } from "@/store/themeStore";
 import { shareText } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
@@ -17,8 +16,9 @@ import { Alert, Platform, Text, View } from "react-native";
 import { showJsonViewerModal } from "./debugUi";
 
 // ------------------------------------------------------------
-// Modal previews — celebrations, then the auto modals (the same three parts each: JSON, preview, reset).
-// Auto-modal previews count like a real show and skip the waits; a block gets an alert with Reset.
+// Modal previews — celebrations, then the auto modals (one JSON for their shared store, a preview + reset each).
+// Auto-modal previews count like a real show and skip the waits; a block gets an alert with Reset
+// (for Store Update, which never stops, the 3-day wait is the block).
 // ------------------------------------------------------------
 
 // Timestamp → readable date for the JSON viewers
@@ -94,24 +94,92 @@ export function previewKhatamCelebrationModal() {
 }
 
 // ------------------------------------------------------------
-// Rate App
+// Auto modals — one JSON for the whole store, in launch order
 // ------------------------------------------------------------
-export function showRateAppJsonModal() {
-  const { rateAppNextShowAt, rateAppShownAt, rateAppShownCount, rateAppDone } = useRateAppStore.getState();
-  showJsonViewerModal("Rate App", {
-    rateAppNextShowAt: formatTime(rateAppNextShowAt),
-    rateAppShownAt: formatTime(rateAppShownAt),
-    rateAppShownCount,
-    rateAppDone,
+export function showAutoModalsJsonModal() {
+  const state = useAutoModalsStore.getState();
+  showJsonViewerModal("Auto Modals", {
+    storeUpdateNextShowAt: formatTime(state.storeUpdateNextShowAt),
+    storeUpdateShownAt: formatTime(state.storeUpdateShownAt),
+    storeUpdateShownCount: state.storeUpdateShownCount,
+    storeUpdateCheckedAt: formatTime(state.storeUpdateCheckedAt),
+    storeUpdateCheckResult: state.storeUpdateCheckResult,
+    notificationPermission: useDeviceSettingsStore.getState().notificationPermission,
+    notifReminderNextShowAt: formatTime(state.notifReminderNextShowAt),
+    notifReminderShownAt: formatTime(state.notifReminderShownAt),
+    notifReminderShownCount: state.notifReminderShownCount,
+    notifReminderDone: state.notifReminderDone,
+    rateAppNextShowAt: formatTime(state.rateAppNextShowAt),
+    rateAppShownAt: formatTime(state.rateAppShownAt),
+    rateAppShownCount: state.rateAppShownCount,
+    rateAppDone: state.rateAppDone,
+    feedbackNextShowAt: formatTime(state.feedbackNextShowAt),
+    feedbackShownAt: formatTime(state.feedbackShownAt),
+    feedbackShownCount: state.feedbackShownCount,
+    feedbackDone: state.feedbackDone,
   });
 }
 
+// ------------------------------------------------------------
+// Store Update
+// ------------------------------------------------------------
+function resetStoreUpdate() {
+  useAutoModalsStore.getState().setAutoModals({
+    storeUpdateNextShowAt: null,
+    storeUpdateShownAt: null,
+    storeUpdateShownCount: 0,
+    storeUpdateCheckedAt: null,
+    storeUpdateCheckResult: null,
+  });
+}
+
+export function previewStoreUpdateModal() {
+  const { storeUpdateNextShowAt, storeUpdateShownCount } = useAutoModalsStore.getState();
+
+  if (storeUpdateNextShowAt && Date.now() < storeUpdateNextShowAt) {
+    Alert.alert("Store Update", `Shown ${storeUpdateShownCount} times — the real modal waits until ${formatTime(storeUpdateNextShowAt)}.`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Reset", onPress: resetStoreUpdate },
+    ]);
+    return;
+  }
+  showStoreUpdateModal();
+}
+
+// ------------------------------------------------------------
+// Notif Reminder
+// ------------------------------------------------------------
+function resetNotifReminder() {
+  useAutoModalsStore.getState().setAutoModals({
+    notifReminderNextShowAt: null,
+    notifReminderShownAt: null,
+    notifReminderShownCount: 0,
+    notifReminderDone: false,
+  });
+}
+
+export function previewNotifReminderModal() {
+  const { notifReminderShownCount, notifReminderDone } = useAutoModalsStore.getState();
+
+  if (notifReminderDone) {
+    Alert.alert("Notif Reminder", `Limit reached (${notifReminderShownCount}/${NOTIF_REMINDER_MAX_SHOWS}) — the real reminder won't show again until notifications are granted and turned off again.`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Reset", onPress: resetNotifReminder },
+    ]);
+    return;
+  }
+  showNotifReminderModal();
+}
+
+// ------------------------------------------------------------
+// Rate App
+// ------------------------------------------------------------
 function resetRateApp() {
-  useRateAppStore.setState({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
+  useAutoModalsStore.getState().setAutoModals({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
 }
 
 export function previewRateAppModal() {
-  const { rateAppShownCount, rateAppDone } = useRateAppStore.getState();
+  const { rateAppShownCount, rateAppDone } = useAutoModalsStore.getState();
 
   if (rateAppDone) {
     const blockedReason = rateAppShownCount >= RATE_APP_MAX_SHOWS
@@ -129,29 +197,17 @@ export function previewRateAppModal() {
 // ------------------------------------------------------------
 // Feedback
 // ------------------------------------------------------------
-export function showFeedbackJsonModal() {
-  const { feedbackNextShowAt, feedbackShownAt, feedbackShownCount, feedbackDone, feedbackLaunchCount } = useFeedbackStore.getState();
-  showJsonViewerModal("Feedback", {
-    feedbackNextShowAt: formatTime(feedbackNextShowAt),
-    feedbackShownAt: formatTime(feedbackShownAt),
-    feedbackShownCount,
-    feedbackDone,
-    feedbackLaunchCount,
-  });
-}
-
 function resetFeedback() {
-  useFeedbackStore.setState({
+  useAutoModalsStore.getState().setAutoModals({
     feedbackNextShowAt: null,
     feedbackShownAt: null,
     feedbackShownCount: 0,
     feedbackDone: false,
-    feedbackLaunchCount: 0,
   });
 }
 
 export function previewFeedbackModal() {
-  const { feedbackShownCount, feedbackDone } = useFeedbackStore.getState();
+  const { feedbackShownCount, feedbackDone } = useAutoModalsStore.getState();
 
   if (feedbackDone) {
     const blockedReason = feedbackShownCount >= FEEDBACK_MAX_SHOWS
@@ -164,35 +220,4 @@ export function previewFeedbackModal() {
     return;
   }
   showFeedbackModal();
-}
-
-// ------------------------------------------------------------
-// Notif Reminder
-// ------------------------------------------------------------
-export function showNotifReminderJsonModal() {
-  const { notifReminderNextShowAt, notifReminderShownAt, notifReminderShownCount, notifReminderDone } = useNotifReminderStore.getState();
-  showJsonViewerModal("Notif Reminder", {
-    notificationPermission: useDeviceSettingsStore.getState().notificationPermission,
-    notifReminderNextShowAt: formatTime(notifReminderNextShowAt),
-    notifReminderShownAt: formatTime(notifReminderShownAt),
-    notifReminderShownCount,
-    notifReminderDone,
-  });
-}
-
-function resetNotifReminder() {
-  useNotifReminderStore.setState({ notifReminderNextShowAt: null, notifReminderShownAt: null, notifReminderShownCount: 0, notifReminderDone: false });
-}
-
-export function previewNotifReminderModal() {
-  const { notifReminderShownCount, notifReminderDone } = useNotifReminderStore.getState();
-
-  if (notifReminderDone) {
-    Alert.alert("Notif Reminder", `Limit reached (${notifReminderShownCount}/${NOTIF_REMINDER_MAX_SHOWS}) — the real reminder won't show again until notifications are granted and turned off again.`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Reset", onPress: resetNotifReminder },
-    ]);
-    return;
-  }
-  showNotifReminderModal();
 }

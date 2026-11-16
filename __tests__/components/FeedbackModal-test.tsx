@@ -1,9 +1,8 @@
-import { openFeedbackModal, showFeedbackModal } from '@/components/Feedback';
+import { showFeedbackModal } from '@/components/FeedbackModal';
 import { PAYPAL_DONATE_URL } from '@/constants/links';
 import { sendFeedback } from '@/services/feedbackService';
-import { useFeedbackStore } from '@/store/feedbackStore';
+import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useModalStore } from '@/store/modalStore';
-import { useRateAppStore } from '@/store/rateAppStore';
 import { openExternalUrl } from '@/utils/system';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
@@ -49,14 +48,11 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.setSystemTime(NOW);
   useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
-  useRateAppStore.setState({ rateAppShownAt: null });
-  // Eligible by default — every test breaks one condition
-  useFeedbackStore.setState({
+  useAutoModalsStore.setState({
     feedbackNextShowAt: NOW - 1,
     feedbackShownAt: null,
     feedbackShownCount: 0,
     feedbackDone: false,
-    feedbackLaunchCount: 10,
   });
 });
 
@@ -64,96 +60,38 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-describe('openFeedbackModal — when it shows', () => {
+describe('showFeedbackModal — show', () => {
   it('shows a fullscreen modal that only its buttons can close, and counts it as shown', () => {
-    openFeedbackModal();
+    showFeedbackModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
     expect(show().mock.calls[0][0]).toMatchObject({ type: 'fullscreen', dismissable: false });
-    expect(useFeedbackStore.getState().feedbackShownCount).toBe(1);
-    expect(useFeedbackStore.getState().feedbackShownAt).toBe(NOW);
+    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(1);
+    expect(useAutoModalsStore.getState().feedbackShownAt).toBe(NOW);
   });
 
   it('opens on the intro step', () => {
-    openFeedbackModal();
+    showFeedbackModal();
     renderShownModal();
     expect(screen.getByText('How do you like Nejon Prayer?')).toBeTruthy();
   });
 
-  it('starts the wait on the first launch after onboarding, without showing', () => {
-    useFeedbackStore.setState({ feedbackNextShowAt: null });
-    openFeedbackModal();
-
-    expect(show()).not.toHaveBeenCalled();
-    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 14 * DAY_MS);
-  });
-
-  it('does nothing before 14 days of use', () => {
-    useFeedbackStore.setState({ feedbackNextShowAt: null });
-    openFeedbackModal();
-    jest.setSystemTime(NOW + 13 * DAY_MS);
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
-  });
-
-  it('does nothing before 10 launches', () => {
-    useFeedbackStore.setState({ feedbackLaunchCount: 9 });
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
-  });
-
-  it('does nothing while snoozed, and shows once the snooze is over', () => {
-    useFeedbackStore.setState({ feedbackNextShowAt: NOW + DAY_MS });
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
-
-    useFeedbackStore.setState({ feedbackNextShowAt: NOW - 1 });
-    openFeedbackModal();
-    expect(show()).toHaveBeenCalledTimes(1);
-  });
-
-  it('never shows once done (sent, "Don\'t ask again", or the 3rd show)', () => {
-    useFeedbackStore.setState({ feedbackDone: true });
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
-  });
-
-  it('the 3rd show marks it done, so it stops after 3 shows', () => {
-    useFeedbackStore.setState({ feedbackShownCount: 2 });
-    openFeedbackModal();
-    expect(show()).toHaveBeenCalledTimes(1);
-    expect(useFeedbackStore.getState().feedbackDone).toBe(true);
-
-    openFeedbackModal();
-    expect(show()).toHaveBeenCalledTimes(1);
-  });
-
-  it('does nothing within 14 days of the "Rate the App" modal', () => {
-    useRateAppStore.setState({ rateAppShownAt: NOW - 13 * DAY_MS });
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
-
-    useRateAppStore.setState({ rateAppShownAt: NOW - 14 * DAY_MS - 1 });
-    openFeedbackModal();
-    expect(show()).toHaveBeenCalledTimes(1);
-  });
-
-  it('yields when another modal is already open', () => {
-    useModalStore.setState({ visible: true });
-    openFeedbackModal();
-    expect(show()).not.toHaveBeenCalled();
+  it('the 3rd show marks it done', () => {
+    useAutoModalsStore.setState({ feedbackShownCount: 2 });
+    showFeedbackModal();
+    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(3);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
   });
 });
 
-describe('showFeedbackModal', () => {
+describe('showFeedbackModal — no checks', () => {
   it('shows with no checks — even when done — and still counts as shown', () => {
-    useFeedbackStore.setState({ feedbackDone: true, feedbackShownCount: 3 });
+    useAutoModalsStore.setState({ feedbackDone: true, feedbackShownCount: 3 });
     showFeedbackModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
-    expect(useFeedbackStore.getState().feedbackShownCount).toBe(4);
+    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(4);
   });
-
 });
 
 describe('showFeedbackModal — from About', () => {
@@ -169,14 +107,14 @@ describe('showFeedbackModal — from About', () => {
   });
 
   it('does not record the open', () => {
-    expect(useFeedbackStore.getState().feedbackShownCount).toBe(0);
-    expect(useFeedbackStore.getState().feedbackShownAt).toBeNull();
+    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().feedbackShownAt).toBeNull();
   });
 
   it('the close icon closes without starting a wait', () => {
     fireEvent.press(screen.getByTestId('icon-close'));
 
-    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW - 1);
+    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW - 1);
     expect(hide()).toHaveBeenCalledWith('close');
   });
 });
@@ -196,15 +134,15 @@ describe('intro buttons', () => {
   it('"Maybe later" snoozes for 30 days and closes', () => {
     fireEvent.press(screen.getByText('Maybe later'));
 
-    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
-    expect(useFeedbackStore.getState().feedbackDone).toBe(false);
+    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('later');
   });
 
   it('"Don\'t ask again" marks it done and closes', () => {
     fireEvent.press(screen.getByText("Don't ask again"));
 
-    expect(useFeedbackStore.getState().feedbackDone).toBe(true);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
     expect(hide()).toHaveBeenCalledWith('never');
   });
 });
@@ -239,8 +177,8 @@ describe('question steps', () => {
   it('the close icon snoozes and closes without sending (not an opt-out)', () => {
     fireEvent.press(screen.getByTestId('icon-close'));
 
-    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
-    expect(useFeedbackStore.getState().feedbackDone).toBe(false);
+    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
     expect(mockSendFeedback).not.toHaveBeenCalled();
   });
@@ -275,7 +213,7 @@ describe('sending', () => {
       message: 'More reciters please',
       language: 'en',
     });
-    expect(useFeedbackStore.getState().feedbackDone).toBe(true);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
   });
 
   it('a second tap on a chip unselects it', async () => {
@@ -312,7 +250,7 @@ describe('sending', () => {
     expect(await screen.findByText(text)).toBeTruthy();
     expect(screen.getByText('Error')).toBeTruthy();
     expect(screen.queryByText('What should we improve or add?')).toBeNull();
-    expect(useFeedbackStore.getState().feedbackDone).toBe(false);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
 
     fireEvent.press(screen.getByText('Retry'));
     expect(await screen.findByText('Thank you!')).toBeTruthy();
@@ -344,8 +282,8 @@ describe('sending', () => {
     // findByText advances the fake clock — measure the snooze from the press
     const pressedAt = Date.now();
     fireEvent.press(screen.getByText('Close'));
-    expect(useFeedbackStore.getState().feedbackNextShowAt).toBe(pressedAt + 30 * DAY_MS);
-    expect(useFeedbackStore.getState().feedbackDone).toBe(false);
+    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(pressedAt + 30 * DAY_MS);
+    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
   });
 

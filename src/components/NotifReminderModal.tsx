@@ -1,8 +1,7 @@
 import { globalStyles } from "@/constants/styles";
-import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
+import { DAY_MS, NOTIF_REMINDER_MAX_SHOWS, NOTIF_REMINDER_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
-import { useNotifReminderStore } from "@/store/notifReminderStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openNotificationSettings } from "@/utils/system";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
@@ -12,80 +11,25 @@ import notifee, { AuthorizationStatus } from "react-native-notify-kit";
 
 type MCIcon = ComponentProps<typeof MaterialDesignIcons>["name"];
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-// First wait after notifications are seen off (after onboarding, the update, or re-disabling)
-const FIRST_REMIND_AFTER_DAYS = 3;
-// Waits after closing the 1st and 2nd show; the 3rd show marks it done
-const WAIT_AFTER_CLOSE_DAYS = [7, 14];
-export const NOTIF_REMINDER_MAX_SHOWS = 3;
-
 // ------------------------------------------------------------
-// Open "Enable notifications" reminder modal
-// ------------------------------------------------------------
-export function openNotifReminderModal() {
-  const {
-    notifReminderNextShowAt,
-    notifReminderShownCount,
-    notifReminderDone,
-    setNotifReminderNextShowAt,
-    setNotifReminderShownCount,
-    setNotifReminderDone,
-  } = useNotifReminderStore.getState();
-
-  // Granted — reset, so a later disable starts the cycle again
-  if (useDeviceSettingsStore.getState().notificationPermission) {
-    if (notifReminderNextShowAt !== null || notifReminderShownCount !== 0 || notifReminderDone) {
-      setNotifReminderNextShowAt(null);
-      setNotifReminderShownCount(0);
-      setNotifReminderDone(false);
-    }
-    return;
-  }
-  // Another modal is open (e.g. "Update available") — yield, try next time
-  if (useModalStore.getState().visible) {
-    return;
-  }
-  // Shown 3 times — stopped for good (until granted and disabled again)
-  if (notifReminderDone) {
-    return;
-  }
-  // First seen with notifications off — let the user use the app first
-  if (notifReminderNextShowAt === null) {
-    setNotifReminderNextShowAt(Date.now() + FIRST_REMIND_AFTER_DAYS * DAY_MS);
-    return;
-  }
-  // Still waiting
-  if (Date.now() < notifReminderNextShowAt) {
-    return;
-  }
-
-  showNotifReminderModal();
-}
-
-// ------------------------------------------------------------
-// Show the reminder modal — no checks (the Debug Panel calls this directly)
+// Show the reminder modal — no checks (canShowNotifReminder runs at launch)
 // ------------------------------------------------------------
 export function showNotifReminderModal() {
-  const {
-    notifReminderShownCount,
-    setNotifReminderNextShowAt,
-    setNotifReminderShownAt,
-    setNotifReminderShownCount,
-    setNotifReminderDone,
-  } = useNotifReminderStore.getState();
+  const { notifReminderShownCount, setAutoModals } = useAutoModalsStore.getState();
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
   const { hide } = useModalStore.getState();
 
-  setNotifReminderShownAt(Date.now());
-  setNotifReminderShownCount(notifReminderShownCount + 1);
-  if (notifReminderShownCount + 1 >= NOTIF_REMINDER_MAX_SHOWS) {
-    setNotifReminderDone(true);
-  }
+  setAutoModals({
+    notifReminderShownAt: Date.now(),
+    notifReminderShownCount: notifReminderShownCount + 1,
+    // Shown 3 times — stopped for good (until granted and turned off again)
+    notifReminderDone: notifReminderShownCount + 1 >= NOTIF_REMINDER_MAX_SHOWS,
+  });
 
   // Both buttons count as a close — the 3rd show has no next wait, Done stops it
   const recordClose = () => {
-    setNotifReminderNextShowAt(Date.now() + (WAIT_AFTER_CLOSE_DAYS[notifReminderShownCount] ?? 0) * DAY_MS);
+    setAutoModals({ notifReminderNextShowAt: Date.now() + (NOTIF_REMINDER_WAIT_DAYS[notifReminderShownCount] ?? 0) * DAY_MS });
   };
 
   const benefits: { icon: MCIcon; text: string }[] = [

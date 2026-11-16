@@ -2,8 +2,9 @@ import AppCard from "@/components/AppCard";
 import AppLoading from "@/components/AppLoading";
 import ModalSheet, { ModalSheetRef } from "@/components/ModalSheet";
 import PrayerRow from "@/components/PrayerRow";
-import { openRateAppModal } from "@/components/RateApp";
+import { showRateAppModal } from "@/components/RateAppModal";
 import { globalStyles } from "@/constants/styles";
+import { canShowRateApp } from "@/hooks/useAutoModalsSync";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
 import { usePrayersStore } from "@/store/prayersStore";
@@ -159,8 +160,8 @@ export default function PrayerTimingsScreen() {
             : await markPrayed(prayerName as PrayerName, selectedDateKey, 'calendar');
 
         // 3rd prayer marked for this day (any day) — ask for a store review
-        if (!isPrayed && getDayPrayedCount(usePrayersTrackingStore.getState().tracking, selectedDateKey) === 3) {
-            openRateAppModal();
+        if (!isPrayed && getDayPrayedCount(usePrayersTrackingStore.getState().tracking, selectedDateKey) === 3 && canShowRateApp()) {
+            showRateAppModal();
         }
     }, [markPrayed, unmarkPrayed, selectedDateKey]);
 

@@ -1,8 +1,9 @@
 import PrayerRow from '@/components/PrayerRow';
-import { openRateAppModal } from '@/components/RateApp';
+import { showRateAppModal } from '@/components/RateAppModal';
 import { globalStyles } from '@/constants/styles';
 import { PRAYER_CELEBRATIONS_TR } from '@/constants/translations/celebrations.tr';
 import { useDebugStore } from '@/debug/debugStore';
+import { canShowRateApp } from '@/hooks/useAutoModalsSync';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useModalStore } from '@/store/modalStore';
@@ -60,8 +61,8 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
     const today = toDateKey();
 
     // 3rd prayer of today — ask for a store review (never the 5th, which shows the celebration)
-    if (getDayPrayedCount(usePrayersTrackingStore.getState().tracking, today) === 3) {
-      openRateAppModal();
+    if (getDayPrayedCount(usePrayersTrackingStore.getState().tracking, today) === 3 && canShowRateApp()) {
+      showRateAppModal();
     }
 
     const alreadyCelebrated = celebratedDate === today;

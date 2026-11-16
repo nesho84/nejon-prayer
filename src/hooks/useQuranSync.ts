@@ -3,7 +3,7 @@ import { useQuranAudioStore } from "@/store/quranAudioStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useEffect } from "react";
 
-export function useQuranSetup() {
+export function useQuranSync() {
   const loadFullQuran = useQuranStore((state) => state.loadFullQuran);
   const syncPlayback = useQuranAudioStore((state) => state.syncPlayback);
 
@@ -24,7 +24,7 @@ export function useQuranSetup() {
   // ------------------------------------------------------------
   useEffect(() => {
     configureAudioMode().catch((err) => {
-      console.error('❌ [useQuranSetup] Audio mode setup failed:', err);
+      console.error('❌ [useQuranSync] Audio mode setup failed:', err);
     });
   }, []);
 
@@ -43,7 +43,7 @@ export function useQuranSetup() {
 
       // Fires on network failure, bad audio URL, or stream interruption
       if (status.error) {
-        console.error("❌ [useQuranSetup] Playback error:", status.error);
+        console.error("❌ [useQuranSync] Playback error:", status.error);
         syncPlayback({ playbackError: status.error, isPlaying: false, isBuffering: false, isSwitching: false });
         return;
       }

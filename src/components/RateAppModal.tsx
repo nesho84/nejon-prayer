@@ -1,72 +1,34 @@
 import CelebrationFx from "@/components/CelebrationFx";
-import { PROMPT_GAP_DAYS } from "@/components/Feedback";
 import { globalStyles } from "@/constants/styles";
-import { useFeedbackStore } from "@/store/feedbackStore";
+import { DAY_MS, RATE_APP_MAX_SHOWS, RATE_APP_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
-import { useRateAppStore } from "@/store/rateAppStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openStoreListing } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-// Wait after "Later"
-const REMIND_AFTER_DAYS = 7;
-// Every open counts (except from About) — the limit marks it done
-export const RATE_APP_MAX_SHOWS = 3;
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Star sizes, left to right — the middle one is the biggest
 const STAR_SIZES = [26, 34, 44, 34, 26];
 
 // ------------------------------------------------------------
-// Open "Rate the App" fullscreen modal (Android only)
-// ------------------------------------------------------------
-export function openRateAppModal() {
-  if (Platform.OS !== "android") {
-    return;
-  }
-
-  const { rateAppNextShowAt, rateAppDone } = useRateAppStore.getState();
-
-  // Tapped "Open Store" or "Already rated", or shown the max times
-  if (rateAppDone) {
-    return;
-  }
-  // Tapped "Later"
-  if (rateAppNextShowAt && Date.now() < rateAppNextShowAt) {
-    return;
-  }
-  // Feedback modal shown recently — keep the two apart, try at a later trigger
-  const feedbackShownAt = useFeedbackStore.getState().feedbackShownAt;
-  if (feedbackShownAt && Date.now() < feedbackShownAt + PROMPT_GAP_DAYS * DAY_MS) {
-    return;
-  }
-  // Another modal is open (e.g. "Update available") — yield, try at a later trigger
-  if (useModalStore.getState().visible) {
-    return;
-  }
-
-  showRateAppModal();
-}
-
-// ------------------------------------------------------------
-// Show the "Rate the App" modal — no checks (the Debug Panel and About call this directly).
+// Show the "Rate the App" modal — no checks (canShowRateApp runs at the triggers).
 // From About the open and "Later" aren't recorded; "Open Store" and "Already rated" always are.
 // ------------------------------------------------------------
 export function showRateAppModal(fromAbout = false) {
-  const { rateAppShownCount, setRateAppNextShowAt, setRateAppShownAt, setRateAppShownCount, setRateAppDone } = useRateAppStore.getState();
+  const { rateAppShownCount, setAutoModals } = useAutoModalsStore.getState();
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
   const { hide } = useModalStore.getState();
 
   // ShownAt keeps the feedback modal from showing soon after this one
   if (!fromAbout) {
-    setRateAppShownAt(Date.now());
-    setRateAppShownCount(rateAppShownCount + 1);
-    if (rateAppShownCount + 1 >= RATE_APP_MAX_SHOWS) {
-      setRateAppDone(true);
-    }
+    setAutoModals({
+      rateAppShownAt: Date.now(),
+      rateAppShownCount: rateAppShownCount + 1,
+      // Every open counts — the limit marks it done
+      rateAppDone: rateAppShownCount + 1 >= RATE_APP_MAX_SHOWS,
+    });
   }
 
   useModalStore.getState().show({
@@ -96,7 +58,7 @@ export function showRateAppModal(fromAbout = false) {
             style={[styles.button, { backgroundColor: theme.gold + "20", borderWidth: 1, borderColor: theme.gold + "40" }]}
             activeOpacity={0.8}
             onPress={() => {
-              setRateAppDone(true);
+              setAutoModals({ rateAppDone: true });
               hide("openStore");
               openStoreListing();
             }}
@@ -109,7 +71,7 @@ export function showRateAppModal(fromAbout = false) {
             activeOpacity={0.8}
             onPress={() => {
               if (!fromAbout) {
-                setRateAppNextShowAt(Date.now() + REMIND_AFTER_DAYS * DAY_MS);
+                setAutoModals({ rateAppNextShowAt: Date.now() + RATE_APP_WAIT_DAYS * DAY_MS });
               }
               hide("later");
             }}
@@ -120,7 +82,7 @@ export function showRateAppModal(fromAbout = false) {
             style={styles.button}
             activeOpacity={0.6}
             onPress={() => {
-              setRateAppDone(true);
+              setAutoModals({ rateAppDone: true });
               hide("alreadyRated");
             }}
           >

@@ -41,7 +41,7 @@ Background playback needs the `expo-audio` config plugin with `enableBackgroundP
 in `app.json` and `setActiveForLockScreen` (called in `playSurah`), otherwise Android kills
 audio after ~3 min in background.
 
-- `isSwitching` in `quranAudioStore` is released by the **status listener** in `useQuranSetup`
+- `isSwitching` in `quranAudioStore` is released by the **status listener** in `useQuranSync`
   (first *loaded* playing / error / finish tick), not by the tab handlers — releasing it earlier
   flickers the row's progress bar while stale duration ticks arrive. The `isLoaded` half matters:
   during a switch ExoPlayer reports `playing: true` for the OLD surah for the whole download
@@ -89,9 +89,11 @@ making cross-cutting changes. Key points to internalize:
   middleware + the shared `mmkvStorage` adapter in `src/store/storage.ts`. MMKV is synchronous,
   so stores are readable at startup. `deviceSettingsStore` and `modalStore` are *not* persisted.
 
-- **Sync hooks** (`src/hooks/use*Sync.ts`, `useQuranSetup`) are all invoked once in `RootLayout`
-  and own the side effects (reschedule notifications, reload prayer times, load Quran JSON,
-  track theme/permissions). Put cross-cutting reactive effects here, not in screens.
+- **Sync hooks** (`src/hooks/use*Sync.ts`) are all invoked once in `RootLayout`, return nothing,
+  and own the app-wide side effects (reschedule notifications, reload prayer times, load Quran JSON,
+  track theme/permissions, the startup auto modals). Put cross-cutting reactive effects here, not in
+  screens. Hooks used inside a screen that **return data** (e.g. `useNextPrayer`) use a plain
+  `useX` name and a named export, like every other hook.
 
 - **Service layer** (`src/services/`) wraps external APIs and device/native modules
   (prayers/aladhan, quran/alquran.cloud, location, notifications, sound, holidays). Stores call

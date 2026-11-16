@@ -11,7 +11,7 @@ import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
 import { globalStyles } from "@/constants/styles";
 import { useDebugStore } from "@/debug/debugStore";
-import useNextPrayer from "@/hooks/useNextPrayer";
+import { useNextPrayer } from "@/hooks/useNextPrayer";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";

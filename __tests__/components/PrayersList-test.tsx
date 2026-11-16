@@ -1,12 +1,14 @@
 import PrayersList from '@/components/PrayersList';
-import { openRateAppModal } from '@/components/RateApp';
+import { showRateAppModal } from '@/components/RateAppModal';
+import { canShowRateApp } from '@/hooks/useAutoModalsSync';
 import { useLanguageStore } from '@/store/languageStore';
 import { usePrayersTrackingStore } from '@/store/prayersTrackingStore';
 import { useThemeStore } from '@/store/themeStore';
 import { toDateKey } from '@/utils/datetime';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
-jest.mock('@/components/RateApp', () => ({ openRateAppModal: jest.fn() }));
+jest.mock('@/components/RateAppModal', () => ({ showRateAppModal: jest.fn() }));
+jest.mock('@/hooks/useAutoModalsSync', () => ({ canShowRateApp: jest.fn(() => true) }));
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), captureMessage: jest.fn(), init: jest.fn() }));
 jest.mock('react-native-notify-kit', () => ({
   __esModule: true,
@@ -141,7 +143,7 @@ describe('PrayersList — rate app trigger', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2026-05-28T21:30:00'));
-    (openRateAppModal as jest.Mock).mockClear();
+    (showRateAppModal as jest.Mock).mockClear();
     usePrayersTrackingStore.setState({ markPrayed: realMarkPrayed } as any);
   });
 
@@ -162,36 +164,43 @@ describe('PrayersList — rate app trigger', () => {
   it('opens the modal on the 3rd prayer of the day', async () => {
     await pressWith(['Fajr', 'Dhuhr'], 'Asr');
 
-    expect(openRateAppModal).toHaveBeenCalledTimes(1);
+    expect(showRateAppModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not open the modal on the 3rd prayer when Rate App is not due', async () => {
+    (canShowRateApp as jest.Mock).mockReturnValueOnce(false);
+    await pressWith(['Fajr', 'Dhuhr'], 'Asr');
+
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 
   it('does not open the modal on the 1st prayer', async () => {
     await pressWith([], 'Fajr');
 
-    expect(openRateAppModal).not.toHaveBeenCalled();
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 
   it('does not open the modal on the 2nd prayer', async () => {
     await pressWith(['Fajr'], 'Dhuhr');
 
-    expect(openRateAppModal).not.toHaveBeenCalled();
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 
   it('does not open the modal on the 4th prayer', async () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr'], 'Maghrib');
 
-    expect(openRateAppModal).not.toHaveBeenCalled();
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 
   it('does not open the modal on the 5th prayer — that one shows the celebration', async () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Isha');
 
-    expect(openRateAppModal).not.toHaveBeenCalled();
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 
   it('does not open the modal when unmarking a prayer (4 marked → 3 left)', async () => {
     await pressWith(['Fajr', 'Dhuhr', 'Asr', 'Maghrib'], 'Fajr');
 
-    expect(openRateAppModal).not.toHaveBeenCalled();
+    expect(showRateAppModal).not.toHaveBeenCalled();
   });
 });
