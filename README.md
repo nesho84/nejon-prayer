@@ -155,7 +155,8 @@ Rate App and Feedback are always at least 7 days apart. No auto modal opens whil
 
 **Launch order** (`checkAutoModalsOnStart`, once per launch after onboarding and the first device-settings
 sync) — at most one of:
-1. **Store update** — if the store check (`expo-in-app-updates`, 5 s timeout, release builds only) reports
+1. **Store update** — if the store check (`checkStoreUpdate` in `src/services/storeUpdateService.ts`, also used by
+   Settings → "Check for update"; 5 s timeout, release builds only) reports
    an update and it's due. "No update" while online resets its cycle; offline, a failed check (sideloaded
    build, iOS without an AppStoreID) or a timeout change nothing.
 2. **Enable notifications** — if due. Granting resets it; turning notifications off again starts the

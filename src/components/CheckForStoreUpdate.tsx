@@ -1,13 +1,12 @@
 import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { checkStoreUpdate } from "@/services/storeUpdateService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
 import { ThemeColors } from "@/types/theme.types";
-import NetInfo from "@react-native-community/netinfo";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import Constants from "expo-constants";
-import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -47,19 +46,13 @@ export default function CheckForStoreUpdate() {
     setStatus("checking");
     setErrorDetail(null);
     try {
-      // Play serves appUpdateInfo from its own cache and resolves fine offline, reporting
-      // "no update" — bail out first, or we'd show that as "up to date".
-      const { isConnected } = await NetInfo.fetch();
-      if (!isConnected) {
-        setErrorDetail("No internet connection");
-        setStatus("error");
-        return;
-      }
-
-      const { updateAvailable } = await ExpoInAppUpdates.checkForUpdate();
-      if (updateAvailable) {
+      const result = await checkStoreUpdate();
+      if (result === "available") {
         showStoreUpdateModal(true);
         setStatus("idle");
+      } else if (result === "offline") {
+        setErrorDetail("No internet connection");
+        setStatus("error");
       } else {
         setStatus("upToDate");
       }

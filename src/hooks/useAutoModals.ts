@@ -8,14 +8,13 @@ import {
   NOTIF_REMINDER_FIRST_WAIT_DAYS,
   RATE_FEEDBACK_GAP_DAYS,
   STORE_UPDATE_CHECK_TIMEOUT_MS,
-  StoreUpdateResult,
   useAutoModalsStore,
 } from "@/store/autoModalsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useModalStore } from "@/store/modalStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
-import NetInfo from "@react-native-community/netinfo";
-import * as ExpoInAppUpdates from "expo-in-app-updates";
+import { checkStoreUpdate } from "@/services/storeUpdateService";
+import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 
@@ -119,25 +118,6 @@ function onNotifPermissionChange() {
 }
 
 // ------------------------------------------------------------
-// Ask Play / App Store for an update
-// ------------------------------------------------------------
-async function checkStoreUpdate(): Promise<StoreUpdateResult> {
-  try {
-    const { updateAvailable } = await ExpoInAppUpdates.checkForUpdate();
-    if (updateAvailable) return "available";
-
-    // Play answers "no update" from its cache when offline
-    const { isConnected } = await NetInfo.fetch();
-    if (!isConnected) return "offline";
-
-    return "upToDate";
-  } catch {
-    // Not installed via Play (dev/sideloaded build), or no AppStoreID on iOS yet
-    return "error";
-  }
-}
-
-// ------------------------------------------------------------
 // Store update result for this start
 // ------------------------------------------------------------
 async function getStoreUpdateResult(): Promise<StoreUpdateResult | null> {
@@ -148,11 +128,16 @@ async function getStoreUpdateResult(): Promise<StoreUpdateResult | null> {
   // Dev builds aren't installed from Play — skip the check
   if (__DEV__) return null;
 
-  // Real check, at most 5 s
-  return Promise.race([
-    checkStoreUpdate(),
-    new Promise<StoreUpdateResult>((resolve) => setTimeout(() => resolve("timeout"), STORE_UPDATE_CHECK_TIMEOUT_MS)),
-  ]);
+  // Real check — give up after 5 s, so the other startup modals aren't held up
+  try {
+    return await Promise.race([
+      checkStoreUpdate(),
+      new Promise<StoreUpdateResult>((resolve) => setTimeout(() => resolve("timeout"), STORE_UPDATE_CHECK_TIMEOUT_MS)),
+    ]);
+  } catch {
+    // Not installed via Play (dev/sideloaded build), or no AppStoreID on iOS yet
+    return "error";
+  }
 }
 
 // ------------------------------------------------------------

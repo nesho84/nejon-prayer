@@ -125,8 +125,9 @@ describe('CheckForStoreUpdate', () => {
     });
   });
 
-  it('shows the error message without asking Play when there is no connection', async () => {
+  it('shows the error message, not "up to date", when Play says no update while offline', async () => {
     netInfoFetch.mockResolvedValueOnce({ isConnected: false });
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: false });
     render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
@@ -134,7 +135,19 @@ describe('CheckForStoreUpdate', () => {
     await waitFor(() => {
       expect(screen.getByText('Could not check for updates')).toBeTruthy();
     });
-    expect(checkForUpdate).not.toHaveBeenCalled();
+    expect(screen.queryByText('You are up to date')).toBeNull();
+  });
+
+  it('opens the update modal offline when Play already knows of an update', async () => {
+    netInfoFetch.mockResolvedValueOnce({ isConnected: false });
+    checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
+    render(<CheckForStoreUpdate />);
+
+    fireEvent.press(screen.getByText('Check for Update'));
+
+    await waitFor(() => {
+      expect(useModalStore.getState().visible).toBe(true);
+    });
   });
 
   it('shows the error message when the check fails', async () => {

@@ -2,10 +2,9 @@ import { sendFeedback } from "@/services/feedbackService";
 import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
 import { FeedbackInput, FeedbackResult } from "@/types/feedback.types";
+import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-export type StoreUpdateResult = "available" | "upToDate" | "offline" | "error" | "timeout";
 
 interface AutoModalsData {
   // Store update
