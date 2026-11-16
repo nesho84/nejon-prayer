@@ -45,11 +45,6 @@ interface SectionProps {
   children: ReactNode;
 }
 
-interface ModalHeadProps {
-  title: string;
-  hint: string;
-}
-
 // How scenario-based features really trigger — shown under their ⓘ
 export const STORE_UPDATE_LAUNCH_HINT =
   "When ON, every app start acts as if the store reported an update (no real check, no 5 s wait) — " +
@@ -217,23 +212,6 @@ export function DebugSection({ title, children }: SectionProps) {
 }
 
 // ------------------------------------------------------------
-// Auto-modal title with an ⓘ that shows how it works
-// ------------------------------------------------------------
-export function AutoModalHead({ title, hint }: ModalHeadProps) {
-  const theme = useThemeStore((state) => state.theme);
-  const [showHint, setShowHint] = useState(false);
-  return (
-    <>
-      <View style={styles.modalHead}>
-        <Text style={[styles.modalTitle, { color: theme.text2 }]}>{title}</Text>
-        <InfoButton active={showHint} onPress={() => setShowHint((v) => !v)} />
-      </View>
-      {showHint && <Hint text={hint} />}
-    </>
-  );
-}
-
-// ------------------------------------------------------------
 // JSON viewer for debugging: scrollable, selectable, copy-to-clipboard
 // ------------------------------------------------------------
 function JsonViewer({ json }: JsonViewerProps) {
@@ -303,18 +281,6 @@ const styles = StyleSheet.create({
     gap: 6,
   },
 
-  // Auto-modal block
-  modalHead: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingLeft: 6,
-    paddingRight: 2,
-  },
-  modalTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
   infoButton: {
     width: 28,
     height: 28,

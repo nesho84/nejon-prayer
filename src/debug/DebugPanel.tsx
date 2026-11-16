@@ -18,10 +18,7 @@ import {
   previewPrayerCelebrationModal,
   previewRateAppModal,
   previewStoreUpdateModal,
-  showFeedbackJsonModal,
-  showNotifReminderJsonModal,
-  showRateAppJsonModal,
-  showStoreUpdateJsonModal,
+  showAutoModalsJsonModal,
 } from "./debugModals";
 import {
   debugDailyQuoteN,
@@ -34,7 +31,6 @@ import {
   logScheduledN,
 } from "./debugNotifs";
 import {
-  AutoModalHead,
   Badge,
   CHECK_FAILED_HINT,
   DebugButton,
@@ -163,10 +159,13 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
         // The debug panel body
         <View style={styles.body}>
 
-          {/* App: onboarding + check-for-update toggles (the two inline status lines + update on launch) */}
+          {/* App */}
           <DebugSection title="App">
             <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+          </DebugSection>
+
+          {/* Store Update: Settings "Check for update" status lines + update on launch */}
+          <DebugSection title="Store Update">
             <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
             <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
             <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
@@ -199,33 +198,14 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
           </DebugSection>
 
-          {/* Auto modals — one card, a block per modal */}
+          {/* Auto modals — a preview each, one JSON for their shared store */}
           <DebugSection title="Auto Modals">
-            <AutoModalHead title="Store Update" hint={STORE_UPDATE_HINT} />
-            <DebugButton label="Show 'Store Update' Modal" color={theme.violet} onPress={previewStoreUpdateModal} />
+            <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={previewStoreUpdateModal} />
+            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={previewNotifReminderModal} />
+            <DebugButton label="Show 'Rate App' Modal" color={theme.violet} hint={RATE_APP_HINT} onPress={previewRateAppModal} />
+            <DebugButton label="Show 'Feedback' Modal" color={theme.violet} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Store Update' JSON" color={theme.gray} onPress={showStoreUpdateJsonModal} />
-
-            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
-
-            <AutoModalHead title="Notif Reminder" hint={NOTIF_REMINDER_HINT} />
-            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} onPress={previewNotifReminderModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Notif Reminder' JSON" color={theme.gray} onPress={showNotifReminderJsonModal} />
-
-            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
-
-            <AutoModalHead title="Rate App" hint={RATE_APP_HINT} />
-            <DebugButton label="Show 'Rate App' Modal" color={theme.violet} onPress={previewRateAppModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Rate App' JSON" color={theme.gray} onPress={showRateAppJsonModal} />
-
-            <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
-
-            <AutoModalHead title="Feedback" hint={FEEDBACK_HINT} />
-            <DebugButton label="Show 'Feedback' Modal" color={theme.violet} onPress={previewFeedbackModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Feedback' JSON" color={theme.gray} onPress={showFeedbackJsonModal} />
+            <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />
           </DebugSection>
 
           {/* Test notifications */}
@@ -295,12 +275,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 
-
-  blockSeparator: {
-    height: 3,
-    marginHorizontal: -8,
-    marginVertical: 6,
-  },
 
   divider: {
     width: "100%",

@@ -16,9 +16,9 @@ import { Alert, Platform, Text, View } from "react-native";
 import { showJsonViewerModal } from "./debugUi";
 
 // ------------------------------------------------------------
-// Modal previews — celebrations, then the auto modals (the same three parts each: JSON, preview, reset).
+// Modal previews — celebrations, then the auto modals (one JSON for their shared store, a preview + reset each).
 // Auto-modal previews count like a real show and skip the waits; a block gets an alert with Reset
-// (for Update, which never stops, the 3-day wait is the block).
+// (for Store Update, which never stops, the 3-day wait is the block).
 // ------------------------------------------------------------
 
 // Timestamp → readable date for the JSON viewers
@@ -94,19 +94,35 @@ export function previewKhatamCelebrationModal() {
 }
 
 // ------------------------------------------------------------
-// Store Update
+// Auto modals — one JSON for the whole store, in launch order
 // ------------------------------------------------------------
-export function showStoreUpdateJsonModal() {
-  const { storeUpdateNextShowAt, storeUpdateShownAt, storeUpdateShownCount, storeUpdateCheckedAt, storeUpdateCheckResult } = useAutoModalsStore.getState();
-  showJsonViewerModal("Store Update", {
-    storeUpdateNextShowAt: formatTime(storeUpdateNextShowAt),
-    storeUpdateShownAt: formatTime(storeUpdateShownAt),
-    storeUpdateShownCount,
-    storeUpdateCheckedAt: formatTime(storeUpdateCheckedAt),
-    storeUpdateCheckResult,
+export function showAutoModalsJsonModal() {
+  const state = useAutoModalsStore.getState();
+  showJsonViewerModal("Auto Modals", {
+    storeUpdateNextShowAt: formatTime(state.storeUpdateNextShowAt),
+    storeUpdateShownAt: formatTime(state.storeUpdateShownAt),
+    storeUpdateShownCount: state.storeUpdateShownCount,
+    storeUpdateCheckedAt: formatTime(state.storeUpdateCheckedAt),
+    storeUpdateCheckResult: state.storeUpdateCheckResult,
+    notificationPermission: useDeviceSettingsStore.getState().notificationPermission,
+    notifReminderNextShowAt: formatTime(state.notifReminderNextShowAt),
+    notifReminderShownAt: formatTime(state.notifReminderShownAt),
+    notifReminderShownCount: state.notifReminderShownCount,
+    notifReminderDone: state.notifReminderDone,
+    rateAppNextShowAt: formatTime(state.rateAppNextShowAt),
+    rateAppShownAt: formatTime(state.rateAppShownAt),
+    rateAppShownCount: state.rateAppShownCount,
+    rateAppDone: state.rateAppDone,
+    feedbackNextShowAt: formatTime(state.feedbackNextShowAt),
+    feedbackShownAt: formatTime(state.feedbackShownAt),
+    feedbackShownCount: state.feedbackShownCount,
+    feedbackDone: state.feedbackDone,
   });
 }
 
+// ------------------------------------------------------------
+// Store Update
+// ------------------------------------------------------------
 function resetStoreUpdate() {
   useAutoModalsStore.getState().setAutoModals({
     storeUpdateNextShowAt: null,
@@ -133,17 +149,6 @@ export function previewStoreUpdateModal() {
 // ------------------------------------------------------------
 // Notif Reminder
 // ------------------------------------------------------------
-export function showNotifReminderJsonModal() {
-  const { notifReminderNextShowAt, notifReminderShownAt, notifReminderShownCount, notifReminderDone } = useAutoModalsStore.getState();
-  showJsonViewerModal("Notif Reminder", {
-    notificationPermission: useDeviceSettingsStore.getState().notificationPermission,
-    notifReminderNextShowAt: formatTime(notifReminderNextShowAt),
-    notifReminderShownAt: formatTime(notifReminderShownAt),
-    notifReminderShownCount,
-    notifReminderDone,
-  });
-}
-
 function resetNotifReminder() {
   useAutoModalsStore.getState().setAutoModals({
     notifReminderNextShowAt: null,
@@ -169,16 +174,6 @@ export function previewNotifReminderModal() {
 // ------------------------------------------------------------
 // Rate App
 // ------------------------------------------------------------
-export function showRateAppJsonModal() {
-  const { rateAppNextShowAt, rateAppShownAt, rateAppShownCount, rateAppDone } = useAutoModalsStore.getState();
-  showJsonViewerModal("Rate App", {
-    rateAppNextShowAt: formatTime(rateAppNextShowAt),
-    rateAppShownAt: formatTime(rateAppShownAt),
-    rateAppShownCount,
-    rateAppDone,
-  });
-}
-
 function resetRateApp() {
   useAutoModalsStore.getState().setAutoModals({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
 }
@@ -202,16 +197,6 @@ export function previewRateAppModal() {
 // ------------------------------------------------------------
 // Feedback
 // ------------------------------------------------------------
-export function showFeedbackJsonModal() {
-  const { feedbackNextShowAt, feedbackShownAt, feedbackShownCount, feedbackDone } = useAutoModalsStore.getState();
-  showJsonViewerModal("Feedback", {
-    feedbackNextShowAt: formatTime(feedbackNextShowAt),
-    feedbackShownAt: formatTime(feedbackShownAt),
-    feedbackShownCount,
-    feedbackDone,
-  });
-}
-
 function resetFeedback() {
   useAutoModalsStore.getState().setAutoModals({
     feedbackNextShowAt: null,
