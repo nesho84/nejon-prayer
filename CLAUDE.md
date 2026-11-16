@@ -154,3 +154,17 @@ and killed-app captures were noise. They log with `console.error` only — keep 
 new background error paths. Sentry calls in stores/services (e.g.
 `syncNotificationsInBackground`) only reach Sentry when the app process has evaluated
 `_layout.tsx` (i.e. backgrounded, not killed); in the headless killed-app path they no-op.
+
+**Known warning: Metro's "invalid package.json … expo-router … router-store … rore.js" (Nov 2026,
+accepted, staying on `@sentry/react-native ~8.28.0`).**
+- **Cause:** Sentry 8.28 requires `expo-router/build/global-state/router-store`, which expo-router 58
+  removed. Metro warns 3× per bundle and falls back; at runtime Sentry's `try/catch` returns `null`.
+  It only affects Sentry's expo-router route tagging, which we don't use.
+- **Fix exists:** `@sentry/react-native` 8.33.0+ (getsentry/sentry-react-native#6923). Tested with
+  8.35.0: no warning, tsc/lint/Jest all pass.
+- **Why we didn't take it:** Expo's SDK 58 list still expects `~8.28.0`, so expo-doctor fails for
+  any newer Sentry unless we add an `expo.install.exclude`. We chose to keep expo-doctor green.
+- **Upgrade when** Expo's list moves to ≥ 8.33.0, or with the next Expo SDK upgrade.
+  Re-check with `npx expo install --check`.
+- **When upgrading,** also bump the pinned `"@sentry/cli@<version>": true` entry in `allowScripts`
+  (`package.json`), or npm blocks the new CLI's install script.
