@@ -163,7 +163,7 @@ describe('QuranTabScreen — playback handlers', () => {
     const s = useQuranAudioStore.getState();
     expect(s.activeSurahId).toBe(1);
     expect(s.isActive).toBe(true);
-    // Released by the status listener (useQuranSetup) on the first playing/error tick
+    // Released by the status listener (useQuranSync) on the first playing/error tick
     expect(s.isSwitching).toBe(true);
   });
 

@@ -1,4 +1,4 @@
-import { useLocationSync } from '@/hooks/useLocationSync';
+import { useLocationChangeSync } from '@/hooks/useLocationChangeSync';
 import { useLocationStore } from '@/store/locationStore';
 import { renderHook } from '@testing-library/react-native';
 import { AppState } from 'react-native';
@@ -28,16 +28,16 @@ beforeEach(() => {
   mockAddEventListener.mockReturnValue({ remove: jest.fn() });
 });
 
-describe('useLocationSync — mount', () => {
+describe('useLocationChangeSync — mount', () => {
   it('checks for a location change once on mount', () => {
-    renderHook(() => useLocationSync());
+    renderHook(() => useLocationChangeSync());
     expect(mockCheckLocationChange).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('useLocationSync — AppState transitions', () => {
+describe('useLocationChangeSync — AppState transitions', () => {
   it('re-checks when coming to foreground from background', () => {
-    renderHook(() => useLocationSync());
+    renderHook(() => useLocationChangeSync());
     const changeCallback = mockAddEventListener.mock.calls[0][1];
     mockCheckLocationChange.mockClear();
 
@@ -47,7 +47,7 @@ describe('useLocationSync — AppState transitions', () => {
   });
 
   it('re-checks when coming to foreground from inactive', () => {
-    renderHook(() => useLocationSync());
+    renderHook(() => useLocationChangeSync());
     const changeCallback = mockAddEventListener.mock.calls[0][1];
     mockCheckLocationChange.mockClear();
 
@@ -57,7 +57,7 @@ describe('useLocationSync — AppState transitions', () => {
   });
 
   it('does not re-check when AppState stays active', () => {
-    renderHook(() => useLocationSync());
+    renderHook(() => useLocationChangeSync());
     const changeCallback = mockAddEventListener.mock.calls[0][1];
     mockCheckLocationChange.mockClear();
 
@@ -66,11 +66,11 @@ describe('useLocationSync — AppState transitions', () => {
   });
 });
 
-describe('useLocationSync — cleanup', () => {
+describe('useLocationChangeSync — cleanup', () => {
   it('removes the AppState subscription on unmount', () => {
     const mockRemove = jest.fn();
     mockAddEventListener.mockReturnValue({ remove: mockRemove });
-    const { unmount } = renderHook(() => useLocationSync());
+    const { unmount } = renderHook(() => useLocationChangeSync());
     unmount();
     expect(mockRemove).toHaveBeenCalled();
   });

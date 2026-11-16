@@ -48,8 +48,7 @@ jest.mock('@react-native-vector-icons/material-icons/static', () => {
   return { MaterialIcons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
 });
 jest.mock('@/hooks/useNextPrayer', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
+  useNextPrayer: jest.fn(() => ({
     prevPrayer: null,
     currentPrayerName: 'Fajr',
     nextPrayerName: 'Dhuhr',

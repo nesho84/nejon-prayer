@@ -98,10 +98,11 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | Hook | Responsibility |
 |---|---|
 | `useDeviceSettingsSync` | Polls permissions and network state |
+| `useLocationChangeSync` | On start and every return to the app, checks if you moved 50 km+ from the saved location (throttled) |
 | `usePrayerTimesSync` | Triggers prayer times reload on location/date change |
 | `useNotificationsSync` | Creates notification channels, reschedules on prayer times or settings change |
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
-| `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
+| `useQuranSync` | Loads the bundled Quran JSON into `quranStore`, sets the audio mode, syncs player status into `quranAudioStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
 | `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |

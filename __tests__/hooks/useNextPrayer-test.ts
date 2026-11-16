@@ -1,4 +1,4 @@
-import useNextPrayer from '@/hooks/useNextPrayer';
+import { useNextPrayer } from '@/hooks/useNextPrayer';
 import { PrayerTimes } from '@/types/prayer.types';
 import { act, renderHook } from '@testing-library/react-native';
 import { useIsFocused } from 'expo-router';

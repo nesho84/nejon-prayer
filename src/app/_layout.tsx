@@ -4,10 +4,10 @@ import { useAdsSync } from "@/hooks/useAdsSync";
 import { useAutoModalsSync } from "@/hooks/useAutoModalsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
 import { useHolidaysSync } from "@/hooks/useHolidaysSync";
-import { useLocationSync } from "@/hooks/useLocationSync";
+import { useLocationChangeSync } from "@/hooks/useLocationChangeSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
-import { useQuranSetup } from "@/hooks/useQuranSetup";
+import { useQuranSync } from "@/hooks/useQuranSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOtaUpdatesSync } from "@/hooks/useOtaUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -60,11 +60,11 @@ function RootLayout() {
   // Initialization and global sync hooks
   useSystemThemeSync();
   useDeviceSettingsSync();
-  useLocationSync();
+  useLocationChangeSync();
   useNotificationsSync();
   usePrayerTimesSync();
   useHolidaysSync();
-  useQuranSetup();
+  useQuranSync();
   useOtaUpdatesSync();
   useAutoModalsSync();
   useAdsSync();
