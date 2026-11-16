@@ -36,6 +36,8 @@ jest.mock('react-native-notify-kit', () => ({
 }));
 
 const NOW = new Date('2026-11-16T12:00:00').getTime();
+// Real time right after the hook file loaded — at or after its app start
+const LOADED_AT = Date.now();
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const checkForUpdate = ExpoInAppUpdates.checkForUpdate as jest.Mock;
@@ -83,13 +85,13 @@ afterEach(() => {
 });
 
 describe('canShowUpdate', () => {
-  it('is due with no wait, and after the wait', () => {
+  it('can show with no wait, and after the wait', () => {
     expect(canShowUpdate()).toBe(true);
     useAutoModalsStore.setState({ updateNextShowAt: NOW - 1 });
     expect(canShowUpdate()).toBe(true);
   });
 
-  it('is not due during the 3-day wait', () => {
+  it('cannot show during the 3-day wait', () => {
     useAutoModalsStore.setState({ updateNextShowAt: NOW + DAY_MS });
     expect(canShowUpdate()).toBe(false);
   });
@@ -100,18 +102,18 @@ describe('canShowNotifReminder', () => {
     useDeviceSettingsStore.setState({ notificationPermission: false });
   });
 
-  it('is due when notifications are off and the wait is over', () => {
+  it('can show when notifications are off and the wait is over', () => {
     useAutoModalsStore.setState({ notifReminderNextShowAt: NOW - 1 });
     expect(canShowNotifReminder()).toBe(true);
   });
 
-  it('is not due before the first wait was started, or while waiting', () => {
+  it('cannot show before the first wait was started, or while waiting', () => {
     expect(canShowNotifReminder()).toBe(false);
     useAutoModalsStore.setState({ notifReminderNextShowAt: NOW + DAY_MS });
     expect(canShowNotifReminder()).toBe(false);
   });
 
-  it('is not due when granted or done', () => {
+  it('cannot show when granted or done', () => {
     useAutoModalsStore.setState({ notifReminderNextShowAt: NOW - 1, notifReminderDone: true });
     expect(canShowNotifReminder()).toBe(false);
     useAutoModalsStore.setState({ notifReminderDone: false });
@@ -121,23 +123,23 @@ describe('canShowNotifReminder', () => {
 });
 
 describe('canShowRateApp', () => {
-  it('is due right away — no first wait', () => {
+  it('can show right away — no first wait', () => {
     expect(canShowRateApp()).toBe(true);
   });
 
-  it('is never due on iOS', () => {
+  it('never shows on iOS', () => {
     Object.defineProperty(Platform, 'OS', { value: 'ios', writable: true, configurable: true });
     expect(canShowRateApp()).toBe(false);
   });
 
-  it('is not due within 7 days of "Later", and due after', () => {
+  it('cannot show within 7 days of "Later", and can after', () => {
     useAutoModalsStore.setState({ rateAppNextShowAt: NOW + DAY_MS });
     expect(canShowRateApp()).toBe(false);
     useAutoModalsStore.setState({ rateAppNextShowAt: NOW - 1 });
     expect(canShowRateApp()).toBe(true);
   });
 
-  it('is never due once done', () => {
+  it('never shows once done', () => {
     useAutoModalsStore.setState({ rateAppDone: true });
     expect(canShowRateApp()).toBe(false);
   });
@@ -149,25 +151,37 @@ describe('canShowRateApp', () => {
     expect(canShowRateApp()).toBe(true);
   });
 
-  it('is not due while another modal is open', () => {
+  it('cannot show while another modal is open', () => {
     useModalStore.setState({ visible: true });
     expect(canShowRateApp()).toBe(false);
+  });
+
+  it('waits for a later session when Update or Notif reminder already showed in this one', () => {
+    useAutoModalsStore.setState({ updateShownAt: LOADED_AT });
+    expect(canShowRateApp()).toBe(false);
+    useAutoModalsStore.setState({ updateShownAt: null, notifReminderShownAt: LOADED_AT });
+    expect(canShowRateApp()).toBe(false);
+  });
+
+  it('can show when Update or Notif reminder showed in an earlier session', () => {
+    useAutoModalsStore.setState({ updateShownAt: LOADED_AT - DAY_MS, notifReminderShownAt: LOADED_AT - DAY_MS });
+    expect(canShowRateApp()).toBe(true);
   });
 });
 
 describe('canShowFeedback', () => {
-  it('is not due before its first wait was started, or while waiting', () => {
+  it('cannot show before its first wait was started, or while waiting', () => {
     expect(canShowFeedback()).toBe(false);
     useAutoModalsStore.setState({ feedbackNextShowAt: NOW + DAY_MS });
     expect(canShowFeedback()).toBe(false);
   });
 
-  it('is due after the wait', () => {
+  it('can show after the wait', () => {
     useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1 });
     expect(canShowFeedback()).toBe(true);
   });
 
-  it('is never due once done', () => {
+  it('never shows once done', () => {
     useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1, feedbackDone: true });
     expect(canShowFeedback()).toBe(false);
   });

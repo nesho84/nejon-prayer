@@ -102,11 +102,16 @@ function migrateOldStores() {
     if (raw === null) {
       continue;
     }
-    const oldState = JSON.parse(raw).state ?? {};
-    for (const key of Object.keys(INITIAL_DATA)) {
-      if (key in oldState) {
-        state[key] = oldState[key];
+    try {
+      const oldState = JSON.parse(raw).state ?? {};
+      for (const key of Object.keys(INITIAL_DATA)) {
+        if (key in oldState) {
+          state[key] = oldState[key];
+        }
       }
+    } catch (err) {
+      // Unreadable — skip this store instead of crashing the app on start
+      console.warn(`⚠️ [autoModalsStore] Failed to migrate ${name}:`, err);
     }
   }
 

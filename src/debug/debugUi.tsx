@@ -107,7 +107,8 @@ export const RATE_APP_HINT =
   "or Quran reading scrolls past ayah 20 — can already happen on day one.\n" +
   "\"Later\" → asks again 7 days later, at the next such moment.\n" +
   "Never again: \"Open Store\", \"Already rated\", or after 3 shows.\n" +
-  "Waits while Feedback was shown in the last 7 days, or another modal is open.\n" +
+  "Waits while Feedback was shown in the last 7 days, Update or Notif Reminder showed since the app started, " +
+  "or another modal is open.\n" +
   "From About: always opens; only \"Open Store\" / \"Already rated\" are recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
 export const FEEDBACK_HINT =

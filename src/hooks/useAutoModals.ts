@@ -19,55 +19,108 @@ import * as ExpoInAppUpdates from "expo-in-app-updates";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 
+// App start — a startup modal shown after this makes Rate App wait for a later session
+const APP_START = Date.now();
+
 // ------------------------------------------------------------
-// Update — due unless waiting after a show
+// Update — can show unless waiting after a show
 // ------------------------------------------------------------
 export function canShowUpdate() {
   const { updateNextShowAt } = useAutoModalsStore.getState();
-  return updateNextShowAt === null || Date.now() >= updateNextShowAt;
+
+  // Still waiting after a show
+  if (updateNextShowAt !== null && Date.now() < updateNextShowAt) {
+    return false;
+  }
+  return true;
 }
 
 // ------------------------------------------------------------
-// Notif reminder — due while notifications are off, after its wait, until done
+// Notif reminder — can show while notifications are off, after its wait, until done
 // ------------------------------------------------------------
 export function canShowNotifReminder() {
   const { notifReminderNextShowAt, notifReminderDone } = useAutoModalsStore.getState();
-  if (useDeviceSettingsStore.getState().notificationPermission || notifReminderDone) {
+
+  // Notifications are on
+  if (useDeviceSettingsStore.getState().notificationPermission) {
     return false;
   }
-  return notifReminderNextShowAt !== null && Date.now() >= notifReminderNextShowAt;
+  // Shown 3 times
+  if (notifReminderDone) {
+    return false;
+  }
+  // First wait not started yet
+  if (notifReminderNextShowAt === null) {
+    return false;
+  }
+  // Still waiting
+  if (Date.now() < notifReminderNextShowAt) {
+    return false;
+  }
+  return true;
 }
 
 // ------------------------------------------------------------
-// Rate App (Android only) — due after "Later", until done, apart from Feedback, no modal open
+// Rate App (Android only) — can show after "Later", until done, apart from the other auto modals
 // ------------------------------------------------------------
 export function canShowRateApp() {
-  const { rateAppNextShowAt, rateAppDone, feedbackShownAt } = useAutoModalsStore.getState();
+  const { rateAppNextShowAt, rateAppDone, feedbackShownAt, updateShownAt, notifReminderShownAt } = useAutoModalsStore.getState();
   const now = Date.now();
 
-  if (Platform.OS !== "android" || rateAppDone) {
+  // Android only
+  if (Platform.OS !== "android") {
     return false;
   }
-  if (rateAppNextShowAt && now < rateAppNextShowAt) {
+  // "Open Store", "Already rated", or shown 3 times
+  if (rateAppDone) {
     return false;
   }
-  if (feedbackShownAt && now < feedbackShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
+  // Still waiting after "Later"
+  if (rateAppNextShowAt !== null && now < rateAppNextShowAt) {
     return false;
   }
-  return !useModalStore.getState().visible;
+  // Feedback shown in the last 7 days
+  if (feedbackShownAt !== null && now < feedbackShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
+    return false;
+  }
+  // Update or Notif reminder already showed this session
+  if (updateShownAt !== null && updateShownAt >= APP_START) {
+    return false;
+  }
+  if (notifReminderShownAt !== null && notifReminderShownAt >= APP_START) {
+    return false;
+  }
+  // Another modal is open
+  if (useModalStore.getState().visible) {
+    return false;
+  }
+  return true;
 }
 
 // ------------------------------------------------------------
-// Feedback — due after its wait, until done, apart from Rate App
+// Feedback — can show after its wait, until done, apart from Rate App
 // ------------------------------------------------------------
 export function canShowFeedback() {
   const { feedbackNextShowAt, feedbackDone, rateAppShownAt } = useAutoModalsStore.getState();
   const now = Date.now();
 
-  if (feedbackDone || feedbackNextShowAt === null || now < feedbackNextShowAt) {
+  // Sent, "Don't ask again", or shown 3 times
+  if (feedbackDone) {
     return false;
   }
-  return !rateAppShownAt || now >= rateAppShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS;
+  // First show not set yet
+  if (feedbackNextShowAt === null) {
+    return false;
+  }
+  // Still waiting
+  if (now < feedbackNextShowAt) {
+    return false;
+  }
+  // Rate App shown in the last 7 days
+  if (rateAppShownAt !== null && now < rateAppShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
+    return false;
+  }
+  return true;
 }
 
 // ------------------------------------------------------------

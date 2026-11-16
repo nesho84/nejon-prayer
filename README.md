@@ -163,7 +163,8 @@ sync) — at most one of:
 3. **Feedback** — if due. Its first show is set to 7 days after onboarding, once, at the top of `checkAutoModalsOnStart`.
 
 **Rate App** keeps its own triggers — the 3rd prayer marked on Home or in the calendar, and Quran reading
-reaching ayah 20 — and opens there when `canShowRateApp()`.
+reaching ayah 20 — and opens there when `canShowRateApp()`. It also waits for a later session when
+Update or Enable notifications already showed in this one.
 
 **Manual opens** skip the checks and aren't recorded: Rate App and Feedback from About (`fromAbout`), and
 Settings → "Check for update" (`showUpdateModal(true)`). The debug panel previews count like a real show.

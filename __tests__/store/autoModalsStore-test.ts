@@ -100,6 +100,20 @@ describe('autoModalsStore — migration', () => {
     expect(store.getState().notifReminderNextShowAt).toBeNull();
   });
 
+  it('skips an unreadable old store without crashing, and still copies the others', () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    const { store, storage } = loadStore({
+      'rate-app-storage': '{not json',
+      'feedback-storage': 'null',
+      'notif-reminder-storage': OLD_NOTIF_REMINDER,
+    });
+
+    expect(store.getState().rateAppDone).toBe(false);
+    expect(store.getState().feedbackNextShowAt).toBeNull();
+    expect(store.getState().notifReminderNextShowAt).toBe(3000);
+    expect(storage.removeItem).toHaveBeenCalledWith('rate-app-storage');
+  });
+
   it('does nothing when the new store already exists', () => {
     const { store, storage } = loadStore({
       'auto-modals-storage': JSON.stringify({ state: { rateAppShownCount: 1 }, version: 0 }),
