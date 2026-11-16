@@ -191,8 +191,8 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
           </DebugSection>
 
-          {/* Update Check: Settings "Check for update" status lines + update on launch */}
-          <DebugSection title="Update Check">
+          {/* Store Update: Settings "Check for update" status lines + update on launch */}
+          <DebugSection title="Store Update">
             <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
             <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
             <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
