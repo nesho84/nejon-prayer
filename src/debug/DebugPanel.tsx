@@ -176,10 +176,10 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
 
           {/* Prayers */}
           <DebugSection title="Prayers">
-            <DebugToggle label="Toggle No Prayer Times (Fresh Install)" value={forceNoPrayerTimes} hint={NO_PRAYER_TIMES_HINT} onPress={toggleNoPrayerTimes} />
-            <DebugToggle label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} hint={OUTDATED_HINT} onPress={togglePrayersOutdated} />
-            <DebugToggle label="Toggle Location Changed" value={forceLocationChange} hint={LOCATION_CHANGED_HINT} onPress={toggleLocationChange} />
-            <DebugToggle label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
+            <DebugToggle color={theme.teal} label="Toggle No Prayer Times (Fresh Install)" value={forceNoPrayerTimes} hint={NO_PRAYER_TIMES_HINT} onPress={toggleNoPrayerTimes} />
+            <DebugToggle color={theme.teal} label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} hint={OUTDATED_HINT} onPress={togglePrayersOutdated} />
+            <DebugToggle color={theme.teal} label="Toggle Location Changed" value={forceLocationChange} hint={LOCATION_CHANGED_HINT} onPress={toggleLocationChange} />
+            <DebugToggle color={theme.teal} label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
             <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} hint={PRAYER_CELEBRATION_HINT} onPress={previewPrayerCelebrationModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Prayer Times' JSON" color={theme.gray} onPress={showPrayerTimesModal} />
@@ -188,15 +188,15 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
 
           {/* Quran */}
           <DebugSection title="Quran">
-            <DebugToggle label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
-            <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.teal} hint={KHATAM_HINT} onPress={previewKhatamCelebrationModal} />
+            <DebugToggle color={theme.secondary} label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
+            <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.secondary} hint={KHATAM_HINT} onPress={previewKhatamCelebrationModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Quran' JSON" color={theme.gray} onPress={showQuranModal} />
           </DebugSection>
 
           {/* Islamic Holidays */}
           <DebugSection title="Islamic Holidays">
-            <DebugToggle label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
+            <DebugToggle color={theme.gold} label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
           </DebugSection>
@@ -204,21 +204,21 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
           {/* Auto modals — one card, a block per modal */}
           <DebugSection title="Auto Modals">
             <AutoModalHead title="Rate App" hint={RATE_APP_HINT} />
-            <DebugButton label="Show 'Rate App' Modal" color={theme.teal} onPress={previewRateAppModal} />
+            <DebugButton label="Show 'Rate App' Modal" color={theme.violet} onPress={previewRateAppModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Rate App' JSON" color={theme.gray} onPress={showRateAppJsonModal} />
 
             <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
 
             <AutoModalHead title="Feedback" hint={FEEDBACK_HINT} />
-            <DebugButton label="Show 'Feedback' Modal" color={theme.teal} onPress={previewFeedbackModal} />
+            <DebugButton label="Show 'Feedback' Modal" color={theme.violet} onPress={previewFeedbackModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Feedback' JSON" color={theme.gray} onPress={showFeedbackJsonModal} />
 
             <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
 
             <AutoModalHead title="Notif Reminder" hint={NOTIF_REMINDER_HINT} />
-            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.teal} onPress={previewNotifReminderModal} />
+            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} onPress={previewNotifReminderModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Notif Reminder' JSON" color={theme.gray} onPress={showNotifReminderJsonModal} />
           </DebugSection>
