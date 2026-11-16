@@ -51,7 +51,7 @@ interface ModalHeadProps {
 }
 
 // How scenario-based features really trigger — shown under their ⓘ
-export const UPDATE_LAUNCH_HINT =
+export const STORE_UPDATE_LAUNCH_HINT =
   "When ON, every app start acts as if the store reported an update (no real check, no 5 s wait) — " +
   "so the launch order and the waits apply. Stays ON across restarts until you turn it off " +
   "(or debug mode is turned off).";
@@ -88,10 +88,10 @@ export const HOLIDAY_CARD_HINT =
   "Here: a fake Ramadan start in 3 days.";
 
 // How the four auto modals work — shown under their ⓘ
-export const UPDATE_HINT =
+export const STORE_UPDATE_HINT =
   "Checked on every app start (release builds only, up to 5 s). Android asks Google Play (In-App Updates), " +
   "which only works when the app was installed from Play; iOS isn't set up yet.\n" +
-  "First in the launch order: Update → Notif Reminder → Feedback, at most one per start.\n" +
+  "First in the launch order: Store Update → Notif Reminder → Feedback, at most one per start.\n" +
   "Newer version → shows; the next two starts show it again, then every 3 days. Never stops.\n" +
   "Up to date (and online) → starts over.\n" +
   "From Settings → \"Check for update\": opens when one is found, not recorded. OTA updates reload silently.\n" +
@@ -100,14 +100,14 @@ export const NOTIF_REMINDER_HINT =
   "First show: on an app start 3+ days after the app first saw notifications turned off.\n" +
   "\"Not now\" or \"Enable\" → asks again 7 days later, then 14 days later (on an app start).\n" +
   "Never again: after 3 shows — starts over once notifications are allowed and later turned off again.\n" +
-  "Waits while Update showed on that start, or another modal is open.\n" +
+  "Waits while Store Update showed on that start, or another modal is open.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
 export const RATE_APP_HINT =
   "First show (Android only): the first time a 3rd prayer gets marked in one day (Home: today; Timings: any day), " +
   "or Quran reading scrolls past ayah 20 — can already happen on day one.\n" +
   "\"Later\" → asks again 7 days later, at the next such moment.\n" +
   "Never again: \"Open Store\", \"Already rated\", or after 3 shows.\n" +
-  "Waits while Feedback was shown in the last 7 days, Update or Notif Reminder showed since the app started, " +
+  "Waits while Feedback was shown in the last 7 days, Store Update or Notif Reminder showed since the app started, " +
   "or another modal is open.\n" +
   "From About: always opens; only \"Open Store\" / \"Already rated\" are recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
@@ -115,7 +115,7 @@ export const FEEDBACK_HINT =
   "First show: on an app start at least 7 days after onboarding.\n" +
   "\"Maybe later\" or close → asks again 30 days later, on an app start.\n" +
   "Never again: sent, \"Don't ask again\", or after 3 shows.\n" +
-  "Waits while Rate App was shown in the last 7 days, Update or Notif Reminder showed on that start, " +
+  "Waits while Rate App was shown in the last 7 days, Store Update or Notif Reminder showed on that start, " +
   "or another modal is open.\n" +
   "From About: always opens at the questions; only sending is recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";

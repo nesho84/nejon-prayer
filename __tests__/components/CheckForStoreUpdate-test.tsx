@@ -1,4 +1,4 @@
-import CheckForUpdate from '@/components/CheckForUpdate';
+import CheckForStoreUpdate from '@/components/CheckForStoreUpdate';
 import { useDebugStore } from '@/debug/debugStore';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -52,22 +52,22 @@ beforeEach(() => {
   (Platform as { OS: string }).OS = 'android';
   useThemeStore.setState({ theme: mockTheme });
   useLanguageStore.setState({ tr: mockTr, language: 'en' as any });
-  useDebugStore.setState({ updatePreview: 'idle' });
+  useDebugStore.setState({ storeUpdatePreview: 'idle' });
   useModalStore.setState({ visible: false, options: null, resolve: null });
   jest.clearAllMocks();
   netInfoFetch.mockResolvedValue({ isConnected: true });
 });
 
-describe('CheckForUpdate', () => {
+describe('CheckForStoreUpdate', () => {
   it('renders the idle state with the check button', () => {
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
     expect(screen.getByText('Check for Update')).toBeTruthy();
     expect(screen.getByText('Check if a new version is available')).toBeTruthy();
   });
 
   it('shows the up-to-date message after a check finds no update', async () => {
     checkForUpdate.mockResolvedValueOnce({ updateAvailable: false });
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
@@ -78,7 +78,7 @@ describe('CheckForUpdate', () => {
 
   it('opens the update-available modal and resets the inline status when an update exists', async () => {
     checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
@@ -89,23 +89,23 @@ describe('CheckForUpdate', () => {
   });
 
   it('does not count a manual open toward the startup check waits', async () => {
-    useAutoModalsStore.setState({ updateShownCount: 0, updateNextShowAt: null, updateShownAt: null });
+    useAutoModalsStore.setState({ storeUpdateShownCount: 0, storeUpdateNextShowAt: null, storeUpdateShownAt: null });
     checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
     await waitFor(() => {
       expect(useModalStore.getState().visible).toBe(true);
     });
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(0);
-    expect(useAutoModalsStore.getState().updateShownAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().storeUpdateShownAt).toBeNull();
   });
 
   it('opens the native Play Store deep link when "Open Store" is pressed in the update modal', async () => {
     jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     checkForUpdate.mockResolvedValueOnce({ updateAvailable: true });
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
@@ -127,7 +127,7 @@ describe('CheckForUpdate', () => {
 
   it('shows the error message without asking Play when there is no connection', async () => {
     netInfoFetch.mockResolvedValueOnce({ isConnected: false });
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
@@ -139,7 +139,7 @@ describe('CheckForUpdate', () => {
 
   it('shows the error message when the check fails', async () => {
     checkForUpdate.mockRejectedValueOnce(new Error('network down'));
-    render(<CheckForUpdate />);
+    render(<CheckForStoreUpdate />);
 
     fireEvent.press(screen.getByText('Check for Update'));
 
@@ -154,20 +154,20 @@ describe('CheckForUpdate', () => {
     });
 
     it('shows the up-to-date line without a real check when debug mode is on', () => {
-      useDebugStore.setState({ updatePreview: 'upToDate', debugModeEnabled: true });
-      render(<CheckForUpdate />);
+      useDebugStore.setState({ storeUpdatePreview: 'upToDate', debugModeEnabled: true });
+      render(<CheckForStoreUpdate />);
       expect(screen.getByText('You are up to date')).toBeTruthy();
     });
 
     it('shows the error line without a real check when debug mode is on', () => {
-      useDebugStore.setState({ updatePreview: 'error', debugModeEnabled: true });
-      render(<CheckForUpdate />);
+      useDebugStore.setState({ storeUpdatePreview: 'error', debugModeEnabled: true });
+      render(<CheckForStoreUpdate />);
       expect(screen.getByText('Could not check for updates')).toBeTruthy();
     });
 
     it('ignores the preview when debug mode is off, even in a dev build', () => {
-      useDebugStore.setState({ updatePreview: 'upToDate', debugModeEnabled: false });
-      render(<CheckForUpdate />);
+      useDebugStore.setState({ storeUpdatePreview: 'upToDate', debugModeEnabled: false });
+      render(<CheckForStoreUpdate />);
       expect(screen.queryByText('You are up to date')).toBeNull();
     });
   });

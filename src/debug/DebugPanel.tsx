@@ -1,4 +1,4 @@
-import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -17,11 +17,11 @@ import {
   previewNotifReminderModal,
   previewPrayerCelebrationModal,
   previewRateAppModal,
-  previewUpdateModal,
+  previewStoreUpdateModal,
   showFeedbackJsonModal,
   showNotifReminderJsonModal,
   showRateAppJsonModal,
-  showUpdateJsonModal,
+  showStoreUpdateJsonModal,
 } from "./debugModals";
 import {
   debugDailyQuoteN,
@@ -51,8 +51,8 @@ import {
   RATE_APP_HINT,
   showJsonViewerModal,
   UP_TO_DATE_HINT,
-  UPDATE_HINT,
-  UPDATE_LAUNCH_HINT,
+  STORE_UPDATE_HINT,
+  STORE_UPDATE_LAUNCH_HINT,
 } from "./debugUi";
 
 interface DebugPanelProps {
@@ -76,16 +76,16 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
   const forceLocationChange = useDebugStore((state) => state.forceLocationChange);
   const forceNoPrayerTimes = useDebugStore((state) => state.forceNoPrayerTimes);
-  const forceUpdateOnLaunch = useDebugStore((state) => state.forceUpdateOnLaunch);
+  const forceStoreUpdateOnLaunch = useDebugStore((state) => state.forceStoreUpdateOnLaunch);
   const toggleHoliday = useDebugStore((state) => state.toggleHoliday);
   const toggleFriday = useDebugStore((state) => state.toggleFriday);
   const toggleQuranPlaying = useDebugStore((state) => state.toggleQuranPlaying);
   const togglePrayersOutdated = useDebugStore((state) => state.togglePrayersOutdated);
   const toggleLocationChange = useDebugStore((state) => state.toggleLocationChange);
   const toggleNoPrayerTimes = useDebugStore((state) => state.toggleNoPrayerTimes);
-  const toggleUpdateOnLaunch = useDebugStore((state) => state.toggleUpdateOnLaunch);
-  const updatePreview = useDebugStore((state) => state.updatePreview);
-  const setUpdatePreview = useDebugStore((state) => state.setUpdatePreview);
+  const toggleStoreUpdateOnLaunch = useDebugStore((state) => state.toggleStoreUpdateOnLaunch);
+  const storeUpdatePreview = useDebugStore((state) => state.storeUpdatePreview);
+  const setStoreUpdatePreview = useDebugStore((state) => state.setStoreUpdatePreview);
   const expanded = useDebugStore((state) => state.debugPanelExpanded);
   const toggleDebugPanel = useDebugStore((state) => state.toggleDebugPanel);
 
@@ -93,7 +93,7 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const notifSeconds = 10; // seconds until the test notification fires
   const notifParams = { options: { language, location, hasAlarm: true }, notifSettings, notifSeconds };
   const notifSecondsBadge = <Badge label={`${notifSeconds}s`} color={theme.placeholder} bg={theme.overlay} />;
-  const togglePreview = (value: UpdatePreview) => setUpdatePreview(updatePreview === value ? "idle" : value);
+  const togglePreview = (value: StoreUpdatePreview) => setStoreUpdatePreview(storeUpdatePreview === value ? "idle" : value);
   const showScheduledNModal = async () => showJsonViewerModal("Scheduled Notifications", await getScheduledNData());
   const showPrayerTrackingModal = () => showJsonViewerModal("Prayer Tracking", usePrayersTrackingStore.getState().tracking);
   const showPrayerTimesModal = () => {
@@ -167,9 +167,9 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
           <DebugSection title="App">
             <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={updatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
-            <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={updatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
-            <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceUpdateOnLaunch} hint={UPDATE_LAUNCH_HINT} onPress={toggleUpdateOnLaunch} />
+            <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
+            <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
+            <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
           </DebugSection>
 
           {/* Prayers */}
@@ -201,10 +201,10 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
 
           {/* Auto modals — one card, a block per modal */}
           <DebugSection title="Auto Modals">
-            <AutoModalHead title="Update" hint={UPDATE_HINT} />
-            <DebugButton label="Show 'Update' Modal" color={theme.violet} onPress={previewUpdateModal} />
+            <AutoModalHead title="Store Update" hint={STORE_UPDATE_HINT} />
+            <DebugButton label="Show 'Store Update' Modal" color={theme.violet} onPress={previewStoreUpdateModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Update' JSON" color={theme.gray} onPress={showUpdateJsonModal} />
+            <DebugButton label="Show 'Store Update' JSON" color={theme.gray} onPress={showStoreUpdateJsonModal} />
 
             <View style={[styles.blockSeparator, { backgroundColor: theme.bg2 }]} />
 

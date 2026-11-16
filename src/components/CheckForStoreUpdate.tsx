@@ -1,5 +1,5 @@
-import { showUpdateModal } from "@/components/UpdateModal";
-import { UpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
+import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Translations } from "@/types/language.types";
@@ -16,7 +16,7 @@ type CheckStatus = "idle" | "checking" | "upToDate" | "error";
 // ------------------------------------------------------------
 // Color + message to show for the current status
 // ------------------------------------------------------------
-function getStatusDisplay(shown: UpdatePreview | CheckStatus, theme: ThemeColors, tr: Translations) {
+function getStatusDisplay(shown: StoreUpdatePreview | CheckStatus, theme: ThemeColors, tr: Translations) {
   if (shown === "upToDate") {
     return { color: theme.green, message: tr.labels.upToDateMessage };
   }
@@ -27,11 +27,11 @@ function getStatusDisplay(shown: UpdatePreview | CheckStatus, theme: ThemeColors
 }
 
 // Main component
-export default function CheckForUpdate() {
+export default function CheckForStoreUpdate() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
-  const preview = useDebugStore((state) => state.updatePreview);
+  const preview = useDebugStore((state) => state.storeUpdatePreview);
   const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
 
   // Local state
@@ -58,7 +58,7 @@ export default function CheckForUpdate() {
 
       const { updateAvailable } = await ExpoInAppUpdates.checkForUpdate();
       if (updateAvailable) {
-        showUpdateModal(true);
+        showStoreUpdateModal(true);
         setStatus("idle");
       } else {
         setStatus("upToDate");
@@ -66,7 +66,7 @@ export default function CheckForUpdate() {
     } catch (err) {
       // Most common cause is ERROR_APP_NOT_OWNED, which is expected on sideloaded/dev builds
       // (the Play In-App Update API only works for apps installed via Play) — not a crash.
-      console.warn("⚠️ [CheckForUpdate] checkForUpdate failed:", err);
+      console.warn("⚠️ [CheckForStoreUpdate] checkForUpdate failed:", err);
       setErrorDetail(err instanceof Error ? err.message : String(err));
       setStatus("error");
     }
@@ -75,7 +75,7 @@ export default function CheckForUpdate() {
   // ------------------------------------------------------------
   // A debug preview (only while debug mode is on) overrides the real status when set
   // ------------------------------------------------------------
-  const shown: UpdatePreview | CheckStatus = debugModeEnabled && preview !== "idle" ? preview : status;
+  const shown: StoreUpdatePreview | CheckStatus = debugModeEnabled && preview !== "idle" ? preview : status;
   const { color: statusColor, message: statusMessage } = getStatusDisplay(shown, theme, tr);
 
   return (

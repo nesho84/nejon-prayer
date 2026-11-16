@@ -90,7 +90,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `languageStore` | Active language + translation strings |
 | `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
 | `tesbihStore` | Counter value, lap count, target |
-| `autoModalsStore` | State of the 4 auto modals (Update, Notif reminder, Rate App, Feedback): next-show time, last show, show count, done |
+| `autoModalsStore` | State of the 4 auto modals (Store update, Notif reminder, Rate App, Feedback): next-show time, last show, show count, done |
 | `modalStore` | Global bottom-sheet modal visibility |
 
 ### Sync Hooks (run once at root layout)
@@ -103,7 +103,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSetup` | Loads the bundled Quran JSON into `quranStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
-| `useAutoModals` | Startup check: store update check, then at most one auto modal (Update → Notif reminder → Feedback); notif reminder resets |
+| `useAutoModals` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
 
@@ -140,13 +140,13 @@ Two audio systems are used:
 ### Auto modals
 
 Four modals open on their own. Their state lives in `autoModalsStore`; the waits are constants at the
-top of that file, and the rules (`canShowUpdate`, `canShowNotifReminder`, `canShowRateApp`, `canShowFeedback`)
+top of that file, and the rules (`canShowStoreUpdate`, `canShowNotifReminder`, `canShowRateApp`, `canShowFeedback`)
 live in `src/hooks/useAutoModals.ts`. Each `show…Modal()` in `src/components/*Modal.tsx` only shows the
 modal and records the show.
 
 | Modal | First wait | After closing / "Later" | Stops for good |
 |---|---|---|---|
-| Update | none | next launch, next launch, then every 3 days | never |
+| Store update | none | next launch, next launch, then every 3 days | never |
 | Enable notifications | 3 days | 7 days, then 14 | after 3 shows |
 | Rate App (Android only) | none | 7 days | after 3 shows, "Open Store", or "Already rated" |
 | Feedback | 7 days | 30 days | after 3 shows, sent, or "Don't ask again" |
@@ -155,7 +155,7 @@ Rate App and Feedback are always at least 7 days apart. No auto modal opens whil
 
 **Launch order** (`checkAutoModalsOnStart`, once per launch after onboarding and the first device-settings
 sync) — at most one of:
-1. **Update** — if the store check (`expo-in-app-updates`, 5 s timeout, release builds only) reports
+1. **Store update** — if the store check (`expo-in-app-updates`, 5 s timeout, release builds only) reports
    an update and it's due. "No update" while online resets its cycle; offline, a failed check (sideloaded
    build, iOS without an AppStoreID) or a timeout change nothing.
 2. **Enable notifications** — if due. Granting resets it; turning notifications off again starts the
@@ -164,10 +164,10 @@ sync) — at most one of:
 
 **Rate App** keeps its own triggers — the 3rd prayer marked on Home or in the calendar, and Quran reading
 reaching ayah 20 — and opens there when `canShowRateApp()`. It also waits for a later session when
-Update or Enable notifications already showed in this one.
+Store update or Enable notifications already showed in this one.
 
 **Manual opens** skip the checks and aren't recorded: Rate App and Feedback from About (`fromAbout`), and
-Settings → "Check for update" (`showUpdateModal(true)`). The debug panel previews count like a real show.
+Settings → "Check for update" (`showStoreUpdateModal(true)`). The debug panel previews count like a real show.
 
 ### Ads (AdMob)
 

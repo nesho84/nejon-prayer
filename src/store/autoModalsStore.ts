@@ -5,15 +5,15 @@ import { FeedbackInput, FeedbackResult } from "@/types/feedback.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type UpdateCheckResult = "available" | "upToDate" | "offline" | "error" | "timeout";
+export type StoreUpdateResult = "available" | "upToDate" | "offline" | "error" | "timeout";
 
 interface AutoModalsData {
-  // Update
-  updateNextShowAt: number | null;
-  updateShownAt: number | null;
-  updateShownCount: number;
-  updateCheckedAt: number | null;
-  updateCheckResult: UpdateCheckResult | null;
+  // Store update
+  storeUpdateNextShowAt: number | null;
+  storeUpdateShownAt: number | null;
+  storeUpdateShownCount: number;
+  storeUpdateCheckedAt: number | null;
+  storeUpdateCheckResult: StoreUpdateResult | null;
   // Notif reminder
   notifReminderNextShowAt: number | null;
   notifReminderShownAt: number | null;
@@ -39,10 +39,10 @@ interface AutoModalsState extends AutoModalsData {
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Update — shows 1 and 2 come back next launch, then every 3 days; never stops
-export const UPDATE_NEXT_LAUNCH_SHOWS = 2;
-export const UPDATE_WAIT_DAYS = 3;
-export const UPDATE_CHECK_TIMEOUT_MS = 5000;
+// Store update — shows 1 and 2 come back next launch, then every 3 days; never stops
+export const STORE_UPDATE_NEXT_LAUNCH_SHOWS = 2;
+export const STORE_UPDATE_WAIT_DAYS = 3;
+export const STORE_UPDATE_CHECK_TIMEOUT_MS = 5000;
 
 // Notif reminder — 3 days after seen off, then 7 and 14 days after closing; 3 shows
 export const NOTIF_REMINDER_FIRST_WAIT_DAYS = 3;
@@ -65,11 +65,11 @@ const STORAGE_NAME = "auto-modals-storage";
 const OLD_STORAGE_NAMES = ["rate-app-storage", "feedback-storage", "notif-reminder-storage"];
 
 const INITIAL_DATA: AutoModalsData = {
-  updateNextShowAt: null,
-  updateShownAt: null,
-  updateShownCount: 0,
-  updateCheckedAt: null,
-  updateCheckResult: null,
+  storeUpdateNextShowAt: null,
+  storeUpdateShownAt: null,
+  storeUpdateShownCount: 0,
+  storeUpdateCheckedAt: null,
+  storeUpdateCheckResult: null,
   notifReminderNextShowAt: null,
   notifReminderShownAt: null,
   notifReminderShownCount: 0,

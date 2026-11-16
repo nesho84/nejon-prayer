@@ -76,7 +76,7 @@ describe('autoModalsStore — migration', () => {
     expect(state.feedbackNextShowAt).toBe(2000);
     expect(state.notifReminderNextShowAt).toBe(3000);
     expect(state.notifReminderShownCount).toBe(1);
-    expect(state.updateShownCount).toBe(0);
+    expect(state.storeUpdateShownCount).toBe(0);
     expect(state.isReady).toBe(true);
 
     expect(storage.removeItem).toHaveBeenCalledWith('rate-app-storage');
@@ -144,10 +144,10 @@ describe('autoModalsStore — setAutoModals', () => {
   });
 
   it('persists only the data keys', () => {
-    useAutoModalsStore.getState().setAutoModals({ updateShownCount: 1 });
+    useAutoModalsStore.getState().setAutoModals({ storeUpdateShownCount: 1 });
 
     const written = JSON.parse(mockSetItem.mock.calls.at(-1)[1]);
-    expect(written.state.updateShownCount).toBe(1);
+    expect(written.state.storeUpdateShownCount).toBe(1);
     expect(written.state).not.toHaveProperty('isReady');
   });
 });

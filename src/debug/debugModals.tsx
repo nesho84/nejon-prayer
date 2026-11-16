@@ -1,7 +1,7 @@
 import { showFeedbackModal } from "@/components/FeedbackModal";
 import { showNotifReminderModal } from "@/components/NotifReminderModal";
 import { showRateAppModal } from "@/components/RateAppModal";
-import { showUpdateModal } from "@/components/UpdateModal";
+import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
@@ -94,40 +94,40 @@ export function previewKhatamCelebrationModal() {
 }
 
 // ------------------------------------------------------------
-// Update
+// Store Update
 // ------------------------------------------------------------
-export function showUpdateJsonModal() {
-  const { updateNextShowAt, updateShownAt, updateShownCount, updateCheckedAt, updateCheckResult } = useAutoModalsStore.getState();
-  showJsonViewerModal("Update", {
-    updateNextShowAt: formatTime(updateNextShowAt),
-    updateShownAt: formatTime(updateShownAt),
-    updateShownCount,
-    updateCheckedAt: formatTime(updateCheckedAt),
-    updateCheckResult,
+export function showStoreUpdateJsonModal() {
+  const { storeUpdateNextShowAt, storeUpdateShownAt, storeUpdateShownCount, storeUpdateCheckedAt, storeUpdateCheckResult } = useAutoModalsStore.getState();
+  showJsonViewerModal("Store Update", {
+    storeUpdateNextShowAt: formatTime(storeUpdateNextShowAt),
+    storeUpdateShownAt: formatTime(storeUpdateShownAt),
+    storeUpdateShownCount,
+    storeUpdateCheckedAt: formatTime(storeUpdateCheckedAt),
+    storeUpdateCheckResult,
   });
 }
 
-function resetUpdate() {
+function resetStoreUpdate() {
   useAutoModalsStore.getState().setAutoModals({
-    updateNextShowAt: null,
-    updateShownAt: null,
-    updateShownCount: 0,
-    updateCheckedAt: null,
-    updateCheckResult: null,
+    storeUpdateNextShowAt: null,
+    storeUpdateShownAt: null,
+    storeUpdateShownCount: 0,
+    storeUpdateCheckedAt: null,
+    storeUpdateCheckResult: null,
   });
 }
 
-export function previewUpdateModal() {
-  const { updateNextShowAt, updateShownCount } = useAutoModalsStore.getState();
+export function previewStoreUpdateModal() {
+  const { storeUpdateNextShowAt, storeUpdateShownCount } = useAutoModalsStore.getState();
 
-  if (updateNextShowAt && Date.now() < updateNextShowAt) {
-    Alert.alert("Update", `Shown ${updateShownCount} times — the real modal waits until ${formatTime(updateNextShowAt)}.`, [
+  if (storeUpdateNextShowAt && Date.now() < storeUpdateNextShowAt) {
+    Alert.alert("Store Update", `Shown ${storeUpdateShownCount} times — the real modal waits until ${formatTime(storeUpdateNextShowAt)}.`, [
       { text: "Cancel", style: "cancel" },
-      { text: "Reset", onPress: resetUpdate },
+      { text: "Reset", onPress: resetStoreUpdate },
     ]);
     return;
   }
-  showUpdateModal();
+  showStoreUpdateModal();
 }
 
 // ------------------------------------------------------------

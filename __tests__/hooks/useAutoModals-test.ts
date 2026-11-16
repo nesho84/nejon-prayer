@@ -1,12 +1,12 @@
 import { showFeedbackModal } from '@/components/FeedbackModal';
 import { showNotifReminderModal } from '@/components/NotifReminderModal';
-import { showUpdateModal } from '@/components/UpdateModal';
+import { showStoreUpdateModal } from '@/components/StoreUpdateModal';
 import { useDebugStore } from '@/debug/debugStore';
 import {
   canShowFeedback,
   canShowNotifReminder,
   canShowRateApp,
-  canShowUpdate,
+  canShowStoreUpdate,
   checkAutoModalsOnStart,
   useAutoModals,
 } from '@/hooks/useAutoModals';
@@ -22,7 +22,7 @@ import { Platform } from 'react-native';
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
-jest.mock('@/components/UpdateModal', () => ({ showUpdateModal: jest.fn() }));
+jest.mock('@/components/StoreUpdateModal', () => ({ showStoreUpdateModal: jest.fn() }));
 jest.mock('@/components/NotifReminderModal', () => ({ showNotifReminderModal: jest.fn() }));
 jest.mock('@/components/FeedbackModal', () => ({ showFeedbackModal: jest.fn() }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
@@ -45,11 +45,11 @@ const netInfoFetch = NetInfo.fetch as jest.Mock;
 const originalDev = (globalThis as any).__DEV__;
 
 const RESET_DATA = {
-  updateNextShowAt: null,
-  updateShownAt: null,
-  updateShownCount: 0,
-  updateCheckedAt: null,
-  updateCheckResult: null,
+  storeUpdateNextShowAt: null,
+  storeUpdateShownAt: null,
+  storeUpdateShownCount: 0,
+  storeUpdateCheckedAt: null,
+  storeUpdateCheckResult: null,
   notifReminderNextShowAt: null,
   notifReminderShownAt: null,
   notifReminderShownCount: 0,
@@ -74,7 +74,7 @@ beforeEach(() => {
   useModalStore.setState({ visible: false });
   useDeviceSettingsStore.setState({ notificationPermission: true, isReady: true });
   useOnboardingStore.setState({ onboardingComplete: true });
-  useDebugStore.setState({ debugModeEnabled: false, forceUpdateOnLaunch: false });
+  useDebugStore.setState({ debugModeEnabled: false, forceStoreUpdateOnLaunch: false });
   checkForUpdate.mockResolvedValue({ updateAvailable: false });
   netInfoFetch.mockResolvedValue({ isConnected: true });
 });
@@ -84,16 +84,16 @@ afterEach(() => {
   (globalThis as any).__DEV__ = originalDev;
 });
 
-describe('canShowUpdate', () => {
+describe('canShowStoreUpdate', () => {
   it('can show with no wait, and after the wait', () => {
-    expect(canShowUpdate()).toBe(true);
-    useAutoModalsStore.setState({ updateNextShowAt: NOW - 1 });
-    expect(canShowUpdate()).toBe(true);
+    expect(canShowStoreUpdate()).toBe(true);
+    useAutoModalsStore.setState({ storeUpdateNextShowAt: NOW - 1 });
+    expect(canShowStoreUpdate()).toBe(true);
   });
 
   it('cannot show during the 3-day wait', () => {
-    useAutoModalsStore.setState({ updateNextShowAt: NOW + DAY_MS });
-    expect(canShowUpdate()).toBe(false);
+    useAutoModalsStore.setState({ storeUpdateNextShowAt: NOW + DAY_MS });
+    expect(canShowStoreUpdate()).toBe(false);
   });
 });
 
@@ -157,14 +157,14 @@ describe('canShowRateApp', () => {
   });
 
   it('waits for a later session when Update or Notif reminder already showed in this one', () => {
-    useAutoModalsStore.setState({ updateShownAt: LOADED_AT });
+    useAutoModalsStore.setState({ storeUpdateShownAt: LOADED_AT });
     expect(canShowRateApp()).toBe(false);
-    useAutoModalsStore.setState({ updateShownAt: null, notifReminderShownAt: LOADED_AT });
+    useAutoModalsStore.setState({ storeUpdateShownAt: null, notifReminderShownAt: LOADED_AT });
     expect(canShowRateApp()).toBe(false);
   });
 
   it('can show when Update or Notif reminder showed in an earlier session', () => {
-    useAutoModalsStore.setState({ updateShownAt: LOADED_AT - DAY_MS, notifReminderShownAt: LOADED_AT - DAY_MS });
+    useAutoModalsStore.setState({ storeUpdateShownAt: LOADED_AT - DAY_MS, notifReminderShownAt: LOADED_AT - DAY_MS });
     expect(canShowRateApp()).toBe(true);
   });
 });
@@ -217,44 +217,44 @@ describe('checkAutoModalsOnStart — store check', () => {
     checkForUpdate.mockResolvedValue({ updateAvailable: true });
     await checkAutoModalsOnStart();
 
-    expect(showUpdateModal).toHaveBeenCalledTimes(1);
-    expect(useAutoModalsStore.getState().updateCheckResult).toBe('available');
-    expect(useAutoModalsStore.getState().updateCheckedAt).toBe(NOW);
+    expect(showStoreUpdateModal).toHaveBeenCalledTimes(1);
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('available');
+    expect(useAutoModalsStore.getState().storeUpdateCheckedAt).toBe(NOW);
   });
 
   it('skips the update modal during its 3-day wait', async () => {
     checkForUpdate.mockResolvedValue({ updateAvailable: true });
-    useAutoModalsStore.setState({ updateNextShowAt: NOW + DAY_MS });
+    useAutoModalsStore.setState({ storeUpdateNextShowAt: NOW + DAY_MS });
     await checkAutoModalsOnStart();
 
-    expect(showUpdateModal).not.toHaveBeenCalled();
+    expect(showStoreUpdateModal).not.toHaveBeenCalled();
   });
 
   it('resets the update cycle when up to date and online', async () => {
-    useAutoModalsStore.setState({ updateShownCount: 4, updateNextShowAt: NOW + DAY_MS });
+    useAutoModalsStore.setState({ storeUpdateShownCount: 4, storeUpdateNextShowAt: NOW + DAY_MS });
     await checkAutoModalsOnStart();
 
-    expect(useAutoModalsStore.getState().updateCheckResult).toBe('upToDate');
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(0);
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('upToDate');
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBeNull();
   });
 
   it('does not reset when Play says "no update" offline', async () => {
     netInfoFetch.mockResolvedValue({ isConnected: false });
-    useAutoModalsStore.setState({ updateShownCount: 4, updateNextShowAt: NOW + DAY_MS });
+    useAutoModalsStore.setState({ storeUpdateShownCount: 4, storeUpdateNextShowAt: NOW + DAY_MS });
     await checkAutoModalsOnStart();
 
-    expect(useAutoModalsStore.getState().updateCheckResult).toBe('offline');
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(4);
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('offline');
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(4);
   });
 
   it('does not reset when the check fails (sideloaded build, iOS) — and still shows the next modal', async () => {
     checkForUpdate.mockRejectedValue(new Error('ERROR_APP_NOT_OWNED'));
-    useAutoModalsStore.setState({ updateShownCount: 4, feedbackNextShowAt: NOW - 1 });
+    useAutoModalsStore.setState({ storeUpdateShownCount: 4, feedbackNextShowAt: NOW - 1 });
     await checkAutoModalsOnStart();
 
-    expect(useAutoModalsStore.getState().updateCheckResult).toBe('error');
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(4);
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('error');
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(4);
     expect(showFeedbackModal).toHaveBeenCalledTimes(1);
   });
 
@@ -268,13 +268,13 @@ describe('checkAutoModalsOnStart — store check', () => {
     });
     await launch;
 
-    expect(useAutoModalsStore.getState().updateCheckResult).toBe('timeout');
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('timeout');
     expect(showFeedbackModal).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       jest.advanceTimersByTime(5000);
     });
-    expect(showUpdateModal).not.toHaveBeenCalled();
+    expect(showStoreUpdateModal).not.toHaveBeenCalled();
   });
 
   it('skips the real check in dev builds', async () => {
@@ -282,24 +282,24 @@ describe('checkAutoModalsOnStart — store check', () => {
     await checkAutoModalsOnStart();
 
     expect(checkForUpdate).not.toHaveBeenCalled();
-    expect(useAutoModalsStore.getState().updateCheckResult).toBeNull();
+    expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBeNull();
   });
 
   it('debug "Update on launch" fakes an available update without a check', async () => {
     (globalThis as any).__DEV__ = true;
-    useDebugStore.setState({ debugModeEnabled: true, forceUpdateOnLaunch: true });
+    useDebugStore.setState({ debugModeEnabled: true, forceStoreUpdateOnLaunch: true });
     await checkAutoModalsOnStart();
 
     expect(checkForUpdate).not.toHaveBeenCalled();
-    expect(showUpdateModal).toHaveBeenCalledTimes(1);
+    expect(showStoreUpdateModal).toHaveBeenCalledTimes(1);
   });
 
   it('ignores "Update on launch" when debug mode is off', async () => {
     (globalThis as any).__DEV__ = true;
-    useDebugStore.setState({ forceUpdateOnLaunch: true });
+    useDebugStore.setState({ forceStoreUpdateOnLaunch: true });
     await checkAutoModalsOnStart();
 
-    expect(showUpdateModal).not.toHaveBeenCalled();
+    expect(showStoreUpdateModal).not.toHaveBeenCalled();
   });
 });
 
@@ -313,7 +313,7 @@ describe('checkAutoModalsOnStart — order', () => {
   it('Update comes first', async () => {
     await checkAutoModalsOnStart();
 
-    expect(showUpdateModal).toHaveBeenCalledTimes(1);
+    expect(showStoreUpdateModal).toHaveBeenCalledTimes(1);
     expect(showNotifReminderModal).not.toHaveBeenCalled();
     expect(showFeedbackModal).not.toHaveBeenCalled();
   });
@@ -338,7 +338,7 @@ describe('checkAutoModalsOnStart — order', () => {
     useModalStore.setState({ visible: true });
     await checkAutoModalsOnStart();
 
-    expect(showUpdateModal).not.toHaveBeenCalled();
+    expect(showStoreUpdateModal).not.toHaveBeenCalled();
     expect(showNotifReminderModal).not.toHaveBeenCalled();
     expect(showFeedbackModal).not.toHaveBeenCalled();
   });

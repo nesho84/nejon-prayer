@@ -1,5 +1,5 @@
 import { globalStyles } from "@/constants/styles";
-import { DAY_MS, UPDATE_NEXT_LAUNCH_SHOWS, UPDATE_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
+import { DAY_MS, STORE_UPDATE_NEXT_LAUNCH_SHOWS, STORE_UPDATE_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -8,20 +8,20 @@ import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-
 import { StyleSheet, Text, View } from "react-native";
 
 // ------------------------------------------------------------
-// Show the "Update available" modal — no checks (canShowUpdate runs at launch).
+// Show the "Update available" modal — no checks (canShowStoreUpdate runs at launch).
 // Recorded on show, since tapping outside closes it too; from Settings nothing is recorded.
 // ------------------------------------------------------------
-export function showUpdateModal(fromSettings = false) {
-  const { updateShownCount, setAutoModals } = useAutoModalsStore.getState();
+export function showStoreUpdateModal(fromSettings = false) {
+  const { storeUpdateShownCount, setAutoModals } = useAutoModalsStore.getState();
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
 
   if (!fromSettings) {
     setAutoModals({
-      updateShownAt: Date.now(),
-      updateShownCount: updateShownCount + 1,
+      storeUpdateShownAt: Date.now(),
+      storeUpdateShownCount: storeUpdateShownCount + 1,
       // Next launch for the first shows, then every few days
-      updateNextShowAt: updateShownCount + 1 <= UPDATE_NEXT_LAUNCH_SHOWS ? null : Date.now() + UPDATE_WAIT_DAYS * DAY_MS,
+      storeUpdateNextShowAt: storeUpdateShownCount + 1 <= STORE_UPDATE_NEXT_LAUNCH_SHOWS ? null : Date.now() + STORE_UPDATE_WAIT_DAYS * DAY_MS,
     });
   }
 

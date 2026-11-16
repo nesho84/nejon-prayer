@@ -4,10 +4,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
 // Debug-only store backing the Debug Panel toggles.
-// forceUpdateOnLaunch, debugModeEnabled and debugPanelExpanded persist across reloads; the rest reset to OFF.
+// forceStoreUpdateOnLaunch, debugModeEnabled and debugPanelExpanded persist across reloads; the rest reset to OFF.
 // ------------------------------------------------------------
 
-export type UpdatePreview = "idle" | "upToDate" | "error";
+export type StoreUpdatePreview = "idle" | "upToDate" | "error";
 
 interface DebugState {
   debugModeEnabled: boolean;
@@ -18,8 +18,8 @@ interface DebugState {
   forcePrayersOutdated: boolean;
   forceLocationChange: boolean;
   forceNoPrayerTimes: boolean;
-  forceUpdateOnLaunch: boolean;
-  updatePreview: UpdatePreview;
+  forceStoreUpdateOnLaunch: boolean;
+  storeUpdatePreview: StoreUpdatePreview;
   isReady: boolean;
   toggleHoliday: () => void;
   toggleFriday: () => void;
@@ -27,10 +27,10 @@ interface DebugState {
   togglePrayersOutdated: () => void;
   toggleLocationChange: () => void;
   toggleNoPrayerTimes: () => void;
-  toggleUpdateOnLaunch: () => void;
+  toggleStoreUpdateOnLaunch: () => void;
   toggleDebugMode: () => void;
   toggleDebugPanel: () => void;
-  setUpdatePreview: (value: UpdatePreview) => void;
+  setStoreUpdatePreview: (value: StoreUpdatePreview) => void;
 }
 
 export const useDebugStore = create<DebugState>()(
@@ -44,8 +44,8 @@ export const useDebugStore = create<DebugState>()(
       forcePrayersOutdated: false,
       forceLocationChange: false,
       forceNoPrayerTimes: false,
-      forceUpdateOnLaunch: false,
-      updatePreview: "idle",
+      forceStoreUpdateOnLaunch: false,
+      storeUpdatePreview: "idle",
       isReady: false,
 
       toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
@@ -54,10 +54,10 @@ export const useDebugStore = create<DebugState>()(
       togglePrayersOutdated: () => set((s) => ({ forcePrayersOutdated: !s.forcePrayersOutdated })),
       toggleLocationChange: () => set((s) => ({ forceLocationChange: !s.forceLocationChange })),
       toggleNoPrayerTimes: () => set((s) => ({ forceNoPrayerTimes: !s.forceNoPrayerTimes })),
-      toggleUpdateOnLaunch: () => set((s) => ({ forceUpdateOnLaunch: !s.forceUpdateOnLaunch })),
+      toggleStoreUpdateOnLaunch: () => set((s) => ({ forceStoreUpdateOnLaunch: !s.forceStoreUpdateOnLaunch })),
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
       toggleDebugPanel: () => set((s) => ({ debugPanelExpanded: !s.debugPanelExpanded })),
-      setUpdatePreview: (value) => set({ updatePreview: value }),
+      setStoreUpdatePreview: (value) => set({ storeUpdatePreview: value }),
     }),
     {
       name: "debug-storage",
@@ -65,7 +65,7 @@ export const useDebugStore = create<DebugState>()(
       partialize: (state) => ({
         debugModeEnabled: state.debugModeEnabled,
         debugPanelExpanded: state.debugPanelExpanded,
-        forceUpdateOnLaunch: state.forceUpdateOnLaunch,
+        forceStoreUpdateOnLaunch: state.forceStoreUpdateOnLaunch,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

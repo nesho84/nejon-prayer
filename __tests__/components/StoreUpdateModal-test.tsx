@@ -1,4 +1,4 @@
-import { showUpdateModal } from '@/components/UpdateModal';
+import { showStoreUpdateModal } from '@/components/StoreUpdateModal';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useModalStore } from '@/store/modalStore';
 import { openStoreListing } from '@/utils/system';
@@ -22,16 +22,16 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.setSystemTime(NOW);
   useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
-  useAutoModalsStore.setState({ updateNextShowAt: null, updateShownAt: null, updateShownCount: 0 });
+  useAutoModalsStore.setState({ storeUpdateNextShowAt: null, storeUpdateShownAt: null, storeUpdateShownCount: 0 });
 });
 
 afterEach(() => {
   jest.useRealTimers();
 });
 
-describe('showUpdateModal — show', () => {
+describe('showStoreUpdateModal — show', () => {
   it('shows a dismissable alert with "Later" and "Open Store"', () => {
-    showUpdateModal();
+    showStoreUpdateModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
     const options = show().mock.calls[0][0];
@@ -41,41 +41,41 @@ describe('showUpdateModal — show', () => {
   });
 
   it('"Open Store" opens the store listing', () => {
-    showUpdateModal();
+    showStoreUpdateModal();
     show().mock.calls[0][0].buttons.find((b: any) => b.action === 'openStore').onPress();
     expect(openStoreListing).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('showUpdateModal — recorded on show', () => {
+describe('showStoreUpdateModal — recorded on show', () => {
   it('1st and 2nd show come back next launch, the 3rd waits 3 days', () => {
-    showUpdateModal();
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(1);
-    expect(useAutoModalsStore.getState().updateShownAt).toBe(NOW);
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBeNull();
+    showStoreUpdateModal();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(1);
+    expect(useAutoModalsStore.getState().storeUpdateShownAt).toBe(NOW);
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBeNull();
 
-    showUpdateModal();
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(2);
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBeNull();
+    showStoreUpdateModal();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(2);
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBeNull();
 
-    showUpdateModal();
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(3);
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBe(NOW + 3 * DAY_MS);
+    showStoreUpdateModal();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(3);
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBe(NOW + 3 * DAY_MS);
   });
 
   it('keeps waiting 3 days after every later show', () => {
-    useAutoModalsStore.setState({ updateShownCount: 5 });
-    showUpdateModal();
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(6);
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBe(NOW + 3 * DAY_MS);
+    useAutoModalsStore.setState({ storeUpdateShownCount: 5 });
+    showStoreUpdateModal();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(6);
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBe(NOW + 3 * DAY_MS);
   });
 
   it('from Settings, nothing is recorded', () => {
-    showUpdateModal(true);
+    showStoreUpdateModal(true);
 
     expect(show()).toHaveBeenCalledTimes(1);
-    expect(useAutoModalsStore.getState().updateShownCount).toBe(0);
-    expect(useAutoModalsStore.getState().updateShownAt).toBeNull();
-    expect(useAutoModalsStore.getState().updateNextShowAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().storeUpdateShownAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeUpdateNextShowAt).toBeNull();
   });
 });
