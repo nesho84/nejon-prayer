@@ -18,17 +18,9 @@ jest.mock('@/services/feedbackService', () => ({
 const mockSendFeedback = sendFeedback as jest.Mock;
 const mockSetItem = mmkvStorage.setItem as jest.Mock;
 
-// Exactly what the old persisted stores saved
+// Exactly what an old persisted store saved
 const OLD_RATE_APP = JSON.stringify({
   state: { rateAppNextShowAt: 1000, rateAppShownAt: 900, rateAppShownCount: 2, rateAppDone: true },
-  version: 0,
-});
-const OLD_FEEDBACK = JSON.stringify({
-  state: { feedbackNextShowAt: 2000, feedbackShownAt: null, feedbackShownCount: 0, feedbackDone: false, feedbackLaunchCount: 4 },
-  version: 0,
-});
-const OLD_NOTIF_REMINDER = JSON.stringify({
-  state: { notifReminderNextShowAt: 3000, notifReminderShownAt: 2500, notifReminderShownCount: 1, notifReminderDone: false },
   version: 0,
 });
 
@@ -51,95 +43,33 @@ const loadStore = (initialItems: Record<string, string>) => {
   return { store, storage };
 };
 
-// Writes to the new store only (other stores load too)
-const newStoreWrites = (storage: Record<'setItem', jest.Mock>) =>
-  storage.setItem.mock.calls.filter(([name]) => name === 'auto-modals-storage');
-
 beforeEach(() => {
   jest.clearAllMocks();
   useLanguageStore.setState({ language: 'en' });
 });
 
-describe('autoModalsStore — migration', () => {
-  it('copies the 3 old stores over and removes them', () => {
+describe('autoModalsStore — old stores', () => {
+  it('deletes the 3 old stores without carrying their values over', () => {
     const { store, storage } = loadStore({
+      'auto-modals-storage': JSON.stringify({ state: { storeReviewShownCount: 1 }, version: 0 }),
       'rate-app-storage': OLD_RATE_APP,
-      'feedback-storage': OLD_FEEDBACK,
-      'notif-reminder-storage': OLD_NOTIF_REMINDER,
     });
-
-    const state = store.getState();
-    expect(state.rateAppNextShowAt).toBe(1000);
-    expect(state.rateAppShownAt).toBe(900);
-    expect(state.rateAppShownCount).toBe(2);
-    expect(state.rateAppDone).toBe(true);
-    expect(state.feedbackNextShowAt).toBe(2000);
-    expect(state.notifReminderNextShowAt).toBe(3000);
-    expect(state.notifReminderShownCount).toBe(1);
-    expect(state.storeUpdateShownCount).toBe(0);
-    expect(state.isReady).toBe(true);
 
     expect(storage.removeItem).toHaveBeenCalledWith('rate-app-storage');
     expect(storage.removeItem).toHaveBeenCalledWith('feedback-storage');
     expect(storage.removeItem).toHaveBeenCalledWith('notif-reminder-storage');
-  });
-
-  it('drops feedbackLaunchCount', () => {
-    const { store, storage } = loadStore({ 'feedback-storage': OLD_FEEDBACK });
-
-    expect(store.getState()).not.toHaveProperty('feedbackLaunchCount');
-    const written = JSON.parse(newStoreWrites(storage)[0][1]);
-    expect(written.state).not.toHaveProperty('feedbackLaunchCount');
-  });
-
-  it('copies only the old stores that exist', () => {
-    const { store, storage } = loadStore({ 'rate-app-storage': OLD_RATE_APP });
-
-    expect(store.getState().rateAppDone).toBe(true);
-    expect(store.getState().feedbackNextShowAt).toBeNull();
-    expect(store.getState().notifReminderNextShowAt).toBeNull();
-  });
-
-  it('skips an unreadable old store without crashing, and still copies the others', () => {
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
-    const { store, storage } = loadStore({
-      'rate-app-storage': '{not json',
-      'feedback-storage': 'null',
-      'notif-reminder-storage': OLD_NOTIF_REMINDER,
-    });
-
-    expect(store.getState().rateAppDone).toBe(false);
-    expect(store.getState().feedbackNextShowAt).toBeNull();
-    expect(store.getState().notifReminderNextShowAt).toBe(3000);
-    expect(storage.removeItem).toHaveBeenCalledWith('rate-app-storage');
-  });
-
-  it('does nothing when the new store already exists', () => {
-    const { store, storage } = loadStore({
-      'auto-modals-storage': JSON.stringify({ state: { rateAppShownCount: 1 }, version: 0 }),
-      'rate-app-storage': OLD_RATE_APP,
-    });
-
-    expect(store.getState().rateAppShownCount).toBe(1);
-    expect(store.getState().rateAppDone).toBe(false);
-    expect(storage.removeItem).not.toHaveBeenCalled();
-  });
-
-  it('does nothing on a fresh install', () => {
-    const { store, storage } = loadStore({});
-
-    expect(store.getState().rateAppDone).toBe(false);
-    expect(newStoreWrites(storage)).toHaveLength(0);
-    expect(storage.removeItem).not.toHaveBeenCalled();
+    expect(store.getState().storeReviewShownCount).toBe(1);
+    expect(store.getState().storeReviewDone).toBe(false);
+    expect(store.getState().isReady).toBe(true);
   });
 });
 
 describe('autoModalsStore — setAutoModals', () => {
   it('merges a patch and keeps the other keys', () => {
-    useAutoModalsStore.getState().setAutoModals({ rateAppShownCount: 2 });
+    useAutoModalsStore.getState().setAutoModals({ storeReviewShownCount: 2 });
     useAutoModalsStore.getState().setAutoModals({ feedbackNextShowAt: 9999 });
 
-    expect(useAutoModalsStore.getState().rateAppShownCount).toBe(2);
+    expect(useAutoModalsStore.getState().storeReviewShownCount).toBe(2);
     expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(9999);
   });
 

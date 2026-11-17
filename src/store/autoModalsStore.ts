@@ -18,11 +18,11 @@ interface AutoModalsData {
   notifReminderShownAt: number | null;
   notifReminderShownCount: number;
   notifReminderDone: boolean;
-  // Rate App
-  rateAppNextShowAt: number | null;
-  rateAppShownAt: number | null;
-  rateAppShownCount: number;
-  rateAppDone: boolean;
+  // Store review
+  storeReviewNextShowAt: number | null;
+  storeReviewShownAt: number | null;
+  storeReviewShownCount: number;
+  storeReviewDone: boolean;
   // Feedback
   feedbackNextShowAt: number | null;
   feedbackShownAt: number | null;
@@ -48,20 +48,21 @@ export const NOTIF_REMINDER_FIRST_WAIT_DAYS = 3;
 export const NOTIF_REMINDER_WAIT_DAYS = [7, 14];
 export const NOTIF_REMINDER_MAX_SHOWS = 3;
 
-// Rate App — no first wait, 7 days after "Later"; 3 shows
-export const RATE_APP_WAIT_DAYS = 7;
-export const RATE_APP_MAX_SHOWS = 3;
+// Store review — no first wait, 7 days after "Later"; 3 shows
+export const STORE_REVIEW_WAIT_DAYS = 7;
+export const STORE_REVIEW_MAX_SHOWS = 3;
 
 // Feedback — 7 days after onboarding, 30 days after "Maybe later" / close; 3 shows
 export const FEEDBACK_FIRST_WAIT_DAYS = 7;
 export const FEEDBACK_WAIT_DAYS = 30;
 export const FEEDBACK_MAX_SHOWS = 3;
 
-// Minimum gap between Rate App and Feedback (checked on both sides)
-export const RATE_FEEDBACK_GAP_DAYS = 7;
+// Minimum gap between Store review and Feedback (checked on both sides)
+export const STORE_REVIEW_FEEDBACK_GAP_DAYS = 7;
 
-const STORAGE_NAME = "auto-modals-storage";
+// Old stores replaced by this one — delete their leftovers (values aren't carried over)
 const OLD_STORAGE_NAMES = ["rate-app-storage", "feedback-storage", "notif-reminder-storage"];
+OLD_STORAGE_NAMES.forEach((name) => mmkvStorage.removeItem(name));
 
 const INITIAL_DATA: AutoModalsData = {
   storeUpdateNextShowAt: null,
@@ -73,55 +74,15 @@ const INITIAL_DATA: AutoModalsData = {
   notifReminderShownAt: null,
   notifReminderShownCount: 0,
   notifReminderDone: false,
-  rateAppNextShowAt: null,
-  rateAppShownAt: null,
-  rateAppShownCount: 0,
-  rateAppDone: false,
+  storeReviewNextShowAt: null,
+  storeReviewShownAt: null,
+  storeReviewShownCount: 0,
+  storeReviewDone: false,
   feedbackNextShowAt: null,
   feedbackShownAt: null,
   feedbackShownCount: 0,
   feedbackDone: false,
 };
-
-// ------------------------------------------------------------
-// Move the 3 old stores into this one (same key names) — before create() hydrates
-// ------------------------------------------------------------
-function migrateOldStores() {
-  // MMKV is sync
-  const getItem = (name: string) => mmkvStorage.getItem(name) as string | null;
-
-  if (getItem(STORAGE_NAME) !== null) {
-    return;
-  }
-
-  // Known keys only — drops feedbackLaunchCount
-  const state: Record<string, unknown> = {};
-  for (const name of OLD_STORAGE_NAMES) {
-    const raw = getItem(name);
-    if (raw === null) {
-      continue;
-    }
-    try {
-      const oldState = JSON.parse(raw).state ?? {};
-      for (const key of Object.keys(INITIAL_DATA)) {
-        if (key in oldState) {
-          state[key] = oldState[key];
-        }
-      }
-    } catch (err) {
-      // Unreadable — skip this store instead of crashing the app on start
-      console.warn(`⚠️ [autoModalsStore] Failed to migrate ${name}:`, err);
-    }
-  }
-
-  if (Object.keys(state).length === 0) {
-    return;
-  }
-  mmkvStorage.setItem(STORAGE_NAME, JSON.stringify({ state, version: 0 }));
-  OLD_STORAGE_NAMES.forEach((name) => mmkvStorage.removeItem(name));
-}
-
-migrateOldStores();
 
 export const useAutoModalsStore = create<AutoModalsState>()(
   persist(
@@ -146,7 +107,7 @@ export const useAutoModalsStore = create<AutoModalsState>()(
       },
     }),
     {
-      name: STORAGE_NAME,
+      name: "auto-modals-storage",
       storage: createJSONStorage(() => mmkvStorage),
       partialize: ({ isReady, setAutoModals, submitFeedback, ...data }) => data,
       onRehydrateStorage: () => (state) => {

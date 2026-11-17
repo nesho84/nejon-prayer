@@ -16,7 +16,7 @@ import {
   previewKhatamCelebrationModal,
   previewNotifReminderModal,
   previewPrayerCelebrationModal,
-  previewRateAppModal,
+  previewStoreReviewModal,
   previewStoreUpdateModal,
   showAutoModalsJsonModal,
 } from "./debugModals";
@@ -44,7 +44,7 @@ import {
   NOTIF_REMINDER_HINT,
   OUTDATED_HINT,
   PRAYER_CELEBRATION_HINT,
-  RATE_APP_HINT,
+  STORE_REVIEW_HINT,
   showJsonViewerModal,
   UP_TO_DATE_HINT,
   STORE_UPDATE_HINT,
@@ -202,7 +202,7 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
           <DebugSection title="Auto Modals">
             <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={previewStoreUpdateModal} />
             <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={previewNotifReminderModal} />
-            <DebugButton label="Show 'Rate App' Modal" color={theme.violet} hint={RATE_APP_HINT} onPress={previewRateAppModal} />
+            <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={previewStoreReviewModal} />
             <DebugButton label="Show 'Feedback' Modal" color={theme.violet} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />

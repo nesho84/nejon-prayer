@@ -5,7 +5,7 @@ import { useDebugStore } from '@/debug/debugStore';
 import {
   canShowFeedback,
   canShowNotifReminder,
-  canShowRateApp,
+  canShowStoreReview,
   canShowStoreUpdate,
   checkAutoModalsOnStart,
   useAutoModalsSync,
@@ -54,10 +54,10 @@ const RESET_DATA = {
   notifReminderShownAt: null,
   notifReminderShownCount: 0,
   notifReminderDone: false,
-  rateAppNextShowAt: null,
-  rateAppShownAt: null,
-  rateAppShownCount: 0,
-  rateAppDone: false,
+  storeReviewNextShowAt: null,
+  storeReviewShownAt: null,
+  storeReviewShownCount: 0,
+  storeReviewDone: false,
   feedbackNextShowAt: null,
   feedbackShownAt: null,
   feedbackShownCount: 0,
@@ -122,50 +122,50 @@ describe('canShowNotifReminder', () => {
   });
 });
 
-describe('canShowRateApp', () => {
+describe('canShowStoreReview', () => {
   it('can show right away — no first wait', () => {
-    expect(canShowRateApp()).toBe(true);
+    expect(canShowStoreReview()).toBe(true);
   });
 
   it('never shows on iOS', () => {
     Object.defineProperty(Platform, 'OS', { value: 'ios', writable: true, configurable: true });
-    expect(canShowRateApp()).toBe(false);
+    expect(canShowStoreReview()).toBe(false);
   });
 
   it('cannot show within 7 days of "Later", and can after', () => {
-    useAutoModalsStore.setState({ rateAppNextShowAt: NOW + DAY_MS });
-    expect(canShowRateApp()).toBe(false);
-    useAutoModalsStore.setState({ rateAppNextShowAt: NOW - 1 });
-    expect(canShowRateApp()).toBe(true);
+    useAutoModalsStore.setState({ storeReviewNextShowAt: NOW + DAY_MS });
+    expect(canShowStoreReview()).toBe(false);
+    useAutoModalsStore.setState({ storeReviewNextShowAt: NOW - 1 });
+    expect(canShowStoreReview()).toBe(true);
   });
 
   it('never shows once done', () => {
-    useAutoModalsStore.setState({ rateAppDone: true });
-    expect(canShowRateApp()).toBe(false);
+    useAutoModalsStore.setState({ storeReviewDone: true });
+    expect(canShowStoreReview()).toBe(false);
   });
 
   it('keeps 7 days from the feedback modal', () => {
     useAutoModalsStore.setState({ feedbackShownAt: NOW - 6 * DAY_MS });
-    expect(canShowRateApp()).toBe(false);
+    expect(canShowStoreReview()).toBe(false);
     useAutoModalsStore.setState({ feedbackShownAt: NOW - 7 * DAY_MS - 1 });
-    expect(canShowRateApp()).toBe(true);
+    expect(canShowStoreReview()).toBe(true);
   });
 
   it('cannot show while another modal is open', () => {
     useModalStore.setState({ visible: true });
-    expect(canShowRateApp()).toBe(false);
+    expect(canShowStoreReview()).toBe(false);
   });
 
   it('waits for a later session when Update or Notif reminder already showed in this one', () => {
     useAutoModalsStore.setState({ storeUpdateShownAt: LOADED_AT });
-    expect(canShowRateApp()).toBe(false);
+    expect(canShowStoreReview()).toBe(false);
     useAutoModalsStore.setState({ storeUpdateShownAt: null, notifReminderShownAt: LOADED_AT });
-    expect(canShowRateApp()).toBe(false);
+    expect(canShowStoreReview()).toBe(false);
   });
 
   it('can show when Update or Notif reminder showed in an earlier session', () => {
     useAutoModalsStore.setState({ storeUpdateShownAt: LOADED_AT - DAY_MS, notifReminderShownAt: LOADED_AT - DAY_MS });
-    expect(canShowRateApp()).toBe(true);
+    expect(canShowStoreReview()).toBe(true);
   });
 });
 
@@ -186,10 +186,10 @@ describe('canShowFeedback', () => {
     expect(canShowFeedback()).toBe(false);
   });
 
-  it('keeps 7 days from the Rate App modal', () => {
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1, rateAppShownAt: NOW - 6 * DAY_MS });
+  it('keeps 7 days from the Store review modal', () => {
+    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1, storeReviewShownAt: NOW - 6 * DAY_MS });
     expect(canShowFeedback()).toBe(false);
-    useAutoModalsStore.setState({ rateAppShownAt: NOW - 7 * DAY_MS - 1 });
+    useAutoModalsStore.setState({ storeReviewShownAt: NOW - 7 * DAY_MS - 1 });
     expect(canShowFeedback()).toBe(true);
   });
 });
@@ -334,7 +334,7 @@ describe('checkAutoModalsOnStart — order', () => {
     expect(showFeedbackModal).toHaveBeenCalledTimes(1);
   });
 
-  it('shows nothing when another modal is open (e.g. Rate App during the check)', async () => {
+  it('shows nothing when another modal is open (e.g. Store review during the check)', async () => {
     useModalStore.setState({ visible: true });
     await checkAutoModalsOnStart();
 

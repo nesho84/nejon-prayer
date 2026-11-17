@@ -72,7 +72,7 @@ export const LOCATION_CHANGED_HINT =
 export const PRAYER_CELEBRATION_HINT =
   "Auto: on Home only, when your tap marks the last of today's 5 prayers. Once a day — but if Isha is the last one " +
   "marked, it shows again. Never from the Timings modal or the notification's \"Prayed\" button. " +
-  "(The 3rd prayer marked in a day asks for Rate App instead.) Here: a random message, tracking untouched.";
+  "(The 3rd prayer marked in a day asks for Store Review instead.) Here: a random message, tracking untouched.";
 export const KHATAM_HINT =
   "Auto: in Khatam mode only, when you tap \"Complete Khatam\" at the end of Surah 114. " +
   "Adds 1 to the khatam count and clears the khatam bookmark; Share or OK then closes the reading screen. " +
@@ -97,7 +97,7 @@ export const NOTIF_REMINDER_HINT =
   "Never again: after 3 shows — starts over once notifications are allowed and later turned off again.\n" +
   "Waits while Store Update showed on that start, or another modal is open.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
-export const RATE_APP_HINT =
+export const STORE_REVIEW_HINT =
   "First show (Android only): the first time a 3rd prayer gets marked in one day (Home: today; Timings: any day), " +
   "or Quran reading scrolls past ayah 20 — can already happen on day one.\n" +
   "\"Later\" → asks again 7 days later, at the next such moment.\n" +
@@ -110,7 +110,7 @@ export const FEEDBACK_HINT =
   "First show: on an app start at least 7 days after onboarding.\n" +
   "\"Maybe later\" or close → asks again 30 days later, on an app start.\n" +
   "Never again: sent, \"Don't ask again\", or after 3 shows.\n" +
-  "Waits while Rate App was shown in the last 7 days, Store Update or Notif Reminder showed on that start, " +
+  "Waits while Store Review was shown in the last 7 days, Store Update or Notif Reminder showed on that start, " +
   "or another modal is open.\n" +
   "From About: always opens at the questions; only sending is recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";

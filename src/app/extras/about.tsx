@@ -1,6 +1,6 @@
 import AppLayout from "@/components/AppLayout";
 import { showFeedbackModal } from "@/components/FeedbackModal";
-import { showRateAppModal } from "@/components/RateAppModal";
+import { showStoreReviewModal } from "@/components/StoreReviewModal";
 import {
     APP_WEBSITE_URL,
     APPLE_STORE_URL,
@@ -152,7 +152,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Rate the App */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => showRateAppModal(true)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => showStoreReviewModal(true)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialDesignIcons name="star-outline" size={22} color={theme.primary} />
                         </View>

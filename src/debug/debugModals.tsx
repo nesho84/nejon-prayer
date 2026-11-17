@@ -1,11 +1,11 @@
 import { showFeedbackModal } from "@/components/FeedbackModal";
 import { showNotifReminderModal } from "@/components/NotifReminderModal";
-import { showRateAppModal } from "@/components/RateAppModal";
+import { showStoreReviewModal } from "@/components/StoreReviewModal";
 import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
-import { FEEDBACK_MAX_SHOWS, NOTIF_REMINDER_MAX_SHOWS, RATE_APP_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
+import { FEEDBACK_MAX_SHOWS, NOTIF_REMINDER_MAX_SHOWS, STORE_REVIEW_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
@@ -109,10 +109,10 @@ export function showAutoModalsJsonModal() {
     notifReminderShownAt: formatTime(state.notifReminderShownAt),
     notifReminderShownCount: state.notifReminderShownCount,
     notifReminderDone: state.notifReminderDone,
-    rateAppNextShowAt: formatTime(state.rateAppNextShowAt),
-    rateAppShownAt: formatTime(state.rateAppShownAt),
-    rateAppShownCount: state.rateAppShownCount,
-    rateAppDone: state.rateAppDone,
+    storeReviewNextShowAt: formatTime(state.storeReviewNextShowAt),
+    storeReviewShownAt: formatTime(state.storeReviewShownAt),
+    storeReviewShownCount: state.storeReviewShownCount,
+    storeReviewDone: state.storeReviewDone,
     feedbackNextShowAt: formatTime(state.feedbackNextShowAt),
     feedbackShownAt: formatTime(state.feedbackShownAt),
     feedbackShownCount: state.feedbackShownCount,
@@ -172,26 +172,26 @@ export function previewNotifReminderModal() {
 }
 
 // ------------------------------------------------------------
-// Rate App
+// Store Review
 // ------------------------------------------------------------
-function resetRateApp() {
-  useAutoModalsStore.getState().setAutoModals({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
+function resetStoreReview() {
+  useAutoModalsStore.getState().setAutoModals({ storeReviewNextShowAt: null, storeReviewShownAt: null, storeReviewShownCount: 0, storeReviewDone: false });
 }
 
-export function previewRateAppModal() {
-  const { rateAppShownCount, rateAppDone } = useAutoModalsStore.getState();
+export function previewStoreReviewModal() {
+  const { storeReviewShownCount, storeReviewDone } = useAutoModalsStore.getState();
 
-  if (rateAppDone) {
-    const blockedReason = rateAppShownCount >= RATE_APP_MAX_SHOWS
-      ? `Limit reached (${rateAppShownCount}/${RATE_APP_MAX_SHOWS}) — the real modal never shows again.`
+  if (storeReviewDone) {
+    const blockedReason = storeReviewShownCount >= STORE_REVIEW_MAX_SHOWS
+      ? `Limit reached (${storeReviewShownCount}/${STORE_REVIEW_MAX_SHOWS}) — the real modal never shows again.`
       : `"Open Store" or "Already rated" was tapped — the real modal never shows again.`;
-    Alert.alert("Rate App", blockedReason, [
+    Alert.alert("Store Review", blockedReason, [
       { text: "Cancel", style: "cancel" },
-      { text: "Reset", onPress: resetRateApp },
+      { text: "Reset", onPress: resetStoreReview },
     ]);
     return;
   }
-  showRateAppModal();
+  showStoreReviewModal();
 }
 
 // ------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { showRateAppModal } from '@/components/RateAppModal';
+import { showStoreReviewModal } from '@/components/StoreReviewModal';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useModalStore } from '@/store/modalStore';
 import { openStoreListing } from '@/utils/system';
@@ -28,45 +28,45 @@ beforeEach(() => {
   jest.useFakeTimers();
   jest.setSystemTime(NOW);
   useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
-  useAutoModalsStore.setState({ rateAppNextShowAt: null, rateAppShownAt: null, rateAppShownCount: 0, rateAppDone: false });
+  useAutoModalsStore.setState({ storeReviewNextShowAt: null, storeReviewShownAt: null, storeReviewShownCount: 0, storeReviewDone: false });
 });
 
 afterEach(() => {
   jest.useRealTimers();
 });
 
-describe('showRateAppModal — show', () => {
+describe('showStoreReviewModal — show', () => {
   it('shows a fullscreen modal that only its buttons can close', () => {
-    showRateAppModal();
+    showStoreReviewModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
     expect(show().mock.calls[0][0]).toMatchObject({ type: 'fullscreen', dismissable: false });
   });
 
   it('shows with no checks — even after "Already rated" and during the wait', () => {
-    useAutoModalsStore.setState({ rateAppDone: true, rateAppNextShowAt: NOW + DAY_MS });
-    showRateAppModal();
+    useAutoModalsStore.setState({ storeReviewDone: true, storeReviewNextShowAt: NOW + DAY_MS });
+    showStoreReviewModal();
     expect(show()).toHaveBeenCalledTimes(1);
   });
 
   it('records when it was shown and counts it, so the feedback modal can keep its distance', () => {
-    showRateAppModal();
-    expect(useAutoModalsStore.getState().rateAppShownAt).toBe(NOW);
-    expect(useAutoModalsStore.getState().rateAppShownCount).toBe(1);
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(false);
+    showStoreReviewModal();
+    expect(useAutoModalsStore.getState().storeReviewShownAt).toBe(NOW);
+    expect(useAutoModalsStore.getState().storeReviewShownCount).toBe(1);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(false);
   });
 
   it('the 3rd show marks it done', () => {
-    useAutoModalsStore.setState({ rateAppShownCount: 2 });
-    showRateAppModal();
-    expect(useAutoModalsStore.getState().rateAppShownCount).toBe(3);
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(true);
+    useAutoModalsStore.setState({ storeReviewShownCount: 2 });
+    showStoreReviewModal();
+    expect(useAutoModalsStore.getState().storeReviewShownCount).toBe(3);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(true);
   });
 });
 
-describe('showRateAppModal — buttons', () => {
+describe('showStoreReviewModal — buttons', () => {
   beforeEach(() => {
-    showRateAppModal();
+    showStoreReviewModal();
     renderShownModal();
   });
 
@@ -80,7 +80,7 @@ describe('showRateAppModal — buttons', () => {
   it('"Open Store" stops it for good, closes and opens the store listing', () => {
     fireEvent.press(screen.getByText('Open Store'));
 
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(true);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(true);
     expect(hide()).toHaveBeenCalledWith('openStore');
     expect(openStoreListing).toHaveBeenCalledTimes(1);
   });
@@ -88,7 +88,7 @@ describe('showRateAppModal — buttons', () => {
   it('"Later" waits 7 days and closes', () => {
     fireEvent.press(screen.getByText('Later'));
 
-    expect(useAutoModalsStore.getState().rateAppNextShowAt).toBe(NOW + 7 * DAY_MS);
+    expect(useAutoModalsStore.getState().storeReviewNextShowAt).toBe(NOW + 7 * DAY_MS);
     expect(hide()).toHaveBeenCalledWith('later');
     expect(openStoreListing).not.toHaveBeenCalled();
   });
@@ -96,39 +96,39 @@ describe('showRateAppModal — buttons', () => {
   it('"Already rated" stops it for good and closes', () => {
     fireEvent.press(screen.getByText('Already rated'));
 
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(true);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(true);
     expect(hide()).toHaveBeenCalledWith('alreadyRated');
     expect(openStoreListing).not.toHaveBeenCalled();
   });
 });
 
-describe('showRateAppModal — from About', () => {
+describe('showStoreReviewModal — from About', () => {
   beforeEach(() => {
-    showRateAppModal(true);
+    showStoreReviewModal(true);
     renderShownModal();
   });
 
   it('does not record the open', () => {
-    expect(useAutoModalsStore.getState().rateAppShownAt).toBeNull();
-    expect(useAutoModalsStore.getState().rateAppShownCount).toBe(0);
+    expect(useAutoModalsStore.getState().storeReviewShownAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeReviewShownCount).toBe(0);
   });
 
   it('"Later" closes without starting a wait', () => {
     fireEvent.press(screen.getByText('Later'));
 
-    expect(useAutoModalsStore.getState().rateAppNextShowAt).toBeNull();
+    expect(useAutoModalsStore.getState().storeReviewNextShowAt).toBeNull();
     expect(hide()).toHaveBeenCalledWith('later');
   });
 
   it('"Open Store" still stops it for good', () => {
     fireEvent.press(screen.getByText('Open Store'));
 
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(true);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(true);
     expect(openStoreListing).toHaveBeenCalledTimes(1);
   });
 
   it('"Already rated" still stops it for good', () => {
     fireEvent.press(screen.getByText('Already rated'));
-    expect(useAutoModalsStore.getState().rateAppDone).toBe(true);
+    expect(useAutoModalsStore.getState().storeReviewDone).toBe(true);
   });
 });

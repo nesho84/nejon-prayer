@@ -1,6 +1,6 @@
 import AboutScreen from '@/app/extras/about';
 import { showFeedbackModal } from '@/components/FeedbackModal';
-import { showRateAppModal } from '@/components/RateAppModal';
+import { showStoreReviewModal } from '@/components/StoreReviewModal';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
@@ -22,7 +22,7 @@ jest.mock('expo-navigation-bar', () => ({
   NavigationBar: { setStyle: jest.fn() },
 }));
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
-jest.mock('@/components/RateAppModal', () => ({ showRateAppModal: jest.fn() }));
+jest.mock('@/components/StoreReviewModal', () => ({ showStoreReviewModal: jest.fn() }));
 jest.mock('@/components/FeedbackModal', () => ({ showFeedbackModal: jest.fn() }));
 // DebugPanel renders under __DEV__ and pulls in native-only modules (in-app updates, notifications)
 jest.mock('@/debug/DebugPanel', () => () => null);
@@ -104,7 +104,7 @@ describe('AboutScreen', () => {
   it('opens the "Rate the App" modal from About when the rate card is pressed', () => {
     render(<AboutScreen />);
     fireEvent.press(screen.getByText('Rate the App'));
-    expect(showRateAppModal).toHaveBeenCalledWith(true);
+    expect(showStoreReviewModal).toHaveBeenCalledWith(true);
   });
 
   it('opens the feedback modal from About when the feedback card is pressed', () => {

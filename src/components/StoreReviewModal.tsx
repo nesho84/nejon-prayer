@@ -1,6 +1,6 @@
 import CelebrationFx from "@/components/CelebrationFx";
 import { globalStyles } from "@/constants/styles";
-import { DAY_MS, RATE_APP_MAX_SHOWS, RATE_APP_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
+import { DAY_MS, STORE_REVIEW_MAX_SHOWS, STORE_REVIEW_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -12,11 +12,11 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 const STAR_SIZES = [26, 34, 44, 34, 26];
 
 // ------------------------------------------------------------
-// Show the "Rate the App" modal — no checks (canShowRateApp runs at the triggers).
+// Show the "Rate the App" modal — no checks (canShowStoreReview runs at the triggers).
 // From About the open and "Later" aren't recorded; "Open Store" and "Already rated" always are.
 // ------------------------------------------------------------
-export function showRateAppModal(fromAbout = false) {
-  const { rateAppShownCount, setAutoModals } = useAutoModalsStore.getState();
+export function showStoreReviewModal(fromAbout = false) {
+  const { storeReviewShownCount, setAutoModals } = useAutoModalsStore.getState();
   const tr = useLanguageStore.getState().tr;
   const theme = useThemeStore.getState().theme;
   const { hide } = useModalStore.getState();
@@ -24,10 +24,10 @@ export function showRateAppModal(fromAbout = false) {
   // ShownAt keeps the feedback modal from showing soon after this one
   if (!fromAbout) {
     setAutoModals({
-      rateAppShownAt: Date.now(),
-      rateAppShownCount: rateAppShownCount + 1,
+      storeReviewShownAt: Date.now(),
+      storeReviewShownCount: storeReviewShownCount + 1,
       // Every open counts — the limit marks it done
-      rateAppDone: rateAppShownCount + 1 >= RATE_APP_MAX_SHOWS,
+      storeReviewDone: storeReviewShownCount + 1 >= STORE_REVIEW_MAX_SHOWS,
     });
   }
 
@@ -58,7 +58,7 @@ export function showRateAppModal(fromAbout = false) {
             style={[styles.button, { backgroundColor: theme.gold + "20", borderWidth: 1, borderColor: theme.gold + "40" }]}
             activeOpacity={0.8}
             onPress={() => {
-              setAutoModals({ rateAppDone: true });
+              setAutoModals({ storeReviewDone: true });
               hide("openStore");
               openStoreListing();
             }}
@@ -71,7 +71,7 @@ export function showRateAppModal(fromAbout = false) {
             activeOpacity={0.8}
             onPress={() => {
               if (!fromAbout) {
-                setAutoModals({ rateAppNextShowAt: Date.now() + RATE_APP_WAIT_DAYS * DAY_MS });
+                setAutoModals({ storeReviewNextShowAt: Date.now() + STORE_REVIEW_WAIT_DAYS * DAY_MS });
               }
               hide("later");
             }}
@@ -82,7 +82,7 @@ export function showRateAppModal(fromAbout = false) {
             style={styles.button}
             activeOpacity={0.6}
             onPress={() => {
-              setAutoModals({ rateAppDone: true });
+              setAutoModals({ storeReviewDone: true });
               hide("alreadyRated");
             }}
           >

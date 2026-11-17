@@ -7,7 +7,7 @@ import {
   DAY_MS,
   FEEDBACK_FIRST_WAIT_DAYS,
   NOTIF_REMINDER_FIRST_WAIT_DAYS,
-  RATE_FEEDBACK_GAP_DAYS,
+  STORE_REVIEW_FEEDBACK_GAP_DAYS,
   STORE_UPDATE_CHECK_TIMEOUT_MS,
   useAutoModalsStore,
 } from "@/store/autoModalsStore";
@@ -18,7 +18,7 @@ import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 
-// App start — a startup modal shown after this makes Rate App wait for a later session
+// App start — a startup modal shown after this makes Store review wait for a later session
 const APP_START = Date.now();
 
 // ------------------------------------------------------------
@@ -56,22 +56,22 @@ export function canShowNotifReminder() {
 }
 
 // ------------------------------------------------------------
-// Rate App (Android only) — can show after "Later", until done, apart from the other auto modals
+// Store review (Android only) — can show after "Later", until done, apart from the other auto modals
 // ------------------------------------------------------------
-export function canShowRateApp() {
-  const { rateAppNextShowAt, rateAppDone, feedbackShownAt, storeUpdateShownAt, notifReminderShownAt } = useAutoModalsStore.getState();
+export function canShowStoreReview() {
+  const { storeReviewNextShowAt, storeReviewDone, feedbackShownAt, storeUpdateShownAt, notifReminderShownAt } = useAutoModalsStore.getState();
   const now = Date.now();
 
   // Android only
   if (Platform.OS !== "android") return false;
   // "Open Store", "Already rated", or shown 3 times
-  if (rateAppDone) return false;
+  if (storeReviewDone) return false;
   // Still waiting after "Later"
-  if (rateAppNextShowAt !== null && now < rateAppNextShowAt) {
+  if (storeReviewNextShowAt !== null && now < storeReviewNextShowAt) {
     return false;
   }
   // Feedback shown in the last 7 days
-  if (feedbackShownAt !== null && now < feedbackShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
+  if (feedbackShownAt !== null && now < feedbackShownAt + STORE_REVIEW_FEEDBACK_GAP_DAYS * DAY_MS) {
     return false;
   }
   // Store update or Notif reminder already showed this session
@@ -90,10 +90,10 @@ export function canShowRateApp() {
 }
 
 // ------------------------------------------------------------
-// Feedback — can show after its wait, until done, apart from Rate App
+// Feedback — can show after its wait, until done, apart from Store review
 // ------------------------------------------------------------
 export function canShowFeedback() {
-  const { feedbackNextShowAt, feedbackDone, rateAppShownAt } = useAutoModalsStore.getState();
+  const { feedbackNextShowAt, feedbackDone, storeReviewShownAt } = useAutoModalsStore.getState();
   const now = Date.now();
 
   // Sent, "Don't ask again", or shown 3 times
@@ -102,8 +102,8 @@ export function canShowFeedback() {
   if (feedbackNextShowAt === null) return false;
   // Still waiting
   if (now < feedbackNextShowAt) return false;
-  // Rate App shown in the last 7 days
-  if (rateAppShownAt !== null && now < rateAppShownAt + RATE_FEEDBACK_GAP_DAYS * DAY_MS) {
+  // Store review shown in the last 7 days
+  if (storeReviewShownAt !== null && now < storeReviewShownAt + STORE_REVIEW_FEEDBACK_GAP_DAYS * DAY_MS) {
     return false;
   }
 
@@ -175,7 +175,7 @@ export async function checkAutoModalsOnStart() {
     setAutoModals({ storeUpdateNextShowAt: null, storeUpdateShownCount: 0 });
   }
 
-  // Another modal is open (e.g. Rate App) — try next launch
+  // Another modal is open (e.g. Store review) — try next launch
   if (useModalStore.getState().visible) {
     return;
   }
