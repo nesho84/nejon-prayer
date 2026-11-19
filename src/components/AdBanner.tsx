@@ -13,6 +13,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { BannerAd, BannerAdSize, useForeground } from "react-native-google-mobile-ads";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Space between the ad and the box's edges, the same on every side
 const PANEL_PADDING = 3;
@@ -27,8 +28,12 @@ export default function AdBanner() {
   const tr = useLanguageStore((state) => state.tr);
   const canRequestAds = useAdsStore((state) => state.canRequestAds);
 
-  // The ad fills the panel's inner width
+  // Landscape side insets (nav buttons, camera cutout) — the banner spans the full screen width
+  const insets = useSafeAreaInsets();
+
+  // The ad fills the panel's inner width, inside the side insets
   const { width } = useWindowDimensions();
+  const adWidth = width - insets.left - insets.right - PANEL_PADDING * 2;
 
   // Load/dismiss state lives in the store. bannerLoaded is a one-way latch, so a failed
   // refresh never collapses a visible ad.
@@ -135,7 +140,12 @@ export default function AdBanner() {
       testID="ad-banner-container"
       style={[
         styles.container,
-        { backgroundColor: theme.bg, borderTopColor: theme.border },
+        {
+          backgroundColor: theme.bg,
+          borderTopColor: theme.border,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
         !loaded && styles.collapsed,
       ]}
     >
@@ -144,7 +154,7 @@ export default function AdBanner() {
           ref={bannerRef}
           unitId={BANNER_UNIT_ID}
           size={BannerAdSize.INLINE_ADAPTIVE_BANNER}
-          width={width - PANEL_PADDING * 2}
+          width={adWidth}
           maxHeight={BANNER_MAX_HEIGHT}
           onAdLoaded={markBannerLoaded}
           onAdFailedToLoad={(err) => {
@@ -160,7 +170,10 @@ export default function AdBanner() {
         // A tab rising from the box's top line, same colour as the box. It sits above the ad,
         // never over it; no bottom hitSlop so it can't take taps from the ad.
         <TouchableOpacity
-          style={[styles.closeTab, { backgroundColor: theme.bg, borderColor: theme.border }]}
+          style={[
+            styles.closeTab,
+            { right: insets.right + PANEL_PADDING, backgroundColor: theme.bg, borderColor: theme.border },
+          ]}
           onPress={dismissBanner}
           accessibilityRole="button"
           accessibilityLabel={tr.labels.closeAd}
@@ -200,7 +213,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     // Ends exactly on the box line, so the side borders stop flush with it
     top: -TAB_HEIGHT,
-    right: PANEL_PADDING,
     zIndex: 1,
     height: TAB_HEIGHT,
     justifyContent: "center",

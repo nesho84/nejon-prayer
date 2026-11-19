@@ -15,6 +15,9 @@ jest.mock('@react-native-vector-icons/ionicons/static', () => {
   return { Ionicons: ({ name }: any) => React.createElement(View, { testID: `icon-${name}` }) };
 });
 jest.mock('@react-native-community/netinfo', () => ({ addEventListener: jest.fn() }));
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 // Press = ad loaded, long-press = load failure — the only way to drive the native view's callbacks
 jest.mock('react-native-google-mobile-ads', () => {
   const React = require('react');

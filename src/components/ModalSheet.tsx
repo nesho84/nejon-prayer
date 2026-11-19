@@ -96,12 +96,15 @@ const ModalSheet = forwardRef<ModalSheetRef, Props>(({
   const rightInset = insets.right;
 
   // Layout
-  const { height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
-  // Max sheet height based on size prop, clamped to 10-100% of screen height
-  const sheetMaxHeight = typeof size === 'number'
-    ? height * Math.min(Math.max(size, 0.1), 1)
-    : height * SIZES_MAP[size ?? 'full'];
+  // Max sheet height based on size prop, clamped to 10-100% of screen height. Landscape leaves
+  // little height, so any sheet may use all of it — content still decides how tall it gets.
+  const sheetMaxHeight = width > height
+    ? height * SIZES_MAP.full
+    : typeof size === 'number'
+      ? height * Math.min(Math.max(size, 0.1), 1)
+      : height * SIZES_MAP[size ?? 'full'];
 
   // Animated values
   const translateY = useSharedValue(0);
