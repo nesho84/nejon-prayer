@@ -1,4 +1,5 @@
 import SettingsScreen from '@/app/(tabs)/settings';
+import { useAdsStore } from '@/store/adsStore';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
@@ -6,6 +7,7 @@ import { useNotificationsStore } from '@/store/notificationsStore';
 import { usePrayersStore } from '@/store/prayersStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -37,6 +39,7 @@ jest.mock('@/services/prayersService', () => ({ getYearlyPrayerTimes: jest.fn() 
 jest.mock('expo-updates', () => ({ isEnabled: false, reloadAsync: jest.fn() }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
 jest.mock('@/services/quranAudioService', () => ({ stopPlayback: jest.fn() }));
+jest.mock('@/services/adsService', () => ({ gatherConsentAndInitialize: jest.fn(), showPrivacyOptions: jest.fn() }));
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
   ImpactFeedbackStyle: { Medium: 'medium' },
@@ -120,6 +123,9 @@ const mockTr = {
     vibrationError: 'Vibration error',
     specialNotificationError: 'Error',
     snoozeError: 'Snooze error',
+    adPrivacyRow: 'Ad privacy',
+    adPrivacyButton: 'Manage ad consent',
+    adPrivacyError: 'Ad privacy error',
   },
   buttons: { cancel: 'Cancel', openSettings: 'Open Settings' },
 } as any;
@@ -159,6 +165,7 @@ beforeEach(() => {
   useLocationStore.setState(readyLocation as any);
   usePrayersStore.setState(readyPrayers as any);
   useNotificationsStore.setState(readyNotifications as any);
+  useAdsStore.setState({ privacyOptionsRequired: false });
   jest.clearAllMocks();
 });
 
@@ -219,5 +226,39 @@ describe('SettingsScreen', () => {
 
     await waitFor(() => expect(mockReset).toHaveBeenCalled());
     expect(mockReload).toHaveBeenCalled();
+  });
+});
+
+describe('SettingsScreen — ad privacy', () => {
+  it('hides the Ad privacy card when Google does not require it', () => {
+    render(<SettingsScreen />);
+    expect(screen.queryByText('Ad privacy')).toBeNull();
+  });
+
+  it('shows the Ad privacy card when required and opens the consent form on press', async () => {
+    const mockOpen = jest.fn(() => Promise.resolve());
+    useAdsStore.setState({ privacyOptionsRequired: true, openPrivacyOptions: mockOpen });
+
+    render(<SettingsScreen />);
+    expect(screen.getByText('Ad privacy')).toBeTruthy();
+    fireEvent.press(screen.getByText('Manage ad consent'));
+
+    await waitFor(() => expect(mockOpen).toHaveBeenCalledTimes(1));
+  });
+
+  it('alerts when the consent form cannot be opened', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    useAdsStore.setState({
+      privacyOptionsRequired: true,
+      openPrivacyOptions: jest.fn(() => Promise.reject(new Error('no form'))),
+    });
+
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('Manage ad consent'));
+
+    await waitFor(() => expect(alertSpy).toHaveBeenCalledWith('Error', 'Ad privacy error'));
+    alertSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 });

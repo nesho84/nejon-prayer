@@ -6,6 +6,7 @@ import StoreUpdateCheck from "@/components/StoreUpdateCheck";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { useDebugStore } from "@/debug/debugStore";
 import { restoreDefaults } from "@/services/resetAppService";
+import { useAdsStore } from "@/store/adsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -63,6 +64,7 @@ export default function SettingsScreen() {
     const notifSettings = useNotificationsStore((state) => state.notifSettings);
     const notifReady = useNotificationsStore((state) => state.isReady);
     const specials = useNotificationsStore((state) => state.specials);
+    const privacyOptionsRequired = useAdsStore((state) => state.privacyOptionsRequired);
 
     // DEBUG: force-show the outdated prayer times warning (Debug Panel toggle)
     const forcePrayersOutdated = useDebugStore((state) => state.forcePrayersOutdated);
@@ -118,6 +120,18 @@ export default function SettingsScreen() {
             Alert.alert(tr.labels.error, tr.labels.languageError);
         } finally {
             setLocalLoading(false);
+        }
+    };
+
+    // ------------------------------------------------------------
+    // Ad privacy — reopens Google's consent form
+    // ------------------------------------------------------------
+    const handleAdPrivacy = async () => {
+        try {
+            await useAdsStore.getState().openPrivacyOptions();
+        } catch (err) {
+            console.error("Ad privacy options error:", err);
+            Alert.alert(tr.labels.error, tr.labels.adPrivacyError);
         }
     };
 
@@ -728,6 +742,26 @@ export default function SettingsScreen() {
                         }
                     </View>
                 </AppCard>
+
+                {/* ------ Ad Privacy (only where Google requires it, e.g. EEA/UK) ------ */}
+                {privacyOptionsRequired && (
+                    <AppCard style={styles.settingCard}>
+                        <Text style={[styles.settingTitle, { color: theme.text2 }]}>
+                            {tr.labels.adPrivacyRow}
+                        </Text>
+                        {/* Divider */}
+                        <View style={[styles.divider, { borderColor: theme.divider2 }]}></View>
+                        <TouchableOpacity
+                            style={[styles.wideButton, { backgroundColor: theme.secondary + '20' }]}
+                            onPress={handleAdPrivacy}
+                        >
+                            <MaterialDesignIcons name="shield-account-outline" size={18} color={theme.secondary + '90'} />
+                            <Text style={[styles.wideButtonText, { color: theme.secondary + '90' }]}>
+                                {tr.labels.adPrivacyButton}
+                            </Text>
+                        </TouchableOpacity>
+                    </AppCard>
+                )}
 
                 {/* ------ Check for Update ------ */}
                 <AppCard style={styles.settingCard}>

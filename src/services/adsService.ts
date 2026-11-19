@@ -1,10 +1,16 @@
-import mobileAds, { AdsConsent } from "react-native-google-mobile-ads";
+import mobileAds, { AdsConsent, AdsConsentPrivacyOptionsRequirementStatus } from "react-native-google-mobile-ads";
+
+export interface AdsConsentState {
+  canRequestAds: boolean;
+  // Google requires a visible way to reopen the consent form (typically EEA/UK users)
+  privacyOptionsRequired: boolean;
+}
 
 // ------------------------------------------------------------
 // Gather UMP consent, then initialize the Mobile Ads SDK.
 // Consent MUST resolve first — ads can preload the moment initialize() is called.
 // ------------------------------------------------------------
-export async function gatherConsentAndInitialize(): Promise<boolean> {
+export async function gatherConsentAndInitialize(): Promise<AdsConsentState> {
   try {
     await AdsConsent.gatherConsent();
   } catch (err) {
@@ -12,9 +18,23 @@ export async function gatherConsentAndInitialize(): Promise<boolean> {
     console.warn("⚠️ [adsService] gatherConsent failed:", err);
   }
 
-  const { canRequestAds } = await AdsConsent.getConsentInfo();
-  if (!canRequestAds) return false;
+  return readConsentAndInitialize();
+}
 
-  await mobileAds().initialize();
-  return true;
+// ------------------------------------------------------------
+// Show Google's privacy options form, then re-read consent — the user may have withdrawn
+// or granted it, and the caller must follow the new canRequestAds.
+// ------------------------------------------------------------
+export async function showPrivacyOptions(): Promise<AdsConsentState> {
+  await AdsConsent.showPrivacyOptionsForm();
+  return readConsentAndInitialize();
+}
+
+async function readConsentAndInitialize(): Promise<AdsConsentState> {
+  const { canRequestAds, privacyOptionsRequirementStatus } = await AdsConsent.getConsentInfo();
+  const privacyOptionsRequired =
+    privacyOptionsRequirementStatus === AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
+
+  if (canRequestAds) await mobileAds().initialize();
+  return { canRequestAds, privacyOptionsRequired };
 }

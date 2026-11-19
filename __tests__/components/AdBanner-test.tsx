@@ -1,6 +1,7 @@
 import AdBanner from '@/components/AdBanner';
-import { BANNER_CLOSE_DELAY_MS, CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
+import { BANNER_CLOSE_DELAY_MS, BANNER_DISMISS_RESET_MS, CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
 import { useAdsStore } from '@/store/adsStore';
+import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import NetInfo from '@react-native-community/netinfo';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -29,8 +30,8 @@ jest.mock('react-native-google-mobile-ads', () => {
   return {
     __esModule: true,
     BannerAd,
-    BannerAdSize: { BANNER: 'BANNER' },
-    TestIds: { BANNER: 'test-banner-id' },
+    BannerAdSize: { INLINE_ADAPTIVE_BANNER: 'INLINE_ADAPTIVE_BANNER' },
+    TestIds: { ADAPTIVE_BANNER: 'test-banner-id' },
     // Captures the callback so a test can simulate the app returning to the foreground
     useForeground: (callback: () => void) => {
       mockForeground.current = callback;
@@ -88,7 +89,7 @@ beforeEach(() => {
     return mockUnsubscribe;
   });
   useThemeStore.setState({ theme: mockTheme });
-  useAdsStore.setState({ canRequestAds: true, bannerLoaded: false, bannerDismissed: false });
+  useAdsStore.setState({ canRequestAds: true, bannerLoaded: false, bannerDismissed: false, bannerDismissedAt: null });
 });
 
 afterEach(() => {
@@ -265,19 +266,6 @@ describe('AdBanner — collapse', () => {
     expect(screen.getByTestId('icon-close')).toBeTruthy();
   });
 
-  it('hides the close button on screens too narrow to fit it beside the ad', () => {
-    const RN = require('react-native');
-    const dimensions = jest.spyOn(RN, 'useWindowDimensions').mockReturnValue({ width: 340, height: 700, scale: 2, fontScale: 1 });
-    render(<AdBanner />);
-    emitConnectivity(true);
-
-    loadAdAndRevealClose();
-
-    expect(isCollapsed()).toBe(false);
-    expect(screen.queryByTestId('icon-close')).toBeNull();
-    dimensions.mockRestore();
-  });
-
   it('stays collapsed but keeps the ad mounted when the first load fails', () => {
     render(<AdBanner />);
     emitConnectivity(true);
@@ -345,6 +333,14 @@ describe('AdBanner — dismissal', () => {
     expect(screen.queryByTestId('icon-close')).toBeNull();
   });
 
+  it('labels the close button for TalkBack', () => {
+    render(<AdBanner />);
+    emitConnectivity(true);
+    loadAdAndRevealClose();
+
+    expect(screen.getByLabelText(useLanguageStore.getState().tr.labels.closeAd)).toBeTruthy();
+  });
+
   it('stays dismissed across re-renders — dismissal is per-session', () => {
     const { rerender } = render(<AdBanner />);
     emitConnectivity(true);
@@ -352,6 +348,70 @@ describe('AdBanner — dismissal', () => {
     fireEvent.press(screen.getByTestId('icon-close').parent!);
 
     rerender(<AdBanner />);
+
+    expect(screen.queryByTestId('banner-ad')).toBeNull();
+  });
+});
+
+describe('AdBanner — dismissal reset', () => {
+  // Shows an ad, waits out the close delay, then dismisses it
+  function dismissLoadedBanner() {
+    render(<AdBanner />);
+    emitConnectivity(true);
+    loadAdAndRevealClose();
+    fireEvent.press(screen.getByTestId('icon-close').parent!);
+  }
+
+  it('brings the banner back on a resume after the reset window, collapsed until a fresh ad loads', () => {
+    dismissLoadedBanner();
+    expect(screen.queryByTestId('banner-ad')).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(BANNER_DISMISS_RESET_MS);
+    });
+    act(() => mockForeground.current?.());
+
+    expect(screen.getByTestId('banner-ad')).toBeTruthy();
+    expect(isCollapsed()).toBe(true);
+    expect(screen.queryByTestId('icon-close')).toBeNull();
+  });
+
+  it('makes the close button wait its full delay again after the banner returns', () => {
+    dismissLoadedBanner();
+    act(() => {
+      jest.advanceTimersByTime(BANNER_DISMISS_RESET_MS);
+    });
+    act(() => mockForeground.current?.());
+
+    fireEvent.press(screen.getByTestId('banner-ad'));
+    act(() => {
+      jest.advanceTimersByTime(BANNER_CLOSE_DELAY_MS - 1);
+    });
+    expect(screen.queryByTestId('icon-close')).toBeNull();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(screen.getByTestId('icon-close')).toBeTruthy();
+  });
+
+  it('keeps the banner dismissed on a resume inside the reset window', () => {
+    dismissLoadedBanner();
+
+    act(() => {
+      jest.advanceTimersByTime(BANNER_DISMISS_RESET_MS - 1);
+    });
+    act(() => mockForeground.current?.());
+
+    expect(screen.queryByTestId('banner-ad')).toBeNull();
+  });
+
+  it('does not bring the banner back without a resume, however long it has been', () => {
+    dismissLoadedBanner();
+
+    act(() => {
+      jest.advanceTimersByTime(BANNER_DISMISS_RESET_MS * 2);
+    });
 
     expect(screen.queryByTestId('banner-ad')).toBeNull();
   });

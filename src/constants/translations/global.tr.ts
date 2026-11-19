@@ -227,6 +227,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "A new version is available on the store. Update now to get the latest features and fixes.",
             upToDateMessage: "You're already on the latest version.",
             updateCheckError: "Couldn't check for updates. Please try again.",
+            // Ads
+            adPrivacyRow: "Ad privacy",
+            adPrivacyButton: "Privacy settings",
+            adPrivacyError: "Couldn't open the ad privacy settings. Please try again.",
+            closeAd: "Close ad",
         },
         buttons: {
             cancel: "Cancel",
@@ -480,6 +485,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Eine neue Version ist im Store verfügbar. Aktualisiere jetzt, um die neuesten Funktionen und Verbesserungen zu erhalten.",
             upToDateMessage: "Du verwendest bereits die neueste Version.",
             updateCheckError: "Updates konnten nicht geprüft werden. Bitte versuche es erneut.",
+            // Ads
+            adPrivacyRow: "Werbung & Datenschutz",
+            adPrivacyButton: "Datenschutzeinstellungen",
+            adPrivacyError: "Die Datenschutz-Einstellungen für Werbung konnten nicht geöffnet werden. Bitte versuche es erneut.",
+            closeAd: "Werbung schließen",
         },
         buttons: {
             cancel: "Abbrechen",
@@ -733,6 +743,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Une nouvelle version est disponible sur le store. Mettez à jour maintenant pour obtenir les dernières fonctionnalités et corrections.",
             upToDateMessage: "Vous utilisez déjà la dernière version.",
             updateCheckError: "Impossible de vérifier les mises à jour. Veuillez réessayer.",
+            // Ads
+            adPrivacyRow: "Confidentialité des annonces",
+            adPrivacyButton: "Paramètres de confidentialité",
+            adPrivacyError: "Impossible d'ouvrir les paramètres de confidentialité des annonces. Veuillez réessayer.",
+            closeAd: "Fermer l'annonce",
         },
         buttons: {
             cancel: "Annuler",
@@ -986,6 +1001,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Një version i ri është i mundshëm. Bëje Update tani për të marrë veçoritë dhe risitë më të fundit.",
             upToDateMessage: "Je në versionin më të fundit.",
             updateCheckError: "Update nuk u kontrollua. Provo përsëri.",
+            // Ads
+            adPrivacyRow: "Privatësia e reklamave",
+            adPrivacyButton: "Cilësimet e privatësisë",
+            adPrivacyError: "Cilësimet e privatësisë nuk u hapën. Provo përsëri.",
+            closeAd: "Mbyll reklamën",
         },
         buttons: {
             cancel: "Anulo",
@@ -1222,6 +1242,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Nova verzija je dostupna u trgovini. Ažurirajte sada da dobijete najnovije funkcije i ispravke.",
             upToDateMessage: "Već koristite najnoviju verziju.",
             updateCheckError: "Provjera ažuriranja nije uspjela. Pokušajte ponovo.",
+            // Ads
+            adPrivacyRow: "Privatnost oglasa",
+            adPrivacyButton: "Postavke privatnosti",
+            adPrivacyError: "Postavke privatnosti oglasa nisu otvorene. Pokušajte ponovo.",
+            closeAd: "Zatvori oglas",
         },
         buttons: {
             cancel: "Otkaži",
@@ -1458,6 +1483,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Нова верзија е достапна во продавницата. Ажурирајте сега за да ги добиете најновите функции и поправки.",
             upToDateMessage: "Веќе ја користите најновата верзија.",
             updateCheckError: "Не може да се провери за ажурирања. Обидете се повторно.",
+            // Ads
+            adPrivacyRow: "Приватност на рекламите",
+            adPrivacyButton: "Поставки за приватност",
+            adPrivacyError: "Поставките за приватност на рекламите не можат да се отворат. Обидете се повторно.",
+            closeAd: "Затвори реклама",
         },
         buttons: {
             cancel: "Откажи",
@@ -1711,6 +1741,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "Mağazada yeni bir sürüm mevcut. En yeni özellikler ve düzeltmeler için şimdi güncelleyin.",
             upToDateMessage: "Zaten en son sürümü kullanıyorsunuz.",
             updateCheckError: "Güncellemeler denetlenemedi. Lütfen tekrar deneyin.",
+            // Ads
+            adPrivacyRow: "Reklam gizliliği",
+            adPrivacyButton: "Gizlilik ayarları",
+            adPrivacyError: "Reklam gizlilik ayarları açılamadı. Lütfen tekrar deneyin.",
+            closeAd: "Reklamı kapat",
         },
         buttons: {
             cancel: "İptal",
@@ -1964,6 +1999,11 @@ export const GLOBAL_TR = {
             updateAvailableMessage: "يتوفر إصدار جديد في المتجر. حدّث الآن للحصول على أحدث الميزات والإصلاحات.",
             upToDateMessage: "أنت تستخدم بالفعل أحدث إصدار.",
             updateCheckError: "تعذّر التحقق من التحديثات. يرجى المحاولة مرة أخرى.",
+            // Ads
+            adPrivacyRow: "خصوصية الإعلانات",
+            adPrivacyButton: "إعدادات الخصوصية",
+            adPrivacyError: "تعذّر فتح إعدادات خصوصية الإعلانات. يرجى المحاولة مرة أخرى.",
+            closeAd: "إغلاق الإعلان",
         },
         buttons: {
             cancel: "إلغاء",
