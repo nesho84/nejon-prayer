@@ -25,29 +25,38 @@ export async function startSound(file: string, volume: number): Promise<void> {
         // Remote URLs use undefined as the base path
         const basePath = isRemoteUrl(file) ? undefined : Sound.MAIN_BUNDLE;
 
-
-        currentSound = new Sound(file, basePath, (err: Error | null) => {
+        // Callbacks use this `sound`, not `currentSound`: stopSound() or a newer
+        // startSound() can clear/replace `currentSound` before they fire.
+        const sound: Sound = new Sound(file, basePath, (err: Error | null) => {
             if (err) {
                 console.error('❌ [soundService] Failed to load:', err);
+                if (currentSound === sound) currentSound = null;
                 return;
             }
 
-            currentSound!.setVolume(volume);
-            currentSound!.setNumberOfLoops(0); // play once
+            // Stopped or replaced while loading — release() is a no-op before load, so release now
+            if (currentSound !== sound) {
+                sound.release();
+                return;
+            }
 
-            const duration = currentSound!.getDuration();
+            sound.setVolume(volume);
+            sound.setNumberOfLoops(0); // play once
+
+            const duration = sound.getDuration();
 
             console.log(`🔊 [soundService] Playing "${file} ${duration.toFixed(2)}sec" at volume ${volume}`);
 
-            currentSound!.play((success: boolean) => {
+            sound.play((success: boolean) => {
                 if (success) {
                     console.log('✅ [soundService] Finished playback');
                 } else {
                     console.error('❌ [soundService] Playback failed');
                 }
-                stopSound();
+                if (currentSound === sound) stopSound();
             });
         });
+        currentSound = sound;
     } catch (err) {
         console.error('❌ [soundService] Error starting:', err);
     }
@@ -57,16 +66,14 @@ export async function startSound(file: string, volume: number): Promise<void> {
 // Stop Sound
 // ------------------------------------------------------------
 export async function stopSound(): Promise<void> {
-    return new Promise<void>((resolve) => {
-        if (currentSound) {
-            currentSound.stop(() => {
-                currentSound!.release();
-                currentSound = null;
-                console.log('🔇 [soundService] Stopped & released');
-                resolve();
-            });
-        } else {
-            resolve();
-        }
-    });
+    const sound = currentSound;
+    if (!sound) return;
+
+    // Cleared synchronously so concurrent callers (e.g. several DISMISSED events) no-op
+    currentSound = null;
+
+    // release() stops playback natively (Android: MediaPlayer.reset/release, iOS: [player stop]),
+    // so there's no stop() callback to wait for. Before load it's a no-op — the load callback handles that.
+    sound.release();
+    console.log('🔇 [soundService] Stopped & released');
 }
