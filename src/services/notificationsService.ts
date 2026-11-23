@@ -699,6 +699,12 @@ export async function handleNotificationEvent(
       console.log(`✅ ${prefix} Notification delivered`);
       // Background sync handled in index.ts
 
+      // Blocked channel: notification is hidden, so skip the sound
+      if (notification.android?.channelId && await notifee.isChannelBlocked(notification.android.channelId)) {
+        console.log(`🔕 ${prefix} Channel blocked, skipping sound`);
+        break;
+      }
+
       // Actions based on notification type
       // eslint-disable-next-line eqeqeq
       if (notifType == 'prayer' || notifType == 'prayer-event') {

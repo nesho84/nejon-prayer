@@ -1,4 +1,4 @@
-import { createNotificationCategories, createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
+import { cancelAllNotifications, createNotificationCategories, createNotificationsChannels, handleNotificationEvent } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -61,6 +61,9 @@ export function useNotificationsSync() {
     // Permission off → what is armed is no longer knowable: an alarm firing while denied
     // is consumed without re-arming its repeat. Drop the hash so a re-enable can't skip.
     if (deviceSettingsReady && notificationsReady && !notificationPermission) {
+      if (useNotificationsStore.getState().lastScheduledHash !== null) {
+        cancelAllNotifications();
+      }
       useNotificationsStore.setState({ lastScheduledHash: null });
     }
 

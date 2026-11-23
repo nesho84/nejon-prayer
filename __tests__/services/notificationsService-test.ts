@@ -1,5 +1,5 @@
 import { getTriggerTime, getVibrationChannelId, handleNotificationEvent, scheduleNotificationsService } from '@/services/notificationsService';
-import { stopSound } from '@/services/soundService';
+import { startSound, stopSound } from '@/services/soundService';
 import notifee, { EventType } from 'react-native-notify-kit';
 
 jest.mock('@sentry/react-native', () => ({
@@ -21,6 +21,7 @@ jest.mock('react-native-notify-kit', () => ({
     getNotificationSettings: jest.fn(() => Promise.resolve({ android: { alarm: 'enabled' } })),
     createTriggerNotification: jest.fn(() => Promise.resolve()),
     cancelDisplayedNotification: jest.fn(() => Promise.resolve()),
+    isChannelBlocked: jest.fn(() => Promise.resolve(false)),
   },
   AndroidCategory: {},
   AndroidColor: { GREEN: 'green' },
@@ -36,6 +37,7 @@ jest.mock('react-native-notify-kit', () => ({
 
 const mockCreateTrigger = notifee.createTriggerNotification as jest.Mock;
 const mockCancelDisplayed = notifee.cancelDisplayedNotification as jest.Mock;
+const mockIsChannelBlocked = notifee.isChannelBlocked as jest.Mock;
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -333,6 +335,22 @@ describe('getVibrationChannelId', () => {
 describe('handleNotificationEvent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('on DELIVERED, plays the prayer sound', async () => {
+    const notification = { id: 'prayer-dhuhr', data: { type: 'prayer', prayerName: 'Dhuhr', sound: 'azan_short.mp3', volume: 0.5 }, android: { channelId: 'nejonprayer-vib-short-v2' } };
+    await handleNotificationEvent(EventType.DELIVERED, notification, undefined, 'background');
+
+    expect(mockIsChannelBlocked).toHaveBeenCalledWith('nejonprayer-vib-short-v2');
+    expect(startSound).toHaveBeenCalledWith('azan_short.mp3', 0.5);
+  });
+
+  it('on DELIVERED, skips the sound when the channel is blocked', async () => {
+    mockIsChannelBlocked.mockResolvedValueOnce(true);
+    const notification = { id: 'prayer-dhuhr', data: { type: 'prayer', prayerName: 'Dhuhr', sound: 'azan_short.mp3' }, android: { channelId: 'nejonprayer-vib-short-v2' } };
+    await handleNotificationEvent(EventType.DELIVERED, notification, undefined, 'background');
+
+    expect(startSound).not.toHaveBeenCalled();
   });
 
   it('on DISMISSED, stops the sound but does not cancel any displayed notification', async () => {

@@ -1,4 +1,5 @@
 import { useNotificationsSync } from '@/hooks/useNotificationsSync';
+import { cancelAllNotifications } from '@/services/notificationsService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -8,6 +9,7 @@ import { renderHook } from '@testing-library/react-native';
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn(), init: jest.fn() }));
 jest.mock('@/services/notificationsService', () => ({
+  cancelAllNotifications: jest.fn(() => Promise.resolve()),
   createNotificationsChannels: jest.fn(() => Promise.resolve()),
   createNotificationCategories: jest.fn(() => Promise.resolve()),
   handleNotificationEvent: jest.fn(() => Promise.resolve()),
@@ -65,6 +67,7 @@ describe('useNotificationsSync', () => {
     renderHook(() => useNotificationsSync());
     expect(mockSyncNotifications).toHaveBeenCalledTimes(1);
     expect(mockSetState).not.toHaveBeenCalled();
+    expect(cancelAllNotifications).not.toHaveBeenCalled();
   });
 
   // Without the clear, re-enabling on the same day matches the stale hash and skips,
@@ -76,11 +79,30 @@ describe('useNotificationsSync', () => {
     expect(mockSyncNotifications).not.toHaveBeenCalled();
   });
 
+  it('cancels the leftover scheduled notifications when notifications are denied', () => {
+    notificationPermission = false;
+    renderHook(() => useNotificationsSync());
+    expect(cancelAllNotifications).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cancel again once the hash is already cleared', () => {
+    notificationPermission = false;
+    (useNotificationsStore as unknown as { getState: jest.Mock }).getState = jest.fn(() => ({
+      syncNotifications: mockSyncNotifications,
+      notifSettings: {},
+      lastScheduledHash: null,
+    }));
+    renderHook(() => useNotificationsSync());
+    expect(cancelAllNotifications).not.toHaveBeenCalled();
+    expect(mockSetState).toHaveBeenCalledWith({ lastScheduledHash: null });
+  });
+
   it('does not clear the hash before the device settings are read', () => {
     notificationPermission = false;
     deviceReady = false;
     renderHook(() => useNotificationsSync());
     expect(mockSetState).not.toHaveBeenCalled();
+    expect(cancelAllNotifications).not.toHaveBeenCalled();
   });
 
   it('does not clear the hash before the notifications store has rehydrated', () => {
