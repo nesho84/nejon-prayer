@@ -8,6 +8,7 @@ import { useLocationChangeSync } from "@/hooks/useLocationChangeSync";
 import { useNotificationsSync } from "@/hooks/useNotificationsSync";
 import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSync } from "@/hooks/useQuranSync";
+import { useSupporterSync } from "@/hooks/useSupporterSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
 import { useOtaUpdatesSync } from "@/hooks/useOtaUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -67,6 +68,7 @@ function RootLayout() {
   useQuranSync();
   useOtaUpdatesSync();
   useAutoModalsSync();
+  useSupporterSync();
   useAdsSync();
 
   return (
