@@ -1,4 +1,4 @@
-import type * as SupporterServiceModule from '@/services/supporterService';
+import type * as BillingServiceModule from '@/services/billingService';
 
 jest.mock('expo-iap', () => ({
   ErrorCode: {
@@ -28,14 +28,17 @@ jest.mock('expo-iap', () => ({
 
 jest.mock('@sentry/react-native', () => ({ captureException: jest.fn() }));
 
+// The service is product-agnostic — any one-time product ids
+const IDS = ['supporter_unlock', 'gift_small', 'gift_medium', 'gift_large'];
+
 // The service keeps its Play connection in module state — load a fresh copy per test
-let service: typeof SupporterServiceModule;
+let service: typeof BillingServiceModule;
 let iap: Record<string, jest.Mock>;
 let Sentry: { captureException: jest.Mock };
 
 beforeEach(() => {
   jest.resetModules();
-  service = require('@/services/supporterService');
+  service = require('@/services/billingService');
   iap = require('expo-iap');
   Sentry = require('@sentry/react-native');
   jest.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -48,21 +51,21 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('supporterService — connection', () => {
+describe('billingService — connection', () => {
   it('connects once and reuses the connection', async () => {
     iap.fetchProducts.mockResolvedValue([{ id: 'supporter_unlock', displayPrice: '€5.99' }]);
-    await service.fetchSupporterProducts();
-    await service.fetchSupporterProducts();
+    await service.getProducts(IDS);
+    await service.getProducts(IDS);
     expect(iap.initConnection).toHaveBeenCalledTimes(1);
   });
 
   it('returns unavailable when Play does not connect, and retries next time', async () => {
     iap.initConnection.mockResolvedValueOnce(false);
-    expect(await service.fetchSupporterProducts()).toEqual({ error: 'unavailable' });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'unavailable' });
     expect(iap.fetchProducts).not.toHaveBeenCalled();
 
     iap.fetchProducts.mockResolvedValue([{ id: 'supporter_unlock', displayPrice: '€5.99' }]);
-    expect(await service.fetchSupporterProducts()).toEqual({
+    expect(await service.getProducts(IDS)).toEqual({
       products: [{ id: 'supporter_unlock', displayPrice: '€5.99' }],
     });
     expect(iap.initConnection).toHaveBeenCalledTimes(2);
@@ -82,14 +85,11 @@ describe('supporterService — connection', () => {
   });
 });
 
-describe('supporterService — fetchSupporterProducts', () => {
-  it('requests all four in-app products', async () => {
-    iap.fetchProducts.mockResolvedValue([{ id: 'gift_small', displayPrice: '€1.99' }]);
-    await service.fetchSupporterProducts();
-    expect(iap.fetchProducts).toHaveBeenCalledWith({
-      skus: ['supporter_unlock', 'gift_small', 'gift_medium', 'gift_large'],
-      type: 'in-app',
-    });
+describe('billingService — getProducts', () => {
+  it('requests exactly the given ids as in-app products', async () => {
+    iap.fetchProducts.mockResolvedValue([{ id: 'other_product', displayPrice: '€3.99' }]);
+    await service.getProducts(['other_product']);
+    expect(iap.fetchProducts).toHaveBeenCalledWith({ skus: ['other_product'], type: 'in-app' });
   });
 
   it('keeps only products Play can sell, with their display price', async () => {
@@ -98,7 +98,7 @@ describe('supporterService — fetchSupporterProducts', () => {
       { id: 'gift_small', displayPrice: '€1.99' },
       { id: 'gift_large', displayPrice: '€9.99', productStatusAndroid: 'not-found' },
     ]);
-    expect(await service.fetchSupporterProducts()).toEqual({
+    expect(await service.getProducts(IDS)).toEqual({
       products: [
         { id: 'supporter_unlock', displayPrice: '€5.99' },
         { id: 'gift_small', displayPrice: '€1.99' },
@@ -108,30 +108,30 @@ describe('supporterService — fetchSupporterProducts', () => {
 
   it('treats no sellable products as unavailable', async () => {
     iap.fetchProducts.mockResolvedValue([{ id: 'gift_small', displayPrice: '', productStatusAndroid: 'no-offers-available' }]);
-    expect(await service.fetchSupporterProducts()).toEqual({ error: 'unavailable' });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'unavailable' });
     iap.fetchProducts.mockResolvedValue(null);
-    expect(await service.fetchSupporterProducts()).toEqual({ error: 'unavailable' });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'unavailable' });
   });
 
   it('maps network errors to unavailable without Sentry, and reconnects next time', async () => {
     iap.fetchProducts.mockRejectedValueOnce({ code: 'network-error' });
-    expect(await service.fetchSupporterProducts()).toEqual({ error: 'unavailable' });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'unavailable' });
     expect(Sentry.captureException).not.toHaveBeenCalled();
 
     iap.fetchProducts.mockResolvedValue([{ id: 'gift_small', displayPrice: '€1.99' }]);
-    await service.fetchSupporterProducts();
+    await service.getProducts(IDS);
     expect(iap.initConnection).toHaveBeenCalledTimes(2);
   });
 
   it('reports unexpected errors to Sentry', async () => {
     const err = { code: 'developer-error' };
     iap.fetchProducts.mockRejectedValueOnce(err);
-    expect(await service.fetchSupporterProducts()).toEqual({ error: 'failed' });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'failed' });
     expect(Sentry.captureException).toHaveBeenCalledWith(err);
   });
 });
 
-describe('supporterService — startPurchase', () => {
+describe('billingService — startPurchase', () => {
   it('opens the Play purchase sheet for the product', async () => {
     iap.requestPurchase.mockResolvedValue(null);
     expect(await service.startPurchase('gift_medium')).toEqual({ ok: true });
@@ -153,7 +153,7 @@ describe('supporterService — startPurchase', () => {
   });
 });
 
-describe('supporterService — getOwnedPurchases', () => {
+describe('billingService — getOwnedPurchases', () => {
   it('returns what Play holds for the account', async () => {
     const purchases = [{ productId: 'supporter_unlock', purchaseState: 'purchased' }];
     iap.getAvailablePurchases.mockResolvedValue(purchases);
@@ -166,7 +166,7 @@ describe('supporterService — getOwnedPurchases', () => {
   });
 });
 
-describe('supporterService — finishPurchase', () => {
+describe('billingService — finishPurchase', () => {
   const purchase = { productId: 'gift_small', purchaseToken: 'token' } as any;
 
   it('consumes gifts and acknowledges the unlock', async () => {
@@ -183,7 +183,7 @@ describe('supporterService — finishPurchase', () => {
   });
 });
 
-describe('supporterService — addPurchaseListeners', () => {
+describe('billingService — addPurchaseListeners', () => {
   it('forwards purchases, maps errors, and removes both listeners', () => {
     const removeUpdated = jest.fn();
     const removeError = jest.fn();

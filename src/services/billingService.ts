@@ -1,13 +1,11 @@
-import { PLAY_CONNECT_TIMEOUT_MS, SUPPORTER_PRODUCT_IDS } from "@/constants/supporter";
 import {
-  SupporterError,
-  SupporterProduct,
-  SupporterProductId,
-  SupporterPurchase,
+  BillingError,
+  BillingProduct,
+  BillingPurchase,
   ProductsResult,
   PurchasesResult,
   StartPurchaseResult,
-} from "@/types/supporter.types";
+} from "@/types/billing.types";
 import * as Sentry from "@sentry/react-native";
 import {
   ErrorCode,
@@ -21,7 +19,12 @@ import {
   requestPurchase,
 } from "expo-iap";
 
-// The only file that imports expo-iap. Never throws — returns results or { error } like feedbackService.
+// Google Play Billing for any one-time product — the only file that imports expo-iap.
+// Never throws — returns results or { error } like feedbackService.
+
+// Play Billing runs inside the Play Store app. If it doesn't answer by then, treat Play as
+// unavailable instead of waiting — the ads gate waits on the first entitlement check.
+const PLAY_CONNECT_TIMEOUT_MS = 8000;
 
 // Play can't be reached right now — expected offline, never reported to Sentry
 const UNAVAILABLE_CODES: string[] = [
@@ -60,12 +63,12 @@ async function connect(): Promise<boolean> {
     });
     const connected = await Promise.race([initConnection(), timedOut]);
     if (!connected) {
-      console.warn("⚠️ [supporterService] Play Billing did not connect");
+      console.warn("⚠️ [billingService] Play Billing did not connect");
       connection = null;
     }
     return connected;
   } catch (err) {
-    console.warn("⚠️ [supporterService] Play Billing connection failed:", err);
+    console.warn("⚠️ [billingService] Play Billing connection failed:", err);
     connection = null;
     return false;
   } finally {
@@ -76,16 +79,16 @@ async function connect(): Promise<boolean> {
 // ------------------------------------------------------------
 // Product details with Play's localized prices
 // ------------------------------------------------------------
-export async function fetchSupporterProducts(): Promise<ProductsResult> {
+export async function getProducts(ids: string[]): Promise<ProductsResult> {
   if (!(await connectPlay())) {
     return { error: "unavailable" };
   }
 
   try {
-    const result = ((await fetchProducts({ skus: SUPPORTER_PRODUCT_IDS, type: "in-app" })) ?? []) as Product[];
-    const products: SupporterProduct[] = result
+    const result = ((await fetchProducts({ skus: ids, type: "in-app" })) ?? []) as Product[];
+    const products: BillingProduct[] = result
       .filter((p) => !("productStatusAndroid" in p) || (p.productStatusAndroid ?? "ok") === "ok")
-      .map((p) => ({ id: p.id as SupporterProductId, displayPrice: p.displayPrice }));
+      .map((p) => ({ id: p.id, displayPrice: p.displayPrice }));
 
     // Play sells none of them here (e.g. a country without paid content) — same as unreachable
     if (products.length === 0) {
@@ -93,14 +96,14 @@ export async function fetchSupporterProducts(): Promise<ProductsResult> {
     }
     return { products };
   } catch (err) {
-    return { error: toSupporterError("fetch products", err) };
+    return { error: toBillingError("fetch products", err) };
   }
 }
 
 // ------------------------------------------------------------
 // Open Play's purchase sheet — the outcome arrives through the purchase listeners
 // ------------------------------------------------------------
-export async function startPurchase(id: SupporterProductId): Promise<StartPurchaseResult> {
+export async function startPurchase(id: string): Promise<StartPurchaseResult> {
   if (!(await connectPlay())) {
     return { error: "unavailable" };
   }
@@ -109,12 +112,12 @@ export async function startPurchase(id: SupporterProductId): Promise<StartPurcha
     await requestPurchase({ request: { google: { skus: [id] } }, type: "in-app" });
     return { ok: true };
   } catch (err) {
-    return { error: toSupporterError("start purchase", err) };
+    return { error: toBillingError("start purchase", err) };
   }
 }
 
 // ------------------------------------------------------------
-// Everything Play holds for this Google account: the unlock, unfinished gifts, pending payments
+// Everything Play holds for this Google account: non-consumables, unconsumed items, pending payments
 // ------------------------------------------------------------
 export async function getOwnedPurchases(): Promise<PurchasesResult> {
   if (!(await connectPlay())) {
@@ -124,20 +127,20 @@ export async function getOwnedPurchases(): Promise<PurchasesResult> {
   try {
     return { purchases: await getAvailablePurchases() };
   } catch (err) {
-    return { error: toSupporterError("query purchases", err) };
+    return { error: toBillingError("query purchases", err) };
   }
 }
 
 // ------------------------------------------------------------
-// Acknowledge the unlock / consume a gift. Play refunds anything unfinished after 3 days,
-// so false here is retried by the next reconcile.
+// Acknowledge (non-consumable) or consume. Play refunds anything unfinished after 3 days,
+// so false here is retried by the caller's next sync.
 // ------------------------------------------------------------
-export async function finishPurchase(purchase: SupporterPurchase, isConsumable: boolean): Promise<boolean> {
+export async function finishPurchase(purchase: BillingPurchase, isConsumable: boolean): Promise<boolean> {
   try {
     await finishTransaction({ purchase, isConsumable });
     return true;
   } catch (err) {
-    toSupporterError("finish purchase", err);
+    toBillingError("finish purchase", err);
     return false;
   }
 }
@@ -146,11 +149,11 @@ export async function finishPurchase(purchase: SupporterPurchase, isConsumable: 
 // App-wide purchase events (also fire when a pending payment clears). Returns the unsubscribe.
 // ------------------------------------------------------------
 export function addPurchaseListeners(
-  onPurchase: (purchase: SupporterPurchase) => void,
-  onError: (error: SupporterError) => void,
+  onPurchase: (purchase: BillingPurchase) => void,
+  onError: (error: BillingError) => void,
 ): () => void {
   const updated = purchaseUpdatedListener(onPurchase);
-  const failed = purchaseErrorListener((err) => onError(toSupporterError("purchase", err)));
+  const failed = purchaseErrorListener((err) => onError(toBillingError("purchase", err)));
 
   return () => {
     updated.remove();
@@ -159,7 +162,7 @@ export function addPurchaseListeners(
 }
 
 // Map expo-iap's error codes; only unexpected failures reach Sentry
-function toSupporterError(action: string, err: unknown): SupporterError {
+function toBillingError(action: string, err: unknown): BillingError {
   const code = (err as { code?: string } | null)?.code;
 
   if (code === ErrorCode.UserCancelled) {
@@ -169,12 +172,12 @@ function toSupporterError(action: string, err: unknown): SupporterError {
     return "owned";
   }
   if (code && UNAVAILABLE_CODES.includes(code)) {
-    console.warn(`⚠️ [supporterService] Play unavailable (${action}):`, code);
+    console.warn(`⚠️ [billingService] Play unavailable (${action}):`, code);
     connection = null;
     return "unavailable";
   }
 
-  console.error(`❌ [supporterService] Failed to ${action}:`, err);
+  console.error(`❌ [billingService] Failed to ${action}:`, err);
   Sentry.captureException(err);
   return "failed";
 }

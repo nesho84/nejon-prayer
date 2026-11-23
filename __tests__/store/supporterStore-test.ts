@@ -1,18 +1,18 @@
-import { fetchSupporterProducts, finishPurchase, getOwnedPurchases, startPurchase } from '@/services/supporterService';
+import { finishPurchase, getOwnedPurchases, getProducts, startPurchase } from '@/services/billingService';
 import { useSupporterStore } from '@/store/supporterStore';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 
-jest.mock('@/services/supporterService', () => ({
-  fetchSupporterProducts: jest.fn(),
+jest.mock('@/services/billingService', () => ({
+  getProducts: jest.fn(),
   finishPurchase: jest.fn(),
   getOwnedPurchases: jest.fn(),
   startPurchase: jest.fn(),
 }));
 
-const mockFetchProducts = fetchSupporterProducts as jest.Mock;
+const mockGetProducts = getProducts as jest.Mock;
 const mockFinishPurchase = finishPurchase as jest.Mock;
 const mockGetOwnedPurchases = getOwnedPurchases as jest.Mock;
 const mockStartPurchase = startPurchase as jest.Mock;
@@ -171,13 +171,14 @@ describe('supporterStore — syncPurchases', () => {
 
 describe('supporterStore — loadProducts', () => {
   it('stores fresh prices and allows buying', async () => {
-    mockFetchProducts.mockResolvedValue({
+    mockGetProducts.mockResolvedValue({
       products: [
         { id: 'supporter_unlock', displayPrice: '€5.99' },
         { id: 'gift_small', displayPrice: '€1.99' },
       ],
     });
     await useSupporterStore.getState().loadProducts();
+    expect(mockGetProducts).toHaveBeenCalledWith(['supporter_unlock', 'gift_small', 'gift_medium', 'gift_large']);
     const state = useSupporterStore.getState();
     expect(state.playStatus).toBe('ready');
     expect(state.productsFresh).toBe(true);
@@ -186,7 +187,7 @@ describe('supporterStore — loadProducts', () => {
 
   it('keeps the last known prices but disallows buying when Play is unavailable', async () => {
     useSupporterStore.setState({ lastKnownPrices: { supporter_unlock: '€5.99' }, productsFresh: true });
-    mockFetchProducts.mockResolvedValue({ error: 'unavailable' });
+    mockGetProducts.mockResolvedValue({ error: 'unavailable' });
     await useSupporterStore.getState().loadProducts();
     const state = useSupporterStore.getState();
     expect(state.playStatus).toBe('unavailable');

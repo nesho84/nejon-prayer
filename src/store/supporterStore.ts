@@ -1,7 +1,8 @@
-import { GIFT_IDS, SUPPORTER_UNLOCK_ID } from "@/constants/supporter";
-import { fetchSupporterProducts, finishPurchase, getOwnedPurchases, startPurchase } from "@/services/supporterService";
+import { GIFT_IDS, SUPPORTER_PRODUCT_IDS, SUPPORTER_UNLOCK_ID } from "@/constants/supporter";
+import { finishPurchase, getOwnedPurchases, getProducts, startPurchase } from "@/services/billingService";
 import { mmkvStorage } from "@/store/storage";
-import { GiftId, SupporterError, SupporterProductId, SupporterPurchase } from "@/types/supporter.types";
+import { BillingError, BillingPurchase } from "@/types/billing.types";
+import { GiftId, SupporterProductId } from "@/types/supporter.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -24,8 +25,8 @@ interface SupporterState extends SupporterData {
   syncPurchases: () => Promise<boolean>;
   loadProducts: () => Promise<void>;
   buy: (id: SupporterProductId) => Promise<void>;
-  handlePurchase: (purchase: SupporterPurchase) => Promise<void>;
-  handlePurchaseError: (error: SupporterError) => void;
+  handlePurchase: (purchase: BillingPurchase) => Promise<void>;
+  handlePurchaseError: (error: BillingError) => void;
 }
 
 const INITIAL_DATA: SupporterData = {
@@ -44,7 +45,7 @@ let syncInProgress: Promise<boolean> | null = null;
 const finishing = new Set<string>();
 
 const isGift = (id: string): id is GiftId => (GIFT_IDS as string[]).includes(id);
-const isAcknowledged = (p: SupporterPurchase) => "isAcknowledgedAndroid" in p && p.isAcknowledgedAndroid === true;
+const isAcknowledged = (p: BillingPurchase) => "isAcknowledgedAndroid" in p && p.isAcknowledgedAndroid === true;
 
 export const useSupporterStore = create<SupporterState>()(
   persist(
@@ -90,7 +91,7 @@ export const useSupporterStore = create<SupporterState>()(
       // Fresh product details; on failure the screen keeps showing lastKnownPrices, marked as such
       loadProducts: async () => {
         set({ playStatus: "loading" });
-        const result = await fetchSupporterProducts();
+        const result = await getProducts(SUPPORTER_PRODUCT_IDS);
         if ("error" in result) {
           set({ playStatus: "unavailable", productsFresh: false });
           return;
