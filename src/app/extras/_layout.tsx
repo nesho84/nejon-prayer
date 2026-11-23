@@ -1,3 +1,4 @@
+import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Stack } from "expo-router";
@@ -6,6 +7,7 @@ export default function ExtrasLayout() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
     const tr = useLanguageStore((state) => state.tr);
+    const language = useLanguageStore((state) => state.language);
 
     return (
         <Stack
@@ -76,6 +78,13 @@ export default function ExtrasLayout() {
                 name="about"
                 options={{
                     title: tr.labels.about,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="supporter"
+                options={{
+                    title: (SUPPORTER_TR[language] ?? SUPPORTER_TR.en).title,
                     headerShown: true,
                 }}
             />
