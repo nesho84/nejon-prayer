@@ -1,8 +1,7 @@
-import { GIFT_IDS, SUPPORTER_PRODUCT_IDS, SUPPORTER_UNLOCK_ID } from "@/constants/supporter";
+import { GIFT_IDS, GiftId, SUPPORTER_PRODUCT_IDS, SUPPORTER_UNLOCK_ID, SupporterProductId } from "@/constants/supporter";
 import { finishPurchase, getOwnedPurchases, getProducts, startPurchase } from "@/services/billingService";
 import { mmkvStorage } from "@/store/storage";
 import { BillingError, BillingPurchase } from "@/types/billing.types";
-import { GiftId, SupporterProductId } from "@/types/supporter.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
