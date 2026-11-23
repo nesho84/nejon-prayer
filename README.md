@@ -240,7 +240,11 @@ npx expo start              # start Metro, then press 's' → 'a'
 
 ---
 
-### 3. Local Release APK (QA / testing)
+### 3. Local Release Build (signed, same as EAS)
+
+Signed with the upload key from `credentials.json` (see [Local Signing](#local-signing)).
+
+**Signed APK**, installed on the device (`expo run` loads `.env.local`, so the Sentry upload works):
 
 ```bash
 npx expo prebuild --clean
@@ -253,7 +257,22 @@ Output: `android/app/build/outputs/apk/release/app-release.apk`
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 ```
 
+**Signed AAB** for Play upload (Gradle directly, so the Sentry token must be exported first):
+
+```bash
+npx expo prebuild --clean
+export SENTRY_AUTH_TOKEN="$(grep '^SENTRY_AUTH_TOKEN=' .env.local | cut -d= -f2- | tr -d '\r')"
+cd android && ./gradlew bundleRelease
+```
+
+Output: `android/app/build/outputs/bundle/release/app-release.aab`
+
 > ❌ No hot reload — ✅ Useful for testing production behavior
+
+> ⚠️ The dev client is signed with the debug key, release builds with the upload key. Android
+> won't update an app with a build signed by a different key, so switching the same phone between
+> them needs `adb uninstall com.nejon.nejonprayer` first (clears app data). The Play version is
+> signed by Google, so it needs an uninstall too.
 
 ---
 
@@ -279,10 +298,51 @@ eas login
 |---|---|---|---|
 | Expo Go | ✅ | ❌ | Quick JS testing |
 | Dev Client | ✅ | ✅ | Active development |
-| Release APK | ❌ | ✅ | QA / sharing |
+| Release APK/AAB | ❌ | ✅ | QA / Play upload (signed) |
 | EAS Build | ❌ | ✅ | Store submission |
 
 **Tip:** Enable **Quick Boot** in AVD Manager and store AVDs on an SSD for faster emulator startup.
+
+---
+
+## Local Signing
+
+Local release builds are signed with the same **upload key** EAS uses, so Play accepts AABs built
+on this PC. The key exists in three places: Expo's servers (used by `eas build`), this project
+folder (used by local builds), and a personal backup.
+
+| File | Content | Git |
+|---|---|---|
+| `credentials.json` | keystore path, alias, passwords | ignored |
+| `credentials/android/keystore.jks` | the upload key | ignored |
+
+**One-time setup** (interactive, run in a terminal):
+
+```bash
+eas credentials -p android
+# → production → "credentials.json: Upload/Download credentials between EAS servers and your local json"
+# → "Download credentials from EAS to credentials.json"
+```
+
+**How it works:** `src/plugins/withReleaseSigning.js` appends a block to the generated
+`android/app/build.gradle` that reads `credentials.json` at build time, so no password is copied
+into generated files. Without the file (e.g. on EAS), nothing changes and EAS signs as before.
+`eas.json` keeps the default `credentialsSource: "remote"`.
+
+**Check a build's signature:**
+
+```bash
+keytool -printcert -jarfile android/app/build/outputs/bundle/release/app-release.aab
+```
+
+The SHA-1 must match Play Console → **Test and release → App integrity → Upload key certificate**
+(not the App signing key, which is Google's).
+
+**Rules:**
+- Never commit `credentials.json` or the `.jks`. Keep a backup in a password manager.
+- If the upload key is ever reset, update **both** copies: the local files, and EAS via
+  `eas credentials` → "Upload credentials from credentials.json to EAS".
+- A lost upload key is recoverable: Play App Signing lets Google reset it (72 h wait).
 
 ---
 
@@ -471,7 +531,8 @@ In the [EAS dashboard](https://expo.dev) under **Project → Secrets**, add:
 Generate the token at: **Sentry → Settings → Auth Tokens → Create New Token**
 Required scopes: `project:releases`, `org:read`.
 
-This token is also referenced in `android/sentry.properties` for local release builds.
+Local builds read the same token from `.env.local` (gitignored): `npx expo run:android` loads it
+automatically, while a direct `./gradlew` call needs it exported first (see Local Release Build).
 
 ---
 

@@ -71,6 +71,7 @@
     },
     "plugins": [
       "./src/plugins/resBuild.js",
+      "./src/plugins/withReleaseSigning.js",
       "expo-router",
       "expo-asset",
       "expo-image",
