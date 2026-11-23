@@ -71,6 +71,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "prebuild": "expo prebuild --clean",
+    "build:aab": "node scripts/build-release.js bundleRelease",
+    "build:apk": "node scripts/build-release.js assembleRelease",
     "test": "jest"
   },
   "jest": {
