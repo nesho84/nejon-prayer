@@ -145,8 +145,6 @@ export const GLOBAL_TR = {
             quotesFooter: "The quotes presented are based on reliable sources but may not be fully accurate. It is recommended to consult scholars or authentic Islamic sources for complete and accurate information.",
             about: "About",
             aboutDesc: "About this App",
-            support: "Support Me",
-            supportDesc: "Support the development",
             // Tesbih
             tInstruction: "Tap the circle to count your Tasbeeh",
             tLap: "LAP",
@@ -403,8 +401,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Die vorgestellten Zitate basieren auf zuverlässigen Quellen, können aber nicht vollständig korrekt sein. Es wird empfohlen, Gelehrte oder authentische islamische Quellen für vollständige und genaue Informationen zu konsultieren.",
             about: "Info",
             aboutDesc: "Über diese App",
-            support: "Unterstützung",
-            supportDesc: "Unterstütze die App-Entwicklung",
             // Tesbih
             tInstruction: "Tippe auf den Kreis, um dein Tasbeeh zu zählen",
             tLap: "RUNDE",
@@ -661,8 +657,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Les citations présentées sont basées sur des sources fiables mais peuvent ne pas être entièrement exactes. Il est recommandé de consulter des savants ou des sources islamiques authentiques pour des informations complètes et précises.",
             about: "À propos",
             aboutDesc: "À propos de cette application",
-            support: "Me soutenir",
-            supportDesc: "Soutenir le développement",
             // Tesbih
             tInstruction: "Appuyez sur le cercle pour compter votre Tasbeeh",
             tLap: "TOUR",
@@ -919,8 +913,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Citatet e paraqitura bazohen në burime të besueshme, por mund të mos jenë plotësisht të sakta. Rekomandohet të konsultoheni me dijetarë ose burime autentike islame për informacione të plota dhe të sakta.",
             about: "Info",
             aboutDesc: "Rreth këtij Aplikacioni",
-            support: "Mbështetje",
-            supportDesc: "Ndihmo zhvillimin e aplikacionit",
             // Tesbih
             tInstruction: "Shtyp rrethin për të numëruar tesbihen",
             tLap: "RAUNDI",
@@ -1167,8 +1159,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Prikazani citati temelje se na pouzdanim izvorima, ali možda nisu u potpunosti tačni. Preporučuje se konsultovanje sa učenjacima ili autentičnim islamskim izvorima radi potpunih i tačnih informacija.",
             about: "O aplikaciji",
             aboutDesc: "O ovoj aplikaciji",
-            support: "Podrži me",
-            supportDesc: "Podrži razvoj",
             tInstruction: "Dodirnite krug za brojanje tesbiha",
             tLap: "KRUG",
             tLimit: "LIMIT",
@@ -1408,8 +1398,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Прикажаните цитати се базираат на доверливи извори, но можеби не се целосно точни. Препорачливо е да се консултирате со учени луѓе или автентични исламски извори за целосни и точни информации.",
             about: "За апликацијата",
             aboutDesc: "За оваа апликација",
-            support: "Поддржи ме",
-            supportDesc: "Поддржи го развојот",
             tInstruction: "Допрете го кругот за броење тесбих",
             tLap: "КРУГ",
             tLimit: "ЛИМИТ",
@@ -1659,8 +1647,6 @@ export const GLOBAL_TR = {
             quotesFooter: "Sunulan alıntılar güvenilir kaynaklara dayanmakla birlikte tamamen doğru olmayabilir. Eksiksiz ve doğru bilgi için alimlerle veya otantik İslami kaynaklarla istişare edilmesi tavsiye edilir.",
             about: "Hakkında",
             aboutDesc: "Bu Uygulama Hakkında",
-            support: "Destek",
-            supportDesc: "Uygulama geliştirmeye yardım edin",
             // Tesbih
             tInstruction: "Tesbih saymak için daireye dokunun",
             tLap: "TUR",
@@ -1917,8 +1903,6 @@ export const GLOBAL_TR = {
             quotesFooter: "الاقتباسات المقدمة مستندة إلى مصادر موثوقة، غير أنها قد لا تكون دقيقة تمامًا. يُنصح بمراجعة العلماء أو المصادر الإسلامية الموثوقة للحصول على معلومات كاملة ودقيقة.",
             about: "حول",
             aboutDesc: "حول هذا التطبيق",
-            support: "ادعمني",
-            supportDesc: "ادعم تطوير التطبيق",
             // Tesbih
             tInstruction: "اضغط على الدائرة لعدّ التسبيح",
             tLap: "دورة",

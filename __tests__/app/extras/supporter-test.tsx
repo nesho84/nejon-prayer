@@ -65,7 +65,7 @@ describe('SupporterScreen — on open', () => {
 
   it('explains why, and that a gift unlocks nothing', () => {
     render(<SupporterScreen />);
-    expect(screen.getByText('Why support?')).toBeTruthy();
+    expect(screen.getByText(/nothing is locked behind a payment/)).toBeTruthy();
     expect(screen.getByText("Doesn't remove ads — just a thank you")).toBeTruthy();
   });
 });
@@ -80,7 +80,7 @@ describe('SupporterScreen — unlock', () => {
   it('shows a pending payment without unlocking or a buy button', () => {
     useSupporterStore.setState({ unlockPending: true });
     render(<SupporterScreen />);
-    expect(screen.getByText('Waiting for Google Play to confirm the payment')).toBeTruthy();
+    expect(screen.getByText('Waiting for Google Play to confirm')).toBeTruthy();
     expect(screen.getByText('Payment pending')).toBeTruthy();
     expect(screen.queryByText('Unlock · €5.99')).toBeNull();
   });
@@ -97,7 +97,7 @@ describe('SupporterScreen — unlock', () => {
   it('shows the supporter state with Play\'s purchase month', () => {
     useSupporterStore.setState({ isSupporter: true, supporterSince: new Date(2026, 10, 20).getTime() });
     render(<SupporterScreen />);
-    expect(screen.getByText('Thank you for supporting Nejon Prayer')).toBeTruthy();
+    expect(screen.getByText('Thank you')).toBeTruthy();
     expect(screen.getByText('Supporter since November 2026')).toBeTruthy();
     expect(screen.queryByText('Unlock · €5.99')).toBeNull();
   });
@@ -148,7 +148,7 @@ describe('SupporterScreen — restore', () => {
     });
     render(<SupporterScreen />);
     await act(async () => fireEvent.press(screen.getByText('Restore purchases')));
-    expect(screen.getByText('Supporter restored')).toBeTruthy();
+    expect(screen.getByText('Supporter status restored')).toBeTruthy();
   });
 
   it('says when there is nothing to restore', async () => {

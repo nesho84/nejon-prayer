@@ -1,4 +1,5 @@
 import AdBanner from "@/components/AdBanner";
+import SupporterBanner from "@/components/SupporterBanner";
 import { useLanguageStore } from "@/store/languageStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
@@ -20,6 +21,7 @@ export default function TabLayout() {
             tabBar={(props) => (
                 <>
                     <AdBanner />
+                    <SupporterBanner />
                     <BottomTabBar {...props} />
                 </>
             )}

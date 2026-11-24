@@ -226,3 +226,42 @@ describe('supporterStore — buy and purchase errors', () => {
     expect(useSupporterStore.getState().isSupporter).toBe(true);
   });
 });
+
+describe('supporterStore — supporter banner', () => {
+  const WAIT_MS = 7 * 24 * 60 * 60 * 1000;
+
+  beforeEach(() => {
+    useSupporterStore.setState({ bannerVisible: false, bannerNextShowAt: null });
+  });
+
+  it('shows the first time and waits 7 days before the next', () => {
+    const before = Date.now();
+    useSupporterStore.getState().showBannerIfDue();
+    expect(useSupporterStore.getState().bannerVisible).toBe(true);
+    expect(useSupporterStore.getState().bannerNextShowAt).toBeGreaterThanOrEqual(before + WAIT_MS);
+  });
+
+  it('stays away until its next show time', () => {
+    useSupporterStore.setState({ bannerNextShowAt: Date.now() + 60_000 });
+    useSupporterStore.getState().showBannerIfDue();
+    expect(useSupporterStore.getState().bannerVisible).toBe(false);
+  });
+
+  it('shows again once the next show time has passed', () => {
+    useSupporterStore.setState({ bannerNextShowAt: Date.now() - 1 });
+    useSupporterStore.getState().showBannerIfDue();
+    expect(useSupporterStore.getState().bannerVisible).toBe(true);
+  });
+
+  it('never shows for a supporter', () => {
+    useSupporterStore.setState({ isSupporter: true });
+    useSupporterStore.getState().showBannerIfDue();
+    expect(useSupporterStore.getState().bannerVisible).toBe(false);
+  });
+
+  it('hides on request', () => {
+    useSupporterStore.setState({ bannerVisible: true });
+    useSupporterStore.getState().hideBanner();
+    expect(useSupporterStore.getState().bannerVisible).toBe(false);
+  });
+});

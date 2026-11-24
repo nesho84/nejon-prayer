@@ -1,4 +1,4 @@
-import { StoreUpdatePreview, useDebugStore } from "@/debug/debugStore";
+import { StoreUpdatePreview, SupporterPreview, useDebugStore } from "@/debug/debugStore";
 import { useHolidaysStore } from "@/store/holidaysStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocationStore } from "@/store/locationStore";
@@ -7,12 +7,15 @@ import { useOnboardingStore } from "@/store/onboardingStore";
 import { usePrayersStore } from "@/store/prayersStore";
 import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useQuranStore } from "@/store/quranStore";
+import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
+  formatTime,
   previewFeedbackModal,
+  previewFeedbackThanks,
   previewKhatamCelebrationModal,
   previewNotifReminderModal,
   previewPrayerCelebrationModal,
@@ -45,6 +48,10 @@ import {
   OUTDATED_HINT,
   PRAYER_CELEBRATION_HINT,
   STORE_REVIEW_HINT,
+  FEEDBACK_THANKS_HINT,
+  SUPPORTER_BANNER_HINT,
+  SUPPORTER_GIFT_HINT,
+  SUPPORTER_PREVIEW_HINT,
   showJsonViewerModal,
   UP_TO_DATE_HINT,
   STORE_UPDATE_HINT,
@@ -82,6 +89,12 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const toggleStoreUpdateOnLaunch = useDebugStore((state) => state.toggleStoreUpdateOnLaunch);
   const storeUpdatePreview = useDebugStore((state) => state.storeUpdatePreview);
   const setStoreUpdatePreview = useDebugStore((state) => state.setStoreUpdatePreview);
+  const supporterPreview = useDebugStore((state) => state.supporterPreview);
+  const setSupporterPreview = useDebugStore((state) => state.setSupporterPreview);
+  const forceSupporterGift = useDebugStore((state) => state.forceSupporterGift);
+  const toggleSupporterGift = useDebugStore((state) => state.toggleSupporterGift);
+  const forceSupporterBanner = useDebugStore((state) => state.forceSupporterBanner);
+  const toggleSupporterBanner = useDebugStore((state) => state.toggleSupporterBanner);
   const expanded = useDebugStore((state) => state.debugPanelExpanded);
   const toggleDebugPanel = useDebugStore((state) => state.toggleDebugPanel);
 
@@ -90,6 +103,21 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const notifParams = { options: { language, location, hasAlarm: true }, notifSettings, notifSeconds };
   const notifSecondsBadge = <Badge label={`${notifSeconds}s`} color={theme.placeholder} bg={theme.overlay} />;
   const togglePreview = (value: StoreUpdatePreview) => setStoreUpdatePreview(storeUpdatePreview === value ? "idle" : value);
+  const toggleSupporterPreview = (value: SupporterPreview) => setSupporterPreview(supporterPreview === value ? "idle" : value);
+  const showSupporterModal = () => {
+    const { isSupporter, supporterSince, unlockPending, giftPending, lastGiftAt, lastKnownPrices, playStatus, bannerNextShowAt } =
+      useSupporterStore.getState();
+    showJsonViewerModal("Supporter", {
+      isSupporter,
+      supporterSince: formatTime(supporterSince),
+      unlockPending,
+      giftPending,
+      lastGiftAt: formatTime(lastGiftAt),
+      lastKnownPrices,
+      playStatus,
+      bannerNextShowAt: formatTime(bannerNextShowAt),
+    });
+  };
   const showScheduledNModal = async () => showJsonViewerModal("Scheduled Notifications", await getScheduledNData());
   const showPrayerTrackingModal = () => showJsonViewerModal("Prayer Tracking", usePrayersTrackingStore.getState().tracking);
   const showPrayerTimesModal = () => {
@@ -196,6 +224,21 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
             <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
             <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
+          </DebugSection>
+
+          {/* Supporter: fake values for the support screens only */}
+          <DebugSection title="Supporter (Play Billing)">
+            <DebugToggle label="Toggle 'Can buy' state" color={theme.pink} value={supporterPreview === "canBuy"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("canBuy")} />
+            <DebugToggle label="Toggle 'Payment pending' state" color={theme.pink} value={supporterPreview === "pending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("pending")} />
+            <DebugToggle label="Toggle 'Play unreachable' state" color={theme.pink} value={supporterPreview === "unreachable"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("unreachable")} />
+            <DebugToggle label="Toggle 'Gift pending' state" color={theme.pink} value={supporterPreview === "giftPending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("giftPending")} />
+            <DebugToggle label="Toggle 'Supporter' state" color={theme.pink} value={supporterPreview === "supporter"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("supporter")} />
+            <DebugToggle label="Toggle 'Gift received' line" color={theme.pink} value={forceSupporterGift} hint={SUPPORTER_GIFT_HINT} onPress={toggleSupporterGift} />
+            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+            <DebugToggle label="Toggle Supporter Banner" color={theme.pink} value={forceSupporterBanner} hint={SUPPORTER_BANNER_HINT} onPress={toggleSupporterBanner} />
+            <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.pink} hint={FEEDBACK_THANKS_HINT} onPress={previewFeedbackThanks} />
+            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+            <DebugButton label="Show 'Supporter' JSON" color={theme.gray} onPress={showSupporterModal} />
           </DebugSection>
 
           {/* Auto modals — a preview each, one JSON for their shared store */}

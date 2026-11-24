@@ -8,6 +8,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 // ------------------------------------------------------------
 
 export type StoreUpdatePreview = "idle" | "upToDate" | "error";
+export type SupporterPreview = "idle" | "canBuy" | "pending" | "unreachable" | "giftPending" | "supporter";
 
 interface DebugState {
   debugModeEnabled: boolean;
@@ -20,6 +21,9 @@ interface DebugState {
   forceNoPrayerTimes: boolean;
   forceStoreUpdateOnLaunch: boolean;
   storeUpdatePreview: StoreUpdatePreview;
+  supporterPreview: SupporterPreview;
+  forceSupporterGift: boolean;
+  forceSupporterBanner: boolean;
   isReady: boolean;
   toggleHoliday: () => void;
   toggleFriday: () => void;
@@ -31,6 +35,9 @@ interface DebugState {
   toggleDebugMode: () => void;
   toggleDebugPanel: () => void;
   setStoreUpdatePreview: (value: StoreUpdatePreview) => void;
+  setSupporterPreview: (value: SupporterPreview) => void;
+  toggleSupporterGift: () => void;
+  toggleSupporterBanner: () => void;
 }
 
 export const useDebugStore = create<DebugState>()(
@@ -46,6 +53,9 @@ export const useDebugStore = create<DebugState>()(
       forceNoPrayerTimes: false,
       forceStoreUpdateOnLaunch: false,
       storeUpdatePreview: "idle",
+      supporterPreview: "idle",
+      forceSupporterGift: false,
+      forceSupporterBanner: false,
       isReady: false,
 
       toggleHoliday: () => set((s) => ({ forceHoliday: !s.forceHoliday })),
@@ -58,6 +68,9 @@ export const useDebugStore = create<DebugState>()(
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
       toggleDebugPanel: () => set((s) => ({ debugPanelExpanded: !s.debugPanelExpanded })),
       setStoreUpdatePreview: (value) => set({ storeUpdatePreview: value }),
+      setSupporterPreview: (value) => set({ supporterPreview: value }),
+      toggleSupporterGift: () => set((s) => ({ forceSupporterGift: !s.forceSupporterGift })),
+      toggleSupporterBanner: () => set((s) => ({ forceSupporterBanner: !s.forceSupporterBanner })),
     }),
     {
       name: "debug-storage",

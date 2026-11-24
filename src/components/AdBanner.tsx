@@ -7,6 +7,7 @@ import {
 import { HIT_SLOP_8 } from "@/constants/styles";
 import { useAdsStore } from "@/store/adsStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
 import NetInfo from "@react-native-community/netinfo";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
@@ -27,6 +28,7 @@ export default function AdBanner() {
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
   const canRequestAds = useAdsStore((state) => state.canRequestAds);
+  const isSupporter = useSupporterStore((state) => state.isSupporter);
 
   // Landscape side insets (nav buttons, camera cutout) — the banner spans the full screen width
   const insets = useSafeAreaInsets();
@@ -131,7 +133,8 @@ export default function AdBanner() {
     return () => clearTimeout(timer);
   }, [loaded]);
 
-  if (!canRequestAds || dismissed) return null;
+  // Supporters never see it — this also covers an unlock bought mid-session
+  if (!canRequestAds || dismissed || isSupporter) return null;
 
   return (
     // Collapsed to zero height until an ad has actually rendered — the native banner paints

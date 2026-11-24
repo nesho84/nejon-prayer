@@ -1,14 +1,15 @@
-import { PAYPAL_DONATE_URL } from "@/constants/links";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { FEEDBACK_TR, FeedbackTranslations } from "@/constants/translations/feedback.tr";
+import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
 import { DAY_MS, FEEDBACK_MAX_SHOWS, FEEDBACK_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
+import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
 import { FeedbackAnswers, FeedbackDonationId, FeedbackError, FeedbackImproveId, FeedbackMostUsedId } from "@/types/feedback.types";
-import { openExternalUrl } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import { router } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -56,10 +57,23 @@ function getChoiceLabels(id: "most_used" | "improve" | "donation_interest", feed
 }
 
 // ------------------------------------------------------------
+// First step — the thank-you start is the debug preview
+// ------------------------------------------------------------
+function getStartStep(fromAbout: boolean, startAtThanks: boolean): FeedbackStep {
+  if (startAtThanks) {
+    return "thanks";
+  }
+  if (fromAbout) {
+    return "rating";
+  }
+  return "intro";
+}
+
+// ------------------------------------------------------------
 // Show the feedback modal — no checks (canShowFeedback runs at launch).
 // From About it opens at "rating", and neither the open nor a close is recorded.
 // ------------------------------------------------------------
-export function showFeedbackModal(fromAbout = false) {
+export function showFeedbackModal(fromAbout = false, startAtThanks = false) {
   const { feedbackShownCount, setAutoModals } = useAutoModalsStore.getState();
 
   if (!fromAbout) {
@@ -76,23 +90,26 @@ export function showFeedbackModal(fromAbout = false) {
     animationType: "fade",
     // Only the buttons close it — so every close records a choice
     dismissable: false,
-    component: <FeedbackForm fromAbout={fromAbout} />,
+    component: <FeedbackForm fromAbout={fromAbout} startAtThanks={startAtThanks} />,
   });
 }
 
 // ------------------------------------------------------------
 // Modal content — intro → questions → thank-you (or error), all in the same modal
 // ------------------------------------------------------------
-function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
+function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startAtThanks: boolean }) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
+  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
   const feedbackTr = FEEDBACK_TR[language] ?? FEEDBACK_TR.en;
+  const supporterTr = SUPPORTER_TR[language] ?? SUPPORTER_TR.en;
+  const isSupporter = useSupporterStore((state) => state.isSupporter);
   const { hide } = useModalStore.getState();
 
   // Local state
-  const [step, setStep] = useState<FeedbackStep>(fromAbout ? "rating" : "intro");
+  const [step, setStep] = useState<FeedbackStep>(getStartStep(fromAbout, startAtThanks));
   const [rating, setRating] = useState<number | null>(null);
   const [answers, setAnswers] = useState<FeedbackAnswers>({});
   const [message, setMessage] = useState("");
@@ -247,15 +264,31 @@ function FeedbackForm({ fromAbout }: { fromAbout: boolean }) {
           <MaterialDesignIcons name="check-circle-outline" size={96} color={theme.success} style={styles.heroIcon} />
           <Text style={[globalStyles.bannerTitle, styles.title, { color: theme.text }]}>{feedbackTr.thanksTitle}</Text>
           <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{feedbackTr.thanksMessage}</Text>
-          <TouchableOpacity
-            style={[styles.supportButton, { backgroundColor: theme.danger + "15", borderColor: theme.danger + "40" }]}
-            onPress={() => openExternalUrl(PAYPAL_DONATE_URL)}
-            activeOpacity={0.7}
-          >
-            <MaterialDesignIcons name="heart-outline" size={18} color={theme.danger} />
-            <Text style={[styles.supportText, { color: theme.danger }]}>{feedbackTr.supportApp}</Text>
-            <MaterialDesignIcons name="open-in-new" size={14} color={theme.danger} />
-          </TouchableOpacity>
+          {/* Opens the support screen (Android only for now) */}
+          {Platform.OS === "android" && (
+            <TouchableOpacity
+              style={[
+                styles.supportButton,
+                { backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white, borderColor: theme.gold + "73" },
+              ]}
+              onPress={() => {
+                hide("close");
+                router.navigate("/extras/supporter");
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.supportIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+                <MaterialDesignIcons name="heart-outline" size={22} color={theme.accent} />
+              </View>
+              <View style={styles.supportTextContainer}>
+                <Text style={[styles.supportText, { color: theme.text }]} numberOfLines={1}>{feedbackTr.supportApp}</Text>
+                <Text style={[styles.supportDescription, { color: theme.textSecondary }]} numberOfLines={2}>
+                  {isSupporter ? supporterTr.moreSupporterBody : supporterTr.moreBody}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Buttons */}
@@ -474,19 +507,37 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
   },
+  // Same look as the More tab support card
   supportButton: {
+    alignSelf: "stretch",
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginTop: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    gap: 14,
+    marginTop: 24,
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
+  },
+  supportIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  supportTextContainer: {
+    flex: 1,
+    gap: 2,
   },
   supportText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
+  },
+  supportDescription: {
+    fontSize: 13.5,
+    lineHeight: 19,
+    opacity: 0.7,
   },
   buttons: {
     gap: 10,

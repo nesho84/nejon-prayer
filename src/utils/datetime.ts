@@ -25,6 +25,13 @@ export const formatDateKey = (dateKey: string): string => {
 };
 
 // ------------------------------------------------------------
+// Formats a timestamp as a date in the given locale (e.g. "23 November 2026")
+// ------------------------------------------------------------
+export const formatDate = (time: number, locale: string, options: Intl.DateTimeFormatOptions): string => {
+  return new Date(time).toLocaleDateString(locale, options);
+};
+
+// ------------------------------------------------------------
 // Checks if a given prayer time (in "HH:mm" format) has already passed today
 // ------------------------------------------------------------
 export const isTimePast = (prayerTime: string): boolean => {

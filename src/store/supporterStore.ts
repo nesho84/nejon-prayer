@@ -1,4 +1,10 @@
-import { GIFT_IDS, GiftId, SUPPORTER_PRODUCT_IDS, SUPPORTER_UNLOCK_ID, SupporterProductId } from "@/constants/supporter";
+import {
+  GIFT_IDS,
+  GiftId,
+  SUPPORTER_PRODUCT_IDS,
+  SUPPORTER_UNLOCK_ID,
+  SupporterProductId,
+} from "@/constants/supporter";
 import { finishPurchase, getOwnedPurchases, getProducts, startPurchase } from "@/services/billingService";
 import { mmkvStorage } from "@/store/storage";
 import { BillingError, BillingPurchase } from "@/types/billing.types";
@@ -13,6 +19,7 @@ interface SupporterData {
   giftPending: boolean;
   lastGiftAt: number | null;       // this device only — Play forgets consumed gifts
   lastKnownPrices: Partial<Record<SupporterProductId, string>>; // display only, never used to buy
+  bannerNextShowAt: number | null; // the supporter banner may appear again from then on
 }
 
 interface SupporterState extends SupporterData {
@@ -21,11 +28,14 @@ interface SupporterState extends SupporterData {
   playStatus: "loading" | "ready" | "unavailable";
   productsFresh: boolean;          // details fetched this session — the only state buying is allowed in
   purchasingId: SupporterProductId | null;
+  bannerVisible: boolean;
   syncPurchases: () => Promise<boolean>;
   loadProducts: () => Promise<void>;
   buy: (id: SupporterProductId) => Promise<void>;
   handlePurchase: (purchase: BillingPurchase) => Promise<void>;
   handlePurchaseError: (error: BillingError) => void;
+  showBannerIfDue: () => void;
+  hideBanner: () => void;
 }
 
 const INITIAL_DATA: SupporterData = {
@@ -35,12 +45,17 @@ const INITIAL_DATA: SupporterData = {
   giftPending: false,
   lastGiftAt: null,
   lastKnownPrices: {},
+  bannerNextShowAt: null,
 };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Supporter banner — shows right after the ad banner is closed, then waits this long
+export const SUPPORTER_BANNER_WAIT_DAYS = 7;
 
 // Coalescing mutex — launch, foreground and Restore share one Play query
 let syncInProgress: Promise<boolean> | null = null;
 // Purchases being acknowledged/consumed — the listener and a sync can see the same one
-// (closing Play's payment sheet also counts as a return to the app)
 const finishing = new Set<string>();
 
 const isGift = (id: string): id is GiftId => (GIFT_IDS as string[]).includes(id);
@@ -55,9 +70,9 @@ export const useSupporterStore = create<SupporterState>()(
       playStatus: "loading",
       productsFresh: false,
       purchasingId: null,
+      bannerVisible: false,
 
-      // Ask Play what this Google account owns. A failed query keeps the cached state;
-      // a successful one is the truth — no unlock in it means refunded/revoked.
+      // Sync with what this Google account owns (a failed query keeps the cache)
       syncPurchases: () => {
         if (syncInProgress) {
           return syncInProgress;
@@ -87,7 +102,7 @@ export const useSupporterStore = create<SupporterState>()(
         return syncInProgress;
       },
 
-      // Fresh product details; on failure the screen keeps showing lastKnownPrices, marked as such
+      // Load fresh product details
       loadProducts: async () => {
         set({ playStatus: "loading" });
         const result = await getProducts(SUPPORTER_PRODUCT_IDS);
@@ -107,31 +122,38 @@ export const useSupporterStore = create<SupporterState>()(
         }
       },
 
-      // One purchase from Play (listener or sync). Pending never unlocks anything.
+      // Handle one purchase from Play (listener or sync)
       handlePurchase: async (purchase) => {
         set({ purchasingId: null });
         const { productId, purchaseState } = purchase;
 
+        // Pending — nothing unlocks yet
+        if (purchaseState === "pending" && productId === SUPPORTER_UNLOCK_ID) {
+          set({ unlockPending: true });
+          return;
+        }
         if (purchaseState === "pending") {
-          set(productId === SUPPORTER_UNLOCK_ID ? { unlockPending: true } : { giftPending: true });
+          set({ giftPending: true });
           return;
         }
         if (purchaseState !== "purchased" || finishing.has(purchase.id)) {
           return;
         }
-
-        if (productId === SUPPORTER_UNLOCK_ID) {
-          set({ isSupporter: true, supporterSince: purchase.transactionDate, unlockPending: false });
-          if (isAcknowledged(purchase)) {
-            return;
-          }
-        } else if (isGift(productId)) {
-          set({ lastGiftAt: purchase.transactionDate, giftPending: false });
-        } else {
+        if (productId !== SUPPORTER_UNLOCK_ID && !isGift(productId)) {
           return;
         }
 
-        // Unlock → acknowledge, gift → consume. A failure is retried by the next sync.
+        if (productId === SUPPORTER_UNLOCK_ID) {
+          set({ isSupporter: true, supporterSince: purchase.transactionDate, unlockPending: false });
+        }
+        if (productId === SUPPORTER_UNLOCK_ID && isAcknowledged(purchase)) {
+          return;
+        }
+        if (isGift(productId)) {
+          set({ lastGiftAt: purchase.transactionDate, giftPending: false });
+        }
+
+        // Unlock → acknowledge, gift → consume (retried by the next sync)
         finishing.add(purchase.id);
         await finishPurchase(purchase, isGift(productId));
         finishing.delete(purchase.id);
@@ -142,11 +164,22 @@ export const useSupporterStore = create<SupporterState>()(
         if (error === "unavailable") {
           set({ playStatus: "unavailable", productsFresh: false });
         }
-        // Bought on another device, or not acknowledged here yet
+        // Already owned — sync to pick it up
         if (error === "owned") {
           get().syncPurchases();
         }
       },
+
+      // Show the supporter banner after the ad banner is closed
+      showBannerIfDue: () => {
+        const { isSupporter, bannerNextShowAt } = get();
+        if (isSupporter || (bannerNextShowAt !== null && Date.now() < bannerNextShowAt)) {
+          return;
+        }
+        set({ bannerVisible: true, bannerNextShowAt: Date.now() + SUPPORTER_BANNER_WAIT_DAYS * DAY_MS });
+      },
+
+      hideBanner: () => set({ bannerVisible: false }),
     }),
     {
       name: "supporter-storage",
@@ -158,6 +191,7 @@ export const useSupporterStore = create<SupporterState>()(
         giftPending: state.giftPending,
         lastGiftAt: state.lastGiftAt,
         lastKnownPrices: state.lastKnownPrices,
+        bannerNextShowAt: state.bannerNextShowAt,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {

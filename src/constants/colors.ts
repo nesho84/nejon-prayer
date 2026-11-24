@@ -32,6 +32,8 @@ export const LIGHT_COLORS = {
     teal: "#0d9488",
     indigo: "#4f46e5",
     orange: "#ea580c",
+    sand: "#8a6d2c",
+    sage: "#3f7a5c",
 
     // Surfaces & Borders
     card: "#f3f3f3",
@@ -110,6 +112,8 @@ export const DARK_COLORS = {
     teal: "#2dd4bf",
     indigo: "#818cf8",
     orange: "#fb923c",
+    sand: "#bca874",
+    sage: "#a2c4b3",
 
     // Surfaces & Borders
     card: "#1f2937",

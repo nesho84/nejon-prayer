@@ -3,8 +3,8 @@ import { showFeedbackModal } from '@/components/FeedbackModal';
 import { showStoreReviewModal } from '@/components/StoreReviewModal';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { Linking, Platform } from 'react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
@@ -51,7 +51,7 @@ const mockTheme = {
 const mockTr = {
   labels: {
     about: 'About', shareApp: 'Share App', shareAppDesc: 'Share with friends',
-    supportDesc: 'Support us', rateApp: 'Rate the App', rateAppDesc: 'On Google Play',
+    rateApp: 'Rate the App', rateAppDesc: 'On Google Play',
     feedback: 'Send Feedback', contactUs: 'Contact Us',
   },
 } as any;
@@ -90,15 +90,9 @@ describe('AboutScreen', () => {
     );
   });
 
-  it('calls Linking.openURL with PayPal URL when support card is pressed', async () => {
-    jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+  it('no longer links to PayPal', () => {
     render(<AboutScreen />);
-    fireEvent.press(screen.getByText('Support us'));
-    await waitFor(() => {
-      expect(Linking.openURL).toHaveBeenCalledWith(
-        expect.stringContaining('paypal.me')
-      );
-    });
+    expect(screen.queryByText(/PayPal/)).toBeNull();
   });
 
   it('opens the "Rate the App" modal from About when the rate card is pressed', () => {

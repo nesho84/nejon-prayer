@@ -1,16 +1,17 @@
 import { showFeedbackModal } from '@/components/FeedbackModal';
-import { PAYPAL_DONATE_URL } from '@/constants/links';
 import { sendFeedback } from '@/services/feedbackService';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useModalStore } from '@/store/modalStore';
-import { openExternalUrl } from '@/utils/system';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
+import { Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
-jest.mock('@/utils/system', () => ({ openExternalUrl: jest.fn() }));
+jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 jest.mock('@/services/feedbackService', () => ({ sendFeedback: jest.fn() }));
+jest.mock('@/services/billingService', () => ({}));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };
@@ -287,16 +288,36 @@ describe('sending', () => {
     expect(hide()).toHaveBeenCalledWith('close');
   });
 
-  it('the thank-you step offers the support link and closes', async () => {
+  it('the thank-you step closes', async () => {
     mockSendFeedback.mockResolvedValue({ ok: true });
     answerAll();
     fireEvent.press(screen.getByText('Send'));
     await screen.findByText('Thank you!');
 
-    fireEvent.press(screen.getByText('Support the app'));
-    expect(openExternalUrl).toHaveBeenCalledWith(PAYPAL_DONATE_URL);
-
     fireEvent.press(screen.getByText('Close'));
     expect(hide()).toHaveBeenCalledWith('close');
+  });
+
+  it('the thank-you step opens the support screen on Android', async () => {
+    (Platform as { OS: string }).OS = 'android';
+    mockSendFeedback.mockResolvedValue({ ok: true });
+    answerAll();
+    fireEvent.press(screen.getByText('Send'));
+    await screen.findByText('Thank you!');
+
+    expect(screen.getByText('Every feature is free. Supporting removes the ads.')).toBeTruthy();
+    fireEvent.press(screen.getByText('Support the app'));
+    expect(hide()).toHaveBeenCalledWith('close');
+    expect(router.navigate).toHaveBeenCalledWith('/extras/supporter');
+  });
+
+  it('the thank-you step has no support link on iOS for now', async () => {
+    (Platform as { OS: string }).OS = 'ios';
+    mockSendFeedback.mockResolvedValue({ ok: true });
+    answerAll();
+    fireEvent.press(screen.getByText('Send'));
+    await screen.findByText('Thank you!');
+
+    expect(screen.queryByText('Support the app')).toBeNull();
   });
 });

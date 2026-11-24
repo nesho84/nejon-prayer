@@ -1,4 +1,4 @@
-import { isTimePast, keyToDate, toDateKey } from '@/utils/datetime';
+import { formatDate, isTimePast, keyToDate, toDateKey } from '@/utils/datetime';
 
 describe('toDateKey', () => {
   it('formats a date correctly', () => {
@@ -24,6 +24,18 @@ describe('keyToDate', () => {
     expect(date.getFullYear()).toBe(2024);
     expect(date.getMonth()).toBe(0); // January
     expect(date.getDate()).toBe(5);
+  });
+});
+
+describe('formatDate', () => {
+  it('formats a timestamp in the given locale', () => {
+    const time = new Date(2026, 10, 23).getTime();
+    expect(formatDate(time, 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })).toBe('23 November 2026');
+  });
+
+  it('formats month and year only', () => {
+    const time = new Date(2026, 10, 23).getTime();
+    expect(formatDate(time, 'en-GB', { month: 'long', year: 'numeric' })).toBe('November 2026');
   });
 });
 

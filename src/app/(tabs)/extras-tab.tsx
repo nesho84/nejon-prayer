@@ -1,14 +1,17 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
 import { globalStyles } from "@/constants/styles";
+import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
+import { useDebugStore } from "@/debug/debugStore";
 import { useLanguageStore } from "@/store/languageStore";
+import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
 import { openExternalUrl } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { Href, router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface SubMenuItem {
@@ -31,7 +34,14 @@ interface MenuItem {
 export default function ExtrasTabScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
+    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     const tr = useLanguageStore((state) => state.tr);
+    const language = useLanguageStore((state) => state.language);
+    const isSupporter = useSupporterStore((state) => state.isSupporter);
+    const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
+    const supporterPreview = useDebugStore((state) => state.supporterPreview);
+
+    const supporterTr = SUPPORTER_TR[language] ?? SUPPORTER_TR.en;
 
     // Safe area insets
     const insets = useSafeAreaInsets();
@@ -40,6 +50,9 @@ export default function ExtrasTabScreen() {
 
     // Local state
     const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    // A debug preview (only while debug mode is on) overrides the real status when set
+    const shownSupporter = debugModeEnabled && supporterPreview !== "idle" ? supporterPreview === "supporter" : isSupporter;
 
     // ------------------------------------------------------------
     // Features data
@@ -145,6 +158,44 @@ export default function ExtrasTabScreen() {
                         {tr.labels.extrasSubtitle || "Enhance your spiritual journey with these tools"}
                     </Text>
                 </AppCard>
+
+                {/* Support Card (Android only for now) */}
+                {Platform.OS === "android" && (
+                    <View
+                        style={[
+                            styles.supportCard,
+                            { backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white, borderColor: theme.gold + '73' },
+                        ]}
+                    >
+                        <Pressable
+                            style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                            android_ripple={{ color: theme.overlayLight, borderless: false }}
+                            onPress={() => router.navigate("/extras/supporter")}
+                        >
+                            <View style={[styles.listItem, styles.supportItem]}>
+                                {shownSupporter ? (
+                                    <View style={[styles.itemIconContainer, { backgroundColor: theme.success + "1F", borderColor: theme.divider2 }]}>
+                                        <MaterialDesignIcons name="check-decagram" size={26} color={theme.success} />
+                                        <Text style={[styles.supporterIconText, { color: theme.success }]} numberOfLines={1} adjustsFontSizeToFit>
+                                            {supporterTr.supporterBadge}
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <View style={[styles.itemIconContainer, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+                                        <MaterialDesignIcons name="heart-outline" size={28} color={theme.accent} />
+                                    </View>
+                                )}
+                                <View style={styles.itemTextContainer}>
+                                    <Text style={[styles.itemTitle, { color: theme.text }]} numberOfLines={1}>{supporterTr.title}</Text>
+                                    <Text style={[styles.itemDescription, { color: theme.textSecondary }]} numberOfLines={2}>
+                                        {shownSupporter ? supporterTr.moreSupporterBody : supporterTr.moreBody}
+                                    </Text>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+                            </View>
+                        </Pressable>
+                    </View>
+                )}
 
                 {/* Feature List Card */}
                 <AppCard style={styles.listCard}>
@@ -274,6 +325,22 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 18,
         opacity: 0.7,
+    },
+
+    // Support Card
+    supportCard: {
+        borderWidth: 1.5,
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+    supportItem: {
+        paddingVertical: 14,
+    },
+    supporterIconText: {
+        fontSize: 9.5,
+        fontWeight: '700',
+        marginTop: 1,
+        paddingHorizontal: 3,
     },
 
     // List Card

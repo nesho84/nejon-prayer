@@ -92,6 +92,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `tesbihStore` | Counter value, lap count, target |
 | `autoModalsStore` | State of the 4 auto modals (Store update, Notif reminder, Store review, Feedback): next-show time, last show, show count, done |
 | `modalStore` | Global bottom-sheet modal visibility |
+| `supporterStore` | Supporter entitlement (offline copy of what Play confirmed), pending payments, last known prices, supporter banner timing |
 
 ### Sync Hooks (run once at root layout)
 
@@ -106,7 +107,8 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
 | `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
-| `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK |
+| `useSupporterSync` | Android: keeps the Play purchase listener alive and syncs purchases on launch and every return to the app |
+| `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK — skipped for supporters (Android waits for the first Play check) |
 
 ### External APIs
 
@@ -213,6 +215,36 @@ Four things to know:
 on Android and `GADDelayAppMeasurementInit` on iOS). It postpones Google's app measurement so
 nothing is tracked before the consent form is answered — the same reason consent runs before
 `initialize()`. Never hand-edit `AndroidManifest.xml` for this — `prebuild --clean` wipes it.
+
+### Supporter (Google Play Billing)
+
+Android only for now. A one-time **Forever supporter** unlock removes ads and shows a supporter
+badge; **gifts** are repeatable and unlock nothing. Every feature stays free either way.
+
+- **Where the entitlement lives:** `supporterStore` (persisted as `supporter-storage`) is the
+  offline copy; **Google Play is the source of truth.** `syncPurchases()` asks Play what the
+  Google account owns — a failed query never revokes anything, a successful one without the unlock
+  removes it (refund). Reinstalls and new phones get the unlock back automatically.
+- **`src/services/billingService.ts` is the only file that imports `expo-iap`** — generic Play
+  plumbing with no product ids. The ids live in `src/constants/supporter.ts` and must match
+  Play Console exactly (they're permanent).
+- **`useSupporterSync`** keeps the purchase listener alive app-wide (a pending payment can clear
+  while the user is elsewhere) and syncs on launch and every return to the app. Pending payments
+  unlock nothing. The unlock is acknowledged, gifts are consumed — Play refunds anything left
+  unfinished for 3 days, so every sync retries.
+- **Ads:** `useAdsSync` waits for the first Play check, so supporters never see the consent form;
+  `AdBanner` renders nothing for supporters.
+- **Prices** come from Play at runtime (`displayPrice`, already in the user's currency). The stored
+  copy is shown as "last known" only; buying needs a fresh fetch in the current session.
+- **Entry points:** the More-tab card, `SupporterBanner` (takes the ad banner's slot after its ✕,
+  at most every `SUPPORTER_BANNER_WAIT_DAYS` = 7), and the feedback thank-you button. Screen:
+  `src/app/extras/supporter.tsx`.
+- **Debug previews:** About → debug panel → "Supporter (Play Billing)" shows each state with fake
+  values (screens only — the real entitlement, ads and Play are untouched; buttons stay real).
+
+Play Console: one-time products `supporter_unlock`, `gift_small`, `gift_medium`, `gift_large`
+(purchase option `buy`). Test purchases need a **License testing** account; a sideloaded dev
+client with the same package name works.
 
 ---
 

@@ -10,7 +10,6 @@ import {
     MORE_APPS_APP_STORE_URL,
     MORE_APPS_GOOGLE_PLAY_URL,
     NEJON_WEBSITE_URL,
-    PAYPAL_DONATE_URL,
     PRIVACY_POLICY_URL
 } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
@@ -136,21 +135,6 @@ export default function AboutScreen() {
 
                 {/* Action Cards */}
                 <View style={[styles.cardGroup, { backgroundColor: theme.secondary + '20' }]}>
-                    {/* Support / PayPal */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => openExternalUrl(PAYPAL_DONATE_URL)} activeOpacity={0.3}>
-                        <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
-                            <MaterialDesignIcons name="heart-outline" size={22} color={theme.danger} />
-                        </View>
-                        <View style={styles.cardTextContainer}>
-                            <Text style={[styles.cardTitle, { color: theme.textSecondary }]}>{tr.labels.supportDesc}</Text>
-                            <Text style={[styles.cardSubtitle, { color: theme.textMuted }]} numberOfLines={1}>via PayPal</Text>
-                        </View>
-                        <MaterialDesignIcons name="open-in-new" size={16} color={theme.textMuted} />
-                    </TouchableOpacity>
-
-                    {/* Divider */}
-                    <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
-
                     {/* Rate the App */}
                     <TouchableOpacity style={styles.cardRow} onPress={() => showStoreReviewModal(true)} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>

@@ -1,11 +1,14 @@
 import ExtrasTabScreen from '@/app/(tabs)/extras-tab';
 import { useLanguageStore } from '@/store/languageStore';
+import { useSupporterStore } from '@/store/supporterStore';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
+jest.mock('@/services/billingService', () => ({}));
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: any) => {
     const React = require('react');
@@ -80,5 +83,35 @@ describe('ExtrasTabScreen', () => {
     render(<ExtrasTabScreen />);
     fireEvent.press(screen.getByText('Beads'));
     expect(router.navigate).toHaveBeenCalledWith('/extras/tesbih');
+  });
+});
+
+describe('ExtrasTabScreen — support card', () => {
+  beforeEach(() => {
+    (Platform as { OS: string }).OS = 'android';
+    useLanguageStore.setState({ language: 'en' as any });
+    useSupporterStore.setState({ isSupporter: false });
+  });
+
+  it('invites to support and opens the support screen', () => {
+    const { router } = require('expo-router');
+    render(<ExtrasTabScreen />);
+    expect(screen.getByText('Every feature is free. Supporting removes the ads.')).toBeTruthy();
+    fireEvent.press(screen.getByText('Support the app'));
+    expect(router.navigate).toHaveBeenCalledWith('/extras/supporter');
+    expect(screen.queryByText('Supporter')).toBeNull();
+  });
+
+  it('shows the supporter badge and thanks a supporter', () => {
+    useSupporterStore.setState({ isSupporter: true });
+    render(<ExtrasTabScreen />);
+    expect(screen.getByText('Supporter')).toBeTruthy();
+    expect(screen.getByText('Ads are off for good. Thank you for backing the app.')).toBeTruthy();
+  });
+
+  it('is hidden on iOS for now', () => {
+    (Platform as { OS: string }).OS = 'ios';
+    render(<ExtrasTabScreen />);
+    expect(screen.queryByText('Support the app')).toBeNull();
   });
 });

@@ -99,6 +99,11 @@ making cross-cutting changes. Key points to internalize:
   (prayers/aladhan, quran/alquran.cloud, location, notifications, sound, holidays). Stores call
   services; components call stores.
 
+- **Supporter / Play Billing (Android only):** the entitlement lives in `supporterStore`; Play is
+  the source of truth and a failed Play query must never revoke it. `src/services/billingService.ts`
+  is the only file that may import `expo-iap` (generic, no product ids); the permanent Play Console
+  product ids live in `src/constants/supporter.ts`. See README "Supporter (Google Play Billing)".
+
 - **`index.ts`** registers the background handler that runs when the app is killed:
   `notifee.onBackgroundEvent` (notification delivery → `syncNotificationsInBackground`,
   "done" action → mark prayer prayed). It calls `useStore.getState()` directly (not hooks)

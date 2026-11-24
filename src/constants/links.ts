@@ -17,7 +17,6 @@ export const MORE_APPS_APP_STORE_URL = NEJON_WEBSITE_URL; // @TODO: set to the A
 
 export const CONTACT_EMAIL = "mailto:support@nejon.net";
 export const HELP_EMAIL = "mailto:help@nejon.net";
-export const PAYPAL_DONATE_URL = "https://paypal.me/NeshatAdemi?locale.x=de_DE&country.x=AT";
 export const PRIVACY_POLICY_URL = "https://nejon-prayer.nejon.net/privacy.html";
 
 // Feedback questionnaire (POST) — public by design, the API has no key

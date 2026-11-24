@@ -2,6 +2,7 @@ import AdBanner from '@/components/AdBanner';
 import { BANNER_CLOSE_DELAY_MS, BANNER_DISMISS_RESET_MS, CONNECTIVITY_DEBOUNCE_MS } from '@/constants/ads';
 import { useAdsStore } from '@/store/adsStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useSupporterStore } from '@/store/supporterStore';
 import { useThemeStore } from '@/store/themeStore';
 import NetInfo from '@react-native-community/netinfo';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -9,6 +10,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
+jest.mock('@/services/billingService', () => ({}));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -93,6 +95,7 @@ beforeEach(() => {
   });
   useThemeStore.setState({ theme: mockTheme });
   useAdsStore.setState({ canRequestAds: true, bannerLoaded: false, bannerDismissed: false, bannerDismissedAt: null });
+  useSupporterStore.setState({ isSupporter: false });
 });
 
 afterEach(() => {
@@ -118,6 +121,25 @@ describe('AdBanner — consent gate', () => {
     emitConnectivity(true);
 
     expect(screen.getByTestId('banner-ad')).toBeTruthy();
+  });
+
+  it('renders nothing for a supporter', () => {
+    useSupporterStore.setState({ isSupporter: true });
+
+    render(<AdBanner />);
+    emitConnectivity(true);
+
+    expect(screen.queryByTestId('ad-banner-container')).toBeNull();
+  });
+
+  it('disappears when someone becomes a supporter mid-session', () => {
+    render(<AdBanner />);
+    emitConnectivity(true);
+    expect(screen.getByTestId('banner-ad')).toBeTruthy();
+
+    act(() => useSupporterStore.setState({ isSupporter: true }));
+
+    expect(screen.queryByTestId('ad-banner-container')).toBeNull();
   });
 });
 

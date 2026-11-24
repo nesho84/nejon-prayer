@@ -22,7 +22,7 @@ import { showJsonViewerModal } from "./debugUi";
 // ------------------------------------------------------------
 
 // Timestamp → readable date for the JSON viewers
-const formatTime = (time: number | null) => (time ? new Date(time).toLocaleString("en-GB") : null);
+export const formatTime = (time: number | null) => (time ? new Date(time).toLocaleString("en-GB") : null);
 
 // ------------------------------------------------------------
 // Debug utility: preview a prayer-complete celebration (random localized)
@@ -220,4 +220,9 @@ export function previewFeedbackModal() {
     return;
   }
   showFeedbackModal();
+}
+
+// Thank-you step only — not counted as a show
+export function previewFeedbackThanks() {
+  showFeedbackModal(true, true);
 }

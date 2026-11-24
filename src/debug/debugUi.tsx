@@ -114,6 +114,19 @@ export const FEEDBACK_HINT =
   "or another modal is open.\n" +
   "From About: always opens at the questions; only sending is recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
+export const SUPPORTER_PREVIEW_HINT =
+  "Shows the More card and the Support screen with fake values, until the app restarts. " +
+  "Ads, consent and the real supporter status don't change — but the buttons are real: " +
+  "Unlock and the gifts open Google Play's real payment sheet.";
+export const SUPPORTER_GIFT_HINT =
+  "Adds the \"Gift received on …\" line on top of the state above (or the real one). " +
+  "Real: shown after a gift on this device — Play forgets consumed gifts, so a reinstall clears it.";
+export const SUPPORTER_BANNER_HINT =
+  "Shows the banner in the ad's slot, until the app restarts. " +
+  "Real: right after the ad banner's X, at most once every 7 days, never for supporters (Android only).";
+export const FEEDBACK_THANKS_HINT =
+  "Opens the Feedback modal on its thank-you step (with the Support button, Android only). " +
+  "Not counted as a show. Real: shown after feedback was sent.";
 
 // ------------------------------------------------------------
 // Small rounded status badge (ON/OFF state, delay seconds, …)
