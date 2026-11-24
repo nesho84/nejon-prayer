@@ -75,7 +75,7 @@ function getUnlockIcon(view: SupporterView, theme: ThemeColors): UnlockIcon {
     if (isUnlockUnavailable(view)) {
         return { name: "alert-circle-outline", color: theme.danger, bg: theme.danger + "26" };
     }
-    return { name: "star-outline", color: theme.accent, bg: theme.gold + "2B" };
+    return { name: "heart-outline", color: theme.accent, bg: theme.accentLight };
 }
 
 // ------------------------------------------------------------
@@ -145,11 +145,16 @@ export default function SupporterScreen() {
     const [restoring, setRestoring] = useState(false);
     const [restoreResult, setRestoreResult] = useState<RestoreResult | null>(null);
 
+    // ------------------------------------------------------------
     // Fresh product details on every visit
+    // ------------------------------------------------------------
     useEffect(() => {
         useSupporterStore.getState().loadProducts();
     }, []);
 
+    // ------------------------------------------------------------
+    // Clear the restore result after a while
+    // ------------------------------------------------------------
     useEffect(() => {
         if (!restoreResult) {
             return;
@@ -158,7 +163,9 @@ export default function SupporterScreen() {
         return () => clearTimeout(timer);
     }, [restoreResult]);
 
+    // ------------------------------------------------------------
     // A debug preview (only while debug mode is on) overrides the real values when set
+    // ------------------------------------------------------------
     const view = getSupporterPreview(
         { isSupporter, supporterSince, unlockPending, giftPending, lastGiftAt, lastKnownPrices, playStatus, productsFresh, purchasingId },
         debugModeEnabled ? supporterPreview : "idle",
@@ -166,8 +173,8 @@ export default function SupporterScreen() {
     );
 
     const cardColors = {
-        backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white,
-        borderColor: theme.gold + "73",
+        backgroundColor: theme.bgGold,
+        borderColor: theme.borderGold,
     };
     const unlockPrice = view.lastKnownPrices[SUPPORTER_UNLOCK_ID];
     const canBuy = view.productsFresh && view.purchasingId === null;
@@ -253,23 +260,32 @@ export default function SupporterScreen() {
 
                 {/* Why support */}
                 <View style={[styles.card, styles.whyCard, cardColors]}>
-                    <Text style={[styles.whyTitle, { color: theme.textSecondary }]}>{supporterTr.whyTitle}</Text>
+                    <Text style={[styles.whyTitle, { color: theme.text2 }]}>{supporterTr.whyTitle}</Text>
                     <Text style={[styles.whyText, { color: theme.placeholder }]}>{supporterTr.whyBody}</Text>
                 </View>
 
                 {/* Forever supporter */}
                 <View style={[styles.card, cardColors]}>
                     <View style={styles.unlockHeader}>
-                        <View style={[styles.iconSquare, { backgroundColor: unlockIcon.bg }]}>
-                            <MaterialDesignIcons name={unlockIcon.name} size={24} color={unlockIcon.color} />
-                        </View>
+                        {view.isSupporter ? (
+                            <View style={[styles.supporterSquare, { backgroundColor: theme.success + "1F", borderColor: theme.divider2 }]}>
+                                <MaterialDesignIcons name="check-decagram" size={32} color={theme.success} />
+                                <Text style={[styles.supporterIconText, { color: theme.success }]} numberOfLines={1} adjustsFontSizeToFit>
+                                    {supporterTr.supporterBadge}
+                                </Text>
+                            </View>
+                        ) : (
+                            <View style={[styles.iconSquare, { backgroundColor: unlockIcon.bg }]}>
+                                <MaterialDesignIcons name={unlockIcon.name} size={24} color={unlockIcon.color} />
+                            </View>
+                        )}
                         <View style={styles.unlockHeaderText}>
                             <Text style={[styles.cardTitle, { color: view.isSupporter ? theme.success : theme.text }]}>
                                 {view.isSupporter ? supporterTr.thankYouTitle : supporterTr.unlockTitle}
                             </Text>
                             {renderStatus(getUnlockStatus(view, supporterTr, theme, tr.labels.localeDate))}
                         </View>
-                        {view.isSupporter && <MaterialDesignIcons name="check-decagram" size={36} color={theme.success} />}
+                        {view.isSupporter && <MaterialDesignIcons name="check" size={36} color={theme.success} />}
                     </View>
 
                     <View style={[styles.unlockDivider, { backgroundColor: resolvedTheme === "dark" ? theme.bg3 : theme.bg4 }]} />
@@ -278,9 +294,9 @@ export default function SupporterScreen() {
                         {supporterTr.benefits.map((benefit) => (
                             <View key={benefit} style={styles.benefitRow}>
                                 <View style={styles.benefitIcon}>
-                                    <MaterialDesignIcons name="check-circle-outline" size={20} color={view.isSupporter ? theme.success : theme.accent} />
+                                    <MaterialDesignIcons name="check" size={22} color={theme.green} />
                                 </View>
-                                <Text style={[styles.benefitText, { color: theme.text2 }]}>{benefit}</Text>
+                                <Text style={[styles.benefitText, { color: theme.textSecondary }]}>{benefit}</Text>
                             </View>
                         ))}
                     </View>
@@ -315,12 +331,12 @@ export default function SupporterScreen() {
                                     <View style={[styles.giftIcon, { backgroundColor: resolvedTheme === "dark" ? theme.white + "0D" : theme.black + "0A" }]}>
                                         <MaterialDesignIcons name="gift-outline" size={19} color={theme.textSecondary} />
                                     </View>
-                                    <Text style={[styles.giftLabel, { color: theme.accent }]}>{supporterTr.gifts[id]}</Text>
+                                    <Text style={[styles.giftLabel, { color: theme.text2 }]}>{supporterTr.gifts[id]}</Text>
                                     <View style={styles.giftPrice}>
                                         {view.purchasingId === id ? (
-                                            <ActivityIndicator size="small" color={theme.accent} />
+                                            <ActivityIndicator size="small" color={theme.text} />
                                         ) : (
-                                            <Text style={[styles.giftPriceText, { color: theme.text }]}>{price ?? "—"}</Text>
+                                            <Text style={[styles.giftPriceText, { color: theme.text2 }]}>{price ?? "—"}</Text>
                                         )}
                                     </View>
                                 </TouchableOpacity>
@@ -338,9 +354,9 @@ export default function SupporterScreen() {
                             <MaterialDesignIcons
                                 name={restoreResult ? RESTORE_ICONS[restoreResult] : "restore"}
                                 size={18}
-                                color={restoreResult === "done" ? theme.success : theme.link}
+                                color={restoreResult === "done" ? theme.success : theme.textSecondary}
                             />
-                            <Text style={[styles.restoreText, { color: theme.link }]}>{getRestoreLabel(restoreResult, supporterTr)}</Text>
+                            <Text style={[styles.restoreText, { color: theme.textSecondary }]}>{getRestoreLabel(restoreResult, supporterTr)}</Text>
                         </>
                     )}
                 </TouchableOpacity>
@@ -429,6 +445,22 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    supporterSquare: {
+        width: 56,
+        height: 56,
+        borderWidth: 1,
+        borderRadius: 14,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    supporterIconText: {
+        fontSize: 9,
+        fontWeight: "700",
+        includeFontPadding: false,
+        marginTop: 1,
+        marginBottom: 2,
+        paddingHorizontal: 3,
+    },
     unlockHeaderText: {
         flex: 1,
     },
@@ -437,7 +469,7 @@ const styles = StyleSheet.create({
         marginVertical: 16,
     },
     benefits: {
-        gap: 9,
+        gap: 8,
     },
     benefitRow: {
         flexDirection: "row",
