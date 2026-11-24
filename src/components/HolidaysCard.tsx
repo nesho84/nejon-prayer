@@ -74,15 +74,17 @@ const HolidaysCard = React.memo(({ holiday, style, testID }: Props) => {
       type: 'alert',
       component: (
         <View style={globalStyles.bannerContainer}>
-          <Feather name="info" size={40} color={theme.accent} />
-          <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{holidayTr.name}</Text>
+          <View style={[styles.modalIconCircle, { backgroundColor: theme.accentLight }]}>
+            <MaterialDesignIcons name="information-variant-circle" size={40} color={theme.accent} />
+          </View>
+          <Text style={[globalStyles.bannerTitle, { color: theme.text }]}>{holidayTr.name}</Text>
           <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{holidayTr.info}</Text>
         </View>
       ),
       buttons: [{
         label: 'OK',
         action: 'ok',
-        buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
+        buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.borderGold },
         labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
       }],
     });
@@ -163,6 +165,13 @@ HolidaysCard.displayName = 'HolidaysCard';
 export default HolidaysCard;
 
 const styles = StyleSheet.create({
+  modalIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   container: {
     flexDirection: "row",
     alignItems: "center",

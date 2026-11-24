@@ -83,14 +83,14 @@ const PrayersList = React.memo(({ prayerTimes, prayerTimesDate, currentPrayerNam
         component: (
           <View style={globalStyles.bannerContainer}>
             <Text style={globalStyles.bannerEmoji}>{variant.emoji}</Text>
-            <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{variant.title}</Text>
+            <Text style={[globalStyles.bannerTitle, { color: theme.text }]}>{variant.title}</Text>
             <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{variant.message}</Text>
           </View>
         ),
         buttons: [{
           label: 'OK',
           action: 'ok',
-          buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.divider2 },
+          buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.borderGold },
           labelStyle: { fontSize: 16, fontWeight: '600', color: theme.accent },
         }],
         celebrationAnimation: true,

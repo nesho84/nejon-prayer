@@ -112,7 +112,7 @@ describe('HolidaysCard', () => {
 
       // The banner carries the info icon, the holiday name and its info text
       render(options!.component as React.ReactElement);
-      expect(screen.getByTestId('feather-info')).toBeTruthy();
+      expect(screen.getByTestId('mci-information-variant-circle')).toBeTruthy();
       expect(screen.getByText('Eid al-Adha')).toBeTruthy();
       expect(screen.getByText(/Ibrahim/)).toBeTruthy();
     });

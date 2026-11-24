@@ -193,7 +193,7 @@ export default function PrayerTimingsScreen() {
             <TouchableOpacity
                 style={[
                     globalStyles.modalButton,
-                    { backgroundColor: theme.overlay, opacity: isToday() ? 0.6 : 1 }
+                    { backgroundColor: theme.overlay, opacity: isToday() ? 0.4 : 1 }
                 ]}
                 onPress={() => setSelectedDate(new Date())}
                 disabled={isToday()}

@@ -93,14 +93,14 @@ export function showNotifReminderModal() {
             <Text style={[styles.buttonText, { color: theme.islamicGreen }]}>{tr.buttons.enableNotifications}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.button, { borderWidth: 1, borderColor: theme.border }]}
+            style={[styles.button, { backgroundColor: theme.overlay }]}
             activeOpacity={0.6}
             onPress={() => {
               recordClose();
               hide("notNow");
             }}
           >
-            <Text style={[styles.buttonText, { color: theme.placeholder }]}>{tr.buttons.notNow}</Text>
+            <Text style={[styles.buttonText, { color: theme.text2 }]}>{tr.buttons.notNow}</Text>
           </TouchableOpacity>
         </View>
       </>

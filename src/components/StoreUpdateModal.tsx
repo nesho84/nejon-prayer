@@ -30,9 +30,9 @@ export function showStoreUpdateModal(fromSettings = false) {
     component: (
       <View style={globalStyles.bannerContainer}>
         <View style={[styles.modalIconCircle, { backgroundColor: theme.islamicGreen + "20" }]}>
-          <MaterialDesignIcons name="information-variant-circle" size={32} color={theme.islamicGreen} />
+          <MaterialDesignIcons name="information-variant-circle" size={40} color={theme.islamicGreen} />
         </View>
-        <Text style={[globalStyles.bannerTitle, { color: theme.text2 }]}>{tr.labels.updateAvailableTitle}</Text>
+        <Text style={[globalStyles.bannerTitle, { color: theme.text }]}>{tr.labels.updateAvailableTitle}</Text>
         <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{tr.labels.updateAvailableMessage}</Text>
       </View>
     ),
@@ -41,14 +41,14 @@ export function showStoreUpdateModal(fromSettings = false) {
         label: tr.buttons.later,
         action: "later",
         buttonStyle: { backgroundColor: theme.overlay },
-        labelStyle: { color: theme.text2 },
+        labelStyle: { fontSize: 16, fontWeight: "600", color: theme.text2 },
       },
       {
         label: tr.buttons.openStore,
         action: "openStore",
         onPress: openStoreListing,
         buttonStyle: { backgroundColor: theme.islamicGreen + "20", borderWidth: 1, borderColor: theme.islamicGreen + "40" },
-        labelStyle: { color: theme.islamicGreen },
+        labelStyle: { fontSize: 16, fontWeight: "600", color: theme.islamicGreen },
       },
     ],
   });
@@ -56,8 +56,8 @@ export function showStoreUpdateModal(fromSettings = false) {
 
 const styles = StyleSheet.create({
   modalIconCircle: {
-    width: 54,
-    height: 54,
+    width: 64,
+    height: 64,
     borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",

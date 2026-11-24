@@ -202,8 +202,8 @@ describe('AyahsScreen khatam completion', () => {
     const options = show.mock.calls[0][0];
     expect(options.celebrationAnimation).toBe(true);
     expect(options.buttons).toHaveLength(2);
-    expect(options.buttons[0].action).toBe('share');
-    expect(options.buttons[1].action).toBe('ok');
+    expect(options.buttons[0].action).toBe('ok');
+    expect(options.buttons[1].action).toBe('share');
   });
 
   it('shares the khatam message with store link and navigates back', async () => {
@@ -211,7 +211,7 @@ describe('AyahsScreen khatam completion', () => {
     fireEvent.press(screen.getByText('Complete Khatam'));
 
     const show = useModalStore.getState().show as jest.Mock;
-    const shareButton = show.mock.calls[0][0].buttons[0];
+    const shareButton = show.mock.calls[0][0].buttons.find((b: any) => b.action === 'share');
     await shareButton.onPress();
 
     const storeUrl = Platform.OS === 'ios' ? APPLE_STORE_URL : GOOGLE_PLAY_URL;
