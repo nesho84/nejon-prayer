@@ -239,7 +239,6 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugToggle label="Toggle 'Gift received' line" color={theme.pink} value={forceSupporterGift} hint={SUPPORTER_GIFT_HINT} onPress={toggleSupporterGift} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugToggle label="Toggle Supporter Banner" color={theme.pink} value={forceSupporterBanner} hint={SUPPORTER_BANNER_HINT} onPress={toggleSupporterBanner} />
-            <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.pink} hint={FEEDBACK_THANKS_HINT} onPress={previewFeedbackThanks} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Supporter' JSON" color={theme.gray} onPress={showSupporterModal} />
           </DebugSection>
@@ -249,9 +248,14 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
             <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={previewStoreUpdateModal} />
             <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={previewNotifReminderModal} />
             <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={previewStoreReviewModal} />
-            <DebugButton label="Show 'Feedback' Modal" color={theme.violet} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />
+          </DebugSection>
+
+          {/* Feedback: opens from About, not an auto modal */}
+          <DebugSection title="Feedback">
+            <DebugButton label="Show 'Feedback' Modal" color={theme.primary} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
+            <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.primary} hint={FEEDBACK_THANKS_HINT} onPress={previewFeedbackThanks} />
           </DebugSection>
 
           {/* Test notifications */}

@@ -6,7 +6,7 @@ import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
 import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
-import { FEEDBACK_MAX_SHOWS, NOTIF_REMINDER_MAX_SHOWS, STORE_REVIEW_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
+import { NOTIF_REMINDER_MAX_SHOWS, STORE_REVIEW_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
@@ -19,7 +19,7 @@ import { Alert, Platform, StyleSheet, Text, View } from "react-native";
 import { showJsonViewerModal } from "./debugUi";
 
 // ------------------------------------------------------------
-// Modal previews — celebrations and holiday info, then the auto modals (one JSON for their shared store, a preview + reset each).
+// Modal previews — celebrations and holiday info, the auto modals (one JSON for their shared store, a preview + reset each), then Feedback.
 // Auto-modal previews count like a real show and skip the waits; a block gets an alert with Reset
 // (for Store Update, which never stops, the 3-day wait is the block).
 // ------------------------------------------------------------
@@ -147,10 +147,6 @@ export function showAutoModalsJsonModal() {
     storeReviewShownAt: formatTime(state.storeReviewShownAt),
     storeReviewShownCount: state.storeReviewShownCount,
     storeReviewDone: state.storeReviewDone,
-    feedbackNextShowAt: formatTime(state.feedbackNextShowAt),
-    feedbackShownAt: formatTime(state.feedbackShownAt),
-    feedbackShownCount: state.feedbackShownCount,
-    feedbackDone: state.feedbackDone,
   });
 }
 
@@ -229,36 +225,15 @@ export function previewStoreReviewModal() {
 }
 
 // ------------------------------------------------------------
-// Feedback
+// Feedback — not an auto modal, opens from About
 // ------------------------------------------------------------
-function resetFeedback() {
-  useAutoModalsStore.getState().setAutoModals({
-    feedbackNextShowAt: null,
-    feedbackShownAt: null,
-    feedbackShownCount: 0,
-    feedbackDone: false,
-  });
-}
-
 export function previewFeedbackModal() {
-  const { feedbackShownCount, feedbackDone } = useAutoModalsStore.getState();
-
-  if (feedbackDone) {
-    const blockedReason = feedbackShownCount >= FEEDBACK_MAX_SHOWS
-      ? `Limit reached (${feedbackShownCount}/${FEEDBACK_MAX_SHOWS}) — the real modal never shows again.`
-      : `Sent, or "Don't ask again" was tapped — the real modal never shows again.`;
-    Alert.alert("Feedback", blockedReason, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Reset", onPress: resetFeedback },
-    ]);
-    return;
-  }
   showFeedbackModal();
 }
 
-// Thank-you step only — not counted as a show
+// Thank-you step only
 export function previewFeedbackThanks() {
-  showFeedbackModal(true, true);
+  showFeedbackModal(true);
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,4 @@
-import { sendFeedback } from '@/services/feedbackService';
 import { useAutoModalsStore } from '@/store/autoModalsStore';
-import { useLanguageStore } from '@/store/languageStore';
 import { mmkvStorage } from '@/store/storage';
 
 jest.mock('@/store/storage', () => ({
@@ -11,11 +9,6 @@ jest.mock('@/store/storage', () => ({
   },
 }));
 
-jest.mock('@/services/feedbackService', () => ({
-  sendFeedback: jest.fn(),
-}));
-
-const mockSendFeedback = sendFeedback as jest.Mock;
 const mockSetItem = mmkvStorage.setItem as jest.Mock;
 
 // Exactly what an old persisted store saved
@@ -45,7 +38,6 @@ const loadStore = (initialItems: Record<string, string>) => {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  useLanguageStore.setState({ language: 'en' });
 });
 
 describe('autoModalsStore — old stores', () => {
@@ -67,10 +59,10 @@ describe('autoModalsStore — old stores', () => {
 describe('autoModalsStore — setAutoModals', () => {
   it('merges a patch and keeps the other keys', () => {
     useAutoModalsStore.getState().setAutoModals({ storeReviewShownCount: 2 });
-    useAutoModalsStore.getState().setAutoModals({ feedbackNextShowAt: 9999 });
+    useAutoModalsStore.getState().setAutoModals({ notifReminderNextShowAt: 9999 });
 
     expect(useAutoModalsStore.getState().storeReviewShownCount).toBe(2);
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(9999);
+    expect(useAutoModalsStore.getState().notifReminderNextShowAt).toBe(9999);
   });
 
   it('persists only the data keys', () => {
@@ -79,38 +71,5 @@ describe('autoModalsStore — setAutoModals', () => {
     const written = JSON.parse(mockSetItem.mock.calls.at(-1)[1]);
     expect(written.state.storeUpdateShownCount).toBe(1);
     expect(written.state).not.toHaveProperty('isReady');
-  });
-});
-
-describe('autoModalsStore — submitFeedback', () => {
-  beforeEach(() => {
-    useAutoModalsStore.setState({ feedbackDone: false });
-  });
-
-  it('sends the answers with the current language', async () => {
-    mockSendFeedback.mockResolvedValue({ ok: true });
-    useLanguageStore.setState({ language: 'ar' });
-
-    await useAutoModalsStore.getState().submitFeedback({ rating: 4, answers: { donation_interest: 'maybe' } });
-
-    expect(mockSendFeedback).toHaveBeenCalledWith({ rating: 4, answers: { donation_interest: 'maybe' }, language: 'ar' });
-  });
-
-  it('marks feedback as done and returns { ok } on success', async () => {
-    mockSendFeedback.mockResolvedValue({ ok: true });
-
-    const result = await useAutoModalsStore.getState().submitFeedback({ rating: 5 });
-
-    expect(result).toEqual({ ok: true });
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
-  });
-
-  it.each(['offline', 'rateLimited', 'server'])('returns the %s error and stays not done', async (error) => {
-    mockSendFeedback.mockResolvedValue({ error });
-
-    const result = await useAutoModalsStore.getState().submitFeedback({ rating: 5 });
-
-    expect(result).toEqual({ error });
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
   });
 });

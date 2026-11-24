@@ -1,13 +1,10 @@
-import { showFeedbackModal } from "@/components/FeedbackModal";
 import { showNotifReminderModal } from "@/components/NotifReminderModal";
 import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { useDebugStore } from "@/debug/debugStore";
 import { checkForStoreUpdate } from "@/services/storeUpdateService";
 import {
   DAY_MS,
-  FEEDBACK_FIRST_WAIT_DAYS,
   NOTIF_REMINDER_FIRST_WAIT_DAYS,
-  STORE_REVIEW_FEEDBACK_GAP_DAYS,
   STORE_UPDATE_CHECK_TIMEOUT_MS,
   useAutoModalsStore,
 } from "@/store/autoModalsStore";
@@ -59,7 +56,7 @@ export function canShowNotifReminder() {
 // Store review (Android only) — can show after "Later", until done, apart from the other auto modals
 // ------------------------------------------------------------
 export function canShowStoreReview() {
-  const { storeReviewNextShowAt, storeReviewDone, feedbackShownAt, storeUpdateShownAt, notifReminderShownAt } = useAutoModalsStore.getState();
+  const { storeReviewNextShowAt, storeReviewDone, storeUpdateShownAt, notifReminderShownAt } = useAutoModalsStore.getState();
   const now = Date.now();
 
   // Android only
@@ -68,10 +65,6 @@ export function canShowStoreReview() {
   if (storeReviewDone) return false;
   // Still waiting after "Later"
   if (storeReviewNextShowAt !== null && now < storeReviewNextShowAt) {
-    return false;
-  }
-  // Feedback shown in the last 7 days
-  if (feedbackShownAt !== null && now < feedbackShownAt + STORE_REVIEW_FEEDBACK_GAP_DAYS * DAY_MS) {
     return false;
   }
   // Store update or Notif reminder already showed this session
@@ -83,27 +76,6 @@ export function canShowStoreReview() {
   }
   // Another modal is open
   if (useModalStore.getState().visible) {
-    return false;
-  }
-
-  return true;
-}
-
-// ------------------------------------------------------------
-// Feedback — can show after its wait, until done, apart from Store review
-// ------------------------------------------------------------
-export function canShowFeedback() {
-  const { feedbackNextShowAt, feedbackDone, storeReviewShownAt } = useAutoModalsStore.getState();
-  const now = Date.now();
-
-  // Sent, "Don't ask again", or shown 3 times
-  if (feedbackDone) return false;
-  // First show not set yet
-  if (feedbackNextShowAt === null) return false;
-  // Still waiting
-  if (now < feedbackNextShowAt) return false;
-  // Store review shown in the last 7 days
-  if (storeReviewShownAt !== null && now < storeReviewShownAt + STORE_REVIEW_FEEDBACK_GAP_DAYS * DAY_MS) {
     return false;
   }
 
@@ -155,16 +127,10 @@ async function getStoreUpdateResult(): Promise<StoreUpdateResult | null> {
 }
 
 // ------------------------------------------------------------
-// Store update check, then at most one auto modal: Store update → Notif reminder → Feedback
+// Store update check, then at most one auto modal: Store update → Notif reminder
 // ------------------------------------------------------------
 export async function checkAutoModalsOnStart() {
-  const { feedbackNextShowAt, feedbackDone, setAutoModals } = useAutoModalsStore.getState();
-
-  // Feedback: first show 7 days after onboarding
-  if (feedbackNextShowAt === null && !feedbackDone) {
-    setAutoModals({ feedbackNextShowAt: Date.now() + FEEDBACK_FIRST_WAIT_DAYS * DAY_MS });
-  }
-
+  const { setAutoModals } = useAutoModalsStore.getState();
   const result = await getStoreUpdateResult();
 
   if (result !== null) {
@@ -186,10 +152,6 @@ export async function checkAutoModalsOnStart() {
   }
   if (canShowNotifReminder()) {
     showNotifReminderModal();
-    return;
-  }
-  if (canShowFeedback()) {
-    showFeedbackModal();
   }
 }
 

@@ -101,9 +101,9 @@ describe('AboutScreen', () => {
     expect(showStoreReviewModal).toHaveBeenCalledWith(true);
   });
 
-  it('opens the feedback modal from About when the feedback card is pressed', () => {
+  it('opens the feedback modal at its intro when the feedback card is pressed', () => {
     render(<AboutScreen />);
     fireEvent.press(screen.getByText('Send Feedback'));
-    expect(showFeedbackModal).toHaveBeenCalledWith(true);
+    expect(showFeedbackModal).toHaveBeenCalledWith();
   });
 });

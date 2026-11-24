@@ -151,7 +151,7 @@ export default function AboutScreen() {
                     <View style={[styles.cardDivider, { backgroundColor: theme.bg }]} />
 
                     {/* Send Feedback (opens the questionnaire directly, skipping the intro) */}
-                    <TouchableOpacity style={styles.cardRow} onPress={() => showFeedbackModal(true)} activeOpacity={0.3}>
+                    <TouchableOpacity style={styles.cardRow} onPress={() => showFeedbackModal()} activeOpacity={0.3}>
                         <View style={[styles.iconContainer, { backgroundColor: theme.primary + '15' }]}>
                             <MaterialDesignIcons name="message-draw" size={22} color={theme.primary} />
                         </View>

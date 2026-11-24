@@ -90,7 +90,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `languageStore` | Active language + translation strings |
 | `deviceSettingsStore` | Live device permission/connectivity flags (not persisted) |
 | `tesbihStore` | Counter value, lap count, target |
-| `autoModalsStore` | State of the 4 auto modals (Store update, Notif reminder, Store review, Feedback): next-show time, last show, show count, done |
+| `autoModalsStore` | State of the 3 auto modals (Store update, Notif reminder, Store review): next-show time, last show, show count, done |
 | `modalStore` | Global bottom-sheet modal visibility |
 | `supporterStore` | Supporter entitlement (offline copy of what Play confirmed), pending payments, last known prices, supporter banner timing |
 
@@ -105,7 +105,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useHolidaysSync` | Fetches Islamic holiday dates once per year (after device settings are ready) |
 | `useQuranSync` | Loads the bundled Quran JSON into `quranStore`, sets the audio mode, syncs player status into `quranAudioStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
-| `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder → Feedback); notif reminder resets |
+| `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useSupporterSync` | Android: keeps the Play purchase listener alive and syncs purchases on launch and every return to the app |
 | `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK — skipped for supporters (Android waits for the first Play check) |
@@ -142,8 +142,8 @@ Two audio systems are used:
 
 ### Auto modals
 
-Four modals open on their own. Their state lives in `autoModalsStore`; the waits are constants at the
-top of that file, and the rules (`canShowStoreUpdate`, `canShowNotifReminder`, `canShowStoreReview`, `canShowFeedback`)
+Three modals open on their own. Their state lives in `autoModalsStore`; the waits are constants at the
+top of that file, and the rules (`canShowStoreUpdate`, `canShowNotifReminder`, `canShowStoreReview`)
 live in `src/hooks/useAutoModalsSync.ts`. Each `show…Modal()` in `src/components/*Modal.tsx` only shows the
 modal and records the show.
 
@@ -152,9 +152,8 @@ modal and records the show.
 | Store update | none | next launch, next launch, then every 3 days | never |
 | Enable notifications | 3 days | 7 days, then 14 | after 3 shows |
 | Store review (Android only) | none | 7 days | after 3 shows, "Open Store", or "Already rated" |
-| Feedback | 7 days | 30 days | after 3 shows, sent, or "Don't ask again" |
 
-Store review and Feedback are always at least 7 days apart. No auto modal opens while another modal is open.
+No auto modal opens while another modal is open.
 
 **Launch order** (`checkAutoModalsOnStart`, once per launch after onboarding and the first device-settings
 sync) — at most one of:
@@ -164,14 +163,16 @@ sync) — at most one of:
    build, iOS without an AppStoreID) or a timeout change nothing.
 2. **Enable notifications** — if due. Granting resets it; turning notifications off again starts the
    3-day wait.
-3. **Feedback** — if due. Its first show is set to 7 days after onboarding, once, at the top of `checkAutoModalsOnStart`.
 
 **Store review** keeps its own triggers — the 3rd prayer marked on Home or in the calendar, and Quran reading
 reaching ayah 20 — and opens there when `canShowStoreReview()`. It also waits for a later session when
 Store update or Enable notifications already showed in this one.
 
-**Manual opens** skip the checks and aren't recorded: Store review and Feedback from About (`fromAbout`), and
+**Manual opens** skip the checks and aren't recorded: Store review from About (`fromAbout`), and
 Settings → "Check for update" (`showStoreUpdateModal(true)`). The debug panel previews count like a real show.
+
+**Feedback** is not an auto modal: it opens only from About → Feedback (intro, 5 questions, thank-you) and
+keeps no state on the device — `FeedbackModal` calls `sendFeedback` directly.
 
 ### Ads (AdMob)
 

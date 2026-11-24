@@ -1,7 +1,7 @@
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { FEEDBACK_TR, FeedbackTranslations } from "@/constants/translations/feedback.tr";
 import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
-import { DAY_MS, FEEDBACK_MAX_SHOWS, FEEDBACK_WAIT_DAYS, useAutoModalsStore } from "@/store/autoModalsStore";
+import { sendFeedback } from "@/services/feedbackService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
 import { useSupporterStore } from "@/store/supporterStore";
@@ -57,47 +57,22 @@ function getChoiceLabels(id: "most_used" | "improve" | "donation_interest", feed
 }
 
 // ------------------------------------------------------------
-// First step — the thank-you start is the debug preview
+// Show the feedback modal (from About) — the thank-you start is the debug preview
 // ------------------------------------------------------------
-function getStartStep(fromAbout: boolean, startAtThanks: boolean): FeedbackStep {
-  if (startAtThanks) {
-    return "thanks";
-  }
-  if (fromAbout) {
-    return "rating";
-  }
-  return "intro";
-}
-
-// ------------------------------------------------------------
-// Show the feedback modal — no checks (canShowFeedback runs at launch).
-// From About it opens at "rating", and neither the open nor a close is recorded.
-// ------------------------------------------------------------
-export function showFeedbackModal(fromAbout = false, startAtThanks = false) {
-  const { feedbackShownCount, setAutoModals } = useAutoModalsStore.getState();
-
-  if (!fromAbout) {
-    setAutoModals({
-      feedbackShownAt: Date.now(),
-      feedbackShownCount: feedbackShownCount + 1,
-      // Every open counts — the limit marks it done
-      feedbackDone: feedbackShownCount + 1 >= FEEDBACK_MAX_SHOWS,
-    });
-  }
-
+export function showFeedbackModal(startAtThanks = false) {
   useModalStore.getState().show({
     type: "fullscreen",
     animationType: "fade",
-    // Only the buttons close it — so every close records a choice
+    // Only the buttons close it — a stray back press doesn't lose the answers
     dismissable: false,
-    component: <FeedbackForm fromAbout={fromAbout} startAtThanks={startAtThanks} />,
+    component: <FeedbackForm startAtThanks={startAtThanks} />,
   });
 }
 
 // ------------------------------------------------------------
 // Modal content — intro → questions → thank-you (or error), all in the same modal
 // ------------------------------------------------------------
-function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startAtThanks: boolean }) {
+function FeedbackForm({ startAtThanks }: { startAtThanks: boolean }) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const tr = useLanguageStore((state) => state.tr);
@@ -108,7 +83,7 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
   const { hide } = useModalStore.getState();
 
   // Local state
-  const [step, setStep] = useState<FeedbackStep>(getStartStep(fromAbout, startAtThanks));
+  const [step, setStep] = useState<FeedbackStep>(startAtThanks ? "thanks" : "intro");
   const [rating, setRating] = useState<number | null>(null);
   const [answers, setAnswers] = useState<FeedbackAnswers>({});
   const [message, setMessage] = useState("");
@@ -124,24 +99,6 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
     offline: feedbackTr.errorOffline,
     rateLimited: feedbackTr.errorRateLimited,
     server: feedbackTr.errorServer,
-  };
-
-  // ------------------------------------------------------------
-  // Close without sending — "Maybe later" and the close icon (not an opt-out)
-  // ------------------------------------------------------------
-  const handleLater = (action: string) => {
-    if (!fromAbout) {
-      useAutoModalsStore.getState().setAutoModals({ feedbackNextShowAt: Date.now() + FEEDBACK_WAIT_DAYS * DAY_MS });
-    }
-    hide(action);
-  };
-
-  // ------------------------------------------------------------
-  // "Don't ask again"
-  // ------------------------------------------------------------
-  const handleNever = () => {
-    useAutoModalsStore.getState().setAutoModals({ feedbackDone: true });
-    hide("never");
   };
 
   // ------------------------------------------------------------
@@ -185,10 +142,11 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
   const handleSubmit = async (text: string) => {
     setIsSending(true);
 
-    const result = await useAutoModalsStore.getState().submitFeedback({
+    const result = await sendFeedback({
       rating: rating ?? undefined,
       answers: Object.keys(answers).length > 0 ? answers : undefined,
       message: text.trim() || undefined,
+      language,
     });
 
     setIsSending(false);
@@ -212,7 +170,7 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
   };
 
   // ------------------------------------------------------------
-  // Intro step — same layout as the "Rate the App" modal
+  // Intro step — same layout as the "Store Review" modal
   // ------------------------------------------------------------
   if (step === "intro") {
     return (
@@ -236,16 +194,10 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.overlay }]}
             activeOpacity={0.8}
-            onPress={() => handleLater("later")}
+            onPress={() => hide("close")}
           >
-            <Text style={[styles.buttonText, { color: theme.text2 }]}>{feedbackTr.promptLater}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.6}
-            onPress={handleNever}
-          >
-            <Text style={[styles.buttonText, { color: theme.textMuted }]}>{feedbackTr.promptNever}</Text>
+            <Ionicons name="close" size={18} color={theme.text2} />
+            <Text style={[styles.buttonText, { color: theme.text2 }]}>{feedbackTr.close}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -340,7 +292,7 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.overlay }]}
             activeOpacity={0.8}
-            onPress={() => handleLater("close")}
+            onPress={() => hide("close")}
             disabled={isSending}
           >
             <Ionicons name="close" size={18} color={theme.text2} />
@@ -365,7 +317,7 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
       <View style={styles.topRow}>
         <TouchableOpacity
           style={[styles.closeButton, { backgroundColor: theme.card }]}
-          onPress={() => handleLater("close")}
+          onPress={() => hide("close")}
           disabled={isSending}
           hitSlop={HIT_SLOP_8}
           activeOpacity={0.7}
@@ -492,7 +444,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Intro + thank-you (same as the "Rate the App" modal)
+  // Intro, thank-you and error (same as the "Store Review" modal)
   content: {
     flex: 1,
     alignItems: "center",

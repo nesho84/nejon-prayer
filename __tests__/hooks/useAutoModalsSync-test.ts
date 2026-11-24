@@ -1,9 +1,7 @@
-import { showFeedbackModal } from '@/components/FeedbackModal';
 import { showNotifReminderModal } from '@/components/NotifReminderModal';
 import { showStoreUpdateModal } from '@/components/StoreUpdateModal';
 import { useDebugStore } from '@/debug/debugStore';
 import {
-  canShowFeedback,
   canShowNotifReminder,
   canShowStoreReview,
   canShowStoreUpdate,
@@ -24,7 +22,6 @@ jest.mock('@/store/storage', () => ({
 }));
 jest.mock('@/components/StoreUpdateModal', () => ({ showStoreUpdateModal: jest.fn() }));
 jest.mock('@/components/NotifReminderModal', () => ({ showNotifReminderModal: jest.fn() }));
-jest.mock('@/components/FeedbackModal', () => ({ showFeedbackModal: jest.fn() }));
 jest.mock('expo-in-app-updates', () => ({ checkForUpdate: jest.fn() }));
 jest.mock('@react-native-community/netinfo', () => ({ fetch: jest.fn() }));
 jest.mock('expo-location', () => ({ hasServicesEnabledAsync: jest.fn() }));
@@ -58,10 +55,6 @@ const RESET_DATA = {
   storeReviewShownAt: null,
   storeReviewShownCount: 0,
   storeReviewDone: false,
-  feedbackNextShowAt: null,
-  feedbackShownAt: null,
-  feedbackShownCount: 0,
-  feedbackDone: false,
 };
 
 beforeEach(() => {
@@ -144,13 +137,6 @@ describe('canShowStoreReview', () => {
     expect(canShowStoreReview()).toBe(false);
   });
 
-  it('keeps 7 days from the feedback modal', () => {
-    useAutoModalsStore.setState({ feedbackShownAt: NOW - 6 * DAY_MS });
-    expect(canShowStoreReview()).toBe(false);
-    useAutoModalsStore.setState({ feedbackShownAt: NOW - 7 * DAY_MS - 1 });
-    expect(canShowStoreReview()).toBe(true);
-  });
-
   it('cannot show while another modal is open', () => {
     useModalStore.setState({ visible: true });
     expect(canShowStoreReview()).toBe(false);
@@ -166,49 +152,6 @@ describe('canShowStoreReview', () => {
   it('can show when Update or Notif reminder showed in an earlier session', () => {
     useAutoModalsStore.setState({ storeUpdateShownAt: LOADED_AT - DAY_MS, notifReminderShownAt: LOADED_AT - DAY_MS });
     expect(canShowStoreReview()).toBe(true);
-  });
-});
-
-describe('canShowFeedback', () => {
-  it('cannot show before its first wait was started, or while waiting', () => {
-    expect(canShowFeedback()).toBe(false);
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW + DAY_MS });
-    expect(canShowFeedback()).toBe(false);
-  });
-
-  it('can show after the wait', () => {
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1 });
-    expect(canShowFeedback()).toBe(true);
-  });
-
-  it('never shows once done', () => {
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1, feedbackDone: true });
-    expect(canShowFeedback()).toBe(false);
-  });
-
-  it('keeps 7 days from the Store review modal', () => {
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1, storeReviewShownAt: NOW - 6 * DAY_MS });
-    expect(canShowFeedback()).toBe(false);
-    useAutoModalsStore.setState({ storeReviewShownAt: NOW - 7 * DAY_MS - 1 });
-    expect(canShowFeedback()).toBe(true);
-  });
-});
-
-describe('checkAutoModalsOnStart — Feedback first show', () => {
-  it('sets the first Feedback show 7 days ahead, only once', async () => {
-    await checkAutoModalsOnStart();
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 7 * DAY_MS);
-    expect(showFeedbackModal).not.toHaveBeenCalled();
-
-    jest.setSystemTime(NOW + DAY_MS);
-    await checkAutoModalsOnStart();
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 7 * DAY_MS);
-  });
-
-  it('leaves a done feedback modal alone', async () => {
-    useAutoModalsStore.setState({ feedbackDone: true });
-    await checkAutoModalsOnStart();
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBeNull();
   });
 });
 
@@ -250,17 +193,19 @@ describe('checkAutoModalsOnStart — store check', () => {
 
   it('does not reset when the check fails (sideloaded build, iOS) — and still shows the next modal', async () => {
     checkForUpdate.mockRejectedValue(new Error('ERROR_APP_NOT_OWNED'));
-    useAutoModalsStore.setState({ storeUpdateShownCount: 4, feedbackNextShowAt: NOW - 1 });
+    useDeviceSettingsStore.setState({ notificationPermission: false });
+    useAutoModalsStore.setState({ storeUpdateShownCount: 4, notifReminderNextShowAt: NOW - 1 });
     await checkAutoModalsOnStart();
 
     expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('error');
     expect(useAutoModalsStore.getState().storeUpdateShownCount).toBe(4);
-    expect(showFeedbackModal).toHaveBeenCalledTimes(1);
+    expect(showNotifReminderModal).toHaveBeenCalledTimes(1);
   });
 
   it('gives up after 5 s, moves on, and ignores a late answer', async () => {
     checkForUpdate.mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve({ updateAvailable: true }), 10000)));
-    useAutoModalsStore.setState({ feedbackNextShowAt: NOW - 1 });
+    useDeviceSettingsStore.setState({ notificationPermission: false });
+    useAutoModalsStore.setState({ notifReminderNextShowAt: NOW - 1 });
 
     const launch = checkAutoModalsOnStart();
     await act(async () => {
@@ -269,7 +214,7 @@ describe('checkAutoModalsOnStart — store check', () => {
     await launch;
 
     expect(useAutoModalsStore.getState().storeUpdateCheckResult).toBe('timeout');
-    expect(showFeedbackModal).toHaveBeenCalledTimes(1);
+    expect(showNotifReminderModal).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       jest.advanceTimersByTime(5000);
@@ -307,7 +252,7 @@ describe('checkAutoModalsOnStart — order', () => {
   beforeEach(() => {
     checkForUpdate.mockResolvedValue({ updateAvailable: true });
     useDeviceSettingsStore.setState({ notificationPermission: false });
-    useAutoModalsStore.setState({ notifReminderNextShowAt: NOW - 1, feedbackNextShowAt: NOW - 1 });
+    useAutoModalsStore.setState({ notifReminderNextShowAt: NOW - 1 });
   });
 
   it('Update comes first', async () => {
@@ -315,7 +260,6 @@ describe('checkAutoModalsOnStart — order', () => {
 
     expect(showStoreUpdateModal).toHaveBeenCalledTimes(1);
     expect(showNotifReminderModal).not.toHaveBeenCalled();
-    expect(showFeedbackModal).not.toHaveBeenCalled();
   });
 
   it('then the notif reminder', async () => {
@@ -323,15 +267,6 @@ describe('checkAutoModalsOnStart — order', () => {
     await checkAutoModalsOnStart();
 
     expect(showNotifReminderModal).toHaveBeenCalledTimes(1);
-    expect(showFeedbackModal).not.toHaveBeenCalled();
-  });
-
-  it('then feedback', async () => {
-    checkForUpdate.mockResolvedValue({ updateAvailable: false });
-    useDeviceSettingsStore.setState({ notificationPermission: true });
-    await checkAutoModalsOnStart();
-
-    expect(showFeedbackModal).toHaveBeenCalledTimes(1);
   });
 
   it('shows nothing when another modal is open (e.g. Store review during the check)', async () => {
@@ -340,7 +275,6 @@ describe('checkAutoModalsOnStart — order', () => {
 
     expect(showStoreUpdateModal).not.toHaveBeenCalled();
     expect(showNotifReminderModal).not.toHaveBeenCalled();
-    expect(showFeedbackModal).not.toHaveBeenCalled();
   });
 });
 
@@ -362,7 +296,6 @@ describe('useAutoModalsSync', () => {
     });
     await flush();
     expect(checkForUpdate).toHaveBeenCalledTimes(1);
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 7 * DAY_MS);
 
     // Debug "Show Onboarding Screen" and back
     act(() => {

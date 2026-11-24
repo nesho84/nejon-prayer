@@ -85,11 +85,11 @@ export const HOLIDAY_INFO_HINT =
   "Real: tap the Holiday Card on Home, or a holiday's ⓘ in Extras → Islamic Holidays. " +
   "Here: a random holiday.";
 
-// How the four auto modals work — shown under their ⓘ
+// How the three auto modals work — shown under their ⓘ
 export const STORE_UPDATE_HINT =
   "Checked on every app start (release builds only, up to 5 s). Android asks Google Play (In-App Updates), " +
   "which only works when the app was installed from Play; iOS isn't set up yet.\n" +
-  "First in the launch order: Store Update → Notif Reminder → Feedback, at most one per start.\n" +
+  "First in the launch order: Store Update → Notif Reminder, at most one per start.\n" +
   "Newer version → shows; the next two starts show it again, then every 3 days. Never stops.\n" +
   "Up to date (and online) → starts over.\n" +
   "From Settings → \"Check for update\": opens when one is found, not recorded. OTA updates reload silently.\n" +
@@ -105,17 +105,8 @@ export const STORE_REVIEW_HINT =
   "or Quran reading scrolls past ayah 20 — can already happen on day one.\n" +
   "\"Later\" → asks again 7 days later, at the next such moment.\n" +
   "Never again: \"Open Store\", \"Already rated\", or after 3 shows.\n" +
-  "Waits while Feedback was shown in the last 7 days, Store Update or Notif Reminder showed since the app started, " +
-  "or another modal is open.\n" +
+  "Waits while Store Update or Notif Reminder showed since the app started, or another modal is open.\n" +
   "From About: always opens; only \"Open Store\" / \"Already rated\" are recorded.\n" +
-  "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
-export const FEEDBACK_HINT =
-  "First show: on an app start at least 7 days after onboarding.\n" +
-  "\"Maybe later\" or close → asks again 30 days later, on an app start.\n" +
-  "Never again: sent, \"Don't ask again\", or after 3 shows.\n" +
-  "Waits while Store Review was shown in the last 7 days, Store Update or Notif Reminder showed on that start, " +
-  "or another modal is open.\n" +
-  "From About: always opens at the questions; only sending is recorded.\n" +
   "Here: counts like a real show and skips the waits — when blocked, you get a Reset.";
 export const SUPPORTER_PREVIEW_HINT =
   "Shows the More card and the Support screen with fake values, until the app restarts. " +
@@ -127,9 +118,12 @@ export const SUPPORTER_GIFT_HINT =
 export const SUPPORTER_BANNER_HINT =
   "Shows the banner in the ad's slot, until the app restarts. " +
   "Real: right after the ad banner's X, at most once every 7 days, never for supporters (Android only).";
+export const FEEDBACK_HINT =
+  "Not an auto modal — opens only from About → Feedback: intro, 5 questions, then thank-you (or an error with Retry). " +
+  "Nothing is saved on the device. Here: the same as from About — sending is real.";
 export const FEEDBACK_THANKS_HINT =
   "Opens the Feedback modal on its thank-you step (with the Support button, Android only). " +
-  "Not counted as a show. Real: shown after feedback was sent.";
+  "Real: shown after feedback was sent.";
 
 // ------------------------------------------------------------
 // Small rounded status badge (ON/OFF state, delay seconds, …)

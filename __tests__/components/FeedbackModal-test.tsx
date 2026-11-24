@@ -1,6 +1,5 @@
 import { showFeedbackModal } from '@/components/FeedbackModal';
 import { sendFeedback } from '@/services/feedbackService';
-import { useAutoModalsStore } from '@/store/autoModalsStore';
 import { useModalStore } from '@/store/modalStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -21,8 +20,6 @@ jest.mock('@react-native-vector-icons/material-design-icons/static', () => {
   return { MaterialDesignIcons: ({ name }: any) => React.createElement('View', { testID: `mdi-${name}` }) };
 });
 
-const NOW = new Date('2026-10-20T12:00:00').getTime();
-const DAY_MS = 24 * 60 * 60 * 1000;
 const mockSendFeedback = sendFeedback as jest.Mock;
 
 const show = () => useModalStore.getState().show as jest.Mock;
@@ -31,11 +28,11 @@ const hide = () => useModalStore.getState().hide as jest.Mock;
 // Renders the content of the modal that was shown, so its buttons can be pressed
 const renderShownModal = () => render(show().mock.calls[0][0].component);
 
-// Shows the modal like the auto prompt does and moves past the intro to the rating step
+// Shows the modal like About does and moves past the intro to the rating step
 const showAtRating = () => {
   showFeedbackModal();
   renderShownModal();
-  fireEvent.press(screen.getByText('Share feedback'));
+  fireEvent.press(screen.getByText('Start'));
 };
 
 // Answers the rating step and moves on
@@ -46,29 +43,15 @@ const rateAndNext = (stars = 4) => {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.useFakeTimers();
-  jest.setSystemTime(NOW);
   useModalStore.setState({ visible: false, show: jest.fn(), hide: jest.fn() } as any);
-  useAutoModalsStore.setState({
-    feedbackNextShowAt: NOW - 1,
-    feedbackShownAt: null,
-    feedbackShownCount: 0,
-    feedbackDone: false,
-  });
-});
-
-afterEach(() => {
-  jest.useRealTimers();
 });
 
 describe('showFeedbackModal — show', () => {
-  it('shows a fullscreen modal that only its buttons can close, and counts it as shown', () => {
+  it('shows a fullscreen modal that only its buttons can close', () => {
     showFeedbackModal();
 
     expect(show()).toHaveBeenCalledTimes(1);
     expect(show().mock.calls[0][0]).toMatchObject({ type: 'fullscreen', dismissable: false });
-    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(1);
-    expect(useAutoModalsStore.getState().feedbackShownAt).toBe(NOW);
   });
 
   it('opens on the intro step', () => {
@@ -77,46 +60,10 @@ describe('showFeedbackModal — show', () => {
     expect(screen.getByText('How do you like Nejon Prayer?')).toBeTruthy();
   });
 
-  it('the 3rd show marks it done', () => {
-    useAutoModalsStore.setState({ feedbackShownCount: 2 });
-    showFeedbackModal();
-    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(3);
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
-  });
-});
-
-describe('showFeedbackModal — no checks', () => {
-  it('shows with no checks — even when done — and still counts as shown', () => {
-    useAutoModalsStore.setState({ feedbackDone: true, feedbackShownCount: 3 });
-    showFeedbackModal();
-
-    expect(show()).toHaveBeenCalledTimes(1);
-    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(4);
-  });
-});
-
-describe('showFeedbackModal — from About', () => {
-  beforeEach(() => {
+  it('opens on the thank-you step for the debug preview', () => {
     showFeedbackModal(true);
     renderShownModal();
-  });
-
-  it('opens directly at the first question', () => {
-    expect(screen.queryByText('How do you like Nejon Prayer?')).toBeNull();
-    expect(screen.getByText('How do you like the app?')).toBeTruthy();
-    expect(screen.getByText('Step 1 / 5')).toBeTruthy();
-  });
-
-  it('does not record the open', () => {
-    expect(useAutoModalsStore.getState().feedbackShownCount).toBe(0);
-    expect(useAutoModalsStore.getState().feedbackShownAt).toBeNull();
-  });
-
-  it('the close icon closes without starting a wait', () => {
-    fireEvent.press(screen.getByTestId('icon-close'));
-
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW - 1);
-    expect(hide()).toHaveBeenCalledWith('close');
+    expect(screen.getByText('Thank you!')).toBeTruthy();
   });
 });
 
@@ -126,25 +73,19 @@ describe('intro buttons', () => {
     renderShownModal();
   });
 
-  it('"Share feedback" moves to the first question', () => {
-    fireEvent.press(screen.getByText('Share feedback'));
+  it('"Start" moves to the first question', () => {
+    fireEvent.press(screen.getByText('Start'));
     expect(screen.getByText('How do you like the app?')).toBeTruthy();
+    expect(screen.getByText('Step 1 / 5')).toBeTruthy();
     expect(hide()).not.toHaveBeenCalled();
   });
 
-  it('"Maybe later" snoozes for 30 days and closes', () => {
-    fireEvent.press(screen.getByText('Maybe later'));
+  it('"Close" closes, with no "Maybe later" or "Don\'t ask again" anymore', () => {
+    expect(screen.queryByText('Maybe later')).toBeNull();
+    expect(screen.queryByText("Don't ask again")).toBeNull();
 
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
-    expect(hide()).toHaveBeenCalledWith('later');
-  });
-
-  it('"Don\'t ask again" marks it done and closes', () => {
-    fireEvent.press(screen.getByText("Don't ask again"));
-
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
-    expect(hide()).toHaveBeenCalledWith('never');
+    fireEvent.press(screen.getByText('Close'));
+    expect(hide()).toHaveBeenCalledWith('close');
   });
 });
 
@@ -175,11 +116,9 @@ describe('question steps', () => {
     expect(screen.getByText('What needs improving?')).toBeTruthy();
   });
 
-  it('the close icon snoozes and closes without sending (not an opt-out)', () => {
+  it('the close icon closes without sending', () => {
     fireEvent.press(screen.getByTestId('icon-close'));
 
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(NOW + 30 * DAY_MS);
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
     expect(mockSendFeedback).not.toHaveBeenCalled();
   });
@@ -214,7 +153,6 @@ describe('sending', () => {
       message: 'More reciters please',
       language: 'en',
     });
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(true);
   });
 
   it('a second tap on a chip unselects it', async () => {
@@ -251,7 +189,6 @@ describe('sending', () => {
     expect(await screen.findByText(text)).toBeTruthy();
     expect(screen.getByText('Error')).toBeTruthy();
     expect(screen.queryByText('What should we improve or add?')).toBeNull();
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
 
     fireEvent.press(screen.getByText('Retry'));
     expect(await screen.findByText('Thank you!')).toBeTruthy();
@@ -272,7 +209,7 @@ describe('sending', () => {
     expect(screen.getByText('Something went wrong. Please try again.')).toBeTruthy();
   });
 
-  it('the rate limit has no Retry — only Close, which snoozes', async () => {
+  it('the rate limit has no Retry — only Close', async () => {
     mockSendFeedback.mockResolvedValue({ error: 'rateLimited' });
     answerAll();
     fireEvent.press(screen.getByText('Send'));
@@ -280,11 +217,7 @@ describe('sending', () => {
     expect(await screen.findByText('Too many submissions today. Please try again tomorrow.')).toBeTruthy();
     expect(screen.queryByText('Retry')).toBeNull();
 
-    // findByText advances the fake clock — measure the snooze from the press
-    const pressedAt = Date.now();
     fireEvent.press(screen.getByText('Close'));
-    expect(useAutoModalsStore.getState().feedbackNextShowAt).toBe(pressedAt + 30 * DAY_MS);
-    expect(useAutoModalsStore.getState().feedbackDone).toBe(false);
     expect(hide()).toHaveBeenCalledWith('close');
   });
 

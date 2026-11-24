@@ -1,7 +1,4 @@
-import { sendFeedback } from "@/services/feedbackService";
-import { useLanguageStore } from "@/store/languageStore";
 import { mmkvStorage } from "@/store/storage";
-import { FeedbackInput, FeedbackResult } from "@/types/feedback.types";
 import { StoreUpdateResult } from "@/types/storeUpdate.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -23,17 +20,11 @@ interface AutoModalsData {
   storeReviewShownAt: number | null;
   storeReviewShownCount: number;
   storeReviewDone: boolean;
-  // Feedback
-  feedbackNextShowAt: number | null;
-  feedbackShownAt: number | null;
-  feedbackShownCount: number;
-  feedbackDone: boolean;
 }
 
 interface AutoModalsState extends AutoModalsData {
   isReady: boolean;
   setAutoModals: (patch: Partial<AutoModalsData>) => void;
-  submitFeedback: (input: Omit<FeedbackInput, "language">) => Promise<FeedbackResult>;
 }
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
@@ -51,14 +42,6 @@ export const NOTIF_REMINDER_MAX_SHOWS = 3;
 // Store review — no first wait, 7 days after "Later"; 3 shows
 export const STORE_REVIEW_WAIT_DAYS = 7;
 export const STORE_REVIEW_MAX_SHOWS = 3;
-
-// Feedback — 7 days after onboarding, 30 days after "Maybe later" / close; 3 shows
-export const FEEDBACK_FIRST_WAIT_DAYS = 7;
-export const FEEDBACK_WAIT_DAYS = 30;
-export const FEEDBACK_MAX_SHOWS = 3;
-
-// Minimum gap between Store review and Feedback (checked on both sides)
-export const STORE_REVIEW_FEEDBACK_GAP_DAYS = 7;
 
 // Old stores replaced by this one — delete their leftovers (values aren't carried over)
 const OLD_STORAGE_NAMES = ["rate-app-storage", "feedback-storage", "notif-reminder-storage"];
@@ -78,10 +61,6 @@ const INITIAL_DATA: AutoModalsData = {
   storeReviewShownAt: null,
   storeReviewShownCount: 0,
   storeReviewDone: false,
-  feedbackNextShowAt: null,
-  feedbackShownAt: null,
-  feedbackShownCount: 0,
-  feedbackDone: false,
 };
 
 export const useAutoModalsStore = create<AutoModalsState>()(
@@ -94,22 +73,11 @@ export const useAutoModalsStore = create<AutoModalsState>()(
       setAutoModals: (patch) => {
         set(patch);
       },
-
-      // Send the questionnaire — a successful send stops the feedback modal for good
-      submitFeedback: async (input) => {
-        const language = useLanguageStore.getState().language;
-        const result = await sendFeedback({ ...input, language });
-
-        if ("ok" in result) {
-          set({ feedbackDone: true });
-        }
-        return result;
-      },
     }),
     {
       name: "auto-modals-storage",
       storage: createJSONStorage(() => mmkvStorage),
-      partialize: ({ isReady, setAutoModals, submitFeedback, ...data }) => data,
+      partialize: ({ isReady, setAutoModals, ...data }) => data,
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.isReady = true;

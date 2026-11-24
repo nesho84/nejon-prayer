@@ -6,8 +6,6 @@ export type FeedbackTranslations = {
   promptTitle: string;
   promptMessage: string;
   promptStart: string;
-  promptLater: string;
-  promptNever: string;
   // Questionnaire
   questions: Record<FeedbackQuestionId, string>;
   multiHint: string;           // under multiple-choice questions
@@ -37,9 +35,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   en: {
     promptTitle: "How do you like Nejon Prayer?",
     promptMessage: "Your feedback helps us improve the app. It takes about a minute.",
-    promptStart: "Share feedback",
-    promptLater: "Maybe later",
-    promptNever: "Don't ask again",
+    promptStart: "Start",
 
     questions: {
       rating: "How do you like the app?",
@@ -99,9 +95,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   de: {
     promptTitle: "Wie gefällt dir Nejon Prayer?",
     promptMessage: "Dein Feedback hilft uns, die App zu verbessern. Es dauert etwa eine Minute.",
-    promptStart: "Feedback geben",
-    promptLater: "Vielleicht später",
-    promptNever: "Nicht mehr fragen",
+    promptStart: "Starten",
 
     questions: {
       rating: "Wie gefällt dir die App?",
@@ -161,9 +155,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   fr: {
     promptTitle: "Que pensez-vous de Nejon Prayer ?",
     promptMessage: "Votre avis nous aide à améliorer l'application. Cela prend environ une minute.",
-    promptStart: "Donner mon avis",
-    promptLater: "Plus tard",
-    promptNever: "Ne plus demander",
+    promptStart: "Commencer",
 
     questions: {
       rating: "Que pensez-vous de l'application ?",
@@ -223,9 +215,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   sq: {
     promptTitle: "Si të duket Nejon Prayer?",
     promptMessage: "Mendimi yt na ndihmon ta përmirësojmë aplikacionin. Zgjat rreth një minutë.",
-    promptStart: "Jep mendimin",
-    promptLater: "Më vonë",
-    promptNever: "Mos më pyet më",
+    promptStart: "Fillo",
 
     questions: {
       rating: "Si të duket aplikacioni?",
@@ -285,9 +275,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   bs: {
     promptTitle: "Kako vam se sviđa Nejon Prayer?",
     promptMessage: "Vaše mišljenje nam pomaže da poboljšamo aplikaciju. Traje oko minutu.",
-    promptStart: "Podijeli mišljenje",
-    promptLater: "Možda kasnije",
-    promptNever: "Ne pitaj više",
+    promptStart: "Počni",
 
     questions: {
       rating: "Kako vam se sviđa aplikacija?",
@@ -347,9 +335,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   mk: {
     promptTitle: "Како ви се допаѓа Nejon Prayer?",
     promptMessage: "Вашето мислење ни помага да ја подобриме апликацијата. Трае околу една минута.",
-    promptStart: "Сподели мислење",
-    promptLater: "Можеби подоцна",
-    promptNever: "Не прашувај повеќе",
+    promptStart: "Започни",
 
     questions: {
       rating: "Како ви се допаѓа апликацијата?",
@@ -409,9 +395,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   tr: {
     promptTitle: "Nejon Prayer'ı nasıl buldunuz?",
     promptMessage: "Görüşleriniz uygulamayı geliştirmemize yardımcı olur. Yaklaşık bir dakika sürer.",
-    promptStart: "Görüş paylaş",
-    promptLater: "Belki sonra",
-    promptNever: "Bir daha sorma",
+    promptStart: "Başla",
 
     questions: {
       rating: "Uygulamayı nasıl buluyorsunuz?",
@@ -471,9 +455,7 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
   ar: {
     promptTitle: "ما رأيك في Nejon Prayer؟",
     promptMessage: "رأيك يساعدنا على تحسين التطبيق. يستغرق الأمر دقيقة تقريبًا.",
-    promptStart: "شارك رأيك",
-    promptLater: "ربما لاحقًا",
-    promptNever: "لا تسألني مجددًا",
+    promptStart: "ابدأ",
 
     questions: {
       rating: "ما رأيك في التطبيق؟",
