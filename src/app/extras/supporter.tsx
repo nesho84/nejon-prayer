@@ -139,7 +139,7 @@ export default function SupporterScreen() {
     // Safe area insets
     const insets = useSafeAreaInsets();
     const topInset = 12;
-    const bottomInset = insets.bottom + 8;
+    const bottomInset = insets.bottom + 12;
 
     // Local state
     const [restoring, setRestoring] = useState(false);
@@ -396,6 +396,7 @@ const styles = StyleSheet.create({
     },
     orText: {
         fontSize: 13.5,
+        includeFontPadding: false,
     },
 
     // Why support
@@ -521,5 +522,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         paddingHorizontal: 16,
         marginTop: -8,
+        marginBottom: 10,
     },
 });
