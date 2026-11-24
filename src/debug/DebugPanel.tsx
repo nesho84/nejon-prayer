@@ -16,6 +16,7 @@ import {
   formatTime,
   previewFeedbackModal,
   previewFeedbackThanks,
+  previewHolidayInfoModal,
   previewKhatamCelebrationModal,
   previewNotifReminderModal,
   previewPrayerCelebrationModal,
@@ -41,6 +42,7 @@ import {
   DebugToggle,
   FEEDBACK_HINT,
   HOLIDAY_CARD_HINT,
+  HOLIDAY_INFO_HINT,
   KHATAM_HINT,
   LOCATION_CHANGED_HINT,
   NO_PRAYER_TIMES_HINT,
@@ -215,6 +217,7 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
           {/* Islamic Holidays */}
           <DebugSection title="Islamic Holidays">
             <DebugToggle color={theme.gold} label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
+            <DebugButton label="Show 'Holiday' Info Modal" color={theme.gold} hint={HOLIDAY_INFO_HINT} onPress={previewHolidayInfoModal} />
             <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
             <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
           </DebugSection>

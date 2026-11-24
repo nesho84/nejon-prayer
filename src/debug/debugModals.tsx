@@ -5,18 +5,21 @@ import { showStoreUpdateModal } from "@/components/StoreUpdateModal";
 import { APPLE_STORE_URL, GOOGLE_PLAY_URL } from "@/constants/links";
 import { globalStyles } from "@/constants/styles";
 import { PRAYER_CELEBRATIONS_TR } from "@/constants/translations/celebrations.tr";
+import { HOLIDAYS_TR } from "@/constants/translations/holidays.tr";
 import { FEEDBACK_MAX_SHOWS, NOTIF_REMINDER_MAX_SHOWS, STORE_REVIEW_MAX_SHOWS, useAutoModalsStore } from "@/store/autoModalsStore";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
 import { useThemeStore } from "@/store/themeStore";
+import { HolidayName } from "@/types/holiday.types";
 import { shareText } from "@/utils/system";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
-import { Alert, Platform, Text, View } from "react-native";
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
+import { Alert, Platform, StyleSheet, Text, View } from "react-native";
 import { showJsonViewerModal } from "./debugUi";
 
 // ------------------------------------------------------------
-// Modal previews — celebrations, then the auto modals (one JSON for their shared store, a preview + reset each).
+// Modal previews — celebrations and holiday info, then the auto modals (one JSON for their shared store, a preview + reset each).
 // Auto-modal previews count like a real show and skip the waits; a block gets an alert with Reset
 // (for Store Update, which never stops, the 3-day wait is the block).
 // ------------------------------------------------------------
@@ -90,6 +93,37 @@ export function previewKhatamCelebrationModal() {
       }
     ],
     celebrationAnimation: true,
+  });
+}
+
+// ------------------------------------------------------------
+// Debug utility: preview a holiday info modal (random holiday)
+// (mirrors showInfo in src/components/HolidaysCard.tsx)
+// ------------------------------------------------------------
+export function previewHolidayInfoModal() {
+  const theme = useThemeStore.getState().theme;
+  const language = useLanguageStore.getState().language;
+  const holidaysTr = HOLIDAYS_TR[language] ?? HOLIDAYS_TR.en;
+  const names = Object.keys(holidaysTr.holidays) as HolidayName[];
+  const holidayTr = holidaysTr.holidays[names[Math.floor(Math.random() * names.length)]];
+
+  useModalStore.getState().show({
+    type: "alert",
+    component: (
+      <View style={globalStyles.bannerContainer}>
+        <View style={[styles.modalIconCircle, { backgroundColor: theme.accentLight }]}>
+          <MaterialDesignIcons name="information-variant-circle" size={40} color={theme.accent} />
+        </View>
+        <Text style={[globalStyles.bannerTitle, { color: theme.text }]}>{holidayTr.name}</Text>
+        <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{holidayTr.info}</Text>
+      </View>
+    ),
+    buttons: [{
+      label: "OK",
+      action: "ok",
+      buttonStyle: { backgroundColor: theme.accentLight, borderWidth: 1, borderColor: theme.borderGold },
+      labelStyle: { fontSize: 16, fontWeight: "600", color: theme.accent },
+    }],
   });
 }
 
@@ -226,3 +260,13 @@ export function previewFeedbackModal() {
 export function previewFeedbackThanks() {
   showFeedbackModal(true, true);
 }
+
+const styles = StyleSheet.create({
+  modalIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

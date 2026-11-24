@@ -81,6 +81,9 @@ export const HOLIDAY_CARD_HINT =
   "Real: on Home, the next of Ramadan, Laylat al-Qadr and the two Eids appears 1–7 days before it " +
   "(7 for Ramadan and the Eids, 3 for Laylat al-Qadr) — not on the day itself. " +
   "Here: a fake Ramadan start in 3 days.";
+export const HOLIDAY_INFO_HINT =
+  "Real: tap the Holiday Card on Home, or a holiday's ⓘ in Extras → Islamic Holidays. " +
+  "Here: a random holiday.";
 
 // How the four auto modals work — shown under their ⓘ
 export const STORE_UPDATE_HINT =
