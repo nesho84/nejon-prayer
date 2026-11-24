@@ -175,7 +175,7 @@ export default function ExtrasTabScreen() {
                             <View style={[styles.listItem, styles.supportItem]}>
                                 {shownSupporter ? (
                                     <View style={[styles.itemIconContainer, { backgroundColor: theme.success + "1F", borderColor: theme.divider2 }]}>
-                                        <MaterialDesignIcons name="check-decagram" size={26} color={theme.success} />
+                                        <MaterialDesignIcons name="check-decagram" size={32} color={theme.success} />
                                         <Text style={[styles.supporterIconText, { color: theme.success }]} numberOfLines={1} adjustsFontSizeToFit>
                                             {supporterTr.supporterBadge}
                                         </Text>
@@ -337,9 +337,11 @@ const styles = StyleSheet.create({
         paddingVertical: 14,
     },
     supporterIconText: {
-        fontSize: 9.5,
+        fontSize: 9,
         fontWeight: '700',
+        includeFontPadding: false,
         marginTop: 1,
+        marginBottom: 2,
         paddingHorizontal: 3,
     },
 
