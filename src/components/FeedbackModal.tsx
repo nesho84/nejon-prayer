@@ -100,7 +100,6 @@ export function showFeedbackModal(fromAbout = false, startAtThanks = false) {
 function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startAtThanks: boolean }) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
-  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
   const feedbackTr = FEEDBACK_TR[language] ?? FEEDBACK_TR.en;
@@ -269,7 +268,7 @@ function FeedbackForm({ fromAbout, startAtThanks }: { fromAbout: boolean; startA
             <TouchableOpacity
               style={[
                 styles.supportButton,
-                { backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white, borderColor: theme.gold + "73" },
+                { backgroundColor: theme.bgGold, borderColor: theme.borderGold },
               ]}
               onPress={() => {
                 hide("close");

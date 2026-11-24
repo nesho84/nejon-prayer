@@ -16,7 +16,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function SupporterBanner() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
-  const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
   const language = useLanguageStore((state) => state.language);
   const adBannerDismissed = useAdsStore((state) => state.bannerDismissed);
   const isSupporter = useSupporterStore((state) => state.isSupporter);
@@ -56,8 +55,8 @@ export default function SupporterBanner() {
       style={[
         styles.container,
         {
-          backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white,
-          borderColor: theme.gold + '73',
+          backgroundColor: theme.bgGold,
+          borderColor: theme.borderGold,
           paddingLeft: insets.left + 12,
           paddingRight: insets.right,
         },

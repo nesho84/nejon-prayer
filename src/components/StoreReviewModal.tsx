@@ -55,7 +55,7 @@ export function showStoreReviewModal(fromAbout = false) {
         {/* Buttons */}
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.gold + "20", borderWidth: 1, borderColor: theme.gold + "40" }]}
+            style={[styles.button, { backgroundColor: theme.bgGold, borderWidth: 1, borderColor: theme.borderGold }]}
             activeOpacity={0.8}
             onPress={() => {
               setAutoModals({ storeReviewDone: true });

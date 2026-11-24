@@ -34,7 +34,6 @@ interface MenuItem {
 export default function ExtrasTabScreen() {
     // Stores
     const theme = useThemeStore((state) => state.theme);
-    const resolvedTheme = useThemeStore((state) => state.resolvedTheme);
     const tr = useLanguageStore((state) => state.tr);
     const language = useLanguageStore((state) => state.language);
     const isSupporter = useSupporterStore((state) => state.isSupporter);
@@ -164,7 +163,7 @@ export default function ExtrasTabScreen() {
                     <View
                         style={[
                             styles.supportCard,
-                            { backgroundColor: resolvedTheme === "dark" ? theme.bg2 : theme.white, borderColor: theme.gold + '73' },
+                            { backgroundColor: theme.bgGold, borderColor: theme.borderGold },
                         ]}
                     >
                         <Pressable

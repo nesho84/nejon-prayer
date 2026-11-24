@@ -4,6 +4,7 @@ export const LIGHT_COLORS = {
     bg2: "#f8faf8",
     bg3: "#f3f4f6",
     bg4: "#e5e7eb",
+    bgGold: "#d1a12715",
 
     // Typography
     text: "#111827",
@@ -42,6 +43,7 @@ export const LIGHT_COLORS = {
     borderCard: "#dde0e6ff",
     borderCard2: "#ced4da",
     borderCard3: "#adb5bd",
+    borderGold: "#d1a12750",
     border: "#dce0e6",
     divider: "#d1d5db",
     divider2: "#d3d7de",
@@ -84,6 +86,7 @@ export const DARK_COLORS = {
     bg2: "#1d1d1d",
     bg3: "#2a2a2a",
     bg4: "#374151",
+    bgGold: "#1d1d1d",
 
     // Typography
     text: "#f3f4f6",
@@ -122,6 +125,7 @@ export const DARK_COLORS = {
     borderCard: "#2d3649",
     borderCard2: "#4a5568",
     borderCard3: "#4d5b6e",
+    borderGold: "#d1a12750",
     border: "#3d4a5e",
     divider: "#4b5563",
     divider2: "#2f3d50ff",
