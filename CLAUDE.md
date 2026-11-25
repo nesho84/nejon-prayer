@@ -152,8 +152,12 @@ add the matching test under the parallel `__tests__/` path. `jest` runs in `sile
 
 ## Error tracking
 
-Sentry is initialized in `src/app/_layout.tsx` (`enabled: !__DEV__`, so it's off in dev), which
-also wraps the root component with `Sentry.wrap`. The background handlers in `index.ts`
+Sentry runs in its minimal form: only `Sentry.init` in `src/app/_layout.tsx` (`enabled: !__DEV__`,
+so it's off in dev). No config plugin, Metro wrapper, `Sentry.wrap` or auth token — builds need
+nothing from Sentry, and stack traces stay minified (messages stay readable). Report only
+unexpected errors: location off, offline/timeouts and HTTP 5xx are skipped. Match expo error
+**messages**, not only `code` — release builds minify the class names expo derives codes from
+(see `EXPECTED_LOCATION_ERROR` in `locationService.ts`). The background handlers in `index.ts`
 deliberately use **no** Sentry: an `await Sentry.flush()` there delayed notification actions,
 and killed-app captures were noise. They log with `console.error` only — keep it that way for
 new background error paths. Sentry calls in stores/services (e.g.

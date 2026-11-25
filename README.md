@@ -287,8 +287,8 @@ npm run build:apk   # APK to install on a phone or share
 | `build:apk` | `android/app/build/outputs/apk/release/app-release.apk` | `adb install -r <apk>` / testers |
 
 Both run `scripts/build-release.js`: `expo prebuild --clean`, then Gradle (`bundleRelease` /
-`assembleRelease`) with `.env.local` loaded, so the Sentry source-map upload gets
-`SENTRY_AUTH_TOKEN`. Prebuild asks before continuing if there are uncommitted changes.
+`assembleRelease`) with `.env.local` loaded if present. No tokens are needed. Prebuild asks before
+continuing if there are uncommitted changes.
 
 Build + install on a connected phone in one step: `npx expo run:android --variant release`.
 
@@ -535,32 +535,28 @@ eas channel:create production
 
 ## Error Monitoring (Sentry)
 
-This app uses **Sentry** (`@sentry/react-native`) for crash reporting and error tracking.
+This app uses **Sentry** (`@sentry/react-native`) in its minimal form: only `Sentry.init` in
+`src/app/_layout.tsx` (`enabled: !__DEV__`), plus `Sentry.captureException` for unexpected errors.
 
 ### What It Does
 
-- Automatically captures unhandled JS exceptions and native crashes
-- Sends error reports to [sentry.io](https://sentry.io) with stack traces and device context
-- Configured via the `@sentry/react-native/expo` plugin in `app.json`
+- Captures crashes automatically: uncaught JS errors and native Android/iOS crashes (`init` starts
+  the native SDK too). Crashes before JS has loaded aren't caught.
+- Groups events by release, read from the installed app (`com.nejon.nejonprayer@<version>+<code>`)
+- Normal conditions are **not** reported: location services off, offline/timeouts, API servers
+  down (HTTP 5xx). Only unexpected failures and real crashes reach the dashboard.
 
-### Configuration (`app.json`)
+### What It Deliberately Doesn't Do
 
-```json
-["@sentry/react-native/expo", {
-  "url": "https://sentry.io/",
-  "project": "react-native",
-  "organization": "nejonnet"
-}]
-```
+- **No config plugin, no Metro wrapper, no `Sentry.wrap`, no auth token.** Builds (local, EAS, OTA)
+  need nothing from Sentry. Nothing to export, no EAS secret.
+- **No source-map / ProGuard upload** — so JS stack traces stay minified and native (R8) frames
+  obfuscated. Error messages stay readable, which is usually enough to find the cause.
 
-### Required EAS Environment Variable
+To get readable stack traces back: re-add the `@sentry/react-native/expo` plugin to `app.json`,
+`getSentryExpoConfig` in `metro.config.js`, and a `SENTRY_AUTH_TOKEN` (`.env.local` + EAS secret).
 
-> ⚠️ **Critical:** EAS cloud builds will fail to upload source maps to Sentry without this secret.
-
-In the [EAS dashboard](https://expo.dev) under **Project → Secrets**, add:
-
-| Secret Name | Value |
-|---|---|
+---|---|
 | `SENTRY_AUTH_TOKEN` | Your Sentry auth token |
 
 Generate the token at: **Sentry → Settings → Auth Tokens → Create New Token**

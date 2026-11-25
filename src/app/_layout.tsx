@@ -89,5 +89,4 @@ function RootLayout() {
   );
 }
 
-// Sentry.wrap adds touch-event breadcrumbs and profiling; errors are caught globally by Sentry.init
-export default Sentry.wrap(RootLayout);
+export default RootLayout;

@@ -1,4 +1,4 @@
-// Signed release build: prebuild, then Gradle with .env.local loaded (e.g. Sentry token).
+// Signed release build: prebuild, then Gradle with .env.local loaded if present.
 // Usage: node scripts/build-release.js bundleRelease | assembleRelease
 const { execSync } = require('child_process');
 const fs = require('fs');
