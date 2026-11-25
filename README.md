@@ -106,7 +106,6 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useQuranSync` | Loads the bundled Quran JSON into `quranStore`, sets the audio mode, syncs player status into `quranAudioStore` |
 | `useSystemThemeSync` | Listens to `Appearance` changes for system theme |
 | `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder); notif reminder resets |
-| `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useSupporterSync` | Android: keeps the Play purchase listener alive and syncs purchases on launch and every return to the app |
 | `useAdsSync` | After onboarding: gathers UMP consent, then initializes the Mobile Ads SDK — skipped for supporters (Android waits for the first Play check) |
 
@@ -492,7 +491,8 @@ This app uses **EAS Update** to ship JS/asset changes without a full store relea
 
 - `expo-updates` checks `updates.url` on launch
 - The app sends its `channel` and `runtimeVersion` to the server
-- If a matching update exists, it downloads and applies it on next launch
+- If a matching update exists, it downloads and applies it on next launch (`checkAutomatically: "ON_LOAD"`). There is no JS hook
+  that reloads mid-session — that would restart the app during onboarding, a modal or a purchase
 - **Only JS and assets change** — native changes still require a full build
 
 ### Channels (configured in `app.json` + `eas.json`)

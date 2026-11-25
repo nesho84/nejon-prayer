@@ -10,7 +10,6 @@ import { usePrayerTimesSync } from "@/hooks/usePrayerTimesSync";
 import { useQuranSync } from "@/hooks/useQuranSync";
 import { useSupporterSync } from "@/hooks/useSupporterSync";
 import { useSystemThemeSync } from "@/hooks/useSystemThemeSync";
-import { useOtaUpdatesSync } from "@/hooks/useOtaUpdatesSync";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import * as Sentry from '@sentry/react-native';
 import { Stack } from "expo-router";
@@ -59,16 +58,25 @@ const RootStack = () => {
 
 function RootLayout() {
   // Initialization and global sync hooks
+  // System light/dark mode
   useSystemThemeSync();
+  // Permissions, on every return
   useDeviceSettingsSync();
+  // Far-from-location warning
   useLocationChangeSync();
+  // Reschedules on changes
   useNotificationsSync();
+  // Reloads on a new day
   usePrayerTimesSync();
+  // Yearly holidays fetch
   useHolidaysSync();
+  // Quran text + audio state
   useQuranSync();
-  useOtaUpdatesSync();
-  useAutoModalsSync();
+  // Play purchases, on every return
   useSupporterSync();
+  // After onboarding: one auto modal
+  useAutoModalsSync();
+  // After onboarding: consent, then ads
   useAdsSync();
 
   return (
