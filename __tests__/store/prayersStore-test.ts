@@ -3,6 +3,7 @@ import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useLocationStore } from '@/store/locationStore';
 import { usePrayersStore } from '@/store/prayersStore';
+import * as Sentry from '@sentry/react-native';
 import { PrayerTimes, YearlyPrayerTimes } from '@/types/prayer.types';
 import { toDateKey } from '@/utils/datetime';
 
@@ -161,6 +162,19 @@ describe('prayersStore — loadPrayerTimes', () => {
     mockDeviceGetState.mockReturnValue({ internetConnection: true });
     await usePrayersStore.getState().loadPrayerTimes();
     expect(usePrayersStore.getState().isLoading).toBe(false);
+  });
+
+  it.each([
+    ['offline/timeout', 'fetch failed: timeout', false],
+    ['the API server down (5xx)', 'HTTP error! status: 504', false],
+    ['a bad request (4xx)', 'HTTP error! status: 400', true],
+    ['an unexpected error', 'Unexpected token <', true],
+  ])('fetch failure from %s is reported to Sentry only when unexpected', async (_, message, reported) => {
+    mockLocationGetState.mockReturnValue({ location: { latitude: 48.2, longitude: 16.3 }, timeZone: { countryCode: 'AT' } });
+    mockDeviceGetState.mockReturnValue({ internetConnection: true });
+    mockGetYearly.mockRejectedValue(new Error(message));
+    await usePrayersStore.getState().loadPrayerTimes();
+    expect((Sentry.captureException as jest.Mock).mock.calls.length > 0).toBe(reported);
   });
 });
 

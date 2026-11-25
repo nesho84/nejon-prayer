@@ -1,6 +1,7 @@
 import { getYearlyHolidays } from '@/services/holidaysService';
 import { useDeviceSettingsStore } from '@/store/deviceSettingsStore';
 import { useHolidaysStore } from '@/store/holidaysStore';
+import * as Sentry from '@sentry/react-native';
 import { YearlyHolidays } from '@/types/holiday.types';
 
 jest.mock('@/store/storage', () => ({
@@ -89,5 +90,17 @@ describe('holidaysStore — loadHolidays', () => {
     expect(useHolidaysStore.getState().yearlyHolidays).toBeNull();
     expect(useHolidaysStore.getState().fetchedYear).toBeNull();
     expect(useHolidaysStore.getState().isLoading).toBe(false);
+  });
+
+  it.each([
+    ['offline/timeout', 'fetch failed: timeout', false],
+    ['the API server down (5xx)', 'HTTP error! status: 504', false],
+    ['a bad request (4xx)', 'HTTP error! status: 400', true],
+    ['an unexpected error', 'network down', true],
+  ])('fetch failure from %s is reported to Sentry only when unexpected', async (_, message, reported) => {
+    mockGetYearlyHolidays.mockRejectedValue(new Error(message));
+    await useHolidaysStore.getState().loadHolidays();
+
+    expect((Sentry.captureException as jest.Mock).mock.calls.length > 0).toBe(reported);
   });
 });

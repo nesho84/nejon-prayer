@@ -14,6 +14,9 @@ interface HolidaysState {
   loadHolidays: () => Promise<void>;
 }
 
+// Offline/timeout or the API server down (5xx): expected, not a bug
+const EXPECTED_FETCH_ERROR = /fetch failed:|HTTP error! status: 5\d\d/;
+
 export const useHolidaysStore = create<HolidaysState>()(
   persist(
     (set, get) => ({
@@ -62,8 +65,7 @@ export const useHolidaysStore = create<HolidaysState>()(
             console.log('🌐 [holidaysStore] Yearly holidays fetched & stored');
           } catch (err) {
             console.warn('⚠️ [holidaysStore] Failed to fetch yearly holidays:', err);
-            // Timeout/offline is expected — not a bug
-            if (!(err instanceof Error && err.message.startsWith('fetch failed:'))) {
+            if (!EXPECTED_FETCH_ERROR.test(String(err))) {
               Sentry.captureException(err);
             }
           }

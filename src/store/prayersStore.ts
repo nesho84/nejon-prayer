@@ -26,6 +26,9 @@ interface PrayersState {
   getPrayerTimesForDate: (dateKey: string) => Promise<PrayerTimes | null>;
 }
 
+// Offline/timeout or the API server down (5xx): expected, not a bug
+const EXPECTED_FETCH_ERROR = /fetch failed:|HTTP error! status: 5\d\d/;
+
 export const usePrayersStore = create<PrayersState>()(
   persist(
     (set, get) => ({
@@ -99,8 +102,7 @@ export const usePrayersStore = create<PrayersState>()(
               return;
             } catch (err) {
               console.warn("⚠️ Failed to fetch yearly prayer times:", err);
-              // Timeout/offline is expected — not a bug
-              if (!(err instanceof Error && err.message.startsWith('fetch failed:'))) {
+              if (!EXPECTED_FETCH_ERROR.test(String(err))) {
                 Sentry.captureException(err);
               }
             }

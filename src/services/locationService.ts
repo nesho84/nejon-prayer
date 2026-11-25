@@ -5,6 +5,10 @@ import * as Sentry from '@sentry/react-native';
 import * as Location from 'expo-location';
 import { Alert, Linking } from 'react-native';
 
+// Location services off / no GPS fix: expected, not a bug.
+// Matched by message, not code: release builds minify the class names expo derives codes from.
+const EXPECTED_LOCATION_ERROR = /location is unavailable|unsatisfied device settings/i;
+
 // ------------------------------------------------------------
 // Get user's current location with address and timezone information
 // ------------------------------------------------------------
@@ -95,9 +99,7 @@ export async function getUserLocation(tr: Translations | null): Promise<Location
         };
     } catch (err) {
         console.warn('❌ Location error:', err);
-        // Location off / no GPS fix is expected — not a bug
-        const code = (err as { code?: string }).code;
-        if (code !== 'ERR_CURRENT_LOCATION_IS_UNAVAILABLE' && code !== 'ERR_LOCATION_SETTINGS_UNSATISFIED' && code !== 'ERR_LOCATION_UNAVAILABLE') {
+        if (!EXPECTED_LOCATION_ERROR.test(String(err))) {
             Sentry.captureException(err);
         }
         const title = tr?.labels.error ?? "Error";

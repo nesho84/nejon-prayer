@@ -201,6 +201,21 @@ describe('getUserLocation', () => {
     expect(Sentry.captureException).toHaveBeenCalled();
   });
 
+  it.each([
+    ['debug build (real code)', 'ERR_CURRENT_LOCATION_IS_UNAVAILABLE', 'Current location is unavailable. Make sure that location services are enabled'],
+    ['release build (minified code)', 'ERR_A', 'Current location is unavailable. Make sure that location services are enabled'],
+    ['release build, settings unsatisfied', 'ERR_B', 'Location request failed due to unsatisfied device settings'],
+  ])('does not report location services off to Sentry — %s', async (_, code, message) => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted', canAskAgain: true });
+    (NetInfo.fetch as jest.Mock).mockResolvedValue({ isConnected: true });
+    (Location.getCurrentPositionAsync as jest.Mock).mockRejectedValue(Object.assign(new Error(message), { code }));
+
+    const result = await getUserLocation(null);
+
+    expect(result).toBeNull();
+    expect(Sentry.captureException).not.toHaveBeenCalled();
+  });
+
   it('captures exception to Sentry and returns null on unexpected error', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock)
       .mockImplementation(() => { throw new Error('native crash'); });
