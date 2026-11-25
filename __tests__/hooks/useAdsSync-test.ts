@@ -1,5 +1,6 @@
 import { useAdsSync } from '@/hooks/useAdsSync';
 import { useAdsStore } from '@/store/adsStore';
+import { useOnboardingStore } from '@/store/onboardingStore';
 import { useSupporterStore } from '@/store/supporterStore';
 import { act, renderHook } from '@testing-library/react-native';
 import { Platform } from 'react-native';
@@ -18,6 +19,7 @@ beforeEach(() => {
   mockInitializeAds.mockResolvedValue(undefined);
   useAdsStore.setState({ canRequestAds: false, initializeAds: mockInitializeAds });
   useSupporterStore.setState({ isReady: true, isSupporter: false, entitlementChecked: false });
+  useOnboardingStore.setState({ onboardingComplete: true });
 });
 
 describe('useAdsSync — Android', () => {
@@ -57,6 +59,16 @@ describe('useAdsSync — Android', () => {
     expect(mockInitializeAds).toHaveBeenCalledTimes(1);
   });
 
+  it('waits for onboarding, so the consent form never covers it (fresh install)', () => {
+    useOnboardingStore.setState({ onboardingComplete: false });
+    useSupporterStore.setState({ entitlementChecked: true });
+    renderHook(() => useAdsSync());
+    expect(mockInitializeAds).not.toHaveBeenCalled();
+
+    act(() => useOnboardingStore.setState({ onboardingComplete: true }));
+    expect(mockInitializeAds).toHaveBeenCalledTimes(1);
+  });
+
   it('runs once per launch — later changes and re-renders do not re-run it', () => {
     useSupporterStore.setState({ entitlementChecked: true });
     const { rerender } = renderHook(() => useAdsSync());
@@ -72,5 +84,12 @@ describe('useAdsSync — iOS', () => {
     (Platform as { OS: string }).OS = 'ios';
     renderHook(() => useAdsSync());
     expect(mockInitializeAds).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for onboarding on iOS too', () => {
+    (Platform as { OS: string }).OS = 'ios';
+    useOnboardingStore.setState({ onboardingComplete: false });
+    renderHook(() => useAdsSync());
+    expect(mockInitializeAds).not.toHaveBeenCalled();
   });
 });

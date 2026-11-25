@@ -108,7 +108,7 @@ All stores are persisted to [MMKV](https://github.com/mrousavy/react-native-mmkv
 | `useAutoModalsSync` | Startup check: store update check, then at most one auto modal (Store update → Notif reminder); notif reminder resets |
 | `useOtaUpdatesSync` | Downloads an OTA (expo-updates) update on launch and reloads |
 | `useSupporterSync` | Android: keeps the Play purchase listener alive and syncs purchases on launch and every return to the app |
-| `useAdsSync` | Gathers UMP consent, then initializes the Mobile Ads SDK — skipped for supporters (Android waits for the first Play check) |
+| `useAdsSync` | After onboarding: gathers UMP consent, then initializes the Mobile Ads SDK — skipped for supporters (Android waits for the first Play check) |
 
 ### External APIs
 
