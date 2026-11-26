@@ -489,6 +489,7 @@ const styles = StyleSheet.create({
     infoText: {
         fontSize: 16,
         fontWeight: '600',
+        includeFontPadding: false,
     },
     accuracyRow: {
         flexDirection: 'row',

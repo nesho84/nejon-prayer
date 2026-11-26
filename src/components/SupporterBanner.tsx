@@ -117,9 +117,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: "600",
+    includeFontPadding: false,
   },
   body: {
     fontSize: 12,
+    includeFontPadding: false,
   },
   closeButton: {
     width: 48,

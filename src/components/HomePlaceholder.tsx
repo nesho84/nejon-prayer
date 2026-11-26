@@ -1,11 +1,11 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
-import AppWarningStrip from "@/components/AppWarningStrip";
 import HolidaysCard from "@/components/HolidaysCard";
 import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayerRow from "@/components/PrayerRow";
 import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
+import WarningNotice from "@/components/WarningNotice";
 import { globalStyles } from "@/constants/styles";
 import { useDeviceSettingsStore } from "@/store/deviceSettingsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -44,7 +44,7 @@ export default function HomePlaceholder() {
     const bottomInset = insets.bottom + 12;
 
     // Both available but still no data → show the real error
-    const stripText = location && internetConnection ? (prayersError || tr.labels.prayersError) : tr.labels.turnOnLocationInternet;
+    const noticeText = location && internetConnection ? (prayersError || tr.labels.prayersError) : tr.labels.turnOnLocationInternet;
 
     // Today (e.g. "Friday, 13 November 2026") — same format as the HomeScreen header
     const formattedDate = new Date().toLocaleDateString(tr.labels.localeDate, {
@@ -147,10 +147,10 @@ export default function HomePlaceholder() {
                     {/* Divider */}
                     <View style={[globalStyles.fullDivider, { backgroundColor: theme.divider2 }]} />
 
-                    {/* Status strip — what's missing + retry */}
-                    <AppWarningStrip
+                    {/* Status notice — what's missing + retry */}
+                    <WarningNotice
                         title={tr.labels.prayersNotDownloaded}
-                        text={stripText}
+                        text={noticeText}
                         chips={[
                             {
                                 icon: location ? "map-marker-outline" : "map-marker-off-outline",
@@ -164,7 +164,7 @@ export default function HomePlaceholder() {
                             },
                         ]}
                         buttonText={tr.buttons.retry}
-                        buttonIcon={<Ionicons name="refresh" size={18} color={theme.accent2} />}
+                        buttonIcon={<Ionicons name="refresh" size={18} color={theme.accent} />}
                         onPress={handleRetry}
                     />
 
@@ -275,7 +275,8 @@ const styles = StyleSheet.create({
         fontSize: 14.4,
         fontWeight: '600',
         letterSpacing: 0.3,
-        marginBottom: 4,
+        marginBottom: 7,
+        includeFontPadding: false,
     },
     locationInfoRow: {
         flexDirection: 'row',
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
     locationInfoText: {
         fontSize: 13,
         letterSpacing: 0.3,
+        includeFontPadding: false,
     },
     chevronRightIcon: {
         width: 32,

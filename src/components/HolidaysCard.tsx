@@ -203,17 +203,20 @@ const styles = StyleSheet.create({
   // Middle — name and date
   middleRow: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
   name: {
     fontSize: 16,
     fontWeight: "700",
+    includeFontPadding: false,
   },
   desc: {
     fontSize: 12,
+    includeFontPadding: false,
   },
   date: {
     fontSize: 11,
+    includeFontPadding: false,
   },
 
   // Right — action icons (list row)

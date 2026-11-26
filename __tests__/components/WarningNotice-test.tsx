@@ -1,4 +1,4 @@
-import AppWarningStrip from '@/components/AppWarningStrip';
+import WarningNotice from '@/components/WarningNotice';
 import { useThemeStore } from '@/store/themeStore';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { View } from 'react-native';
@@ -34,16 +34,16 @@ beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme as any });
 });
 
-describe('AppWarningStrip', () => {
+describe('WarningNotice', () => {
   it('renders the passed icon, the text and the settings icon', () => {
     render(
-      <AppWarningStrip
-        icon={<View testID="strip-icon" />}
+      <WarningNotice
+        icon={<View testID="notice-icon" />}
         text="Prayer times are outdated"
         onPress={() => { }}
       />
     );
-    expect(screen.getByTestId('strip-icon')).toBeTruthy();
+    expect(screen.getByTestId('notice-icon')).toBeTruthy();
     expect(screen.getByText('Prayer times are outdated')).toBeTruthy();
     expect(screen.getByTestId('icon-settings-outline')).toBeTruthy();
   });
@@ -51,8 +51,8 @@ describe('AppWarningStrip', () => {
   it('calls onPress when pressed', () => {
     const onPress = jest.fn();
     render(
-      <AppWarningStrip
-        icon={<View testID="strip-icon" />}
+      <WarningNotice
+        icon={<View testID="notice-icon" />}
         text="You seem to have moved"
         onPress={onPress}
       />
@@ -63,7 +63,7 @@ describe('AppWarningStrip', () => {
 
   it('renders title, text, chips and a button', () => {
     render(
-      <AppWarningStrip
+      <WarningNotice
         title="Prayer times not downloaded"
         text="Turn on location and internet"
         chips={[
@@ -83,7 +83,7 @@ describe('AppWarningStrip', () => {
 
   it('colors missing chips with danger and OK chips with success', () => {
     render(
-      <AppWarningStrip
+      <WarningNotice
         text="Status"
         chips={[
           { icon: 'map-marker-off-outline', label: 'Location off', ok: false },
@@ -99,7 +99,7 @@ describe('AppWarningStrip', () => {
 
   it('calls onPress from the button', () => {
     const onPress = jest.fn();
-    render(<AppWarningStrip text="Status" buttonText="Retry" onPress={onPress} />);
+    render(<WarningNotice text="Status" buttonText="Retry" onPress={onPress} />);
     fireEvent.press(screen.getByText('Retry'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });

@@ -228,6 +228,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Ad privacy",
             adPrivacyButton: "Privacy settings",
+            adPrivacyInfo: "Change your consent for personalized ads.",
             adPrivacyError: "Couldn't open the ad privacy settings. Please try again.",
             closeAd: "Close ad",
         },
@@ -484,6 +485,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Werbung & Datenschutz",
             adPrivacyButton: "Datenschutzeinstellungen",
+            adPrivacyInfo: "Ändere deine Einwilligung für personalisierte Werbung.",
             adPrivacyError: "Die Datenschutz-Einstellungen für Werbung konnten nicht geöffnet werden. Bitte versuche es erneut.",
             closeAd: "Werbung schließen",
         },
@@ -740,6 +742,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Confidentialité des annonces",
             adPrivacyButton: "Paramètres de confidentialité",
+            adPrivacyInfo: "Modifiez votre consentement aux annonces personnalisées.",
             adPrivacyError: "Impossible d'ouvrir les paramètres de confidentialité des annonces. Veuillez réessayer.",
             closeAd: "Fermer l'annonce",
         },
@@ -996,6 +999,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Privatësia e reklamave",
             adPrivacyButton: "Cilësimet e privatësisë",
+            adPrivacyInfo: "Ndrysho pëlqimin për reklamat e personalizuara.",
             adPrivacyError: "Cilësimet e privatësisë nuk u hapën. Provo përsëri.",
             closeAd: "Mbyll reklamën",
         },
@@ -1235,6 +1239,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Privatnost oglasa",
             adPrivacyButton: "Postavke privatnosti",
+            adPrivacyInfo: "Promijenite pristanak za personalizirane oglase.",
             adPrivacyError: "Postavke privatnosti oglasa nisu otvorene. Pokušajte ponovo.",
             closeAd: "Zatvori oglas",
         },
@@ -1474,6 +1479,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Приватност на рекламите",
             adPrivacyButton: "Поставки за приватност",
+            adPrivacyInfo: "Променете ја согласноста за персонализирани реклами.",
             adPrivacyError: "Поставките за приватност на рекламите не можат да се отворат. Обидете се повторно.",
             closeAd: "Затвори реклама",
         },
@@ -1730,6 +1736,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "Reklam gizliliği",
             adPrivacyButton: "Gizlilik ayarları",
+            adPrivacyInfo: "Kişiselleştirilmiş reklam iznini değiştirin.",
             adPrivacyError: "Reklam gizlilik ayarları açılamadı. Lütfen tekrar deneyin.",
             closeAd: "Reklamı kapat",
         },
@@ -1986,6 +1993,7 @@ export const GLOBAL_TR = {
             // Ads
             adPrivacyRow: "خصوصية الإعلانات",
             adPrivacyButton: "إعدادات الخصوصية",
+            adPrivacyInfo: "غيّر موافقتك على الإعلانات المخصّصة.",
             adPrivacyError: "تعذّر فتح إعدادات خصوصية الإعلانات. يرجى المحاولة مرة أخرى.",
             closeAd: "إغلاق الإعلان",
         },

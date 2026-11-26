@@ -135,7 +135,7 @@ export const globalStyles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 9.5,
     paddingHorizontal: 12,
     borderRadius: 10,
     gap: 6,
@@ -143,6 +143,7 @@ export const globalStyles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '500',
+    includeFontPadding: false,
   },
 
   // Icon-only buttons (pair with HIT_SLOP_8 and a theme.pressed tint)

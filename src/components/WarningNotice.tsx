@@ -6,7 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type MCIcon = ComponentProps<typeof MaterialDesignIcons>["name"];
 
-interface StripChip {
+interface NoticeChip {
     icon: MCIcon;
     label: string;
     ok: boolean; // green when OK, red when missing
@@ -16,27 +16,29 @@ interface Props {
     icon?: React.ReactNode;
     title?: string;
     text: string;
-    chips?: StripChip[];
-    buttonText?: string; // present → full-width button; absent → whole strip tappable
+    chips?: NoticeChip[];
+    buttonText?: string; // present → full-width button; absent → whole notice tappable
     buttonIcon?: React.ReactNode;
     onPress: () => void;
 }
 
-export default function AppWarningStrip({ icon, title, text, chips, buttonText, buttonIcon, onPress }: Props) {
+export default function WarningNotice({ icon, title, text, chips, buttonText, buttonIcon, onPress }: Props) {
     // Stores
     const theme = useThemeStore((state) => state.theme);
 
-    const boxStyle = [styles.box, { backgroundColor: theme.warning + '14', borderColor: theme.warning + '25' }];
+    const boxStyle = [styles.box, { backgroundColor: theme.bgGold, borderColor: theme.borderGold }];
 
-    // Compact: the whole strip is tappable (opens settings)
+    // Compact: the whole notice is tappable (opens settings)
     if (!buttonText) {
         return (
             <TouchableOpacity style={[boxStyle, styles.compact]} activeOpacity={0.3} onPress={onPress}>
-                {icon}
-                <Text style={[styles.compactText, { color: theme.accent2 }]} numberOfLines={3}>
+                <View style={[styles.iconSquare, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+                    {icon}
+                </View>
+                <Text style={[styles.compactText, { color: theme.sand }]} numberOfLines={3}>
                     {text}
                 </Text>
-                <Ionicons name="settings-outline" size={18} color={theme.accent2} />
+                <Ionicons name="settings-outline" size={22} color={theme.accent} />
             </TouchableOpacity>
         );
     }
@@ -48,7 +50,7 @@ export default function AppWarningStrip({ icon, title, text, chips, buttonText, 
                 {title && (
                     <View style={styles.titleRow}>
                         {icon}
-                        <Text style={[styles.title, { color: theme.accent2 }]}>{title}</Text>
+                        <Text style={[styles.title, { color: theme.brown }]}>{title}</Text>
                     </View>
                 )}
                 <Text style={[styles.text, { color: theme.textSecondary }]}>{text}</Text>
@@ -71,12 +73,12 @@ export default function AppWarningStrip({ icon, title, text, chips, buttonText, 
 
             {/* Button */}
             <TouchableOpacity
-                style={[styles.button, { backgroundColor: theme.warning + '17' }]}
+                style={[styles.button, { backgroundColor: theme.accentLight, borderColor: theme.borderGold }]}
                 activeOpacity={0.7}
                 onPress={onPress}
             >
                 {buttonIcon}
-                <Text style={[styles.buttonText, { color: theme.accent2 }]}>{buttonText}</Text>
+                <Text style={[styles.buttonText, { color: theme.accent }]}>{buttonText}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -96,12 +98,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 12,
-        gap: 8,
+        gap: 12,
     },
     compactText: {
         flex: 1,
-        fontSize: 13,
+        fontSize: 14,
+        fontWeight: '500',
         letterSpacing: 0.3,
+        includeFontPadding: false,
+    },
+    iconSquare: {
+        width: 38,
+        height: 38,
+        borderRadius: 12,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
     // Full
@@ -148,6 +160,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 8,
+        borderWidth: 1,
         padding: 10,
         gap: 8,
     },

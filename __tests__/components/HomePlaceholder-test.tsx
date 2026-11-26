@@ -136,7 +136,7 @@ describe('HomePlaceholder', () => {
     expect(screen.getByText('No location')).toBeTruthy();
   });
 
-  it('shows the strip title, the turn-on message and the Location on / Offline chips when offline', () => {
+  it('shows the notice title, the turn-on message and the Location on / Offline chips when offline', () => {
     render(<HomePlaceholder />);
     expect(screen.getByText('Prayer times not downloaded')).toBeTruthy();
     expect(screen.getByText('Turn on location and internet')).toBeTruthy();

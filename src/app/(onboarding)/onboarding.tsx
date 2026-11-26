@@ -403,11 +403,13 @@ const styles = StyleSheet.create({
   permissionTitle: {
     fontSize: 14,
     fontWeight: "600",
+    includeFontPadding: false,
   },
   permissionBody: {
     fontSize: 12,
     lineHeight: 16,
     opacity: 0.85,
+    includeFontPadding: false,
   },
   permissionDivider: {
     width: "100%",

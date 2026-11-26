@@ -390,7 +390,6 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 13,
     opacity: 0.7,
-    lineHeight: 20,
   },
   headerRightIcons: {
     marginLeft: 'auto',

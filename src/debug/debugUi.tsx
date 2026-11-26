@@ -57,7 +57,7 @@ export const CHECK_FAILED_HINT =
   "Shows the red line under Settings → \"Check for update\" without a real check, until the app restarts. " +
   "Real: shown when a manual check runs offline, or Play can't answer (e.g. the app wasn't installed from Play).";
 export const NO_PRAYER_TIMES_HINT =
-  "Real: Home shows the placeholder (explorable Home + retry strip) instead of the prayer list when there are " +
+  "Real: Home shows the placeholder (explorable Home + retry notice) instead of the prayer list when there are " +
   "no prayer times — no location saved yet, or nothing could be loaded and nothing is saved " +
   "(e.g. offline on the first start). Without prayer times no notifications get scheduled. " +
   "Here: only Home changes.";

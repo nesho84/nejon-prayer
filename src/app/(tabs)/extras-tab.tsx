@@ -372,11 +372,12 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 17,
         fontWeight: '600',
+        includeFontPadding: false,
     },
     itemDescription: {
         fontSize: 14,
-        lineHeight: 20,
         opacity: 0.7,
+        includeFontPadding: false,
     },
     itemDivider: {
         height: 2,
@@ -400,5 +401,6 @@ const styles = StyleSheet.create({
     subLabel: {
         fontSize: 15,
         flex: 1,
+        includeFontPadding: false,
     },
 });

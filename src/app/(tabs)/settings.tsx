@@ -760,6 +760,9 @@ export default function SettingsScreen() {
                                 {tr.labels.adPrivacyButton}
                             </Text>
                         </TouchableOpacity>
+                        <Text style={[styles.infoText, { color: theme.placeholder, fontSize: 12.5, textAlign: 'center' }]}>
+                            {tr.labels.adPrivacyInfo}
+                        </Text>
                     </AppCard>
                 )}
 

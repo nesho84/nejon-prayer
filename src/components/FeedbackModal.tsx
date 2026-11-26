@@ -484,11 +484,12 @@ const styles = StyleSheet.create({
   supportText: {
     fontSize: 16,
     fontWeight: "600",
+    includeFontPadding: false,
   },
   supportDescription: {
     fontSize: 13.5,
-    lineHeight: 19,
     opacity: 0.7,
+    includeFontPadding: false,
   },
   buttons: {
     gap: 10,

@@ -304,11 +304,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "600",
         letterSpacing: -0.3,
+        includeFontPadding: false,
     },
     cardSubtitle: {
         fontSize: 14,
         fontWeight: "400",
         opacity: 0.6,
+        includeFontPadding: false,
     },
     cardDivider: {
         height: 3,

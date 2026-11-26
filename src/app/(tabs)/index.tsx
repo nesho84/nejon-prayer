@@ -1,7 +1,6 @@
 import AppCard from "@/components/AppCard";
 import AppLayout from "@/components/AppLayout";
 import AppLoading from "@/components/AppLoading";
-import AppWarningStrip from "@/components/AppWarningStrip";
 import HolidaysCard from "@/components/HolidaysCard";
 import HomePlaceholder from "@/components/HomePlaceholder";
 import PrayerCountdownCard from "@/components/PrayerCountdownCard";
@@ -9,6 +8,7 @@ import PrayerProgressCard from "@/components/PrayerProgressCard";
 import PrayersList from "@/components/PrayersList";
 import QuotesCarouselCard from "@/components/QuotesCarouselCard";
 import QuranPlaying from "@/components/QuranPlaying";
+import WarningNotice from "@/components/WarningNotice";
 import { globalStyles } from "@/constants/styles";
 import { useDebugStore } from "@/debug/debugStore";
 import { useNextPrayer } from "@/hooks/useNextPrayer";
@@ -112,7 +112,7 @@ export default function HomeScreen() {
         return <AppLoading text={tr.labels.loading} />;
     }
 
-    // No prayer times (offline / no location) — explorable placeholder with a retry strip
+    // No prayer times (offline / no location) — explorable placeholder with a retry notice
     if (!prayerTimes || prayersError || forceNoPrayerTimes) {
         return <HomePlaceholder />;
     }
@@ -199,8 +199,8 @@ export default function HomeScreen() {
 
                     {/* Warning 1: Outdated prayer times warning */}
                     {(prayersOutdated || forcePrayersOutdated) && (
-                        <AppWarningStrip
-                            icon={<Ionicons name="alert-circle-outline" size={20} color={theme.accent2} />}
+                        <WarningNotice
+                            icon={<Ionicons name="alert-circle-outline" size={22} color={theme.accent} />}
                             text={tr.labels.prayerTimesOutdatedShort}
                             onPress={() => router.navigate("/(tabs)/settings")}
                         />
@@ -208,8 +208,8 @@ export default function HomeScreen() {
 
                     {/* Warning 2: Location changed warning */}
                     {(locationChanged || forceLocationChange) && (
-                        <AppWarningStrip
-                            icon={<MaterialDesignIcons name="map-marker-radius" size={20} color={theme.accent2} />}
+                        <WarningNotice
+                            icon={<MaterialDesignIcons name="map-marker-radius" size={22} color={theme.accent} />}
                             text={tr.labels.locationChangedShort}
                             onPress={() => router.navigate("/(tabs)/settings")}
                         />
@@ -262,7 +262,8 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         letterSpacing: 0.3,
         // textTransform: 'uppercase',
-        marginBottom: 4,
+        marginBottom: 7,
+        includeFontPadding: false,
     },
     locationInfoRow: {
         flexDirection: 'row',
@@ -274,6 +275,7 @@ const styles = StyleSheet.create({
     locationInfoText: {
         fontSize: 13,
         letterSpacing: 0.3,
+        includeFontPadding: false,
     },
     chevronRightIcon: {
         width: 32,

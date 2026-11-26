@@ -378,6 +378,7 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 19,
         fontWeight: "700",
+        includeFontPadding: false,
     },
     statusRow: {
         flexDirection: "row",
@@ -389,6 +390,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         lineHeight: 19,
+        includeFontPadding: false,
     },
 
     // Dividers
@@ -524,6 +526,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16.5,
         fontWeight: "700",
+        includeFontPadding: false,
     },
     giftPrice: {
         minWidth: 72,
@@ -533,6 +536,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "700",
         letterSpacing: 0.3,
+        includeFontPadding: false,
     },
 
     // Restore + fine print
