@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   surahInfoContainer: {
     flex: 1,
     flexDirection: "column",
-    gap: 6,
+    gap: 1.5,
   },
   surahNameRow: {
     flexDirection: "row",

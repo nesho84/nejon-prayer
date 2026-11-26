@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     lineHeight: 22,
     letterSpacing: -0.2,
-    paddingBottom: 4,
+    paddingBottom: 2,
   },
   headerSubtitle: {
     fontSize: 13,

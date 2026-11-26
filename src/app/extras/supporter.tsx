@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
-        marginTop: 4,
+        marginTop: 2,
     },
     statusText: {
         flex: 1,

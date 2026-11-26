@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     },
     cardTextContainer: {
         flex: 1,
-        gap: 3,
+        gap: 4.5,
     },
     cardTitle: {
         fontSize: 16,

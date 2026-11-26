@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    gap: 1,
+    gap: 3.5,
   },
   title: {
     fontSize: 15,

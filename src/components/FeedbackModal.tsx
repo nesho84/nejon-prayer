@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   },
   supportTextContainer: {
     flex: 1,
-    gap: 2,
+    gap: 5,
   },
   supportText: {
     fontSize: 16,
