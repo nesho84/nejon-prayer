@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   itemTitle: {
-    flex: 1,
     fontSize: 16,
     fontWeight: "600",
     includeFontPadding: false,
