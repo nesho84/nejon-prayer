@@ -32,7 +32,7 @@ beforeEach(() => {
   useThemeStore.setState({ theme: mockTheme });
   useLanguageStore.setState({ language: 'en' as any });
   useAdsStore.setState({ bannerDismissed: false });
-  useSupporterStore.setState({ isSupporter: false, bannerVisible: false, bannerNextShowAt: null });
+  useSupporterStore.setState({ isSupporter: false, bannerVisible: false });
 });
 
 describe('SupporterBanner', () => {
@@ -64,6 +64,16 @@ describe('SupporterBanner', () => {
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
+  it('its X also ends the debug preview', () => {
+    const { useDebugStore } = require('@/debug/debugStore');
+    useDebugStore.setState({ debugModeEnabled: true, forceSupporterBanner: true });
+    render(<SupporterBanner />);
+    fireEvent.press(screen.getByLabelText('Close'));
+    expect(useDebugStore.getState().forceSupporterBanner).toBe(false);
+    expect(screen.queryByText('Support the app')).toBeNull();
+    useDebugStore.setState({ debugModeEnabled: false });
+  });
+
   it('goes away when the banner comes back', () => {
     render(<SupporterBanner />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
@@ -71,11 +81,13 @@ describe('SupporterBanner', () => {
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
-  it('does not come back before its next show time', () => {
-    useSupporterStore.setState({ bannerNextShowAt: Date.now() + 60_000 });
+  it('comes back every time the banner is closed again', () => {
     render(<SupporterBanner />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
-    expect(screen.queryByText('Support the app')).toBeNull();
+    fireEvent.press(screen.getByLabelText('Close'));
+    act(() => useAdsStore.setState({ bannerDismissed: false }));
+    act(() => useAdsStore.setState({ bannerDismissed: true }));
+    expect(screen.getByText('Support the app')).toBeTruthy();
   });
 
   it('never shows for a supporter', () => {

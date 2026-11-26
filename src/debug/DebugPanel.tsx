@@ -107,7 +107,7 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const togglePreview = (value: StoreUpdatePreview) => setStoreUpdatePreview(storeUpdatePreview === value ? "idle" : value);
   const toggleSupporterPreview = (value: SupporterPreview) => setSupporterPreview(supporterPreview === value ? "idle" : value);
   const showSupporterModal = () => {
-    const { isSupporter, supporterSince, unlockPending, giftPending, lastGiftAt, lastKnownPrices, playStatus, bannerNextShowAt } =
+    const { isSupporter, supporterSince, unlockPending, giftPending, lastGiftAt, lastKnownPrices, playStatus } =
       useSupporterStore.getState();
     showJsonViewerModal("Supporter", {
       isSupporter,
@@ -117,7 +117,6 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
       lastGiftAt: formatTime(lastGiftAt),
       lastKnownPrices,
       playStatus,
-      bannerNextShowAt: formatTime(bannerNextShowAt),
     });
   };
   const showScheduledNModal = async () => showJsonViewerModal("Scheduled Notifications", await getScheduledNData());

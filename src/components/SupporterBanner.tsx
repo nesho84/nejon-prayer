@@ -34,7 +34,7 @@ export default function SupporterBanner() {
       return;
     }
     if (adBannerDismissed) {
-      useSupporterStore.getState().showBannerIfDue();
+      useSupporterStore.getState().showBanner();
     } else {
       useSupporterStore.getState().hideBanner();
     }
@@ -48,6 +48,14 @@ export default function SupporterBanner() {
   const openSupporterScreen = () => {
     useSupporterStore.getState().hideBanner();
     router.navigate("/extras/supporter");
+  };
+
+  // The X also ends a debug preview, so it closes like the real banner
+  const closeBanner = () => {
+    useSupporterStore.getState().hideBanner();
+    if (forceBanner) {
+      useDebugStore.getState().toggleSupporterBanner();
+    }
   };
 
   return (
@@ -75,7 +83,7 @@ export default function SupporterBanner() {
 
       <TouchableOpacity
         style={styles.closeButton}
-        onPress={() => useSupporterStore.getState().hideBanner()}
+        onPress={closeBanner}
         accessibilityRole="button"
         accessibilityLabel={supporterTr.closeBanner}
         hitSlop={HIT_SLOP_8}

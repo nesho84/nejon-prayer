@@ -19,7 +19,6 @@ interface SupporterData {
   giftPending: boolean;
   lastGiftAt: number | null;       // this device only — Play forgets consumed gifts
   lastKnownPrices: Partial<Record<SupporterProductId, string>>; // display only, never used to buy
-  bannerNextShowAt: number | null; // the supporter banner may appear again from then on
 }
 
 interface SupporterState extends SupporterData {
@@ -34,7 +33,7 @@ interface SupporterState extends SupporterData {
   buy: (id: SupporterProductId) => Promise<void>;
   handlePurchase: (purchase: BillingPurchase) => Promise<void>;
   handlePurchaseError: (error: BillingError) => void;
-  showBannerIfDue: () => void;
+  showBanner: () => void;
   hideBanner: () => void;
 }
 
@@ -45,13 +44,7 @@ const INITIAL_DATA: SupporterData = {
   giftPending: false,
   lastGiftAt: null,
   lastKnownPrices: {},
-  bannerNextShowAt: null,
 };
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-// Supporter banner — shows right after the ad banner is closed, then waits this long
-export const SUPPORTER_BANNER_WAIT_DAYS = 7;
 
 // Coalescing mutex — launch, foreground and Restore share one Play query
 let syncInProgress: Promise<boolean> | null = null;
@@ -170,13 +163,12 @@ export const useSupporterStore = create<SupporterState>()(
         }
       },
 
-      // Show the supporter banner after the ad banner is closed
-      showBannerIfDue: () => {
-        const { isSupporter, bannerNextShowAt } = get();
-        if (isSupporter || (bannerNextShowAt !== null && Date.now() < bannerNextShowAt)) {
+      // Show the supporter banner every time the ad banner is closed
+      showBanner: () => {
+        if (get().isSupporter) {
           return;
         }
-        set({ bannerVisible: true, bannerNextShowAt: Date.now() + SUPPORTER_BANNER_WAIT_DAYS * DAY_MS });
+        set({ bannerVisible: true });
       },
 
       hideBanner: () => set({ bannerVisible: false }),
@@ -191,7 +183,6 @@ export const useSupporterStore = create<SupporterState>()(
         giftPending: state.giftPending,
         lastGiftAt: state.lastGiftAt,
         lastKnownPrices: state.lastKnownPrices,
-        bannerNextShowAt: state.bannerNextShowAt,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
