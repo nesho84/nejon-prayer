@@ -45,10 +45,8 @@ export default function SupporterBanner() {
     return null;
   }
 
-  const openSupporterScreen = () => {
-    useSupporterStore.getState().hideBanner();
-    router.navigate("/extras/supporter");
-  };
+  // Stays visible; only the X, an unlock or the ad's return hides it
+  const openSupporterScreen = () => router.navigate("/extras/supporter");
 
   // The X also ends a debug preview, so it closes like the real banner
   const closeBanner = () => {

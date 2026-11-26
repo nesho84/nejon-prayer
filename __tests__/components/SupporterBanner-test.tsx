@@ -48,12 +48,19 @@ describe('SupporterBanner', () => {
     expect(screen.getByText('No ads for supporters')).toBeTruthy();
   });
 
-  it('opens the support screen and closes itself', () => {
+  it('opens the support screen and stays visible', () => {
     const { router } = require('expo-router');
     render(<SupporterBanner />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     fireEvent.press(screen.getByText('Support the app'));
     expect(router.navigate).toHaveBeenCalledWith('/extras/supporter');
+    expect(screen.getByText('Support the app')).toBeTruthy();
+  });
+
+  it('goes away once the user becomes a supporter', () => {
+    render(<SupporterBanner />);
+    act(() => useAdsStore.setState({ bannerDismissed: true }));
+    act(() => useSupporterStore.setState({ isSupporter: true }));
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
