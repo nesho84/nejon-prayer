@@ -13,6 +13,7 @@ export default function ModalsLayout() {
       <Stack.Screen name="prayerNotification" />
       <Stack.Screen name="prayerTimings" />
       <Stack.Screen name="quranSettings" />
+      <Stack.Screen name="debugTools" />
     </Stack>
   );
 }

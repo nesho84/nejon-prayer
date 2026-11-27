@@ -239,7 +239,7 @@ badge; **gifts** are repeatable and unlock nothing. Every feature stays free eit
 - **Entry points:** the More-tab card, `SupporterBanner` (takes the ad banner's slot after its ✕,
   every time it is closed), and the feedback thank-you button. Screen:
   `src/app/extras/supporter.tsx`.
-- **Debug previews:** About → debug panel → "Supporter (Play Billing)" shows each state with fake
+- **Debug previews:** debug sheet (wrench tab on the right edge, debug mode only) → "Supporter (Play Billing)" shows each state with fake
   values (screens only — the real entitlement, ads and Play are untouched; buttons stay real).
 
 Play Console: one-time products `supporter_unlock`, `gift_small`, `gift_medium`, `gift_large`

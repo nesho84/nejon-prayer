@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 // ------------------------------------------------------------
 // Debug-only store backing the Debug Panel toggles.
-// forceStoreUpdateOnLaunch, debugModeEnabled and debugPanelExpanded persist across reloads; the rest reset to OFF.
+// forceStoreUpdateOnLaunch and debugModeEnabled persist across reloads; the rest reset to OFF.
 // ------------------------------------------------------------
 
 export type StoreUpdatePreview = "idle" | "upToDate" | "error";
@@ -12,7 +12,6 @@ export type SupporterPreview = "idle" | "canBuy" | "pending" | "unreachable" | "
 
 interface DebugState {
   debugModeEnabled: boolean;
-  debugPanelExpanded: boolean;
   forceHoliday: boolean;
   forceFriday: boolean;
   forceQuranPlaying: boolean;
@@ -33,7 +32,6 @@ interface DebugState {
   toggleNoPrayerTimes: () => void;
   toggleStoreUpdateOnLaunch: () => void;
   toggleDebugMode: () => void;
-  toggleDebugPanel: () => void;
   setStoreUpdatePreview: (value: StoreUpdatePreview) => void;
   setSupporterPreview: (value: SupporterPreview) => void;
   toggleSupporterGift: () => void;
@@ -44,7 +42,6 @@ export const useDebugStore = create<DebugState>()(
   persist(
     (set) => ({
       debugModeEnabled: false,
-      debugPanelExpanded: false,
       forceHoliday: false,
       forceFriday: false,
       forceQuranPlaying: false,
@@ -66,7 +63,6 @@ export const useDebugStore = create<DebugState>()(
       toggleNoPrayerTimes: () => set((s) => ({ forceNoPrayerTimes: !s.forceNoPrayerTimes })),
       toggleStoreUpdateOnLaunch: () => set((s) => ({ forceStoreUpdateOnLaunch: !s.forceStoreUpdateOnLaunch })),
       toggleDebugMode: () => set((s) => ({ debugModeEnabled: !s.debugModeEnabled })),
-      toggleDebugPanel: () => set((s) => ({ debugPanelExpanded: !s.debugPanelExpanded })),
       setStoreUpdatePreview: (value) => set({ storeUpdatePreview: value }),
       setSupporterPreview: (value) => set({ supporterPreview: value }),
       toggleSupporterGift: () => set((s) => ({ forceSupporterGift: !s.forceSupporterGift })),
@@ -77,7 +73,6 @@ export const useDebugStore = create<DebugState>()(
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         debugModeEnabled: state.debugModeEnabled,
-        debugPanelExpanded: state.debugPanelExpanded,
         forceStoreUpdateOnLaunch: state.forceStoreUpdateOnLaunch,
       }),
       onRehydrateStorage: () => (state) => {

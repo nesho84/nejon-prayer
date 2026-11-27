@@ -1,5 +1,6 @@
 import AppLoading from "@/components/AppLoading";
 import ModalProvider from "@/components/ModalProvider";
+import DebugTab from "@/debug/DebugTab";
 import { useAdsSync } from "@/hooks/useAdsSync";
 import { useAutoModalsSync } from "@/hooks/useAutoModalsSync";
 import { useDeviceSettingsSync } from "@/hooks/useDeviceSettingsSync";
@@ -84,6 +85,8 @@ function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <RootStack />
         <ModalProvider />
+        {/* Debug mode only: opens the debug sheet from any screen */}
+        <DebugTab />
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

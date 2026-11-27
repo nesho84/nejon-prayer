@@ -9,9 +9,9 @@ import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
-import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { router } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
 import {
   formatTime,
   previewFeedbackModal,
@@ -60,13 +60,11 @@ import {
   STORE_UPDATE_LAUNCH_HINT,
 } from "./debugUi";
 
-interface DebugPanelProps {
-  status: string;
-  onStatusPress: () => void;
-}
+// Popup previews wait for the sheet to slide away, so they open over the real screen
+const SHEET_CLOSE_MS = 300;
 
-// Debug Tools box (About screen) — status badge on its top border, header toggles the grouped sections
-export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
+// Debug tools list — shown in the debug sheet ((modals)/debugTools), opened by DebugTab from any screen
+export default function DebugPanel() {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
@@ -97,8 +95,12 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
   const toggleSupporterGift = useDebugStore((state) => state.toggleSupporterGift);
   const forceSupporterBanner = useDebugStore((state) => state.forceSupporterBanner);
   const toggleSupporterBanner = useDebugStore((state) => state.toggleSupporterBanner);
-  const expanded = useDebugStore((state) => state.debugPanelExpanded);
-  const toggleDebugPanel = useDebugStore((state) => state.toggleDebugPanel);
+
+  // Close the sheet, then show the popup preview
+  const closeThen = (preview: () => void) => () => {
+    router.back();
+    setTimeout(preview, SHEET_CLOSE_MS);
+  };
 
   // Shared params and handlers
   const notifSeconds = 10; // seconds until the test notification fires
@@ -158,173 +160,130 @@ export default function DebugPanel({ status, onStatusPress }: DebugPanelProps) {
 
   // Main component
   return (
-    <View style={[styles.box, { backgroundColor: theme.bg2, borderColor: theme.danger + "40" }]}>
-      {/* Status badge — sits on the top border (page background cuts the line); taps count toward deactivating */}
-      <View style={styles.statusWrap} pointerEvents="box-none">
-        <TouchableOpacity activeOpacity={0.6} hitSlop={8} onPress={onStatusPress}>
-          <Text style={[styles.statusBadge, { color: theme.placeholder, borderColor: theme.danger, backgroundColor: theme.bg }]}>
-            {status}
-          </Text>
-        </TouchableOpacity>
+    <>
+    {/* Header — same layout as the other sheets, wrench beside the title */}
+    <View style={styles.headerContainer}>
+      <View style={styles.headerTitleRow}>
+        <MaterialDesignIcons name="wrench" size={22} color={theme.danger} />
+        <Text style={[styles.headerTitle, { color: theme.danger }]}>Debug tools</Text>
       </View>
-
-      <TouchableOpacity
-        style={[styles.selector, { backgroundColor: theme.danger + "15" }]}
-        activeOpacity={0.7}
-        onPress={toggleDebugPanel}
-      >
-        <Ionicons name="bug" size={20} color={theme.danger} style={styles.selectorIcon} />
-        <Text style={[styles.selectorText, { color: theme.danger }]}>
-          {expanded ? "Hide debug actions" : "Show debug actions"}
-        </Text>
-        <MaterialDesignIcons
-          name={expanded ? "chevron-up" : "chevron-down"}
-          size={24}
-          color={theme.danger}
-        />
-      </TouchableOpacity>
-
-      {expanded && (
-        // The debug panel body
-        <View style={styles.body}>
-
-          {/* App */}
-          <DebugSection title="App">
-            <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
-          </DebugSection>
-
-          {/* Prayers */}
-          <DebugSection title="Prayers">
-            <DebugToggle color={theme.teal} label="Toggle No Prayer Times (Fresh Install)" value={forceNoPrayerTimes} hint={NO_PRAYER_TIMES_HINT} onPress={toggleNoPrayerTimes} />
-            <DebugToggle color={theme.teal} label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} hint={OUTDATED_HINT} onPress={togglePrayersOutdated} />
-            <DebugToggle color={theme.teal} label="Toggle Location Changed" value={forceLocationChange} hint={LOCATION_CHANGED_HINT} onPress={toggleLocationChange} />
-            <DebugToggle color={theme.teal} label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
-            <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} hint={PRAYER_CELEBRATION_HINT} onPress={previewPrayerCelebrationModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Prayer Times' JSON" color={theme.gray} onPress={showPrayerTimesModal} />
-            <DebugButton label="Show 'Prayer Tracking' JSON" color={theme.gray} onPress={showPrayerTrackingModal} />
-          </DebugSection>
-
-          {/* Quran */}
-          <DebugSection title="Quran">
-            <DebugToggle color={theme.secondary} label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
-            <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.secondary} hint={KHATAM_HINT} onPress={previewKhatamCelebrationModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Quran' JSON" color={theme.gray} onPress={showQuranModal} />
-          </DebugSection>
-
-          {/* Islamic Holidays */}
-          <DebugSection title="Islamic Holidays">
-            <DebugToggle color={theme.gold} label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
-            <DebugButton label="Show 'Holiday' Info Modal" color={theme.gold} hint={HOLIDAY_INFO_HINT} onPress={previewHolidayInfoModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
-          </DebugSection>
-
-          {/* Store Update: Settings "Check for update" status lines + update on launch */}
-          <DebugSection title="Store Update">
-            <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
-            <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
-            <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
-          </DebugSection>
-
-          {/* Supporter: fake values for the support screens only */}
-          <DebugSection title="Supporter (Play Billing)">
-            <DebugToggle label="Toggle 'Can buy' state" color={theme.pink} value={supporterPreview === "canBuy"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("canBuy")} />
-            <DebugToggle label="Toggle 'Payment pending' state" color={theme.pink} value={supporterPreview === "pending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("pending")} />
-            <DebugToggle label="Toggle 'Play unreachable' state" color={theme.pink} value={supporterPreview === "unreachable"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("unreachable")} />
-            <DebugToggle label="Toggle 'Gift pending' state" color={theme.pink} value={supporterPreview === "giftPending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("giftPending")} />
-            <DebugToggle label="Toggle 'Supporter' state" color={theme.pink} value={supporterPreview === "supporter"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("supporter")} />
-            <DebugToggle label="Toggle 'Gift received' line" color={theme.pink} value={forceSupporterGift} hint={SUPPORTER_GIFT_HINT} onPress={toggleSupporterGift} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugToggle label="Toggle Supporter Banner" color={theme.pink} value={forceSupporterBanner} hint={SUPPORTER_BANNER_HINT} onPress={toggleSupporterBanner} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Supporter' JSON" color={theme.gray} onPress={showSupporterModal} />
-          </DebugSection>
-
-          {/* Auto modals — a preview each, one JSON for their shared store */}
-          <DebugSection title="Auto Modals">
-            <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={previewStoreUpdateModal} />
-            <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={previewNotifReminderModal} />
-            <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={previewStoreReviewModal} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />
-          </DebugSection>
-
-          {/* Feedback: opens from About, not an auto modal */}
-          <DebugSection title="Feedback">
-            <DebugButton label="Show 'Feedback' Modal" color={theme.primary} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
-            <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.primary} hint={FEEDBACK_THANKS_HINT} onPress={previewFeedbackThanks} />
-          </DebugSection>
-
-          {/* Test notifications */}
-          <DebugSection title="Notifications">
-            <DebugButton label="Test Prayer Not." color={theme.orange} onPress={() => debugPrayerN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Test Prayer Event Not." color={theme.orange} onPress={() => debugEventN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Test Prayer Reminder Not." color={theme.orange} onPress={() => debugPrayerReminderN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Test Friday Not." color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Test Islamic Holiday Not." color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Test Daily Quote Not." color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
-            <DebugButton label="Log Channels & Scheduled" color={theme.orange} onPress={logScheduledN} />
-            <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
-            <DebugButton label="Show 'Scheduled Notifications' JSON" color={theme.gray} onPress={showScheduledNModal} />
-          </DebugSection>
-
-        </View>
-      )}
+      <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>Previews and test switches, debug mode only</Text>
     </View>
+
+    <View style={styles.body}>
+
+      {/* App */}
+      <DebugSection title="App">
+        <DebugButton label="Show Onboarding Screen" color={theme.info} onPress={() => useOnboardingStore.getState().setOnboarding(false)} />
+      </DebugSection>
+
+      {/* Prayers */}
+      <DebugSection title="Prayers">
+        <DebugToggle color={theme.teal} label="Toggle No Prayer Times (Fresh Install)" value={forceNoPrayerTimes} hint={NO_PRAYER_TIMES_HINT} onPress={toggleNoPrayerTimes} />
+        <DebugToggle color={theme.teal} label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} hint={OUTDATED_HINT} onPress={togglePrayersOutdated} />
+        <DebugToggle color={theme.teal} label="Toggle Location Changed" value={forceLocationChange} hint={LOCATION_CHANGED_HINT} onPress={toggleLocationChange} />
+        <DebugToggle color={theme.teal} label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
+        <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} hint={PRAYER_CELEBRATION_HINT} onPress={closeThen(previewPrayerCelebrationModal)} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Prayer Times' JSON" color={theme.gray} onPress={showPrayerTimesModal} />
+        <DebugButton label="Show 'Prayer Tracking' JSON" color={theme.gray} onPress={showPrayerTrackingModal} />
+      </DebugSection>
+
+      {/* Quran */}
+      <DebugSection title="Quran">
+        <DebugToggle color={theme.secondary} label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
+        <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.secondary} hint={KHATAM_HINT} onPress={closeThen(previewKhatamCelebrationModal)} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Quran' JSON" color={theme.gray} onPress={showQuranModal} />
+      </DebugSection>
+
+      {/* Islamic Holidays */}
+      <DebugSection title="Islamic Holidays">
+        <DebugToggle color={theme.gold} label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
+        <DebugButton label="Show 'Holiday' Info Modal" color={theme.gold} hint={HOLIDAY_INFO_HINT} onPress={closeThen(previewHolidayInfoModal)} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
+      </DebugSection>
+
+      {/* Store Update: Settings "Check for update" status lines + update on launch */}
+      <DebugSection title="Store Update">
+        <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
+        <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
+        <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
+      </DebugSection>
+
+      {/* Supporter: fake values for the support screens only */}
+      <DebugSection title="Supporter (Play Billing)">
+        <DebugToggle label="Toggle 'Can buy' state" color={theme.pink} value={supporterPreview === "canBuy"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("canBuy")} />
+        <DebugToggle label="Toggle 'Payment pending' state" color={theme.pink} value={supporterPreview === "pending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("pending")} />
+        <DebugToggle label="Toggle 'Play unreachable' state" color={theme.pink} value={supporterPreview === "unreachable"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("unreachable")} />
+        <DebugToggle label="Toggle 'Gift pending' state" color={theme.pink} value={supporterPreview === "giftPending"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("giftPending")} />
+        <DebugToggle label="Toggle 'Supporter' state" color={theme.pink} value={supporterPreview === "supporter"} hint={SUPPORTER_PREVIEW_HINT} onPress={() => toggleSupporterPreview("supporter")} />
+        <DebugToggle label="Toggle 'Gift received' line" color={theme.pink} value={forceSupporterGift} hint={SUPPORTER_GIFT_HINT} onPress={toggleSupporterGift} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugToggle label="Toggle Supporter Banner" color={theme.pink} value={forceSupporterBanner} hint={SUPPORTER_BANNER_HINT} onPress={toggleSupporterBanner} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Supporter' JSON" color={theme.gray} onPress={showSupporterModal} />
+      </DebugSection>
+
+      {/* Auto modals — a preview each, one JSON for their shared store */}
+      <DebugSection title="Auto Modals">
+        <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={closeThen(previewStoreUpdateModal)} />
+        <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={closeThen(previewNotifReminderModal)} />
+        <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={closeThen(previewStoreReviewModal)} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />
+      </DebugSection>
+
+      {/* Feedback: opens from About, not an auto modal */}
+      <DebugSection title="Feedback">
+        <DebugButton label="Show 'Feedback' Modal" color={theme.primary} hint={FEEDBACK_HINT} onPress={closeThen(previewFeedbackModal)} />
+        <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.primary} hint={FEEDBACK_THANKS_HINT} onPress={closeThen(previewFeedbackThanks)} />
+      </DebugSection>
+
+      {/* Test notifications */}
+      <DebugSection title="Notifications">
+        <DebugButton label="Test Prayer Not." color={theme.orange} onPress={() => debugPrayerN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Test Prayer Event Not." color={theme.orange} onPress={() => debugEventN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Test Prayer Reminder Not." color={theme.orange} onPress={() => debugPrayerReminderN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Test Friday Not." color={theme.orange} onPress={() => debugFridayN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Test Islamic Holiday Not." color={theme.orange} onPress={() => debugHolidayN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Test Daily Quote Not." color={theme.orange} onPress={() => debugDailyQuoteN(notifParams)} right={notifSecondsBadge} />
+        <DebugButton label="Log Channels & Scheduled" color={theme.orange} onPress={logScheduledN} />
+        <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
+        <DebugButton label="Show 'Scheduled Notifications' JSON" color={theme.gray} onPress={showScheduledNModal} />
+      </DebugSection>
+
+    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  // Own bordered box — sets the panel apart from the About content
-  // paddingTop leaves room for the badge that overlaps the top border
-  box: {
-    marginHorizontal: 14,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 8,
-    paddingHorizontal: 10,
-    paddingTop: 24,
-  },
-  statusWrap: {
-    position: "absolute",
-    top: -13,
-    left: 0,
-    right: 0,
+  // Same header as the other sheets (prayerTimings, quranSettings)
+  headerContainer: {
     alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 6,
   },
-  statusBadge: {
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    fontSize: 12,
-    fontWeight: "500",
-    includeFontPadding: false,
-    overflow: "hidden",
-  },
-  selector: {
+  headerTitleRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+    gap: 8,
+    marginBottom: 4,
   },
-  selectorIcon: {
-    marginRight: 10,
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: "700",
   },
-  selectorText: {
-    fontSize: 17,
-    flex: 1,
-    fontWeight: "500",
+  headerSubtitle: {
+    fontSize: 15,
+    textAlign: "center",
   },
   body: {
     gap: 16,
-    marginTop: 16,
+    paddingHorizontal: 6,
   },
-
-
   divider: {
     width: "100%",
     height: StyleSheet.hairlineWidth,
