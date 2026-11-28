@@ -1,5 +1,5 @@
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
-import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
+import { SUPPORTER_TR, SupporterTranslations } from "@/constants/translations/supporter.tr";
 import { useDebugStore } from "@/debug/debugStore";
 import { useAdsStore } from "@/store/adsStore";
 import { useLanguageStore } from "@/store/languageStore";
@@ -12,37 +12,43 @@ import { useEffect } from "react";
 import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface SupporterBannerProps {
-  // "banner": Home ad slot (60dp, X, shows after the ad's X). "card": Extras, Feedback
-  variant: "banner" | "card";
-  // Runs before opening the support screen (e.g. close the popup it sits in)
-  onOpen?: () => void;
+interface Props {
+  variant: "banner" | "card"; // banner: Home ad slot, after the ad's X; card: Extras, Feedback
+  onOpen?: () => void;        // runs before opening the support screen (e.g. close the popup it sits in)
   style?: ViewStyle;
 }
 
 // ------------------------------------------------------------
-// Support the app — one look for every place it appears (Android only for now)
+// Card description: thanks for supporters, the pitch otherwise
 // ------------------------------------------------------------
-export default function SupporterBanner({ variant, onOpen, style }: SupporterBannerProps) {
+function getCardBody(isSupporter: boolean, supporterTr: SupporterTranslations) {
+  if (isSupporter) {
+    return supporterTr.moreSupporterBody;
+  }
+  return supporterTr.moreBody;
+}
+
+// Support the app — one look for every place it appears (Android only for now)
+export default function SupporterBanner({ variant, onOpen, style }: Props) {
   // Stores
   const theme = useThemeStore((state) => state.theme);
   const language = useLanguageStore((state) => state.language);
   const adBannerDismissed = useAdsStore((state) => state.bannerDismissed);
   const isSupporter = useSupporterStore((state) => state.isSupporter);
   const bannerVisible = useSupporterStore((state) => state.bannerVisible);
+  const supporterTr = SUPPORTER_TR[language] ?? SUPPORTER_TR.en;
+
+  // DEBUG: force-show the banner, and fake the supporter state on cards (Debug Panel toggles)
   const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
   const forceBanner = useDebugStore((state) => state.forceSupporterBanner);
   const supporterPreview = useDebugStore((state) => state.supporterPreview);
-
-  const supporterTr = SUPPORTER_TR[language] ?? SUPPORTER_TR.en;
-  const isBanner = variant === "banner";
 
   // Same side insets as the ad banner
   const insets = useSafeAreaInsets();
 
   // Banner: show on the ad banner's X, hide when the ad banner comes back
   useEffect(() => {
-    if (!isBanner || Platform.OS !== "android") {
+    if (variant !== "banner" || Platform.OS !== "android") {
       return;
     }
     if (adBannerDismissed) {
@@ -50,75 +56,50 @@ export default function SupporterBanner({ variant, onOpen, style }: SupporterBan
     } else {
       useSupporterStore.getState().hideBanner();
     }
-  }, [isBanner, adBannerDismissed]);
+  }, [variant, adBannerDismissed]);
 
   if (Platform.OS !== "android") {
     return null;
   }
-  // Banner: a debug preview shows it regardless; supporters never see it
-  if (isBanner && !(debugModeEnabled && forceBanner) && (!bannerVisible || isSupporter)) {
-    return null;
-  }
 
-  // Card: the debug supporter preview can fake the supporter state
-  const shownSupporter = debugModeEnabled && supporterPreview !== "idle" ? supporterPreview === "supporter" : isSupporter;
+  const boxColors = { backgroundColor: theme.bgGold, borderColor: theme.borderGold };
 
   const openSupporterScreen = () => {
     onOpen?.();
     router.navigate("/extras/supporter");
   };
 
-  // The X also ends a debug preview, so it closes like the real banner
-  const closeBanner = () => {
-    useSupporterStore.getState().hideBanner();
-    if (forceBanner) {
-      useDebugStore.getState().toggleSupporterBanner();
+  // Banner: Home ad slot — 60dp, one line, X
+  if (variant === "banner") {
+    // A debug preview shows it regardless; supporters never see it
+    if (!(debugModeEnabled && forceBanner) && (!bannerVisible || isSupporter)) {
+      return null;
     }
-  };
 
-  // Icon square: green supporter badge on cards, heart otherwise
-  const icon = !isBanner && shownSupporter ? (
-    <View style={[styles.cardIcon, { backgroundColor: theme.success + "1F", borderColor: theme.divider2 }]}>
-      <MaterialDesignIcons name="check-decagram" size={32} color={theme.success} />
-      <Text style={[styles.badgeText, { color: theme.success }]} numberOfLines={1} adjustsFontSizeToFit>
-        {supporterTr.supporterBadge}
-      </Text>
-    </View>
-  ) : (
-    <View style={[isBanner ? styles.bannerIcon : styles.cardIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
-      <MaterialDesignIcons name="heart-outline" size={isBanner ? 20 : 28} color={theme.accent} />
-    </View>
-  );
+    // The X also ends a debug preview, so it closes like the real banner
+    const closeBanner = () => {
+      useSupporterStore.getState().hideBanner();
+      if (forceBanner) {
+        useDebugStore.getState().toggleSupporterBanner();
+      }
+    };
 
-  const body = isBanner ? supporterTr.bannerBody : shownSupporter ? supporterTr.moreSupporterBody : supporterTr.moreBody;
+    return (
+      <View style={[styles.banner, boxColors, { paddingLeft: insets.left + 12, paddingRight: insets.right }, style]}>
+        <Pressable
+          style={({ pressed }) => [styles.bannerContent, { opacity: pressed ? 0.7 : 1 }]}
+          onPress={openSupporterScreen}
+        >
+          <View style={[styles.bannerIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+            <MaterialDesignIcons name="heart-outline" size={20} color={theme.accent} />
+          </View>
+          <View style={styles.bannerText}>
+            <Text style={[styles.bannerTitle, { color: theme.text }]} numberOfLines={1}>{supporterTr.title}</Text>
+            <Text style={[styles.bannerBody, { color: theme.textSecondary }]} numberOfLines={1}>{supporterTr.bannerBody}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.text2} />
+        </Pressable>
 
-  return (
-    <View
-      style={[
-        isBanner ? styles.banner : styles.card,
-        { backgroundColor: theme.bgGold, borderColor: theme.borderGold },
-        isBanner && { paddingLeft: insets.left + 12, paddingRight: insets.right },
-        style,
-      ]}
-    >
-      <Pressable
-        style={({ pressed }) => [isBanner ? styles.bannerContent : styles.cardContent, { opacity: pressed ? 0.7 : 1 }]}
-        android_ripple={isBanner ? undefined : { color: theme.overlayLight, borderless: false }}
-        onPress={openSupporterScreen}
-      >
-        {icon}
-        <View style={isBanner ? styles.bannerText : styles.cardText}>
-          <Text style={[isBanner ? styles.bannerTitle : styles.cardTitle, { color: theme.text }]} numberOfLines={1}>
-            {supporterTr.title}
-          </Text>
-          <Text style={[isBanner ? styles.bannerBody : styles.cardBody, { color: theme.textSecondary }]} numberOfLines={isBanner ? 1 : 2}>
-            {body}
-          </Text>
-        </View>
-        <Ionicons name="chevron-forward" size={isBanner ? 18 : 20} color={theme.text2} />
-      </Pressable>
-
-      {isBanner && (
         <Pressable
           style={({ pressed }) => [globalStyles.iconButton, styles.closeButton, pressed && { backgroundColor: theme.pressed }]}
           onPress={closeBanner}
@@ -128,7 +109,40 @@ export default function SupporterBanner({ variant, onOpen, style }: SupporterBan
         >
           <Ionicons name="close" size={18} color={theme.text2} />
         </Pressable>
-      )}
+      </View>
+    );
+  }
+
+  // Card: Extras and Feedback — long description, supporter badge
+  const shownSupporter = debugModeEnabled && supporterPreview !== "idle" ? supporterPreview === "supporter" : isSupporter;
+
+  return (
+    <View style={[styles.card, boxColors, style]}>
+      <Pressable
+        style={({ pressed }) => [styles.cardContent, { opacity: pressed ? 0.7 : 1 }]}
+        android_ripple={{ color: theme.overlayLight, borderless: false }}
+        onPress={openSupporterScreen}
+      >
+        {shownSupporter ? (
+          <View style={[styles.cardIcon, { backgroundColor: theme.success + "1F", borderColor: theme.divider2 }]}>
+            <MaterialDesignIcons name="check-decagram" size={32} color={theme.success} />
+            <Text style={[styles.badgeText, { color: theme.success }]} numberOfLines={1} adjustsFontSizeToFit>
+              {supporterTr.supporterBadge}
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.cardIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+            <MaterialDesignIcons name="heart-outline" size={28} color={theme.accent} />
+          </View>
+        )}
+        <View style={styles.cardText}>
+          <Text style={[styles.cardTitle, { color: theme.text }]} numberOfLines={1}>{supporterTr.title}</Text>
+          <Text style={[styles.cardBody, { color: theme.textSecondary }]} numberOfLines={2}>
+            {getCardBody(shownSupporter, supporterTr)}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={theme.text2} />
+      </Pressable>
     </View>
   );
 }
