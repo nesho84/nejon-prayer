@@ -85,31 +85,37 @@ export default function SupporterBanner({ variant, onOpen, style }: Props) {
     };
 
     return (
-      <View style={[styles.banner, boxColors, { paddingLeft: insets.left + 12, paddingRight: insets.right }, style]}>
-        <Pressable
-          style={({ pressed }) => [styles.bannerContent, { opacity: pressed ? 0.7 : 1 }]}
-          onPress={openSupporterScreen}
-        >
-          <View style={[styles.bannerIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
-            <MaterialDesignIcons name="heart-outline" size={20} color={theme.accent} />
-          </View>
-          <View style={styles.bannerText}>
-            <Text style={[styles.bannerTitle, { color: theme.text }]} numberOfLines={1}>{supporterTr.title}</Text>
-            <Text style={[styles.bannerBody, { color: theme.textSecondary }]} numberOfLines={1}>{supporterTr.bannerBody}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.text2} />
-        </Pressable>
+      // The whole banner ripples on press; the X inside keeps its own button
+      <Pressable
+        style={[styles.banner, boxColors, { paddingLeft: insets.left + 12, paddingRight: insets.right }, style]}
+        android_ripple={{ color: theme.pressed, borderless: false }}
+        onPress={openSupporterScreen}
+      >
+        {({ pressed }) => (
+          <>
+            <View style={[styles.bannerContent, { opacity: pressed ? 0.7 : 1 }]}>
+              <View style={[styles.bannerIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
+                <MaterialDesignIcons name="heart-outline" size={20} color={theme.accent} />
+              </View>
+              <View style={styles.bannerText}>
+                <Text style={[styles.bannerTitle, { color: theme.text }]} numberOfLines={1}>{supporterTr.title}</Text>
+                <Text style={[styles.bannerBody, { color: theme.textSecondary }]} numberOfLines={1}>{supporterTr.bannerBody}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={theme.text2} />
+            </View>
 
-        <Pressable
-          style={({ pressed }) => [globalStyles.iconButton, styles.closeButton, pressed && { backgroundColor: theme.pressed }]}
-          onPress={closeBanner}
-          accessibilityRole="button"
-          accessibilityLabel={supporterTr.closeBanner}
-          hitSlop={HIT_SLOP_8}
-        >
-          <Ionicons name="close" size={18} color={theme.text2} />
-        </Pressable>
-      </View>
+            <Pressable
+              style={({ pressed: xPressed }) => [globalStyles.iconButton, styles.closeButton, xPressed && { backgroundColor: theme.pressed }]}
+              onPress={closeBanner}
+              accessibilityRole="button"
+              accessibilityLabel={supporterTr.closeBanner}
+              hitSlop={HIT_SLOP_8}
+            >
+              <Ionicons name="close" size={18} color={theme.text2} />
+            </Pressable>
+          </>
+        )}
+      </Pressable>
     );
   }
 
@@ -120,7 +126,7 @@ export default function SupporterBanner({ variant, onOpen, style }: Props) {
     <View style={[styles.card, boxColors, style]}>
       <Pressable
         style={({ pressed }) => [styles.cardContent, { opacity: pressed ? 0.7 : 1 }]}
-        android_ripple={{ color: theme.overlayLight, borderless: false }}
+        android_ripple={{ color: theme.pressed, borderless: false }}
         onPress={openSupporterScreen}
       >
         {shownSupporter ? (
