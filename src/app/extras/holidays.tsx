@@ -179,20 +179,20 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
 
-    // Year badges (inside header)
-    // Line across the card between the subtitle and the year badges
+    // Header divider (between subtitle and year badges)
     headerDivider: {
         alignSelf: "stretch",
         height: 1,
         marginTop: 12,
     },
+
+    // Year badges (inside header)
     yearLinks: {
         flexDirection: "row",
         justifyContent: "center",
         flexWrap: "wrap",
         gap: 14,
-        // Matches the card's 16px bottom padding, so the buttons sit centered below the divider
-        marginTop: 16,
+        marginTop: 16, // same as the card's bottom padding
     },
     yearBadge: {
         paddingHorizontal: 18,

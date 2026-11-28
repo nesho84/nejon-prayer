@@ -97,7 +97,7 @@ export default function QuranReadingCard() {
         ))}
       </View>
 
-      {/* Reading mode Card: the outer View clips the ripple to the rounded corners; the reset button keeps its own */}
+      {/* Reading mode Card (outer View clips the ripple) */}
       <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: theme.gold }]}>
         <Pressable android_ripple={{ color: theme.pressed, borderless: false }} onPress={handlePress}>
           {({ pressed }) => (
@@ -246,4 +246,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-

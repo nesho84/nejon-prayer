@@ -280,7 +280,6 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
 
-
     // List Card
     listCard: {
         flex: 1,

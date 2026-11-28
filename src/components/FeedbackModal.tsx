@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   heroIcon: {
     marginBottom: 8,
   },
-  // Thank-you: green check (as on the supporter card) in a tinted ring
+  // Thank-you: green check (as on the supporter card) in an outlined ring
   thanksCircle: {
     width: 104,
     height: 104,
