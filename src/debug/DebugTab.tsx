@@ -3,7 +3,7 @@ import { useDebugStore } from "@/debug/debugStore";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { router, usePathname } from "expo-router";
+import { router, usePathname, useSegments } from "expo-router";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -19,6 +19,7 @@ export default function DebugTab() {
   const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
   const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
   const pathname = usePathname();
+  const segments = useSegments();
   const insets = useSafeAreaInsets();
 
   // The sheet is a protected route — no tab before onboarding
@@ -26,10 +27,14 @@ export default function DebugTab() {
     return null;
   }
 
-  // Same tab opens and closes the sheet
+  // Same tab opens and closes the sheet; replaces another open sheet so two never overlap
   const toggleSheet = () => {
     if (pathname === "/debugTools") {
       router.back();
+      return;
+    }
+    if (segments[0] === "(modals)") {
+      router.replace("/(modals)/debugTools");
       return;
     }
     router.navigate("/(modals)/debugTools");
