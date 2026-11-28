@@ -4,19 +4,23 @@ import DebugPanel from "@/debug/DebugPanel";
 import { useThemeStore } from "@/store/themeStore";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
 import { ComponentRef, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-// Last scroll position, so the sheet reopens where you left it (until the app restarts)
+// Last scroll position: the sheet reopens where it was left (until the app restarts)
 let lastScrollY = 0;
 
-// Debug sheet — opened by DebugTab; the list lives in src/debug
 export default function DebugToolsScreen() {
+  // Stores
   const theme = useThemeStore((state) => state.theme);
+
+  // Refs
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const restored = useRef(false);
 
-  // Scroll back once the list has its full height
+  // ------------------------------------------------------------
+  // Restore the last scroll position once the list has its full height
+  // ------------------------------------------------------------
   const restoreScroll = () => {
     if (restored.current) {
       return;
@@ -25,6 +29,14 @@ export default function DebugToolsScreen() {
     scrollRef.current?.scrollTo({ y: lastScrollY, animated: false });
   };
 
+  // ------------------------------------------------------------
+  // Remember the scroll position
+  // ------------------------------------------------------------
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    lastScrollY = e.nativeEvent.contentOffset.y;
+  };
+
+  // Main Content
   return (
     <ModalSheet size="xxl" scrolling={false} colors={{ sheetBackgroundColor: theme.bg2, handleColor: theme.handle }}>
       <ScrollView
@@ -35,7 +47,7 @@ export default function DebugToolsScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         scrollEventThrottle={100}
-        onScroll={(e) => { lastScrollY = e.nativeEvent.contentOffset.y; }}
+        onScroll={handleScroll}
         onContentSizeChange={restoreScroll}
       >
         <View style={globalStyles.modalContainer}>

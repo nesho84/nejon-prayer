@@ -11,15 +11,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const HEADER_HEIGHT = 56;
 const TAB_GAP = 8;
 
-// ------------------------------------------------------------
 // Edge tab that opens the debug sheet from any screen — debug mode only
-// ------------------------------------------------------------
 export default function DebugTab() {
+  // Stores
   const theme = useThemeStore((state) => state.theme);
   const debugModeEnabled = useDebugStore((state) => state.debugModeEnabled);
   const onboardingComplete = useOnboardingStore((state) => state.onboardingComplete);
+
+  // Router
   const pathname = usePathname();
   const segments = useSegments();
+
+  // Safe area insets
   const insets = useSafeAreaInsets();
 
   // The sheet is a protected route — no tab before onboarding
@@ -27,7 +30,9 @@ export default function DebugTab() {
     return null;
   }
 
+  // ------------------------------------------------------------
   // Same tab opens and closes the sheet; replaces another open sheet so two never overlap
+  // ------------------------------------------------------------
   const toggleSheet = () => {
     if (pathname === "/debugTools") {
       router.back();
@@ -59,8 +64,7 @@ export default function DebugTab() {
 }
 
 const styles = StyleSheet.create({
-  // Edge handle: solid card2 surface, border on the three visible sides, flush with the right edge
-  // (inside the landscape nav bar); paddingLeft nudges the icon 1px right (optical center)
+  // Flush with the right edge, no right border; paddingLeft centers the icon optically
   tab: {
     position: "absolute",
     width: 28,
