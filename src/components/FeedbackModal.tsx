@@ -208,7 +208,9 @@ function FeedbackForm({ startAtThanks }: { startAtThanks: boolean }) {
       <View style={styles.container}>
         {/* Icon + text + support link */}
         <View style={styles.content}>
-          <MaterialDesignIcons name="check-circle-outline" size={96} color={theme.success} style={styles.heroIcon} />
+          <View style={[styles.thanksCircle, { borderColor: theme.success + "73" }]}>
+            <MaterialDesignIcons name="check" size={56} color={theme.success} />
+          </View>
           <Text style={[globalStyles.bannerTitle, styles.title, { color: theme.text }]}>{feedbackTr.thanksTitle}</Text>
           <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{feedbackTr.thanksMessage}</Text>
           {/* Opens the support screen, closing this popup first */}
@@ -426,6 +428,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   heroIcon: {
+    marginBottom: 8,
+  },
+  // Thank-you: green check (as on the supporter card) in a tinted ring
+  thanksCircle: {
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
   title: {
