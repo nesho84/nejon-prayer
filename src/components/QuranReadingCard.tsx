@@ -97,54 +97,54 @@ export default function QuranReadingCard() {
         ))}
       </View>
 
-      {/* Reading mode Card (outer View clips the ripple) */}
+      {/* Reading mode Card */}
       <View style={[styles.card, { backgroundColor: theme.overlayLight, borderColor: theme.border, borderLeftColor: theme.gold }]}>
-        <Pressable android_ripple={{ color: theme.pressed, borderless: false }} onPress={handlePress}>
-          {({ pressed }) => (
-            <View style={{ opacity: pressed ? 0.7 : 1 }}>
+        <Pressable
+          style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+          android_ripple={{ color: theme.pressed, borderless: false }}
+          onPress={handlePress}
+        >
 
-              {/* Main content */}
-              <View style={styles.cardMain}>
-                <View style={styles.cardContent}>
-                  <Text style={[styles.cardLabel, { color: theme.text2 }]}>{cardLabel}</Text>
-                  <Text style={[styles.surahName, { color: theme.text }]}>
-                    {surahName ?? FIRST_SURAH_NAME}
+          {/* Main content */}
+          <View style={styles.cardMain}>
+            <View style={styles.cardContent}>
+              <Text style={[styles.cardLabel, { color: theme.text2 }]}>{cardLabel}</Text>
+              <Text style={[styles.surahName, { color: theme.text }]}>
+                {surahName ?? FIRST_SURAH_NAME}
+              </Text>
+              <Text style={[styles.ayahNumber, { color: theme.text2 }]}>
+                {ayahId ? `${tr.labels.ayah} ${ayahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
+              </Text>
+            </View>
+            <MaterialIcons name="arrow-right-alt" size={36} color={theme.gold} />
+          </View>
+
+          {/* Khatam footer: inside card, separated by divider */}
+          {!isReading && (
+            <>
+              <View style={[styles.cardDivider, { backgroundColor: theme.divider2 }]} />
+              <View style={styles.khatamFooter}>
+                <View style={styles.khatamCountContainer}>
+                  {/* Count */}
+                  <Text style={[styles.khatamCountText, { color: theme.textMuted }]}>
+                    {khatamCount}
                   </Text>
-                  <Text style={[styles.ayahNumber, { color: theme.text2 }]}>
-                    {ayahId ? `${tr.labels.ayah} ${ayahId}` : `${tr.labels.ayah} ${FIRST_AYAH_ID}`}
+                  {/* Label */}
+                  <Text style={[styles.khatamCountLabel, { color: theme.textMuted }]}>
+                    × {tr.labels.khatam}
                   </Text>
                 </View>
-                <MaterialIcons name="arrow-right-alt" size={36} color={theme.gold} />
+                <Pressable
+                  style={({ pressed }) => [globalStyles.iconButton, styles.resetButton, pressed && { backgroundColor: theme.pressed }]}
+                  onPress={handleReset}
+                  hitSlop={HIT_SLOP_8}
+                >
+                  <Ionicons name="refresh-outline" size={18} color={theme.placeholder} />
+                </Pressable>
               </View>
-
-              {/* Khatam footer: inside card, separated by divider */}
-              {!isReading && (
-                <>
-                  <View style={[styles.cardDivider, { backgroundColor: theme.divider2 }]} />
-                  <View style={styles.khatamFooter}>
-                    <View style={styles.khatamCountContainer}>
-                      {/* Count */}
-                      <Text style={[styles.khatamCountText, { color: theme.textMuted }]}>
-                        {khatamCount}
-                      </Text>
-                      {/* Label */}
-                      <Text style={[styles.khatamCountLabel, { color: theme.textMuted }]}>
-                        × {tr.labels.khatam}
-                      </Text>
-                    </View>
-                    <Pressable
-                      style={({ pressed: resetPressed }) => [globalStyles.iconButton, styles.resetButton, resetPressed && { backgroundColor: theme.pressed }]}
-                      onPress={handleReset}
-                      hitSlop={HIT_SLOP_8}
-                    >
-                      <Ionicons name="refresh-outline" size={18} color={theme.placeholder} />
-                    </Pressable>
-                  </View>
-                </>
-              )}
-
-            </View>
+            </>
           )}
+
         </Pressable>
       </View>
 
