@@ -39,6 +39,7 @@ const UNAVAILABLE_CODES: string[] = [
   ErrorCode.InitConnection,
   ErrorCode.NotPrepared,
   ErrorCode.RemoteError,
+  ErrorCode.QueryProduct, // also wraps a disconnected Play service (responseCode -1)
 ];
 
 // One connection for the app's lifetime; cleared on failure so the next call retries

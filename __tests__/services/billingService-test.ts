@@ -15,6 +15,7 @@ jest.mock('expo-iap', () => ({
     InitConnection: 'init-connection',
     NotPrepared: 'not-prepared',
     RemoteError: 'remote-error',
+    QueryProduct: 'query-product',
     DeveloperError: 'developer-error',
   },
   initConnection: jest.fn(),
@@ -121,6 +122,12 @@ describe('billingService — getProducts', () => {
     iap.fetchProducts.mockResolvedValue([{ id: 'gift_small', displayPrice: '€1.99' }]);
     await service.getProducts(IDS);
     expect(iap.initConnection).toHaveBeenCalledTimes(2);
+  });
+
+  it('maps a failed product query (Play disconnected) to unavailable without Sentry', async () => {
+    iap.fetchProducts.mockRejectedValueOnce({ code: 'query-product', responseCode: -1 });
+    expect(await service.getProducts(IDS)).toEqual({ error: 'unavailable' });
+    expect(Sentry.captureException).not.toHaveBeenCalled();
   });
 
   it('reports unexpected errors to Sentry', async () => {
