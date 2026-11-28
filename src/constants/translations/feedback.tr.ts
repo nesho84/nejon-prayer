@@ -18,7 +18,6 @@ export type FeedbackTranslations = {
   // Result
   thanksTitle: string;
   thanksMessage: string;
-  supportApp: string;
   errorOffline: string;
   errorRateLimited: string;
   errorServer: string;
@@ -54,7 +53,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Thank you!",
     thanksMessage: "Your feedback helps us improve the app.",
-    supportApp: "Support the app",
     errorOffline: "No internet connection. Check your connection and try again.",
     errorRateLimited: "Too many submissions today. Please try again tomorrow.",
     errorServer: "Something went wrong. Please try again.",
@@ -114,7 +112,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Danke!",
     thanksMessage: "Dein Feedback hilft uns, die App zu verbessern.",
-    supportApp: "App unterstützen",
     errorOffline: "Keine Internetverbindung. Prüfe deine Verbindung und versuche es erneut.",
     errorRateLimited: "Heute wurde zu oft gesendet. Bitte versuche es morgen erneut.",
     errorServer: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
@@ -174,7 +171,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Merci !",
     thanksMessage: "Votre avis nous aide à améliorer l'application.",
-    supportApp: "Soutenir l'application",
     errorOffline: "Pas de connexion Internet. Vérifiez votre connexion et réessayez.",
     errorRateLimited: "Trop d'envois aujourd'hui. Veuillez réessayer demain.",
     errorServer: "Une erreur s'est produite. Veuillez réessayer.",
@@ -234,7 +230,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Faleminderit!",
     thanksMessage: "Mendimi yt na ndihmon ta përmirësojmë aplikacionin.",
-    supportApp: "Mbështet aplikacionin",
     errorOffline: "Nuk ka internet. Kontrollo lidhjen dhe provo përsëri.",
     errorRateLimited: "Ke dërguar shumë herë sot. Provo përsëri nesër.",
     errorServer: "Diçka shkoi keq. Provo përsëri.",
@@ -294,7 +289,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Hvala!",
     thanksMessage: "Vaše mišljenje nam pomaže da poboljšamo aplikaciju.",
-    supportApp: "Podrži aplikaciju",
     errorOffline: "Nema internet veze. Provjerite vezu i pokušajte ponovo.",
     errorRateLimited: "Previše slanja danas. Pokušajte ponovo sutra.",
     errorServer: "Nešto nije u redu. Pokušajte ponovo.",
@@ -354,7 +348,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Ви благодариме!",
     thanksMessage: "Вашето мислење ни помага да ја подобриме апликацијата.",
-    supportApp: "Поддржи ја апликацијата",
     errorOffline: "Нема интернет врска. Проверете ја врската и обидете се повторно.",
     errorRateLimited: "Премногу испраќања денес. Обидете се повторно утре.",
     errorServer: "Нешто тргна наопаку. Обидете се повторно.",
@@ -414,7 +407,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "Teşekkürler!",
     thanksMessage: "Görüşleriniz uygulamayı geliştirmemize yardımcı olur.",
-    supportApp: "Uygulamayı destekle",
     errorOffline: "İnternet bağlantısı yok. Bağlantınızı kontrol edip tekrar deneyin.",
     errorRateLimited: "Bugün çok fazla gönderim yapıldı. Lütfen yarın tekrar deneyin.",
     errorServer: "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
@@ -474,7 +466,6 @@ export const FEEDBACK_TR: Record<Language, FeedbackTranslations> = {
 
     thanksTitle: "شكرًا لك!",
     thanksMessage: "رأيك يساعدنا على تحسين التطبيق.",
-    supportApp: "ادعم التطبيق",
     errorOffline: "لا يوجد اتصال بالإنترنت. تحقق من الاتصال وحاول مرة أخرى.",
     errorRateLimited: "عدد كبير من الإرسالات اليوم. يرجى المحاولة غدًا.",
     errorServer: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",

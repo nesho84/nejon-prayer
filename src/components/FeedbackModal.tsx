@@ -1,15 +1,13 @@
+import SupporterBanner from "@/components/SupporterBanner";
 import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { FEEDBACK_TR, FeedbackTranslations } from "@/constants/translations/feedback.tr";
-import { SUPPORTER_TR } from "@/constants/translations/supporter.tr";
 import { sendFeedback } from "@/services/feedbackService";
 import { useLanguageStore } from "@/store/languageStore";
 import { useModalStore } from "@/store/modalStore";
-import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
 import { FeedbackAnswers, FeedbackDonationId, FeedbackError, FeedbackImproveId, FeedbackMostUsedId } from "@/types/feedback.types";
 import { Ionicons } from "@react-native-vector-icons/ionicons/static";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { router } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
@@ -78,8 +76,6 @@ function FeedbackForm({ startAtThanks }: { startAtThanks: boolean }) {
   const tr = useLanguageStore((state) => state.tr);
   const language = useLanguageStore((state) => state.language);
   const feedbackTr = FEEDBACK_TR[language] ?? FEEDBACK_TR.en;
-  const supporterTr = SUPPORTER_TR[language] ?? SUPPORTER_TR.en;
-  const isSupporter = useSupporterStore((state) => state.isSupporter);
   const { hide } = useModalStore.getState();
 
   // Local state
@@ -215,31 +211,8 @@ function FeedbackForm({ startAtThanks }: { startAtThanks: boolean }) {
           <MaterialDesignIcons name="check-circle-outline" size={96} color={theme.success} style={styles.heroIcon} />
           <Text style={[globalStyles.bannerTitle, styles.title, { color: theme.text }]}>{feedbackTr.thanksTitle}</Text>
           <Text style={[globalStyles.bannerMessage, { color: theme.textMuted }]}>{feedbackTr.thanksMessage}</Text>
-          {/* Opens the support screen (Android only for now) */}
-          {Platform.OS === "android" && (
-            <TouchableOpacity
-              style={[
-                styles.supportButton,
-                { backgroundColor: theme.bgGold, borderColor: theme.borderGold },
-              ]}
-              onPress={() => {
-                hide("close");
-                router.navigate("/extras/supporter");
-              }}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.supportIcon, { backgroundColor: theme.accentLight, borderColor: theme.divider2 }]}>
-                <MaterialDesignIcons name="heart-outline" size={22} color={theme.accent} />
-              </View>
-              <View style={styles.supportTextContainer}>
-                <Text style={[styles.supportText, { color: theme.text }]} numberOfLines={1}>{feedbackTr.supportApp}</Text>
-                <Text style={[styles.supportDescription, { color: theme.textSecondary }]} numberOfLines={2}>
-                  {isSupporter ? supporterTr.moreSupporterBody : supporterTr.moreBody}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={theme.text2} />
-            </TouchableOpacity>
-          )}
+          {/* Opens the support screen, closing this popup first */}
+          <SupporterBanner variant="card" onOpen={() => hide("close")} style={styles.supportCard} />
         </View>
 
         {/* Buttons */}
@@ -458,38 +431,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
   },
-  // Same look as the More tab support card
-  supportButton: {
+  supportCard: {
     alignSelf: "stretch",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
     marginTop: 24,
-    padding: 12,
-    borderRadius: 16,
-    borderWidth: 1.5,
-  },
-  supportIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  supportTextContainer: {
-    flex: 1,
-    gap: 5,
-  },
-  supportText: {
-    fontSize: 16,
-    fontWeight: "600",
-    includeFontPadding: false,
-  },
-  supportDescription: {
-    fontSize: 13.5,
-    opacity: 0.7,
-    includeFontPadding: false,
   },
   buttons: {
     gap: 10,

@@ -120,6 +120,10 @@ export default function HolidaysScreen() {
                                 <Text style={globalStyles.headerIcon}>✨</Text>
                                 <Text style={[globalStyles.headerTitle, { color: theme.text }]}>{holidaysTr.headerTitle}</Text>
                                 <Text style={[globalStyles.headerSubtitle, { color: theme.placeholder }]}>{holidaysTr.headerSubtitle}</Text>
+                                {/* Divider */}
+                                {AVAILABLE_YEARS.length > 1 && (
+                                    <View style={[styles.headerDivider, { backgroundColor: theme.divider2 }]} />
+                                )}
                                 {/* Year badges */}
                                 {AVAILABLE_YEARS.length > 1 && (
                                     <View style={styles.yearLinks}>
@@ -176,12 +180,19 @@ const styles = StyleSheet.create({
     },
 
     // Year badges (inside header)
+    // Line across the card between the subtitle and the year badges
+    headerDivider: {
+        alignSelf: "stretch",
+        height: 1,
+        marginTop: 12,
+    },
     yearLinks: {
         flexDirection: "row",
         justifyContent: "center",
         flexWrap: "wrap",
-        gap: 8,
-        marginTop: 12,
+        gap: 14,
+        // Matches the card's 16dp bottom padding, so the buttons sit centered below the divider
+        marginTop: 16,
     },
     yearBadge: {
         paddingHorizontal: 18,

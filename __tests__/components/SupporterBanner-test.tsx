@@ -37,12 +37,12 @@ beforeEach(() => {
 
 describe('SupporterBanner', () => {
   it('stays hidden while the banner is showing', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
   it('appears in the banner slot when the banner is closed', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     expect(screen.getByText('Support the app')).toBeTruthy();
     expect(screen.getByText('No ads for supporters')).toBeTruthy();
@@ -50,7 +50,7 @@ describe('SupporterBanner', () => {
 
   it('opens the support screen and stays visible', () => {
     const { router } = require('expo-router');
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     fireEvent.press(screen.getByText('Support the app'));
     expect(router.navigate).toHaveBeenCalledWith('/extras/supporter');
@@ -58,14 +58,14 @@ describe('SupporterBanner', () => {
   });
 
   it('goes away once the user becomes a supporter', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     act(() => useSupporterStore.setState({ isSupporter: true }));
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
   it('closes with its X', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     fireEvent.press(screen.getByLabelText('Close'));
     expect(screen.queryByText('Support the app')).toBeNull();
@@ -74,7 +74,7 @@ describe('SupporterBanner', () => {
   it('its X also ends the debug preview', () => {
     const { useDebugStore } = require('@/debug/debugStore');
     useDebugStore.setState({ debugModeEnabled: true, forceSupporterBanner: true });
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     fireEvent.press(screen.getByLabelText('Close'));
     expect(useDebugStore.getState().forceSupporterBanner).toBe(false);
     expect(screen.queryByText('Support the app')).toBeNull();
@@ -82,14 +82,14 @@ describe('SupporterBanner', () => {
   });
 
   it('goes away when the banner comes back', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     act(() => useAdsStore.setState({ bannerDismissed: false }));
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
   it('comes back every time the banner is closed again', () => {
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     fireEvent.press(screen.getByLabelText('Close'));
     act(() => useAdsStore.setState({ bannerDismissed: false }));
@@ -99,15 +99,32 @@ describe('SupporterBanner', () => {
 
   it('never shows for a supporter', () => {
     useSupporterStore.setState({ isSupporter: true });
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     expect(screen.queryByText('Support the app')).toBeNull();
   });
 
   it('never shows on iOS for now', () => {
     (Platform as { OS: string }).OS = 'ios';
-    render(<SupporterBanner />);
+    render(<SupporterBanner variant="banner" />);
     act(() => useAdsStore.setState({ bannerDismissed: true }));
     expect(screen.queryByText('Support the app')).toBeNull();
+  });
+
+  describe('card', () => {
+    it('always shows, with the long description', () => {
+      render(<SupporterBanner variant="card" />);
+      expect(screen.getByText('Support the app')).toBeTruthy();
+      expect(screen.queryByLabelText('Close')).toBeNull();
+    });
+
+    it('runs onOpen before opening the support screen', () => {
+      const { router } = require('expo-router');
+      const onOpen = jest.fn();
+      render(<SupporterBanner variant="card" onOpen={onOpen} />);
+      fireEvent.press(screen.getByText('Support the app'));
+      expect(onOpen).toHaveBeenCalledTimes(1);
+      expect(router.navigate).toHaveBeenCalledWith('/extras/supporter');
+    });
   });
 });

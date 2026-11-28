@@ -1,4 +1,4 @@
-import { HIT_SLOP_8 } from "@/constants/styles";
+import { globalStyles, HIT_SLOP_8 } from "@/constants/styles";
 import { useLanguageStore } from "@/store/languageStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -130,12 +130,13 @@ export default function QuranReadingCard() {
                     × {tr.labels.khatam}
                   </Text>
                 </View>
-                <TouchableOpacity
+                <Pressable
+                  style={({ pressed }) => [globalStyles.iconButton, styles.resetButton, pressed && { backgroundColor: theme.pressed }]}
                   onPress={handleReset}
                   hitSlop={HIT_SLOP_8}
                 >
                   <Ionicons name="refresh-outline" size={18} color={theme.placeholder} />
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </>
           )}
@@ -222,6 +223,11 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     paddingBottom: 12,
     paddingHorizontal: 16,
+  },
+  // 26dp pressed circle, clear of the divider above; negative margin keeps the footer height
+  resetButton: {
+    padding: 4,
+    margin: -4,
   },
   khatamCountContainer: {
     flexDirection: "row",

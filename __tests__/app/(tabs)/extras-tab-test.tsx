@@ -9,6 +9,7 @@ jest.mock('@/store/storage', () => ({
   mmkvStorage: { getItem: jest.fn(() => null), setItem: jest.fn(), removeItem: jest.fn() },
 }));
 jest.mock('@/services/billingService', () => ({}));
+jest.mock('@/services/adsService', () => ({}));
 jest.mock('react-native-safe-area-context', () => ({
   SafeAreaView: ({ children }: any) => {
     const React = require('react');

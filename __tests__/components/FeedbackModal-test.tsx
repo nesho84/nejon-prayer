@@ -11,6 +11,10 @@ jest.mock('@/store/storage', () => ({
 jest.mock('expo-router', () => ({ router: { navigate: jest.fn() } }));
 jest.mock('@/services/feedbackService', () => ({ sendFeedback: jest.fn() }));
 jest.mock('@/services/billingService', () => ({}));
+jest.mock('@/services/adsService', () => ({}));
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 jest.mock('@react-native-vector-icons/ionicons/static', () => {
   const React = require('react');
   return { Ionicons: ({ name }: any) => React.createElement('View', { testID: `icon-${name}` }) };

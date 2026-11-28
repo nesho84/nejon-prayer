@@ -44,7 +44,7 @@ export default function DebugTab() {
       ]}
       onPress={toggleSheet}
       activeOpacity={0.6}
-      hitSlop={{ top: 6, bottom: 6, left: 27, right: 0 }}
+      hitSlop={{ top: 6, bottom: 6, left: 24, right: 0 }}
       accessibilityRole="button"
       accessibilityLabel="Debug tools"
     >
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   // (inside the landscape nav bar); paddingLeft nudges the icon 1dp right (optical center)
   tab: {
     position: "absolute",
-    width: 23,
+    width: 28,
     height: 38,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,

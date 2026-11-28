@@ -9,9 +9,7 @@ import { usePrayersTrackingStore } from "@/store/prayersTrackingStore";
 import { useQuranStore } from "@/store/quranStore";
 import { useSupporterStore } from "@/store/supporterStore";
 import { useThemeStore } from "@/store/themeStore";
-import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons/static";
-import { router } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import {
   formatTime,
   previewFeedbackModal,
@@ -60,9 +58,6 @@ import {
   STORE_UPDATE_LAUNCH_HINT,
 } from "./debugUi";
 
-// Popup previews wait for the sheet to slide away, so they open over the real screen
-const SHEET_CLOSE_MS = 300;
-
 // Debug tools list — shown in the debug sheet ((modals)/debugTools), opened by DebugTab from any screen
 export default function DebugPanel() {
   // Stores
@@ -95,12 +90,6 @@ export default function DebugPanel() {
   const toggleSupporterGift = useDebugStore((state) => state.toggleSupporterGift);
   const forceSupporterBanner = useDebugStore((state) => state.forceSupporterBanner);
   const toggleSupporterBanner = useDebugStore((state) => state.toggleSupporterBanner);
-
-  // Close the sheet, then show the popup preview
-  const closeThen = (preview: () => void) => () => {
-    router.back();
-    setTimeout(preview, SHEET_CLOSE_MS);
-  };
 
   // Shared params and handlers
   const notifSeconds = 10; // seconds until the test notification fires
@@ -160,16 +149,6 @@ export default function DebugPanel() {
 
   // Main component
   return (
-    <>
-    {/* Header — same layout as the other sheets, wrench beside the title */}
-    <View style={styles.headerContainer}>
-      <View style={styles.headerTitleRow}>
-        <MaterialDesignIcons name="wrench" size={22} color={theme.danger} />
-        <Text style={[styles.headerTitle, { color: theme.danger }]}>Debug tools</Text>
-      </View>
-      <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>Previews and test switches, debug mode only</Text>
-    </View>
-
     <View style={styles.body}>
 
       {/* App */}
@@ -183,7 +162,7 @@ export default function DebugPanel() {
         <DebugToggle color={theme.teal} label="Toggle Outdated Prayer Times" value={forcePrayersOutdated} hint={OUTDATED_HINT} onPress={togglePrayersOutdated} />
         <DebugToggle color={theme.teal} label="Toggle Location Changed" value={forceLocationChange} hint={LOCATION_CHANGED_HINT} onPress={toggleLocationChange} />
         <DebugToggle color={theme.teal} label="Toggle Friday Badge" value={forceFriday} onPress={toggleFriday} />
-        <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} hint={PRAYER_CELEBRATION_HINT} onPress={closeThen(previewPrayerCelebrationModal)} />
+        <DebugButton label="Show 'Prayer' Celebration Modal" color={theme.teal} hint={PRAYER_CELEBRATION_HINT} onPress={previewPrayerCelebrationModal} />
         <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
         <DebugButton label="Show 'Prayer Times' JSON" color={theme.gray} onPress={showPrayerTimesModal} />
         <DebugButton label="Show 'Prayer Tracking' JSON" color={theme.gray} onPress={showPrayerTrackingModal} />
@@ -192,7 +171,7 @@ export default function DebugPanel() {
       {/* Quran */}
       <DebugSection title="Quran">
         <DebugToggle color={theme.secondary} label="Toggle Quran Now-Playing" value={forceQuranPlaying} onPress={toggleQuranPlaying} />
-        <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.secondary} hint={KHATAM_HINT} onPress={closeThen(previewKhatamCelebrationModal)} />
+        <DebugButton label="Show 'Khatam' Celebration Modal" color={theme.secondary} hint={KHATAM_HINT} onPress={previewKhatamCelebrationModal} />
         <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
         <DebugButton label="Show 'Quran' JSON" color={theme.gray} onPress={showQuranModal} />
       </DebugSection>
@@ -200,7 +179,7 @@ export default function DebugPanel() {
       {/* Islamic Holidays */}
       <DebugSection title="Islamic Holidays">
         <DebugToggle color={theme.gold} label="Toggle Holiday Card" value={forceHoliday} hint={HOLIDAY_CARD_HINT} onPress={toggleHoliday} />
-        <DebugButton label="Show 'Holiday' Info Modal" color={theme.gold} hint={HOLIDAY_INFO_HINT} onPress={closeThen(previewHolidayInfoModal)} />
+        <DebugButton label="Show 'Holiday' Info Modal" color={theme.gold} hint={HOLIDAY_INFO_HINT} onPress={previewHolidayInfoModal} />
         <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
         <DebugButton label="Show 'Islamic Holidays' JSON" color={theme.gray} onPress={showHolidaysModal} />
       </DebugSection>
@@ -210,6 +189,12 @@ export default function DebugPanel() {
         <DebugToggle label="Toggle 'Up to date' line" color={theme.green} value={storeUpdatePreview === "upToDate"} hint={UP_TO_DATE_HINT} onPress={() => togglePreview("upToDate")} />
         <DebugToggle label="Toggle 'Check failed' line" color={theme.green} value={storeUpdatePreview === "error"} hint={CHECK_FAILED_HINT} onPress={() => togglePreview("error")} />
         <DebugToggle label="Toggle 'Update available' On Launch" color={theme.green} value={forceStoreUpdateOnLaunch} hint={STORE_UPDATE_LAUNCH_HINT} onPress={toggleStoreUpdateOnLaunch} />
+      </DebugSection>
+
+      {/* Feedback: opens from About, not an auto modal */}
+      <DebugSection title="Feedback">
+        <DebugButton label="Show 'Feedback' Modal" color={theme.primary} hint={FEEDBACK_HINT} onPress={previewFeedbackModal} />
+        <DebugButton label="Show 'Feedback' Modal Thank-you Step" color={theme.primary} hint={FEEDBACK_THANKS_HINT} onPress={previewFeedbackThanks} />
       </DebugSection>
 
       {/* Supporter: fake values for the support screens only */}
@@ -228,17 +213,11 @@ export default function DebugPanel() {
 
       {/* Auto modals — a preview each, one JSON for their shared store */}
       <DebugSection title="Auto Modals">
-        <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={closeThen(previewStoreUpdateModal)} />
-        <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={closeThen(previewNotifReminderModal)} />
-        <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={closeThen(previewStoreReviewModal)} />
+        <DebugButton label="Show 'Store Update' Modal" color={theme.violet} hint={STORE_UPDATE_HINT} onPress={previewStoreUpdateModal} />
+        <DebugButton label="Show 'Notif Reminder' Modal" color={theme.violet} hint={NOTIF_REMINDER_HINT} onPress={previewNotifReminderModal} />
+        <DebugButton label="Show 'Store Review' Modal" color={theme.violet} hint={STORE_REVIEW_HINT} onPress={previewStoreReviewModal} />
         <View style={[styles.divider, { backgroundColor: theme.divider2 }]} />
         <DebugButton label="Show 'Auto Modals' JSON" color={theme.gray} onPress={showAutoModalsJsonModal} />
-      </DebugSection>
-
-      {/* Feedback: opens from About, not an auto modal */}
-      <DebugSection title="Feedback">
-        <DebugButton label="Show 'Feedback' Modal" color={theme.primary} hint={FEEDBACK_HINT} onPress={closeThen(previewFeedbackModal)} />
-        <DebugButton label="Show 'Feedback' Thank-you Step" color={theme.primary} hint={FEEDBACK_THANKS_HINT} onPress={closeThen(previewFeedbackThanks)} />
       </DebugSection>
 
       {/* Test notifications */}
@@ -255,31 +234,10 @@ export default function DebugPanel() {
       </DebugSection>
 
     </View>
-    </>
   );
 }
 
 const styles = StyleSheet.create({
-  // Same header as the other sheets (prayerTimings, quranSettings)
-  headerContainer: {
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingBottom: 6,
-  },
-  headerTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 4,
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: "700",
-  },
-  headerSubtitle: {
-    fontSize: 15,
-    textAlign: "center",
-  },
   body: {
     gap: 16,
     paddingHorizontal: 6,

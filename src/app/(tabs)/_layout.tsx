@@ -21,7 +21,7 @@ export default function TabLayout() {
             tabBar={(props) => (
                 <>
                     <AdBanner />
-                    <SupporterBanner />
+                    <SupporterBanner variant="banner" />
                     <BottomTabBar {...props} />
                 </>
             )}
