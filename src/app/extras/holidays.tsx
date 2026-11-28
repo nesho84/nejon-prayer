@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flexWrap: "wrap",
         gap: 14,
-        // Matches the card's 16dp bottom padding, so the buttons sit centered below the divider
+        // Matches the card's 16px bottom padding, so the buttons sit centered below the divider
         marginTop: 16,
     },
     yearBadge: {

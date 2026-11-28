@@ -69,7 +69,7 @@ export default function SupporterBanner({ variant, onOpen, style }: Props) {
     router.navigate("/extras/supporter");
   };
 
-  // Banner: Home ad slot — 60dp, one line, X
+  // Banner: Home ad slot — 60px, one line, X
   if (variant === "banner") {
     // A debug preview shows it regardless; supporters never see it
     if (!(debugModeEnabled && forceBanner) && (!bannerVisible || isSupporter)) {
@@ -148,7 +148,7 @@ export default function SupporterBanner({ variant, onOpen, style }: Props) {
 }
 
 const styles = StyleSheet.create({
-  // Banner — fills the ad banner's slot: never taller than its 66dp box
+  // Banner — fills the ad banner's slot: never taller than its 66px box
   banner: {
     height: 60,
     flexDirection: "row",
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     includeFontPadding: false,
   },
-  // 34dp pressed circle + 7dp each side keeps the old 48dp slot
+  // 34px pressed circle + 7px each side keeps the old 48px slot
   closeButton: {
     marginHorizontal: 7,
   },

@@ -55,7 +55,7 @@ export default function DebugTab() {
 
 const styles = StyleSheet.create({
   // Edge handle: solid card2 surface, border on the three visible sides, flush with the right edge
-  // (inside the landscape nav bar); paddingLeft nudges the icon 1dp right (optical center)
+  // (inside the landscape nav bar); paddingLeft nudges the icon 1px right (optical center)
   tab: {
     position: "absolute",
     width: 28,

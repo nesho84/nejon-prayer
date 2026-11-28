@@ -20,7 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const PANEL_PADDING = 3;
 // Fixed tab height, so the tab can be placed exactly on the box's top line
 const TAB_HEIGHT = 19;
-// Caps the adaptive height near the old banner's, instead of large anchored's 50–150dp
+// Caps the adaptive height near the old banner's, instead of large anchored's 50–150px
 const BANNER_MAX_HEIGHT = 60;
 
 export default function AdBanner() {

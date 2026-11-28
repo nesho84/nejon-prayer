@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     paddingHorizontal: 16,
   },
-  // 26dp pressed circle, clear of the divider above; negative margin keeps the footer height
+  // 26px pressed circle, clear of the divider above; negative margin keeps the footer height
   resetButton: {
     padding: 4,
     margin: -4,
